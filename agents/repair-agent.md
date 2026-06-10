@@ -1,18 +1,18 @@
 ---
 name: repair-agent
-role: "실패 시 디버그·수정 루프"
+role: "Debug & fix loop"
 color: "#ec4899"
 mission: >-
-  undefined
+  Diagnoses execution/build failures and runs a fix loop. Records the failure mode in measured. Also resolves gated cards where possible so they can move to the execute queue.
 runner: claude
 group: domain
 model_default: sonnet
 tools_allowed: [Read, Bash, Write]
 worktree: isolated
-escalation: orchestrator
+escalation: human
 owns: []
 ---
 
 # repair-agent
 
-실행/빌드 실패를 진단하고 수정 루프를 돈다. 실패 모드를 measured에 기록한다.
+Execute sub-agent. Diagnoses failures and attempts fixes.

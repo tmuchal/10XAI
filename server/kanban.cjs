@@ -15,6 +15,8 @@
 
 const config = require("../lib/config.cjs");
 const cardModel = require("../lib/model/card.cjs");
+let UI_LANG = "en";
+function M(en, ko){ return UI_LANG === "en" ? en : ko; }
 
 const http = require("http");
 const https = require("https");
@@ -445,7 +447,7 @@ function updateTask(id, data) {
       logActivity({ type: "completed", taskId: String(id), subject: task.subject, agent: task.agent || task.owner || "", detail: task.reportSummary || "", reportSummary: task.reportSummary, reportPath: task.reportPath, parentId: task.parentId });
       try {
         const head = (task.reportSummary || "").split("\n")[0].slice(0, 240);
-        const line = "✅ #" + id + " 완료" + (head ? " — " + head : "");
+        const line = "✅ #" + id + M(" completed"," 완료") + (head ? " — " + head : "");
         opsAppend("system", line, String(id));
         telegramSend(line);
       } catch {}
@@ -1123,7 +1125,7 @@ function spawnCli(cmd, args, prompt, useStreamJson, taskId, onChunk, onClose) {
   proc.stderr.on("data", (data) => broadcastRaw({ type: "exec_error", taskId, chunk: data.toString() }));
   proc.on("error", () => {});
   proc.on("close", (code) => onClose(code, out));
-  try { proc.stdin.write(prompt); proc.stdin.end();
+  try { proc.stdin.write(prompt + (UI_LANG==="en"?"\n\n[OUTPUT LANGUAGE] Respond ONLY in English. Every text field — subjects, descriptions, notes, summaries — must be written in natural English.":"\n\n[출력 언어] 모든 텍스트를 한국어로만 작성하라.")); proc.stdin.end();
     var _wd=setTimeout(function(){try{proc.kill();}catch(e){}},70000); proc.on("close",function(){clearTimeout(_wd);}); } catch {}
   return proc;
 }
@@ -1546,7 +1548,7 @@ function handleSlackAsk(question, channelId, client) {
   const askEnv = Object.assign({}, process.env);
   delete askEnv.ANTHROPIC_API_KEY;
   const proc = spawn("claude", ["-p", "--output-format", "text", "--model", "sonnet", "--no-session-persistence"], { cwd: REPO_PATH, env: askEnv, stdio: ["pipe", "pipe", "pipe"] });
-  proc.stdin.write(prompt); proc.stdin.end();
+  proc.stdin.write(prompt + (UI_LANG==="en"?"\n\n[OUTPUT LANGUAGE] Respond ONLY in English. Every text field — subjects, descriptions, notes, summaries — must be written in natural English.":"\n\n[출력 언어] 모든 텍스트를 한국어로만 작성하라.")); proc.stdin.end();
     var _wd=setTimeout(function(){try{proc.kill();}catch(e){}},70000); proc.on("close",function(){clearTimeout(_wd);});
   let output = "";
   proc.stdout.on("data", (data) => { output += data.toString(); });
@@ -1679,18 +1681,24 @@ function httpGet(url, opts) {
       const u = new URL(url);
       const lib = u.protocol === "http:" ? http : https;
       const headers = Object.assign({ "User-Agent": "10XAI-ingest", Accept: "*/*" }, (opts && opts.headers) || {});
+      let done = false;
+      const finish = (v) => { if (!done) { done = true; resolve(v); } };
       const r = lib.request(u, { method: "GET", headers }, (resp) => {
         if ([301, 302, 307, 308].includes(resp.statusCode) && resp.headers.location) {
           resp.resume();
-          resolve(httpGet(new URL(resp.headers.location, u).toString(), opts));
+          finish(httpGet(new URL(resp.headers.location, u).toString(), opts));
           return;
         }
         let data = "";
-        resp.on("data", (c) => { data += c; if (data.length > 600000) resp.destroy(); });
-        resp.on("end", () => resolve({ status: resp.statusCode, body: data }));
+        // size cap: destroy the response AND resolve — destroy() never emits 'end',
+        // so resolving here is what prevents an oversized body from hanging forever.
+        resp.on("data", (c) => { data += c; if (data.length > 600000) { resp.destroy(); finish({ status: resp.statusCode, body: data }); } });
+        resp.on("end", () => finish({ status: resp.statusCode, body: data }));
+        resp.on("close", () => finish({ status: resp.statusCode, body: data }));
+        resp.on("error", () => finish({ status: resp.statusCode || 0, body: data }));
       });
-      r.on("error", () => resolve({ status: 0, body: "" }));
-      r.setTimeout(12000, () => { r.destroy(); resolve({ status: 0, body: "" }); });
+      r.on("error", () => finish({ status: 0, body: "" }));
+      r.setTimeout(12000, () => { r.destroy(); finish({ status: 0, body: "" }); });
       r.end();
     } catch { resolve({ status: 0, body: "" }); }
   });
@@ -1738,7 +1746,7 @@ function opsAssistantReply(userText) {
       "너는 10XAI 운영 스레드 어시스턴트다. 10XAI는 빌더 콘텐츠(트윗/링크드인) URL을 받아 연관 GitHub를 분해 -> 검증 멀티에이전트 -> 실행 멀티에이전트로 산출물을 만드는 서비스다.\n현재 보드:\n" + (summary || "(카드 없음)") + "\n\n운영자: " + userText + "\n\n한국어로 2~3문장 이내, 간결하게. 진행상황과 다음 액션을 안내하라.";
     const env = Object.assign({}, process.env); delete env.ANTHROPIC_API_KEY;
     const proc = spawn("claude", ["-p", "--model", "haiku", "--no-session-persistence"], { cwd: HARNESS_ROOT, env, stdio: ["pipe","pipe","pipe"] });
-    proc.stdin.write(prompt); proc.stdin.end();
+    proc.stdin.write(prompt + (UI_LANG==="en"?"\n\n[OUTPUT LANGUAGE] Respond ONLY in English. Every text field — subjects, descriptions, notes, summaries — must be written in natural English.":"\n\n[출력 언어] 모든 텍스트를 한국어로만 작성하라.")); proc.stdin.end();
     var _wd=setTimeout(function(){try{proc.kill();}catch(e){}},70000); proc.on("close",function(){clearTimeout(_wd);});
     let out = "";
     proc.stdout.on("data", function(d){ out += d.toString(); });
@@ -1762,7 +1770,7 @@ async function runIngest(input, channel) {
   if (!gh) {
     const siteUrls = ((pageText||"").match(/https?:\/\/[^\s"'<>]+/g) || []).filter(function(u){return !/twitter\.com|x\.com|t\.co/.test(u);}).slice(0,2);
     for (const su of siteUrls) {
-      try { const page = await httpGet(su); if (page.body) { const g2 = extractGithubRepo(page.body); if (g2) { gh = g2; opsAppend("system","🔗 "+su+" 에서 GitHub 발견: "+g2.owner+"/"+g2.repo, null); break; } } } catch(e){}
+      try { const page = await httpGet(su); if (page.body) { const g2 = extractGithubRepo(page.body); if (g2) { gh = g2; opsAppend("system",M("🔗 Found GitHub via "+su+": ","🔗 "+su+" 에서 GitHub 발견: ")+g2.owner+"/"+g2.repo, null); break; } } } catch(e){}
     }
   }
   let repoInfo = null;
@@ -1770,7 +1778,7 @@ async function runIngest(input, channel) {
   if (pageText) bundle += "\n\n## 가져온 페이지 본문\n" + pageText;
   if (gh) {
     try {
-      opsAppend("system", "🔗 연관 GitHub 연동 중: " + gh.owner + "/" + gh.repo, null);
+      opsAppend("system", M("🔗 Linking related GitHub: ","🔗 연관 GitHub 연동 중: ") + gh.owner + "/" + gh.repo, null);
       repoInfo = await loadGithubRepo(gh.owner, gh.repo);
       bundle += "\n\n## 연관 GitHub: " + repoInfo.repo + "\n### README\n" + (repoInfo.readme || "(없음)");
       for (const s of repoInfo.skills) bundle += "\n\n### " + s.path + "\n" + s.content;
@@ -1789,7 +1797,7 @@ function ingestContent(content, channel, extra) {
   delete env.ANTHROPIC_API_KEY;
   const proc = spawn("claude", ["-p", "--model", "opus", "--no-session-persistence"],
     { cwd: HARNESS_ROOT, env, stdio: ["pipe", "pipe", "pipe"] });
-  proc.stdin.write(prompt); proc.stdin.end();
+  proc.stdin.write(prompt + (UI_LANG==="en"?"\n\n[OUTPUT LANGUAGE] Respond ONLY in English. Every text field — subjects, descriptions, notes, summaries — must be written in natural English.":"\n\n[출력 언어] 모든 텍스트를 한국어로만 작성하라.")); proc.stdin.end();
     var _wd=setTimeout(function(){try{proc.kill();}catch(e){}},70000); proc.on("close",function(){clearTimeout(_wd);});
   let out = "", err = "";
   proc.stdout.on("data", (d) => { out += d.toString(); });
@@ -1797,7 +1805,7 @@ function ingestContent(content, channel, extra) {
   proc.on("close", () => {
     const cards = extractJsonArray(out);
     if (!Array.isArray(cards) || !cards.length) {
-      try { opsAppend("system", "⚠️ 분해 실패 — 카드를 만들지 못했습니다. " + (err.slice(0, 200) || out.slice(0, 200)), null); } catch {}
+      try { opsAppend("system", M("⚠️ Decomposition failed — could not create cards. ","⚠️ 분해 실패 — 카드를 만들지 못했습니다. ") + (err.slice(0, 200) || out.slice(0, 200)), null); } catch {}
       return;
     }
     cards.sort((a, b) => (a.order || 0) - (b.order || 0));
@@ -1827,11 +1835,11 @@ function ingestContent(content, channel, extra) {
         made++;
       } catch {}
     }
-    try { opsAppend("system", "📥 콘텐츠 분해 완료 — 카드 " + made + "개 생성 (" + (channel || "x") + ")", null); } catch {}
+    try { opsAppend("system", M("📥 Decomposition complete — " + made + " cards created (" + (channel || "x") + ")","📥 콘텐츠 분해 완료 — 카드 " + made + "개 생성 (" + (channel || "x") + ")"), null); } catch {}
     if (made > 0) { try { runVerifyOrchestrator(); } catch (e) {} }
   });
   proc.on("error", () => {
-    try { opsAppend("system", "⚠️ 분해 실패 — claude CLI 실행 오류", null); } catch {}
+    try { opsAppend("system", M("⚠️ Decomposition failed — claude CLI error","⚠️ 분해 실패 — claude CLI 실행 오류"), null); } catch {}
   });
 }
 
@@ -1843,12 +1851,11 @@ function verifyWorker(card) {
       "너는 10XAI 검증 에이전트(보안·정책 담당). 아래 작업 카드 1개를 검증한다.\n" +
       "카드: " + (card.subject||"") + "\n설명: " + String(card.description||"").slice(0,1500) + "\n" +
       "작성자 주장(claim): " + JSON.stringify(claim) + "\n\n" +
-      "보안·정책 리스크를 매칭하라: prompt injection, 악성 도구 호출, 비밀값 노출, 과도한 권한, 플랫폼 ToS 위반, AI Act 등.\n" +
-      "그리고 작성자 주장이 과장/체리피킹인지 한 줄 평가하라.\n" +
+      "이 단계를 실제로 코드/도구 관점에서 분석하라: ① 기술적 타당성(이 순서로 진짜 되는가, 빠진 선행단계는) ② 보안·정책 리스크(prompt injection, 악성 도구 호출, 비밀값/키 노출, 과도한 권한, 공급망, 플랫폼 ToS, AI Act) ③ 작성자 주장(비용·시간·'무료')의 과장/체리피킹 여부.\n구체적 근거를 note에 한국어로 적어라(막연한 판정 금지).\n" +
       "JSON 하나만 출력(설명·코드펜스 없이): { \"score\": <0-100 위험>, \"flags\": [\"...\"], \"badges\": [\"security\"?], \"note\": \"한 줄 한국어 판정\" }";
     const env = Object.assign({}, process.env); delete env.ANTHROPIC_API_KEY;
     const proc = spawn("claude", ["-p","--model","sonnet","--no-session-persistence"], { cwd: HARNESS_ROOT, env, stdio:["pipe","pipe","pipe"] });
-    proc.stdin.write(prompt); proc.stdin.end();
+    proc.stdin.write(prompt + (UI_LANG==="en"?"\n\n[OUTPUT LANGUAGE] Respond ONLY in English. Every text field — subjects, descriptions, notes, summaries — must be written in natural English.":"\n\n[출력 언어] 모든 텍스트를 한국어로만 작성하라.")); proc.stdin.end();
     var _wd=setTimeout(function(){try{proc.kill();}catch(e){}},70000); proc.on("close",function(){clearTimeout(_wd);});
     let out="";
     proc.stdout.on("data", function(d){ out+=d.toString(); });
@@ -1859,12 +1866,12 @@ function verifyWorker(card) {
 async function runVerifyOrchestrator(batchId) {
   let cards = readAllTasks().filter(function(t){ const m=t.metadata||{}; return (m.phase==="verify"||!m.phase) && t.status==="pending" && (m.source==="ingest"||m.kind==="original"||m.kind==="gapfill"); });
   if (batchId) cards = cards.filter(function(t){ return (t.metadata&&t.metadata.batchId)===batchId; });
-  if (!cards.length) { opsAppend("system","검증할 분해됨 카드가 없습니다.",null); return; }
-  opsAppend("system","🔍 검증 오케스트레이터 시작 — 카드 "+cards.length+"개에 검증 워커 분배(병렬 팬아웃)", null);
+  if (!cards.length) { opsAppend("system",M("No decomposed cards to verify.","검증할 분해됨 카드가 없습니다."),null); return; }
+  opsAppend("system",M("🔍 Verify orchestrator started — fanning out verify workers across "+cards.length+" cards (parallel)","🔍 검증 오케스트레이터 시작 — 카드 "+cards.length+"개에 검증 워커 분배(병렬 팬아웃)"), null);
   let risky=0;
   await Promise.all(cards.map(async function(card){
     updateTask(card.id, { status:"in_progress", metadata:{ assignedTo:"verify-agent#"+card.id } });
-    opsAppend("system","🔍 #"+card.id+" 검증 워커 실행 중… ("+String(card.subject||"").slice(0,30)+")", null);
+    opsAppend("system",M("🔍 #"+card.id+" verify worker running… ("+String(card.subject||"").slice(0,30)+")","🔍 #"+card.id+" 검증 워커 실행 중… ("+String(card.subject||"").slice(0,30)+")"), null);
     const r = await verifyWorker(card);
     const score = (r && typeof r.score==="number") ? r.score : 30;
     const flags = (r && Array.isArray(r.flags)) ? r.flags : [];
@@ -1872,14 +1879,14 @@ async function runVerifyOrchestrator(batchId) {
     const note = (r && r.note) ? String(r.note) : "";
     const blocked = score>=75 || flags.some(function(f){ return /secret|inject|malicious|payment/i.test(String(f)); });
     const upd = { metadata:{ verify:{ status:"done", risk:{ score:score, flags:flags }, note:note, gate:{ status: blocked?"blocked":"open" } }, badges:badges, risk:{ score:score, flags:flags } } };
-    if (blocked) { upd.status="in_review"; risky++; opsAppend("system","⚠️ #"+card.id+" 게이트·검토 — risk "+score+" ("+(note||flags.join(","))+")", null); }
-    else { upd.status="completed"; opsAppend("system","✅ #"+card.id+" 검증완료 — risk "+score+(note?" · "+note:""), null); }
+    if (blocked) { upd.status="in_review"; risky++; opsAppend("system",M("⚠️ #"+card.id+" gated — risk "+score+" ("+(note||flags.join(","))+")","⚠️ #"+card.id+" 게이트·검토 — risk "+score+" ("+(note||flags.join(","))+")"), null); }
+    else { upd.status="pending"; upd.metadata.phase="execute"; opsAppend("system",M("✅ #"+card.id+" verified → moved to execute queue (risk "+score+(note?" · "+note:"")+")","✅ #"+card.id+" 검증 통과 → 실행 대기로 이동 (risk "+score+(note?" · "+note:"")+")"), null); }
     updateTask(card.id, upd);
   }));
   const passed = cards.length - risky;
   const gateMsg = (risky>0)
-    ? ("✅ 검증 완료 — 통과 "+passed+"건, 위험 "+risky+"건은 게이트 보류. 통과하신 소스를 실행 에이전트(하네스 엔지니어링) 형태로 만들어 드리겠습니다. 진행하려면 상단 ▶ 실행하기 버튼을 누르거나 운영스레드에 실행 이라고 입력하세요.")
-    : ("✅ 검증 완료 — "+passed+"건 모두 문제 없습니다. 검증하신 소스를 실행 에이전트(하네스 엔지니어링) 형태로 만들어 드리겠습니다. 진행하려면 상단 ▶ 실행하기 버튼을 누르거나 운영스레드에 실행 이라고 입력하세요.");
+    ? M("✅ Verification complete — "+passed+" card(s) passed and are waiting in the Execute pipeline. Press ▶ Run to execute via harness engineering. "+risky+" risky card(s) are at the gate — try 🔧 Repair to resolve them.","✅ 검증 완료 — 통과 "+passed+"건이 실행 파이프라인에서 대기 중입니다. ▶ 실행하기를 누르면 하네스 엔지니어링으로 실행됩니다. 위험 "+risky+"건은 게이트에 있고, 🔧 게이트 수리로 문제해결을 시도할 수 있습니다.")
+    : M("✅ Verification complete — all "+passed+" card(s) passed and are waiting in the Execute pipeline. Press ▶ Run to execute.","✅ 검증 완료 — "+passed+"건 모두 통과해 실행 파이프라인에서 대기 중입니다. ▶ 실행하기를 누르면 실행됩니다.");
   opsAppend("claude", gateMsg, null);
 }
 
@@ -1890,7 +1897,7 @@ function execWorker(card) {
     const prompt="너는 10XAI 실행 에이전트. 아래 '검증 통과' 카드를 격리 샌드박스에서 실제 실행한다고 보고, 현실적인 실측치를 추정하라(작성자 주장과 비교).\n카드: "+(card.subject||"")+"\n설명: "+String(card.description||"").slice(0,800)+"\n작성자 주장: "+JSON.stringify(claim)+"\nJSON 하나만 출력(설명 없이): { \"cost\": <USD 숫자>, \"timeMin\": <분 숫자>, \"successRate\": <0~1>, \"failed\": <true/false>, \"failureMode\": \"<없으면 빈칸>\", \"note\": \"<한 줄 한국어 산출 결과>\" }";
     const env=Object.assign({},process.env); delete env.ANTHROPIC_API_KEY;
     const proc=spawn("claude",["-p","--model","sonnet","--no-session-persistence"],{cwd:HARNESS_ROOT,env,stdio:["pipe","pipe","pipe"]});
-    proc.stdin.write(prompt); proc.stdin.end();
+    proc.stdin.write(prompt + (UI_LANG==="en"?"\n\n[OUTPUT LANGUAGE] Respond ONLY in English. Every text field — subjects, descriptions, notes, summaries — must be written in natural English.":"\n\n[출력 언어] 모든 텍스트를 한국어로만 작성하라.")); proc.stdin.end();
     var _wd=setTimeout(function(){try{proc.kill();}catch(e){}},70000); proc.on("close",function(){clearTimeout(_wd);});
     let out=""; proc.stdout.on("data",function(d){out+=d.toString();});
     proc.on("close",function(){let r=null;try{const s=out.indexOf("{"),e=out.lastIndexOf("}");if(s>-1&&e>-1)r=JSON.parse(out.slice(s,e+1));}catch(x){}resolve(r);});
@@ -1917,27 +1924,54 @@ function buildLibraryModule(cards) {
     try { idx = JSON.parse(fs.readFileSync(idxPath, "utf-8")); } catch(e){}
     idx.unshift({ id: id, name: mod.name, repo: repo, sourceUrl: sourceUrl, channel: channel, cards: cards.length, createdAt: mod.createdAt, file: base + ".json", skill: base + ".md", cardsData: mod.cards });
     fs.writeFileSync(idxPath, JSON.stringify(idx.slice(0, 200), null, 2));
-    opsAppend("system", "📚 라이브러리에 모듈 추가 — " + (repo || base) + " (" + cards.length + "카드, SKILL.md + JSON)", null);
+    opsAppend("system", M("📚 Module added to Library — " + (repo || base) + " (" + cards.length + " cards, SKILL.md + JSON)","📚 라이브러리에 모듈 추가 — " + (repo || base) + " (" + cards.length + "카드, SKILL.md + JSON)"), null);
     return mod;
   } catch(e){ return null; }
 }
 async function runExecOrchestrator() {
-  let cards=readAllTasks().filter(function(t){const m=t.metadata||{};return (m.phase==="verify"||!m.phase)&&t.status==="completed"&&(m.source==="ingest"||m.kind==="original"||m.kind==="gapfill");});
-  if(!cards.length){opsAppend("system","실행할 검증 통과 카드가 없습니다. (검증을 먼저 완료하세요)",null);return;}
-  opsAppend("system","⚙ 실행 오케스트레이터(opus) 시작 — 통과 카드 "+cards.length+"개를 실행 멀티에이전트로 분배·동시 실행",null);
+  let cards=readAllTasks().filter(function(t){const m=t.metadata||{};return m.phase==="execute"&&t.status==="pending";});
+  if(!cards.length){opsAppend("system",M("No cards in the execute queue. (verify some first)","실행 대기 중인 카드가 없습니다. (검증을 먼저 통과시키세요)"),null);return;}
+  opsAppend("system",M("⚙ Execute orchestrator (opus) started — distributing "+cards.length+" verified cards to execute agents (concurrent)","⚙ 실행 오케스트레이터(opus) 시작 — 통과 카드 "+cards.length+"개를 실행 멀티에이전트로 분배·동시 실행"),null);
   await Promise.all(cards.map(async function(card){
     updateTask(card.id,{status:"in_progress",metadata:{phase:"execute",assignedTo:"exec-runner#"+card.id}});
-    opsAppend("system","▶️ #"+card.id+" 실행 워커 가동… ("+String(card.subject||"").slice(0,28)+")",null);
+    opsAppend("system",M("▶️ #"+card.id+" execute worker running… ("+String(card.subject||"").slice(0,28)+")","▶️ #"+card.id+" 실행 워커 가동… ("+String(card.subject||"").slice(0,28)+")"),null);
     const r=await execWorker(card);
     const numf=function(v){if(v==null)return null;const n=parseFloat(String(v).replace(/[^0-9.]/g,""));return isNaN(n)?null:n;};
     let sr=numf(r&&r.successRate); if(sr!=null&&sr>1) sr=sr/100;
     const measured={cost:numf(r&&r.cost),timeMin:numf(r&&r.timeMin),successRate:sr,failed:!!(r&&r.failed),failureMode:(r&&r.failureMode)||"",note:(r&&r.note)||""};
     if(measured.cost==null&&measured.timeMin==null&&measured.successRate==null){const cl=(card.metadata&&card.metadata.claim)||{};measured.timeMin=cl.timeMin!=null?Math.round(cl.timeMin*1.8):8;measured.cost=cl.free===true?0.2:(cl.cost!=null?Number(cl.cost):0.1);measured.successRate=0.7;measured.note=(measured.note||"")+" (추정)";}
     updateTask(card.id,{status:"completed",metadata:{phase:"execute",measured:measured}});
-    opsAppend("system","✅ #"+card.id+" 산출 완료 — 실측 "+(measured.timeMin!=null?measured.timeMin+"분":"-")+" / $"+(measured.cost!=null?measured.cost:"-")+" / 성공률 "+(measured.successRate!=null?Math.round(measured.successRate*100)+"%":"-"),null);
+    opsAppend("system",M("✅ #"+card.id+" output ready — measured "+(measured.timeMin!=null?measured.timeMin+"min":"-")+" / $"+(measured.cost!=null?measured.cost:"-")+" / success "+(measured.successRate!=null?Math.round(measured.successRate*100)+"%":"-"),"✅ #"+card.id+" 산출 완료 — 실측 "+(measured.timeMin!=null?measured.timeMin+"분":"-")+" / $"+(measured.cost!=null?measured.cost:"-")+" / 성공률 "+(measured.successRate!=null?Math.round(measured.successRate*100)+"%":"-")),null);
   }));
   try { buildLibraryModule(cards); } catch(e){}
-  opsAppend("claude","⚙ 실행 완료 — "+cards.length+"개 카드 산출물 생성. claim vs 실측 갭이 카드에 기록됐고 라이브러리에 누적됩니다. 실행 파이프라인 탭에서 확인하세요.",null);
+  opsAppend("claude",M("⚙ Execution complete — "+cards.length+" card outputs generated. Claim vs measured gaps are on each card and added to the Library. See the Execute Pipeline tab.","⚙ 실행 완료 — "+cards.length+"개 카드 산출물 생성. claim vs 실측 갭이 카드에 기록됐고 라이브러리에 누적됩니다. 실행 파이프라인 탭에서 확인하세요."),null);
+}
+
+function repairWorker(card){
+  return new Promise(function(resolve){
+    var v=(card.metadata&&card.metadata.verify)||{};
+    var prompt="너는 10XAI repair 에이전트. 검증에서 게이트(보류)된 아래 카드의 보안·정책 문제를 분석하고 안전하게 해결 가능한지 판단하라.\n카드: "+(card.subject||"")+"\n설명: "+String(card.description||"").slice(0,600)+"\n위험: "+JSON.stringify(v.risk||{})+"\n판정: "+(v.note||"")+"\nJSON 하나만 출력: { \"resolved\": <true=안전하게 해결 가능>, \"fix\": \"<구체적 해결책 한두 줄, 한국어>\", \"residualRisk\": <0-100> }";
+    var env=Object.assign({},process.env); delete env.ANTHROPIC_API_KEY;
+    var proc=spawn("claude",["-p","--model","sonnet","--no-session-persistence"],{cwd:HARNESS_ROOT,env,stdio:["pipe","pipe","pipe"]});
+    proc.stdin.write(prompt + (UI_LANG==="en"?"\n\n[OUTPUT LANGUAGE] Respond ONLY in English. Every text field — subjects, descriptions, notes, summaries — must be written in natural English.":"\n\n[출력 언어] 모든 텍스트를 한국어로만 작성하라.")); proc.stdin.end();
+    var _wd=setTimeout(function(){try{proc.kill();}catch(e){}},70000); proc.on("close",function(){clearTimeout(_wd);});
+    var out=""; proc.stdout.on("data",function(d){out+=d.toString();});
+    proc.on("close",function(){var r=null;try{var s=out.indexOf("{"),e=out.lastIndexOf("}");if(s>-1&&e>-1)r=JSON.parse(out.slice(s,e+1));}catch(x){}resolve(r);});
+    proc.on("error",function(){resolve(null);});
+  });
+}
+async function runRepairOrchestrator(){
+  var cards=readAllTasks().filter(function(t){return t.status==="in_review"&&t.metadata&&t.metadata.verify;});
+  if(!cards.length){opsAppend("system",M("No gated cards to repair.","수리할 게이트 카드가 없습니다."),null);return;}
+  opsAppend("system",M("🔧 Repair agent started — attempting to resolve "+cards.length+" gated cards","🔧 repair 에이전트 시작 — 게이트 카드 "+cards.length+"개 문제해결 시도"),null);
+  var fixed=0;
+  await Promise.all(cards.map(async function(card){
+    var r=await repairWorker(card);
+    var resolved=!!(r&&r.resolved); var fix=(r&&r.fix)||"";
+    if(resolved){ updateTask(card.id,{status:"pending",metadata:{phase:"execute",repair:{resolved:true,fix:fix}}}); fixed++; opsAppend("system",M("🔧✅ #"+card.id+" repaired → execute queue: "+fix.slice(0,50),"🔧✅ #"+card.id+" 수리 완료 → 실행 대기: "+fix.slice(0,50)),null); }
+    else { updateTask(card.id,{metadata:{repair:{resolved:false,fix:fix}}}); opsAppend("system",M("🔧⚠️ #"+card.id+" cannot auto-repair — needs human review: "+fix.slice(0,50),"🔧⚠️ #"+card.id+" 자동수리 불가 — 사람 검토 필요: "+fix.slice(0,50)),null); }
+  }));
+  opsAppend("claude",M("🔧 Repair complete — "+fixed+" resolved and moved to the execute queue, "+(cards.length-fixed)+" still need human review.","🔧 수리 완료 — "+fixed+"건 해결되어 실행 대기로 이동, "+(cards.length-fixed)+"건은 사람 검토가 필요합니다."),null);
 }
 
 // ── HTTP server ──────────────────────────────────────────────────────────────
@@ -1972,6 +2006,14 @@ const server = http.createServer(async (req, res) => {
     return;
   }
 
+  // POST /api/repair/run — 게이트 카드 수리(문제해결)
+  if (req.url === "/api/repair/run" && req.method === "POST") {
+    if (!cliAvailable) { res.writeHead(503, { "Content-Type": "application/json" }); res.end('{"error":"claude CLI 사용 불가"}'); return; }
+    runRepairOrchestrator();
+    res.writeHead(202, { "Content-Type": "application/json" }); res.end('{"ok":true,"status":"repairing"}');
+    return;
+  }
+
   // POST /api/execute/run — 실행 오케스트레이터 트리거
   if (req.url === "/api/execute/run" && req.method === "POST") {
     if (!cliAvailable) { res.writeHead(503, { "Content-Type": "application/json" }); res.end('{"error":"claude CLI 사용 불가"}'); return; }
@@ -1985,6 +2027,13 @@ const server = http.createServer(async (req, res) => {
     let idx = [];
     try { idx = JSON.parse(fs.readFileSync(path.join(HARNESS_ROOT, "library", "index.json"), "utf-8")); } catch(e){}
     res.writeHead(200, { "Content-Type": "application/json" }); res.end(JSON.stringify(idx));
+    return;
+  }
+
+  // POST /api/lang — UI 언어 설정 (서버 생성물 언어)
+  if (req.url === "/api/lang" && req.method === "POST") {
+    try { const b = await parseBody(req); if (b.lang === "en" || b.lang === "ko") UI_LANG = b.lang; } catch(e){}
+    res.writeHead(200, { "Content-Type": "application/json" }); res.end(JSON.stringify({ ok: true, lang: UI_LANG }));
     return;
   }
 
@@ -2018,7 +2067,7 @@ const server = http.createServer(async (req, res) => {
       if (!input) { res.writeHead(400, { "Content-Type": "application/json" }); res.end('{"error":"url 또는 content가 필요합니다"}'); return; }
       if (!cliAvailable) { res.writeHead(503, { "Content-Type": "application/json" }); res.end('{"error":"claude CLI 사용 불가 — nested session이면 launchd standalone 서버에서 실행하세요"}'); return; }
       runIngest(input, body.channel || "x");  // background; cards stream via SSE
-      try { opsAppend("system", "📥 ingest 시작: " + input.slice(0, 120), null); } catch {}
+      try { opsAppend("system", M("📥 Ingest started: ","📥 ingest 시작: ") + input.slice(0, 120), null); } catch {}
       res.writeHead(202, { "Content-Type": "application/json" }); res.end(JSON.stringify({ ok: true, status: "ingesting" }));
     } catch (e) { res.writeHead(400, { "Content-Type": "application/json" }); res.end(JSON.stringify({ error: e.message })); }
     return;

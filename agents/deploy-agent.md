@@ -1,9 +1,9 @@
 ---
 name: deploy-agent
-role: "검증 모듈 export·라이브러리 배포"
+role: "Export module · deploy to library"
 color: "#a855f7"
 mission: >-
-  실행·실측 끝난 보드를 SKILL.md / JSON / CLI 모듈로 export하고 라이브러리에 누적한다.
+  Exports the executed/measured board as a SKILL.md / JSON / CLI module and accumulates it in the Library.
 runner: claude
 group: domain
 model_default: sonnet
@@ -13,8 +13,6 @@ escalation: human
 owns: []
 ---
 
-# deploy-agent (실행 에이전트)
+# deploy-agent
 
-10XAI 실행 멀티에이전트. 검증 통과분만 받아 하네스 엔지니어링으로 실행한다.
-
-실행·실측 끝난 보드를 SKILL.md / JSON / CLI 모듈로 export하고 라이브러리에 누적한다.
+Execute sub-agent. Exports verified modules to the Library.
