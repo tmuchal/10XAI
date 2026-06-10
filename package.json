@@ -1,24 +1,24 @@
 {
   "name": "10XAI",
   "version": "0.1.0",
-  "description": "10XAI — agent-kanban-harness instance (multi-agent harness)",
+  "description": "10XAI — Builder content, into verified modules. Paste an AI-builder post or repo; decompose, verify, and measure claim vs. reality.",
   "keywords": [
+    "ai",
+    "content-verification",
     "kanban",
     "multi-agent",
     "claude",
-    "codex",
-    "ops",
-    "harness",
-    "telegram",
-    "incident-response"
+    "reproducibility",
+    "security",
+    "cost-analysis"
   ],
-  "homepage": "https://github.com/Zakedu/agent-kanban-harness",
+  "homepage": "https://github.com/tmuchal/10XAI",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/Zakedu/agent-kanban-harness.git"
+    "url": "git+https://github.com/tmuchal/10XAI.git"
   },
   "bugs": {
-    "url": "https://github.com/Zakedu/agent-kanban-harness/issues"
+    "url": "https://github.com/tmuchal/10XAI/issues"
   },
   "license": "MIT",
   "main": "server/kanban.cjs",
