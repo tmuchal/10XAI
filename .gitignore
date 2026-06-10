@@ -1,0 +1,18 @@
+# local config & secrets (절대 커밋 금지)
+config.js
+.env
+
+# logs & runtime
+*.log
+server.log
+
+# runtime output (검증·실행 산출물)
+library/
+workspace/
+data/
+
+# deps
+node_modules/
+
+# os
+.DS_Store
