@@ -1,26 +1,26 @@
-# 예시: Generic SaaS Setup
+# Example: Generic SaaS Setup
 
-이 예시는 의도적으로 가상입니다. 실제 project name, user data, production task history, domain-specific operating note를 공개하지 않고 agent setup의 모양만 보여줍니다.
+This example is intentionally fictional. It shows only the shape of the agent setup, without exposing any real project name, user data, production task history, or domain-specific operating notes.
 
-## 제품 형태
+## Product Shape
 
-작은 B2B SaaS 제품을 가정합니다.
+Assume a small B2B SaaS product.
 
-- React 또는 Next.js front end.
-- Node, serverless functions, 또는 가벼운 API layer.
-- migration이 있는 SQL database.
-- Stripe 또는 다른 payment provider.
-- Vercel, Fly.io, Render 같은 deploy target.
-- 선택 Sentry 또는 log-based monitoring.
+- A React or Next.js front end.
+- Node, serverless functions, or a light API layer.
+- A SQL database with migrations.
+- Stripe or another payment provider.
+- A deploy target such as Vercel, Fly.io, or Render.
+- Optionally Sentry or log-based monitoring.
 
-하네스는 app repo 옆에서 실행됩니다. app code는 포함하지 않습니다. 하네스가 소유하는 것은 kanban board, agent definitions, playbooks, local runner reports, gate scripts입니다.
+The harness runs alongside the app repo. It does not include the app code. What the harness owns is the kanban board, agent definitions, playbooks, local runner reports, and gate scripts.
 
 ## Config
 
 ```js
 module.exports = {
   projectName: "Example SaaS",
-  goal: "6주 후 — 주간 보고서 자동 생성 자동화 1개 완성",
+  goal: "After 6 weeks — complete 1 automation that auto-generates the weekly report",
   repoPath: "/absolute/path/to/example-saas",
   kanbanPort: 8080,
   boardDir: "example-saas",
@@ -34,20 +34,20 @@ module.exports = {
 };
 ```
 
-`setup --guided`는 package scripts와 common directories를 scan한 뒤 비슷한 파일을 자동 생성합니다.
+`setup --guided` scans package scripts and common directories, then auto-generates a similar file.
 
-## 에이전트 매트릭스
+## Agent Matrix
 
-처음에는 작고 겹치지 않는 set으로 시작합니다.
+Start with a small, non-overlapping set.
 
-- `orchestrator`: operator request를 task로 만들고 라우팅합니다.
-- `frontend-agent`: UI, routes, browser behavior, client state를 맡습니다.
-- `backend-agent`: API, auth, database, migrations, shared server code를 맡습니다.
-- `qa-agent`: test creation, regression check, verification evidence를 맡습니다.
-- `deploy-gate-agent`: release gate와 failed deploy triage를 맡습니다.
-- `docs-agent`: runbook, handoff note, onboarding doc을 맡습니다.
+- `orchestrator`: turns operator requests into tasks and routes them.
+- `frontend-agent`: owns UI, routes, browser behavior, and client state.
+- `backend-agent`: owns API, auth, database, migrations, and shared server code.
+- `qa-agent`: owns test creation, regression checks, and verification evidence.
+- `deploy-gate-agent`: owns the release gate and failed-deploy triage.
+- `docs-agent`: owns runbooks, handoff notes, and onboarding docs.
 
-권장 runner 기본값:
+Recommended runner defaults:
 
 - Frontend implementation: `reviewer:codex`
 - Backend/data/auth changes: `both`
@@ -55,19 +55,19 @@ module.exports = {
 - Documentation: `claude`
 - Release gate: `reviewer:codex`
 
-## 고위험 경계
+## High-Risk Boundaries
 
-agent를 실행하기 전에 명시적 boundary를 정합니다.
+Set explicit boundaries before running an agent.
 
-- Payment and billing code는 review가 필요합니다.
-- Auth and permission changes는 `both`가 필요합니다.
-- Migrations는 `both`와 rollback note가 필요합니다.
-- Production deploy는 gate pass가 필요합니다.
-- Human-impacting automated decision은 detection-and-escalation만 허용합니다.
+- Payment and billing code requires review.
+- Auth and permission changes require `both`.
+- Migrations require `both` plus a rollback note.
+- Production deploys require a gate pass.
+- Human-impacting automated decisions are allowed only as detection-and-escalation.
 
 ## Playbooks
 
-제품에 실제로 있는 incident마다 1페이지 playbook을 만듭니다.
+Create a one-page playbook for each incident that actually exists in your product.
 
 - Build failure.
 - E2E regression.
@@ -76,14 +76,14 @@ agent를 실행하기 전에 명시적 boundary를 정합니다.
 - Database migration rollback.
 - Customer-impacting login failure.
 
-공개 template에서는 playbook도 가상으로 유지하세요. real provider ID, customer name, Slack channel, on-call name, production URL은 local private config에 둡니다.
+In the public template, keep the playbooks fictional too. Real provider IDs, customer names, Slack channels, on-call names, and production URLs belong in local private config.
 
-## 공개 저장소 개인정보 규칙
+## Public Repository Privacy Rules
 
-public repository에는 pattern만 넣고 company는 넣지 않습니다.
+Put only the pattern in a public repository, never the company.
 
-- `config.example.js`는 포함하고 `config.js`는 포함하지 않습니다.
-- `.env.example`은 포함하고 `.env`는 포함하지 않습니다.
-- fake playbook은 포함하고 real incident log는 포함하지 않습니다.
-- agent template은 포함하고 production task history는 포함하지 않습니다.
-- sanitized example은 포함하고 app-specific customer, payment, auth, analytics data는 포함하지 않습니다.
+- Include `config.example.js`, not `config.js`.
+- Include `.env.example`, not `.env`.
+- Include fake playbooks, not real incident logs.
+- Include agent templates, not production task history.
+- Include sanitized examples, not app-specific customer, payment, auth, or analytics data.

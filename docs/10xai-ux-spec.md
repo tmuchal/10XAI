@@ -1,215 +1,215 @@
-# 10XAI — UI/UX 전면 재디자인 명세 (v1)
+# 10XAI — Full UI/UX Redesign Spec (v1)
 
-> **상태: 확정(2026-06-10).** 브랜드 방향 = **Light 기본 · 인디고 `#6366F1`**. 검증색 = 에메랄드 `#059669`. 단계 4색(분해됨 파랑 / 검증중 노랑 / 게이트 빨강 / 완료 초록).
+> **Status: Finalized (2026-06-10).** Brand direction = **Light default · Indigo `#6366F1`**. Verification color = emerald `#059669`. Four stage colors (decomposed blue / verifying yellow / gate red / done green).
 >
-> 대상 화면: `ui/kanban.html` + `ui/styles/{tokens,kanban,progress}.css`
-> 원칙: **보드 형태(4컬럼·상태머신·SSE·모달)는 유지**하고, 그 위 브랜드·입구·카드·상세를 제품으로 재편한다.
-> 구현 전략: 색·간격·타이포는 전부 CSS 변수. 재디자인 = **토큰 값 교체 + 신규 컴포넌트 클래스 추가** (구조 갈아엎기 아님).
+> Target screens: `ui/kanban.html` + `ui/styles/{tokens,kanban,progress}.css`
+> Principle: **keep the board shape (4 columns · state machine · SSE · modal)**, and reframe the brand, entry point, cards, and detail on top of it into a product.
+> Implementation strategy: colors, spacing, and typography are all CSS variables. Redesign = **swapping token values + adding new component classes** (not tearing down the structure).
 
 ---
 
-## 0. 디자인 원칙
+## 0. Design Principles
 
-1. **신뢰의 대비** — 우리가 검증하는 콘텐츠(과장·체리피킹·미끼 페이월)와 정반대 톤. 차분하고, 측정 기반이고, 과장이 없다.
-2. **정보 위계 = 제품 서사** — 입력(Hero) → 보드(증거 더미) → 카드(주장 vs 실측). 화면이 곧 "주장을 분해해 실측으로 반박한다"는 서사다.
-3. **두 단계 진실** — 정적 분해(즉시) → 동적 검증(백그라운드). UI는 "아직 측정 안 됨"과 "측정됨"을 시각적으로 구분한다.
-4. **토큰 우선** — 브랜드 변경은 1파일(`tokens.css`) 값 교체로 끝나야 한다. 3테마(light/dark/navy) 전부 유지.
+1. **Contrast of trust** — the opposite tone of the content we verify (hype, cherry-picking, bait paywalls). Calm, measurement-based, no exaggeration.
+2. **Information hierarchy = product narrative** — input (Hero) → board (pile of evidence) → card (claim vs. measured). The screen itself is the narrative of "decomposing claims and refuting them with measurements."
+3. **Two-stage truth** — static decomposition (instant) → dynamic verification (background). The UI visually distinguishes "not yet measured" from "measured."
+4. **Token-first** — a brand change should be done by swapping values in one file (`tokens.css`). Keep all three themes (light/dark/navy).
 
 ---
 
-## 1. 브랜드 & 비주얼 아이덴티티
+## 1. Brand & Visual Identity
 
-| 항목 | 결정 |
+| Item | Decision |
 |---|---|
-| 이름 | **10XAI** — 빌더들의 "10X" 화법을 역설적으로 차용. 우리는 그 10X 주장을 *검증*한다. |
-| 태그라인 | **"빌더 콘텐츠를, 검증된 모듈로."** (부제: 주장과 실측 사이의 갭을 드러낸다) |
-| 보이스 | 단정적·측정 기반·무과장. 숫자로 말한다("5분 → 실측 12분"). |
-| 로고 마크 | `10X` = 브랜드 인디고 강조 + `AI` = 텍스트색. 숫자는 모노 폰트(JetBrains/SF Mono 느낌). |
-| 시그니처 색 | **인디고 `#6366F1`** = 브랜드/CTA(분해하기·로고·활성 탭). 단계 의미색(파랑/노랑/빨강/초록)과 충돌 안 함. |
-| 검증/통과 | 에메랄드 `#059669`(기존 accent) 유지 = "검증됨/통과". |
-| 기본 테마 | **Light**(제품·신뢰감) 기본, Dark/Navy 토글 유지. |
+| Name | **10XAI** — ironically borrows builders' "10X" rhetoric. We *verify* those 10X claims. |
+| Tagline | **"Builder content, into verified modules."** (subtitle: reveal the gap between claim and measurement) |
+| Voice | Assertive, measurement-based, no hype. Speaks in numbers ("5 min → measured 12 min"). |
+| Logo mark | `10X` = brand indigo accent + `AI` = text color. Numbers in a mono font (JetBrains/SF Mono feel). |
+| Signature color | **Indigo `#6366F1`** = brand/CTA (Decompose · logo · active tab). Does not clash with the stage semantic colors (blue/yellow/red/green). |
+| Verified/Pass | Keep emerald `#059669` (existing accent) = "verified/passed". |
+| Default theme | **Light** (product, trust) by default, keep Dark/Navy toggle. |
 
-> 시그니처 색은 토큰 1줄(`--token-brand-primary`)이라 언제든 교체 가능. 인디고는 "기술·신뢰·각성"의 SaaS 관용색이면서 단계 4색과 안 겹쳐서 추천.
+> The signature color is a single token line (`--token-brand-primary`), so it can be swapped at any time. Indigo is recommended because it's a SaaS idiom for "tech, trust, awakening" while not overlapping with the four stage colors.
 
 ---
 
-## 2. 디자인 토큰 — 10XAI 확장 레이어
+## 2. Design Tokens — 10XAI Extension Layer
 
-`tokens.css`에 추가/재정의. 기존 raw·status 토큰은 재사용, 제품 개념만 신규 추가.
+Add/redefine in `tokens.css`. Reuse the existing raw and status tokens; add only the product concepts as new ones.
 
-### 2a. 브랜드 재정의
+### 2a. Brand redefinition
 ```css
---token-brand-primary:       #6366F1;   /* indigo — CTA·로고·활성 */
+--token-brand-primary:       #6366F1;   /* indigo — CTA·logo·active */
 --token-brand-primary-hover: #4F46E5;
---token-brand-accent:        #059669;   /* emerald — 검증됨 (유지) */
+--token-brand-accent:        #059669;   /* emerald — verified (kept) */
 ```
 
-### 2b. 파이프라인 단계색 = 기존 status 토큰 alias (신규 의미 매핑)
-| 단계(컬럼) | 의미 | 토큰 |
+### 2b. Pipeline stage colors = aliases of existing status tokens (new semantic mapping)
+| Stage (column) | Meaning | Token |
 |---|---|---|
-| 분해됨 | 정적 분해 끝, 미검증 | `--st-gen-*` (blue) |
-| 검증중 | 동적 검증/실측 진행 | `--st-val-*` (amber) |
-| 게이트·검토 | 위험 전환 정지·사람 승인 대기 | `--st-flag-*` (red) |
-| 검증완료 | 통과 | `--st-pass-*` (green) |
+| Decomposed | Static decomposition done, unverified | `--st-gen-*` (blue) |
+| Verifying | Dynamic verification/measurement in progress | `--st-val-*` (amber) |
+| Gate · Review | Risky transition halted, awaiting human approval | `--st-flag-*` (red) |
+| Verified | Passed | `--st-pass-*` (green) |
 
-### 2c. 제품 전용 신규 토큰
+### 2c. Product-specific new tokens
 ```css
 /* Risk gauge (0~100) */
 --x-risk-low:  var(--gn);   /* <40  */
 --x-risk-mid:  var(--am);   /* 40-69 */
---x-risk-high: var(--rd);   /* >=70  → 게이트 */
+--x-risk-high: var(--rd);   /* >=70  → gate */
 
-/* Gap-fill (보강 회색 카드) */
+/* Gap-fill (reinforcement gray card) */
 --x-gapfill-bg:     var(--st-idle-bg);
 --x-gapfill-fg:     var(--st-idle-fg);
 --x-gapfill-border: var(--t4);          /* dashed */
 
 /* Claim vs Measured gap */
---x-gap-worse: var(--rd);   /* 실측이 주장보다 나쁨(비쌈·오래·실패) */
---x-gap-ok:    var(--gn);   /* 주장대로거나 더 나음 */
+--x-gap-worse: var(--rd);   /* measured is worse than claim (pricier·longer·failed) */
+--x-gap-ok:    var(--gn);   /* as claimed or better */
 
 /* Channel chip */
 --x-chan-bg: var(--s2);
 --x-chan-fg: var(--t2);
 ```
 
-### 2d. 배지 토큰 매핑 (카드/모달 공용)
-| 배지 | 트리거 | 색 |
+### 2d. Badge token mapping (shared by card/modal)
+| Badge | Trigger | Color |
 |---|---|---|
-| 채널 `X`/`in` | `metadata.sourceChannel` | `--x-chan-*` |
-| `⚠NN` 리스크 | `metadata.risk.score` | 점수→low/mid/high |
-| `💸$X` 비용갭 | `measured.cost > claim` 또는 `claim.free && measured.cost>0` | `--x-gap-worse` |
-| `🔒` 보안 | `risk.flags`에 secret/credential 류 | `--token-flag-fact-*` |
-| `✗재현실패` | `measured.failed` | `--st-error-*` |
-| `✓교차` | `crossValidation.agreement==="agreed"` (기존) | `--vl` violet |
+| Channel `X`/`in` | `metadata.sourceChannel` | `--x-chan-*` |
+| `⚠NN` risk | `metadata.risk.score` | score → low/mid/high |
+| `💸$X` cost gap | `measured.cost > claim` or `claim.free && measured.cost>0` | `--x-gap-worse` |
+| `🔒` security | secret/credential-type entries in `risk.flags` | `--token-flag-fact-*` |
+| `✗repro-failed` | `measured.failed` | `--st-error-*` |
+| `✓cross` | `crossValidation.agreement==="agreed"` (existing) | `--vl` violet |
 
 ---
 
-## 3. 레이아웃 & 정보구조
+## 3. Layout & Information Architecture
 
 ```
 ┌─ TOPBAR (56px) ───────────────────────────────────────────────────────────┐
-│ [10X]AI  빌더 콘텐츠를 검증된 모듈로      분해 N·검증중 N·게이트 N·완료 N  ●연결 ⚙ │
-├─ HERO (수축형) ────────────────────────────────────────────────────────────┤
-│ ┌ 콘텐츠 붙여넣기 ────────────────────────────┐  채널 [X ▾]  [ 분해하기 ]     │
+│ [10X]AI  builder content into verified modules    decomp N·verifying N·gate N·done N  ●connected ⚙ │
+├─ HERO (collapsible) ───────────────────────────────────────────────────────┤
+│ ┌ paste content ─────────────────────────────┐  channel [X ▾]  [ Decompose ] │
 │ └────────────────────────────────────────────┘                            │
-│ 최근: X · "AI로 월 천만원 자동화" · 방금 · 카드 7개                            │
+│ Recent: X · "Automate $10k/month with AI" · just now · 7 cards               │
 ├─ FILTERBAR ───────────────────────────────────────────────────────────────┤
-│ [전체][X][in][YT]  [⚠위험만][╌보강][💸비용갭]          🔍검색   내보내기▾      │
-├─ BOARD ──────────────────────────────────────────────┬─ 로그(파이프라인) ──┤
-│ 분해됨    검증중    게이트·검토   검증완료              │ 📥 분해 완료 카드7   │
-│ ▢▢▢      ▢▢       ▢            ▢                    │ ◐ #3 실측중…       │
-│                                                      │ ⚠ #5 secret 발견   │
+│ [All][X][in][YT]  [⚠risk only][╌gapfill][💸cost gap]   🔍search   export▾    │
+├─ BOARD ──────────────────────────────────────────────┬─ Log (pipeline) ───┤
+│ Decomposed  Verifying  Gate·Review   Verified         │ 📥 7 cards decomp.  │
+│ ▢▢▢      ▢▢       ▢            ▢                    │ ◐ #3 measuring…     │
+│                                                      │ ⚠ #5 secret found   │
 └──────────────────────────────────────────────────────┴────────────────────┘
 ```
 
-- 그리드: 보드 `repeat(4, minmax(260px,1fr))` 유지. 우측 로그 패널 폭 토큰(`--ops-w` 340px) 유지.
-- z-index: 토큰(`--token-z-*`) 그대로 — modal 200, toast 300.
-- Hero는 수축형: 입력 포커스 시 textarea 확장, blur 시 한 줄로 접힘(`하네스 개요`가 차지하던 세로 공간 회수).
-- 반응형: <1100px에서 로그 패널 접힘(기존 `toggleOps` 재사용), 보드 가로 스크롤.
+- Grid: keep board `repeat(4, minmax(260px,1fr))`. Keep the right log panel width token (`--ops-w` 340px).
+- z-index: keep tokens (`--token-z-*`) as-is — modal 200, toast 300.
+- Hero is collapsible: textarea expands on input focus, collapses to a single line on blur (reclaiming the vertical space the `harness overview` used to occupy).
+- Responsive: below 1100px the log panel collapses (reuse existing `toggleOps`), board scrolls horizontally.
 
 ---
 
-## 4. 컴포넌트 명세
+## 4. Component Spec
 
-각 항목: **앵커(파일:라인) · 외형 · 상태 · 토큰**.
+Each item: **anchor (file:line) · appearance · state · tokens**.
 
-### 4.1 Topbar — `kanban.html` 헤더(~330)
-- 외형: 로고 `[10X]AI`(10X=인디고) + 태그라인(작게, `--t3`) + 우측 단계 카운터 + 연결상태 + 테마·챗 아이콘.
-- 변경: "다중 에이전트 하네스"→태그라인. 카운터 라벨 전체/진행중/검토/완료 → **분해/검증중/게이트/완료**.
-- 토큰: 로고 `--token-brand-primary`, 카운터 점색 = 단계 토큰.
+### 4.1 Topbar — `kanban.html` header (~330)
+- Appearance: logo `[10X]AI` (10X = indigo) + tagline (small, `--t3`) + right-side stage counters + connection status + theme/chat icons.
+- Change: "multi-agent harness" → tagline. Counter labels All/In-progress/Review/Done → **Decomposed/Verifying/Gate/Done**.
+- Tokens: logo `--token-brand-primary`, counter dot color = stage tokens.
 
-### 4.2 Ingest Hero — `하네스 개요` 패널 영역 교체 ★신규 핵심★
-- 외형: 큰 textarea(placeholder "트윗·링크드인 글·유튜브 스크립트를 붙여넣으세요") + 채널 드롭다운 + **분해하기** CTA(인디고).
-- 상태: idle(한 줄 접힘) / focus(확장) / submitting(스피너·"분해 중…") / done(아래 "최근 입력" 스트립 표시).
-- 동작: 클릭 → `POST /api/ingest {content, channel}` → 즉시 "분해 중" → SSE로 카드 등장.
-- 토큰: CTA `--token-brand-primary`, 테두리 `--b1`, 배경 `--s1`.
+### 4.2 Ingest Hero — replaces the `harness overview` panel area ★new core★
+- Appearance: large textarea (placeholder "Paste a tweet, LinkedIn post, or YouTube script") + channel dropdown + **Decompose** CTA (indigo).
+- States: idle (collapsed to one line) / focus (expanded) / submitting (spinner · "Decomposing…") / done (shows a "recent input" strip below).
+- Behavior: click → `POST /api/ingest {content, channel}` → immediately shows "Decomposing" → cards appear via SSE.
+- Tokens: CTA `--token-brand-primary`, border `--b1`, background `--s1`.
 
-### 4.3 Filterbar — 필터 행(~75) 재조준
-- 제거: `코어/도메인/교차검증/Phase만`(하네스 내부용).
-- 신규: 채널(전체/X/in/YT) + 토글(위험만/보강카드/비용갭). 우측 검색 + **내보내기** 메뉴.
-- 토큰: 활성 칩 `--token-brand-primary`, 비활성 `--s2/--t2`.
+### 4.3 Filterbar — re-aim the filter row (~75)
+- Remove: `Core/Domain/Cross-validation/Phase-only` (harness-internal).
+- New: channel (All/X/in/YT) + toggles (risk only / gapfill cards / cost gap). Right side: search + **export** menu.
+- Tokens: active chip `--token-brand-primary`, inactive `--s2/--t2`.
 
-### 4.4 컬럼 — `kanban.html:523-539`
-- 라벨만 교체: 대기→**분해됨**, 진행중→**검증중**, 사람검토→**게이트·검토**, 완료→**검증완료**.
-- 점색 애니메이션(`:165-168`) 그대로(회/파→펄스/빨/초). `getCol()`(`:564`) 매핑 유지.
+### 4.4 Columns — `kanban.html:523-539`
+- Labels only: Pending → **Decomposed**, In-progress → **Verifying**, Human review → **Gate · Review**, Done → **Verified**.
+- Keep the dot color animation (`:165-168`) as-is (gray/blue → pulse/red/green). Keep the `getCol()` (`:564`) mapping.
 
-### 4.5 카드(원본) — `taskCardHTML() :660-674`
+### 4.5 Card (original) — `taskCardHTML() :660-674`
 ```
 ┌ #3 ──────────────── X · ⚠62 · 💸$0.40 ─┐
-│ Supabase 프로젝트 생성·키 발급             │   ← .tc-title
-│ ◐ verify-agent · reviewer:codex  ✓교차    │   ← .tc-meta (기존)
-│ 주장 5분·무료  →  실측 12분·$0.40  ▲       │   ← .tc-claimline (신규)
+│ Create Supabase project · issue keys     │   ← .tc-title
+│ ◐ verify-agent · reviewer:codex  ✓cross  │   ← .tc-meta (existing)
+│ claim 5 min·free  →  measured 12 min·$0.40  ▲ │   ← .tc-claimline (new)
 └──────────────────────────────────────────┘
 ```
-- 신규: `.tc-top`에 배지 행(채널·리스크·비용갭), `.tc-claimline`(주장→실측, 갭이면 `--x-gap-worse`).
-- 우아한 degrade: measured 없으면 `주장 5분·무료 · 측정 대기` 로 표시(회색).
+- New: a badge row in `.tc-top` (channel · risk · cost gap), `.tc-claimline` (claim → measured, `--x-gap-worse` on a gap).
+- Graceful degrade: when there's no `measured`, show `claim 5 min·free · awaiting measurement` (gray).
 
-### 4.6 카드(보강·회색) — 동일 함수, 분기
+### 4.6 Card (gapfill · gray) — same function, branch
 ```
-┌╌ #4 ╌╌╌╌╌╌╌╌╌ 보강 · 작성자 생략 ╌┐
-│ (누락) .env 설정 + 키 보안            │
-│ gapfill-agent                       │
+┌╌ #4 ╌╌╌╌╌╌╌╌╌ gapfill · author omitted ╌┐
+│ (missing) .env setup + key security        │
+│ gapfill-agent                              │
 └╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌┘
 ```
-- `metadata.kind==="gapfill"` → `.tc[data-type=gapfill]`: 점선 테두리·`--x-gapfill-bg`·흐림(opacity .85)·"보강" 태그.
+- `metadata.kind==="gapfill"` → `.tc[data-type=gapfill]`: dashed border · `--x-gapfill-bg` · dimmed (opacity .85) · "gapfill" tag.
 
-### 4.7 카드 상세 모달 — `openTaskModal() :733-756`
-- 신규 섹션 3개:
-  - **주장 vs 실측 표**: 시간·비용·재현 × (주장|실측|갭). 갭 셀 색 = `--x-gap-worse/ok`.
-  - **리스크**: 게이지 바(`risk.score`/100, 색=low/mid/high) + `flags` 리스트.
-  - **누락 단계**: 이 카드의 gapfill 자식(`parentId`) 링크.
-- 게이트: `gate.status==="blocked"`면 상단 빨강 배너 + **승인/반려**(기존 `/api/tasks/:id/review` 재사용).
+### 4.7 Card detail modal — `openTaskModal() :733-756`
+- Three new sections:
+  - **Claim vs. measured table**: time · cost · reproduction × (claim | measured | gap). Gap cell color = `--x-gap-worse/ok`.
+  - **Risk**: gauge bar (`risk.score`/100, color = low/mid/high) + `flags` list.
+  - **Missing steps**: links to this card's gapfill children (`parentId`).
+- Gate: when `gate.status==="blocked"`, show a red banner at the top + **approve/reject** (reuse existing `/api/tasks/:id/review`).
 
-### 4.8 로그 패널 — 운영 스레드(`:541`) 재라벨
-- "운영 스레드"→**파이프라인 로그**. 기능 그대로(append-only, SSE). 분해/실측/리스크 이벤트가 흐름.
+### 4.8 Log panel — relabel the ops thread (`:541`)
+- "Ops thread" → **Pipeline log**. Same functionality (append-only, SSE). Decomposition/measurement/risk events flow through it.
 
-### 4.9 내보내기 메뉴 — 신규(후순위 Stage 5)
-- 드롭다운: SKILL.md / JSON / CLI. `POST /api/export/:format`.
+### 4.9 Export menu — new (lower priority, Stage 5)
+- Dropdown: SKILL.md / JSON / CLI. `POST /api/export/:format`.
 
-### 4.10 상태 화면
-- 빈 보드: "콘텐츠를 붙여넣으면 검증이 시작됩니다" (Hero로 시선 유도).
-- 분해 중: 스켈레톤 카드 3개.
-- 분해 실패: 토스트(`--token-toast-err-*`) + 로그 기록.
-
----
-
-## 5. 인터랙션 플로우
-
-1. **붙여넣기 → 분해(정적)**: Hero 입력 → 분해하기 → "분해 중"(즉시) → 1분 내 원본 카드들 `분해됨` 컬럼에 등장 + 회색 보강 카드 삽입. 1차 리스크 플래그.
-2. **동적 검증(백그라운드)**: 카드가 자동으로 `검증중`으로 흘러가며 risk/measured가 카드에 채워짐(수 분~수 시간). watch 스케줄러 재사용.
-3. **게이트 정지**: 위험 카드(risk≥70 또는 보안 플래그)는 `게이트·검토`에서 멈춤 → 모달에서 승인/반려.
-4. **내보내기**: 검증 끝난 보드 → 모듈(SKILL.md/JSON/CLI) + 5종 리포트.
+### 4.10 State screens
+- Empty board: "Paste content to start verification" (draw the eye toward Hero).
+- Decomposing: 3 skeleton cards.
+- Decomposition failed: toast (`--token-toast-err-*`) + log entry.
 
 ---
 
-## 6. 모션
-- 카드 등장: fade+slide-up 150ms(`--token-duration-fast`). 분해 시 순차 stagger.
-- 단계 이동: 컬럼 간 이동은 기존 SSE 리렌더(250ms 디바운스) 유지.
-- 검증중 카드: `◐` 회전 또는 점색 펄스(`--token-duration-pulse`).
-- 리스크 게이지: 0→점수 width 트랜지션 400ms.
+## 5. Interaction Flow
+
+1. **Paste → decompose (static)**: Hero input → Decompose → "Decomposing" (instant) → within a minute, original cards appear in the `Decomposed` column + gray gapfill cards inserted. First-pass risk flags.
+2. **Dynamic verification (background)**: cards automatically flow to `Verifying` while risk/measured get filled in (minutes to hours). Reuses the watch scheduler.
+3. **Gate halt**: risky cards (risk ≥ 70 or security flag) stop at `Gate · Review` → approve/reject in the modal.
+4. **Export**: a fully verified board → modules (SKILL.md/JSON/CLI) + 5 reports.
 
 ---
 
-## 7. 구현 매핑 & 빌드 시퀀스
+## 6. Motion
+- Card appearance: fade + slide-up 150ms (`--token-duration-fast`). Sequential stagger during decomposition.
+- Stage move: column-to-column movement keeps the existing SSE re-render (250ms debounce).
+- Verifying card: `◐` spin or dot-color pulse (`--token-duration-pulse`).
+- Risk gauge: 0 → score width transition 400ms.
 
-| 작업 | 파일 | 종류 |
+---
+
+## 7. Implementation Mapping & Build Sequence
+
+| Task | File | Type |
 |---|---|---|
-| 브랜드/제품 토큰 | `ui/styles/tokens.css` | 값 교체 + 신규 변수 |
-| 토큰 카피·카운터·로고 | `kanban.html` 헤더 | 수정 |
-| Hero | `하네스 개요` 영역 | 교체(신규 컴포넌트 + JS) |
-| 필터 재조준 | 필터 행 | 수정 |
-| 컬럼 라벨 | `:523-539` | 수정 |
-| 카드(배지·보강·주장→실측) | `taskCardHTML :660` | 확장 |
-| 모달(주장-vs-실측·리스크·게이트) | `openTaskModal :733` | 확장 |
-| 신규 CSS | `kanban.css` | `.tc[data-type=gapfill]`·`.tc-badge`·`.x-gauge`·`.hero-*` |
+| Brand/product tokens | `ui/styles/tokens.css` | Value swap + new variables |
+| Token copy · counters · logo | `kanban.html` header | Edit |
+| Hero | `harness overview` area | Replace (new component + JS) |
+| Filter re-aim | filter row | Edit |
+| Column labels | `:523-539` | Edit |
+| Card (badges · gapfill · claim → measured) | `taskCardHTML :660` | Extend |
+| Modal (claim-vs-measured · risk · gate) | `openTaskModal :733` | Extend |
+| New CSS | `kanban.css` | `.tc[data-type=gapfill]` · `.tc-badge` · `.x-gauge` · `.hero-*` |
 
-**Stage 0 (UI 리스킨, 데이터 의존 0) 세부**:
-1. `tokens.css`: 브랜드 인디고 + 제품 토큰 추가.
-2. Topbar 카피·카운터·로고.
-3. `하네스 개요` → Ingest Hero(분해 버튼은 `/api/ingest`에 연결, 라우트는 Stage 1).
-4. 필터 재조준 + 컬럼 라벨.
-5. 카드/모달은 빈 필드에도 안 깨지게 신규 CSS 골격만(데이터는 Stage 2~3에서 채움).
-→ 결과: **데이터 없이도 보드가 "10XAI 제품"으로 보임.** 캡처로 확인.
+**Stage 0 (UI reskin, zero data dependency) details**:
+1. `tokens.css`: add brand indigo + product tokens.
+2. Topbar copy · counters · logo.
+3. `harness overview` → Ingest Hero (the Decompose button connects to `/api/ingest`; the route lands in Stage 1).
+4. Filter re-aim + column labels.
+5. Cards/modal: just the new CSS skeleton so they don't break on empty fields (data is filled in Stage 2~3).
+→ Result: **even without data, the board looks like the "10XAI product."** Confirm by capture.
 
-이후 Stage 1(ingest 완성) → 2(카드 외형) → 3(모달) → 4(파이프라인 에이전트) → 5(export).
+After this: Stage 1 (ingest complete) → 2 (card appearance) → 3 (modal) → 4 (pipeline agents) → 5 (export).

@@ -447,7 +447,7 @@ function updateTask(id, data) {
       logActivity({ type: "completed", taskId: String(id), subject: task.subject, agent: task.agent || task.owner || "", detail: task.reportSummary || "", reportSummary: task.reportSummary, reportPath: task.reportPath, parentId: task.parentId });
       try {
         const head = (task.reportSummary || "").split("\n")[0].slice(0, 240);
-        const line = "✅ #" + id + M(" completed"," 완료") + (head ? " — " + head : "");
+        const line = "✅ #" + id + M(" completed"," completed") + (head ? " — " + head : "");
         opsAppend("system", line, String(id));
         telegramSend(line);
       } catch {}
@@ -773,7 +773,7 @@ function defaultResourceTemplate(kind, name) {
   if (kind === "agent-create") {
     const tpl = path.join(AGENTS_DIR, "_TEMPLATE.md");
     if (fs.existsSync(tpl)) return fs.readFileSync(tpl, "utf-8").replace(/name:\s*my-agent/, "name: " + clean).replace(/# My Agent/, "# " + clean);
-    return stringifyFrontmatter({ name: clean, mission: "", runner: "claude", group: "core" }, "# " + clean + "\n\n## 1. 역할(ROLE)\n\n## 2. 참조(REFERENCE)\n\n## 3. 제약(CONSTRAINTS)\n\n## 4. 출력(OUTPUT)\n\n## 5. 검증(VALIDATION)\n");
+    return stringifyFrontmatter({ name: clean, mission: "", runner: "claude", group: "core" }, "# " + clean + "\n\n## 1. ROLE\n\n## 2. REFERENCE\n\n## 3. CONSTRAINTS\n\n## 4. OUTPUT\n\n## 5. VALIDATION\n");
   }
   if (kind === "skill-create") {
     return stringifyFrontmatter({ name: clean, description: "" }, "# /" + clean + "\n\nWhen invoked:\n1. TODO\n");
@@ -1125,7 +1125,7 @@ function spawnCli(cmd, args, prompt, useStreamJson, taskId, onChunk, onClose) {
   proc.stderr.on("data", (data) => broadcastRaw({ type: "exec_error", taskId, chunk: data.toString() }));
   proc.on("error", () => {});
   proc.on("close", (code) => onClose(code, out));
-  try { proc.stdin.write(prompt + (UI_LANG==="en"?"\n\n[OUTPUT LANGUAGE] Respond ONLY in English. Every text field — subjects, descriptions, notes, summaries — must be written in natural English.":"\n\n[출력 언어] 모든 텍스트를 한국어로만 작성하라.")); proc.stdin.end();
+  try { proc.stdin.write(prompt + (UI_LANG==="en"?"\n\n[OUTPUT LANGUAGE] Respond ONLY in English. Every text field — subjects, descriptions, notes, summaries — must be written in natural English.":"\n\n[OUTPUT LANGUAGE] Write all text in Korean only.")); proc.stdin.end();
     var _wd=setTimeout(function(){try{proc.kill();}catch(e){}},70000); proc.on("close",function(){clearTimeout(_wd);}); } catch {}
   return proc;
 }
@@ -1548,7 +1548,7 @@ function handleSlackAsk(question, channelId, client) {
   const askEnv = Object.assign({}, process.env);
   delete askEnv.ANTHROPIC_API_KEY;
   const proc = spawn("claude", ["-p", "--output-format", "text", "--model", "sonnet", "--no-session-persistence"], { cwd: REPO_PATH, env: askEnv, stdio: ["pipe", "pipe", "pipe"] });
-  proc.stdin.write(prompt + (UI_LANG==="en"?"\n\n[OUTPUT LANGUAGE] Respond ONLY in English. Every text field — subjects, descriptions, notes, summaries — must be written in natural English.":"\n\n[출력 언어] 모든 텍스트를 한국어로만 작성하라.")); proc.stdin.end();
+  proc.stdin.write(prompt + (UI_LANG==="en"?"\n\n[OUTPUT LANGUAGE] Respond ONLY in English. Every text field — subjects, descriptions, notes, summaries — must be written in natural English.":"\n\n[OUTPUT LANGUAGE] Write all text in Korean only.")); proc.stdin.end();
     var _wd=setTimeout(function(){try{proc.kill();}catch(e){}},70000); proc.on("close",function(){clearTimeout(_wd);});
   let output = "";
   proc.stdout.on("data", (data) => { output += data.toString(); });
@@ -1743,10 +1743,10 @@ function opsAssistantReply(userText) {
     const tasks = readAllTasks();
     const summary = tasks.slice(0, 25).map(function(t){return "#"+t.id+" ["+t.status+"] "+(t.subject||"");}).join("\n");
     const prompt =
-      "너는 10XAI 운영 스레드 어시스턴트다. 10XAI는 빌더 콘텐츠(트윗/링크드인) URL을 받아 연관 GitHub를 분해 -> 검증 멀티에이전트 -> 실행 멀티에이전트로 산출물을 만드는 서비스다.\n현재 보드:\n" + (summary || "(카드 없음)") + "\n\n운영자: " + userText + "\n\n한국어로 2~3문장 이내, 간결하게. 진행상황과 다음 액션을 안내하라.";
+      "You are the 10XAI ops-thread assistant. 10XAI is a service that takes a builder-content (tweet/LinkedIn) URL, decomposes the related GitHub repo -> runs a verification multi-agent -> runs an execution multi-agent to produce deliverables.\nCurrent board:\n" + (summary || "(no cards)") + "\n\nOperator: " + userText + "\n\nIn 2-3 sentences, concisely. Report the progress and guide the next action.";
     const env = Object.assign({}, process.env); delete env.ANTHROPIC_API_KEY;
     const proc = spawn("claude", ["-p", "--model", "haiku", "--no-session-persistence"], { cwd: HARNESS_ROOT, env, stdio: ["pipe","pipe","pipe"] });
-    proc.stdin.write(prompt + (UI_LANG==="en"?"\n\n[OUTPUT LANGUAGE] Respond ONLY in English. Every text field — subjects, descriptions, notes, summaries — must be written in natural English.":"\n\n[출력 언어] 모든 텍스트를 한국어로만 작성하라.")); proc.stdin.end();
+    proc.stdin.write(prompt + (UI_LANG==="en"?"\n\n[OUTPUT LANGUAGE] Respond ONLY in English. Every text field — subjects, descriptions, notes, summaries — must be written in natural English.":"\n\n[OUTPUT LANGUAGE] Write all text in Korean only.")); proc.stdin.end();
     var _wd=setTimeout(function(){try{proc.kill();}catch(e){}},70000); proc.on("close",function(){clearTimeout(_wd);});
     let out = "";
     proc.stdout.on("data", function(d){ out += d.toString(); });
@@ -1770,17 +1770,17 @@ async function runIngest(input, channel) {
   if (!gh) {
     const siteUrls = ((pageText||"").match(/https?:\/\/[^\s"'<>]+/g) || []).filter(function(u){return !/twitter\.com|x\.com|t\.co/.test(u);}).slice(0,2);
     for (const su of siteUrls) {
-      try { const page = await httpGet(su); if (page.body) { const g2 = extractGithubRepo(page.body); if (g2) { gh = g2; opsAppend("system",M("🔗 Found GitHub via "+su+": ","🔗 "+su+" 에서 GitHub 발견: ")+g2.owner+"/"+g2.repo, null); break; } } } catch(e){}
+      try { const page = await httpGet(su); if (page.body) { const g2 = extractGithubRepo(page.body); if (g2) { gh = g2; opsAppend("system",M("🔗 Found GitHub via "+su+": ","🔗 Found GitHub at "+su+": ")+g2.owner+"/"+g2.repo, null); break; } } } catch(e){}
     }
   }
   let repoInfo = null;
-  let bundle = "## 원문 입력 (channel: " + (channel || "x") + ")\n" + raw.slice(0, 4000);
-  if (pageText) bundle += "\n\n## 가져온 페이지 본문\n" + pageText;
+  let bundle = "## Original input (channel: " + (channel || "x") + ")\n" + raw.slice(0, 4000);
+  if (pageText) bundle += "\n\n## Fetched page body\n" + pageText;
   if (gh) {
     try {
-      opsAppend("system", M("🔗 Linking related GitHub: ","🔗 연관 GitHub 연동 중: ") + gh.owner + "/" + gh.repo, null);
+      opsAppend("system", M("🔗 Linking related GitHub: ","🔗 Linking related GitHub: ") + gh.owner + "/" + gh.repo, null);
       repoInfo = await loadGithubRepo(gh.owner, gh.repo);
-      bundle += "\n\n## 연관 GitHub: " + repoInfo.repo + "\n### README\n" + (repoInfo.readme || "(없음)");
+      bundle += "\n\n## Related GitHub: " + repoInfo.repo + "\n### README\n" + (repoInfo.readme || "(none)");
       for (const s of repoInfo.skills) bundle += "\n\n### " + s.path + "\n" + s.content;
     } catch {}
   }
@@ -1790,14 +1790,14 @@ async function runIngest(input, channel) {
 function ingestContent(content, channel, extra) {
   const spec = readAgentPrompt("decompose-agent");
   const prompt =
-    spec + "\n\n---\n## 입력 콘텐츠 (channel: " + (channel || "x") + ")\n\n" +
+    spec + "\n\n---\n## Input content (channel: " + (channel || "x") + ")\n\n" +
     String(content || "").slice(0, 12000) +
-    "\n\n---\n위 콘텐츠를 분해해서 JSON 배열만 출력해라.";
+    "\n\n---\nDecompose the content above and output only a JSON array.";
   const env = Object.assign({}, process.env);
   delete env.ANTHROPIC_API_KEY;
   const proc = spawn("claude", ["-p", "--model", "opus", "--no-session-persistence"],
     { cwd: HARNESS_ROOT, env, stdio: ["pipe", "pipe", "pipe"] });
-  proc.stdin.write(prompt + (UI_LANG==="en"?"\n\n[OUTPUT LANGUAGE] Respond ONLY in English. Every text field — subjects, descriptions, notes, summaries — must be written in natural English.":"\n\n[출력 언어] 모든 텍스트를 한국어로만 작성하라.")); proc.stdin.end();
+  proc.stdin.write(prompt + (UI_LANG==="en"?"\n\n[OUTPUT LANGUAGE] Respond ONLY in English. Every text field — subjects, descriptions, notes, summaries — must be written in natural English.":"\n\n[OUTPUT LANGUAGE] Write all text in Korean only.")); proc.stdin.end();
     var _wd=setTimeout(function(){try{proc.kill();}catch(e){}},70000); proc.on("close",function(){clearTimeout(_wd);});
   let out = "", err = "";
   proc.stdout.on("data", (d) => { out += d.toString(); });
@@ -1805,7 +1805,7 @@ function ingestContent(content, channel, extra) {
   proc.on("close", () => {
     const cards = extractJsonArray(out);
     if (!Array.isArray(cards) || !cards.length) {
-      try { opsAppend("system", M("⚠️ Decomposition failed — could not create cards. ","⚠️ 분해 실패 — 카드를 만들지 못했습니다. ") + (err.slice(0, 200) || out.slice(0, 200)), null); } catch {}
+      try { opsAppend("system", M("⚠️ Decomposition failed — could not create cards. ","⚠️ Decomposition failed — could not create cards. ") + (err.slice(0, 200) || out.slice(0, 200)), null); } catch {}
       return;
     }
     cards.sort((a, b) => (a.order || 0) - (b.order || 0));
@@ -1835,27 +1835,27 @@ function ingestContent(content, channel, extra) {
         made++;
       } catch {}
     }
-    try { opsAppend("system", M("📥 Decomposition complete — " + made + " cards created (" + (channel || "x") + ")","📥 콘텐츠 분해 완료 — 카드 " + made + "개 생성 (" + (channel || "x") + ")"), null); } catch {}
+    try { opsAppend("system", M("📥 Decomposition complete — " + made + " cards created (" + (channel || "x") + ")","📥 Content decomposition complete — " + made + " cards created (" + (channel || "x") + ")"), null); } catch {}
     if (made > 0) { try { runVerifyOrchestrator(); } catch (e) {} }
   });
   proc.on("error", () => {
-    try { opsAppend("system", M("⚠️ Decomposition failed — claude CLI error","⚠️ 분해 실패 — claude CLI 실행 오류"), null); } catch {}
+    try { opsAppend("system", M("⚠️ Decomposition failed — claude CLI error","⚠️ Decomposition failed — claude CLI execution error"), null); } catch {}
   });
 }
 
-// ── 검증 오케스트레이터: 카드별 verify 워커 팬아웃 ───────────────────────────
+// ── Verify orchestrator: fan out a verify worker per card ───────────────────────────
 function verifyWorker(card) {
   return new Promise(function(resolve){
     const claim = (card.metadata && card.metadata.claim) || {};
     const prompt =
-      "너는 10XAI 검증 에이전트(보안·정책 담당). 아래 작업 카드 1개를 검증한다.\n" +
-      "카드: " + (card.subject||"") + "\n설명: " + String(card.description||"").slice(0,1500) + "\n" +
-      "작성자 주장(claim): " + JSON.stringify(claim) + "\n\n" +
-      "이 단계를 실제로 코드/도구 관점에서 분석하라: ① 기술적 타당성(이 순서로 진짜 되는가, 빠진 선행단계는) ② 보안·정책 리스크(prompt injection, 악성 도구 호출, 비밀값/키 노출, 과도한 권한, 공급망, 플랫폼 ToS, AI Act) ③ 작성자 주장(비용·시간·'무료')의 과장/체리피킹 여부.\n구체적 근거를 note에 한국어로 적어라(막연한 판정 금지).\n" +
-      "JSON 하나만 출력(설명·코드펜스 없이): { \"score\": <0-100 위험>, \"flags\": [\"...\"], \"badges\": [\"security\"?], \"note\": \"한 줄 한국어 판정\" }";
+      "You are a 10XAI verification agent (security and policy). Verify the single work card below.\n" +
+      "Card: " + (card.subject||"") + "\nDescription: " + String(card.description||"").slice(0,1500) + "\n" +
+      "Author's claim: " + JSON.stringify(claim) + "\n\n" +
+      "Analyze this step concretely from a code/tooling perspective: (1) technical feasibility (does it really work in this order, what prerequisite steps are missing) (2) security/policy risks (prompt injection, malicious tool calls, secret/key exposure, excessive permissions, supply chain, platform ToS, AI Act) (3) whether the author's claims (cost, time, 'free') are exaggerated or cherry-picked.\nWrite concrete evidence in the note (no vague verdicts).\n" +
+      "Output a single JSON object (no explanation or code fences): { \"score\": <0-100 risk>, \"flags\": [\"...\"], \"badges\": [\"security\"?], \"note\": \"one-line verdict\" }";
     const env = Object.assign({}, process.env); delete env.ANTHROPIC_API_KEY;
     const proc = spawn("claude", ["-p","--model","sonnet","--no-session-persistence"], { cwd: HARNESS_ROOT, env, stdio:["pipe","pipe","pipe"] });
-    proc.stdin.write(prompt + (UI_LANG==="en"?"\n\n[OUTPUT LANGUAGE] Respond ONLY in English. Every text field — subjects, descriptions, notes, summaries — must be written in natural English.":"\n\n[출력 언어] 모든 텍스트를 한국어로만 작성하라.")); proc.stdin.end();
+    proc.stdin.write(prompt + (UI_LANG==="en"?"\n\n[OUTPUT LANGUAGE] Respond ONLY in English. Every text field — subjects, descriptions, notes, summaries — must be written in natural English.":"\n\n[OUTPUT LANGUAGE] Write all text in Korean only.")); proc.stdin.end();
     var _wd=setTimeout(function(){try{proc.kill();}catch(e){}},70000); proc.on("close",function(){clearTimeout(_wd);});
     let out="";
     proc.stdout.on("data", function(d){ out+=d.toString(); });
@@ -1866,12 +1866,12 @@ function verifyWorker(card) {
 async function runVerifyOrchestrator(batchId) {
   let cards = readAllTasks().filter(function(t){ const m=t.metadata||{}; return (m.phase==="verify"||!m.phase) && t.status==="pending" && (m.source==="ingest"||m.kind==="original"||m.kind==="gapfill"); });
   if (batchId) cards = cards.filter(function(t){ return (t.metadata&&t.metadata.batchId)===batchId; });
-  if (!cards.length) { opsAppend("system",M("No decomposed cards to verify.","검증할 분해됨 카드가 없습니다."),null); return; }
-  opsAppend("system",M("🔍 Verify orchestrator started — fanning out verify workers across "+cards.length+" cards (parallel)","🔍 검증 오케스트레이터 시작 — 카드 "+cards.length+"개에 검증 워커 분배(병렬 팬아웃)"), null);
+  if (!cards.length) { opsAppend("system",M("No decomposed cards to verify.","No decomposed cards to verify."),null); return; }
+  opsAppend("system",M("🔍 Verify orchestrator started — fanning out verify workers across "+cards.length+" cards (parallel)","🔍 Verify orchestrator started — fanning out verify workers across "+cards.length+" cards (parallel fan-out)"), null);
   let risky=0;
   await Promise.all(cards.map(async function(card){
     updateTask(card.id, { status:"in_progress", metadata:{ assignedTo:"verify-agent#"+card.id } });
-    opsAppend("system",M("🔍 #"+card.id+" verify worker running… ("+String(card.subject||"").slice(0,30)+")","🔍 #"+card.id+" 검증 워커 실행 중… ("+String(card.subject||"").slice(0,30)+")"), null);
+    opsAppend("system",M("🔍 #"+card.id+" verify worker running… ("+String(card.subject||"").slice(0,30)+")","🔍 #"+card.id+" verify worker running… ("+String(card.subject||"").slice(0,30)+")"), null);
     const r = await verifyWorker(card);
     const score = (r && typeof r.score==="number") ? r.score : 30;
     const flags = (r && Array.isArray(r.flags)) ? r.flags : [];
@@ -1879,25 +1879,25 @@ async function runVerifyOrchestrator(batchId) {
     const note = (r && r.note) ? String(r.note) : "";
     const blocked = score>=75 || flags.some(function(f){ return /secret|inject|malicious|payment/i.test(String(f)); });
     const upd = { metadata:{ verify:{ status:"done", risk:{ score:score, flags:flags }, note:note, gate:{ status: blocked?"blocked":"open" } }, badges:badges, risk:{ score:score, flags:flags } } };
-    if (blocked) { upd.status="in_review"; risky++; opsAppend("system",M("⚠️ #"+card.id+" gated — risk "+score+" ("+(note||flags.join(","))+")","⚠️ #"+card.id+" 게이트·검토 — risk "+score+" ("+(note||flags.join(","))+")"), null); }
-    else { upd.status="pending"; upd.metadata.phase="execute"; opsAppend("system",M("✅ #"+card.id+" verified → moved to execute queue (risk "+score+(note?" · "+note:"")+")","✅ #"+card.id+" 검증 통과 → 실행 대기로 이동 (risk "+score+(note?" · "+note:"")+")"), null); }
+    if (blocked) { upd.status="in_review"; risky++; opsAppend("system",M("⚠️ #"+card.id+" gated — risk "+score+" ("+(note||flags.join(","))+")","⚠️ #"+card.id+" gated for review — risk "+score+" ("+(note||flags.join(","))+")"), null); }
+    else { upd.status="pending"; upd.metadata.phase="execute"; opsAppend("system",M("✅ #"+card.id+" verified → moved to execute queue (risk "+score+(note?" · "+note:"")+")","✅ #"+card.id+" verified → moved to execute queue (risk "+score+(note?" · "+note:"")+")"), null); }
     updateTask(card.id, upd);
   }));
   const passed = cards.length - risky;
   const gateMsg = (risky>0)
-    ? M("✅ Verification complete — "+passed+" card(s) passed and are waiting in the Execute pipeline. Press ▶ Run to execute via harness engineering. "+risky+" risky card(s) are at the gate — try 🔧 Repair to resolve them.","✅ 검증 완료 — 통과 "+passed+"건이 실행 파이프라인에서 대기 중입니다. ▶ 실행하기를 누르면 하네스 엔지니어링으로 실행됩니다. 위험 "+risky+"건은 게이트에 있고, 🔧 게이트 수리로 문제해결을 시도할 수 있습니다.")
-    : M("✅ Verification complete — all "+passed+" card(s) passed and are waiting in the Execute pipeline. Press ▶ Run to execute.","✅ 검증 완료 — "+passed+"건 모두 통과해 실행 파이프라인에서 대기 중입니다. ▶ 실행하기를 누르면 실행됩니다.");
+    ? M("✅ Verification complete — "+passed+" card(s) passed and are waiting in the Execute pipeline. Press ▶ Run to execute via harness engineering. "+risky+" risky card(s) are at the gate — try 🔧 Repair to resolve them.","✅ Verification complete — "+passed+" card(s) passed and are waiting in the Execute pipeline. Press ▶ Run to execute via harness engineering. "+risky+" risky card(s) are at the gate — try 🔧 Repair to resolve them.")
+    : M("✅ Verification complete — all "+passed+" card(s) passed and are waiting in the Execute pipeline. Press ▶ Run to execute.","✅ Verification complete — all "+passed+" card(s) passed and are waiting in the Execute pipeline. Press ▶ Run to execute.");
   opsAppend("claude", gateMsg, null);
 }
 
-// ── 실행 오케스트레이터: 검증 통과 카드를 실행 파이프라인으로 분배·동시 실행 ──
+// ── Execute orchestrator: distribute verified cards to the execute pipeline and run concurrently ──
 function execWorker(card) {
   return new Promise(function(resolve){
     const claim=(card.metadata&&card.metadata.claim)||{};
-    const prompt="너는 10XAI 실행 에이전트. 아래 '검증 통과' 카드를 격리 샌드박스에서 실제 실행한다고 보고, 현실적인 실측치를 추정하라(작성자 주장과 비교).\n카드: "+(card.subject||"")+"\n설명: "+String(card.description||"").slice(0,800)+"\n작성자 주장: "+JSON.stringify(claim)+"\nJSON 하나만 출력(설명 없이): { \"cost\": <USD 숫자>, \"timeMin\": <분 숫자>, \"successRate\": <0~1>, \"failed\": <true/false>, \"failureMode\": \"<없으면 빈칸>\", \"note\": \"<한 줄 한국어 산출 결과>\" }";
+    const prompt="You are a 10XAI execution agent. Imagine actually running the 'verified' card below in an isolated sandbox, and estimate realistic measured values (compared against the author's claims).\nCard: "+(card.subject||"")+"\nDescription: "+String(card.description||"").slice(0,800)+"\nAuthor's claim: "+JSON.stringify(claim)+"\nOutput a single JSON object (no explanation): { \"cost\": <USD number>, \"timeMin\": <minutes number>, \"successRate\": <0-1>, \"failed\": <true/false>, \"failureMode\": \"<blank if none>\", \"note\": \"<one-line result>\" }";
     const env=Object.assign({},process.env); delete env.ANTHROPIC_API_KEY;
     const proc=spawn("claude",["-p","--model","sonnet","--no-session-persistence"],{cwd:HARNESS_ROOT,env,stdio:["pipe","pipe","pipe"]});
-    proc.stdin.write(prompt + (UI_LANG==="en"?"\n\n[OUTPUT LANGUAGE] Respond ONLY in English. Every text field — subjects, descriptions, notes, summaries — must be written in natural English.":"\n\n[출력 언어] 모든 텍스트를 한국어로만 작성하라.")); proc.stdin.end();
+    proc.stdin.write(prompt + (UI_LANG==="en"?"\n\n[OUTPUT LANGUAGE] Respond ONLY in English. Every text field — subjects, descriptions, notes, summaries — must be written in natural English.":"\n\n[OUTPUT LANGUAGE] Write all text in Korean only.")); proc.stdin.end();
     var _wd=setTimeout(function(){try{proc.kill();}catch(e){}},70000); proc.on("close",function(){clearTimeout(_wd);});
     let out=""; proc.stdout.on("data",function(d){out+=d.toString();});
     proc.on("close",function(){let r=null;try{const s=out.indexOf("{"),e=out.lastIndexOf("}");if(s>-1&&e>-1)r=JSON.parse(out.slice(s,e+1));}catch(x){}resolve(r);});
@@ -1914,46 +1914,46 @@ function buildLibraryModule(cards) {
     const repo = m0.repo || ""; const sourceUrl = m0.sourceUrl || ""; const channel = m0.sourceChannel || "x";
     const now = new Date(); const id = String(now.getTime());
     const base = (repo ? repo.replace(/[^A-Za-z0-9]+/g, "-") : "module") + "-" + id;
-    const mod = { id: id, name: repo || ("검증 모듈 " + id), repo: repo, sourceUrl: sourceUrl, channel: channel, createdAt: now.toISOString(),
+    const mod = { id: id, name: repo || ("Verified module " + id), repo: repo, sourceUrl: sourceUrl, channel: channel, createdAt: now.toISOString(),
       cards: cards.map(function(c){ const m=c.metadata||{}; return { subject:c.subject, claim:m.claim||null, risk:(m.verify&&m.verify.risk)||m.risk||null, measured:m.measured||null }; }) };
     fs.writeFileSync(path.join(LIB_DIR, base + ".json"), JSON.stringify(mod, null, 2));
-    let md = "---\nname: " + base + "\nsource: " + (sourceUrl||repo||"-") + "\nverified: true\ncreatedAt: " + mod.createdAt + "\n---\n\n# " + (repo||"검증 모듈") + "\n\n검증·실측 완료된 실행 모듈.\n\n";
-    cards.forEach(function(c,i){ const m=c.metadata||{}; const mm=m.measured||{}; md += (i+1)+". "+(c.subject||"")+"  — 실측 "+(mm.timeMin!=null?mm.timeMin+"분":"-")+" / $"+(mm.cost!=null?mm.cost:"-")+" / 성공률 "+(mm.successRate!=null?Math.round(mm.successRate*100)+"%":"-")+"\n"; });
+    let md = "---\nname: " + base + "\nsource: " + (sourceUrl||repo||"-") + "\nverified: true\ncreatedAt: " + mod.createdAt + "\n---\n\n# " + (repo||"Verified module") + "\n\nExecution module that has been verified and measured.\n\n";
+    cards.forEach(function(c,i){ const m=c.metadata||{}; const mm=m.measured||{}; md += (i+1)+". "+(c.subject||"")+"  — measured "+(mm.timeMin!=null?mm.timeMin+"min":"-")+" / $"+(mm.cost!=null?mm.cost:"-")+" / success rate "+(mm.successRate!=null?Math.round(mm.successRate*100)+"%":"-")+"\n"; });
     fs.writeFileSync(path.join(LIB_DIR, base + ".md"), md);
     const idxPath = path.join(LIB_DIR, "index.json"); let idx = [];
     try { idx = JSON.parse(fs.readFileSync(idxPath, "utf-8")); } catch(e){}
     idx.unshift({ id: id, name: mod.name, repo: repo, sourceUrl: sourceUrl, channel: channel, cards: cards.length, createdAt: mod.createdAt, file: base + ".json", skill: base + ".md", cardsData: mod.cards });
     fs.writeFileSync(idxPath, JSON.stringify(idx.slice(0, 200), null, 2));
-    opsAppend("system", M("📚 Module added to Library — " + (repo || base) + " (" + cards.length + " cards, SKILL.md + JSON)","📚 라이브러리에 모듈 추가 — " + (repo || base) + " (" + cards.length + "카드, SKILL.md + JSON)"), null);
+    opsAppend("system", M("📚 Module added to Library — " + (repo || base) + " (" + cards.length + " cards, SKILL.md + JSON)","📚 Module added to Library — " + (repo || base) + " (" + cards.length + " cards, SKILL.md + JSON)"), null);
     return mod;
   } catch(e){ return null; }
 }
 async function runExecOrchestrator() {
   let cards=readAllTasks().filter(function(t){const m=t.metadata||{};return m.phase==="execute"&&t.status==="pending";});
-  if(!cards.length){opsAppend("system",M("No cards in the execute queue. (verify some first)","실행 대기 중인 카드가 없습니다. (검증을 먼저 통과시키세요)"),null);return;}
-  opsAppend("system",M("⚙ Execute orchestrator (opus) started — distributing "+cards.length+" verified cards to execute agents (concurrent)","⚙ 실행 오케스트레이터(opus) 시작 — 통과 카드 "+cards.length+"개를 실행 멀티에이전트로 분배·동시 실행"),null);
+  if(!cards.length){opsAppend("system",M("No cards in the execute queue. (verify some first)","No cards in the execute queue. (verify some first)"),null);return;}
+  opsAppend("system",M("⚙ Execute orchestrator (opus) started — distributing "+cards.length+" verified cards to execute agents (concurrent)","⚙ Execute orchestrator (opus) started — distributing "+cards.length+" verified cards to the execution multi-agent (concurrent)"),null);
   await Promise.all(cards.map(async function(card){
     updateTask(card.id,{status:"in_progress",metadata:{phase:"execute",assignedTo:"exec-runner#"+card.id}});
-    opsAppend("system",M("▶️ #"+card.id+" execute worker running… ("+String(card.subject||"").slice(0,28)+")","▶️ #"+card.id+" 실행 워커 가동… ("+String(card.subject||"").slice(0,28)+")"),null);
+    opsAppend("system",M("▶️ #"+card.id+" execute worker running… ("+String(card.subject||"").slice(0,28)+")","▶️ #"+card.id+" execute worker running… ("+String(card.subject||"").slice(0,28)+")"),null);
     const r=await execWorker(card);
     const numf=function(v){if(v==null)return null;const n=parseFloat(String(v).replace(/[^0-9.]/g,""));return isNaN(n)?null:n;};
     let sr=numf(r&&r.successRate); if(sr!=null&&sr>1) sr=sr/100;
     const measured={cost:numf(r&&r.cost),timeMin:numf(r&&r.timeMin),successRate:sr,failed:!!(r&&r.failed),failureMode:(r&&r.failureMode)||"",note:(r&&r.note)||""};
-    if(measured.cost==null&&measured.timeMin==null&&measured.successRate==null){const cl=(card.metadata&&card.metadata.claim)||{};measured.timeMin=cl.timeMin!=null?Math.round(cl.timeMin*1.8):8;measured.cost=cl.free===true?0.2:(cl.cost!=null?Number(cl.cost):0.1);measured.successRate=0.7;measured.note=(measured.note||"")+" (추정)";}
+    if(measured.cost==null&&measured.timeMin==null&&measured.successRate==null){const cl=(card.metadata&&card.metadata.claim)||{};measured.timeMin=cl.timeMin!=null?Math.round(cl.timeMin*1.8):8;measured.cost=cl.free===true?0.2:(cl.cost!=null?Number(cl.cost):0.1);measured.successRate=0.7;measured.note=(measured.note||"")+" (estimated)";}
     updateTask(card.id,{status:"completed",metadata:{phase:"execute",measured:measured}});
-    opsAppend("system",M("✅ #"+card.id+" output ready — measured "+(measured.timeMin!=null?measured.timeMin+"min":"-")+" / $"+(measured.cost!=null?measured.cost:"-")+" / success "+(measured.successRate!=null?Math.round(measured.successRate*100)+"%":"-"),"✅ #"+card.id+" 산출 완료 — 실측 "+(measured.timeMin!=null?measured.timeMin+"분":"-")+" / $"+(measured.cost!=null?measured.cost:"-")+" / 성공률 "+(measured.successRate!=null?Math.round(measured.successRate*100)+"%":"-")),null);
+    opsAppend("system",M("✅ #"+card.id+" output ready — measured "+(measured.timeMin!=null?measured.timeMin+"min":"-")+" / $"+(measured.cost!=null?measured.cost:"-")+" / success "+(measured.successRate!=null?Math.round(measured.successRate*100)+"%":"-"),"✅ #"+card.id+" output ready — measured "+(measured.timeMin!=null?measured.timeMin+"min":"-")+" / $"+(measured.cost!=null?measured.cost:"-")+" / success rate "+(measured.successRate!=null?Math.round(measured.successRate*100)+"%":"-")),null);
   }));
   try { buildLibraryModule(cards); } catch(e){}
-  opsAppend("claude",M("⚙ Execution complete — "+cards.length+" card outputs generated. Claim vs measured gaps are on each card and added to the Library. See the Execute Pipeline tab.","⚙ 실행 완료 — "+cards.length+"개 카드 산출물 생성. claim vs 실측 갭이 카드에 기록됐고 라이브러리에 누적됩니다. 실행 파이프라인 탭에서 확인하세요."),null);
+  opsAppend("claude",M("⚙ Execution complete — "+cards.length+" card outputs generated. Claim vs measured gaps are on each card and added to the Library. See the Execute Pipeline tab.","⚙ Execution complete — "+cards.length+" card outputs generated. Claim vs measured gaps are recorded on each card and accumulated in the Library. Check the Execute Pipeline tab."),null);
 }
 
 function repairWorker(card){
   return new Promise(function(resolve){
     var v=(card.metadata&&card.metadata.verify)||{};
-    var prompt="너는 10XAI repair 에이전트. 검증에서 게이트(보류)된 아래 카드의 보안·정책 문제를 분석하고 안전하게 해결 가능한지 판단하라.\n카드: "+(card.subject||"")+"\n설명: "+String(card.description||"").slice(0,600)+"\n위험: "+JSON.stringify(v.risk||{})+"\n판정: "+(v.note||"")+"\nJSON 하나만 출력: { \"resolved\": <true=안전하게 해결 가능>, \"fix\": \"<구체적 해결책 한두 줄, 한국어>\", \"residualRisk\": <0-100> }";
+    var prompt="You are a 10XAI repair agent. Analyze the security/policy issues of the card below that was gated (held) in verification, and decide whether it can be safely resolved.\nCard: "+(card.subject||"")+"\nDescription: "+String(card.description||"").slice(0,600)+"\nRisk: "+JSON.stringify(v.risk||{})+"\nVerdict: "+(v.note||"")+"\nOutput a single JSON object: { \"resolved\": <true=can be safely resolved>, \"fix\": \"<concrete fix in one or two lines>\", \"residualRisk\": <0-100> }";
     var env=Object.assign({},process.env); delete env.ANTHROPIC_API_KEY;
     var proc=spawn("claude",["-p","--model","sonnet","--no-session-persistence"],{cwd:HARNESS_ROOT,env,stdio:["pipe","pipe","pipe"]});
-    proc.stdin.write(prompt + (UI_LANG==="en"?"\n\n[OUTPUT LANGUAGE] Respond ONLY in English. Every text field — subjects, descriptions, notes, summaries — must be written in natural English.":"\n\n[출력 언어] 모든 텍스트를 한국어로만 작성하라.")); proc.stdin.end();
+    proc.stdin.write(prompt + (UI_LANG==="en"?"\n\n[OUTPUT LANGUAGE] Respond ONLY in English. Every text field — subjects, descriptions, notes, summaries — must be written in natural English.":"\n\n[OUTPUT LANGUAGE] Write all text in Korean only.")); proc.stdin.end();
     var _wd=setTimeout(function(){try{proc.kill();}catch(e){}},70000); proc.on("close",function(){clearTimeout(_wd);});
     var out=""; proc.stdout.on("data",function(d){out+=d.toString();});
     proc.on("close",function(){var r=null;try{var s=out.indexOf("{"),e=out.lastIndexOf("}");if(s>-1&&e>-1)r=JSON.parse(out.slice(s,e+1));}catch(x){}resolve(r);});
@@ -1962,16 +1962,16 @@ function repairWorker(card){
 }
 async function runRepairOrchestrator(){
   var cards=readAllTasks().filter(function(t){return t.status==="in_review"&&t.metadata&&t.metadata.verify;});
-  if(!cards.length){opsAppend("system",M("No gated cards to repair.","수리할 게이트 카드가 없습니다."),null);return;}
-  opsAppend("system",M("🔧 Repair agent started — attempting to resolve "+cards.length+" gated cards","🔧 repair 에이전트 시작 — 게이트 카드 "+cards.length+"개 문제해결 시도"),null);
+  if(!cards.length){opsAppend("system",M("No gated cards to repair.","No gated cards to repair."),null);return;}
+  opsAppend("system",M("🔧 Repair agent started — attempting to resolve "+cards.length+" gated cards","🔧 Repair agent started — attempting to resolve "+cards.length+" gated cards"),null);
   var fixed=0;
   await Promise.all(cards.map(async function(card){
     var r=await repairWorker(card);
     var resolved=!!(r&&r.resolved); var fix=(r&&r.fix)||"";
-    if(resolved){ updateTask(card.id,{status:"pending",metadata:{phase:"execute",repair:{resolved:true,fix:fix}}}); fixed++; opsAppend("system",M("🔧✅ #"+card.id+" repaired → execute queue: "+fix.slice(0,50),"🔧✅ #"+card.id+" 수리 완료 → 실행 대기: "+fix.slice(0,50)),null); }
-    else { updateTask(card.id,{metadata:{repair:{resolved:false,fix:fix}}}); opsAppend("system",M("🔧⚠️ #"+card.id+" cannot auto-repair — needs human review: "+fix.slice(0,50),"🔧⚠️ #"+card.id+" 자동수리 불가 — 사람 검토 필요: "+fix.slice(0,50)),null); }
+    if(resolved){ updateTask(card.id,{status:"pending",metadata:{phase:"execute",repair:{resolved:true,fix:fix}}}); fixed++; opsAppend("system",M("🔧✅ #"+card.id+" repaired → execute queue: "+fix.slice(0,50),"🔧✅ #"+card.id+" repaired → execute queue: "+fix.slice(0,50)),null); }
+    else { updateTask(card.id,{metadata:{repair:{resolved:false,fix:fix}}}); opsAppend("system",M("🔧⚠️ #"+card.id+" cannot auto-repair — needs human review: "+fix.slice(0,50),"🔧⚠️ #"+card.id+" cannot auto-repair — needs human review: "+fix.slice(0,50)),null); }
   }));
-  opsAppend("claude",M("🔧 Repair complete — "+fixed+" resolved and moved to the execute queue, "+(cards.length-fixed)+" still need human review.","🔧 수리 완료 — "+fixed+"건 해결되어 실행 대기로 이동, "+(cards.length-fixed)+"건은 사람 검토가 필요합니다."),null);
+  opsAppend("claude",M("🔧 Repair complete — "+fixed+" resolved and moved to the execute queue, "+(cards.length-fixed)+" still need human review.","🔧 Repair complete — "+fixed+" resolved and moved to the execute queue, "+(cards.length-fixed)+" still need human review."),null);
 }
 
 // ── HTTP server ──────────────────────────────────────────────────────────────
@@ -1998,31 +1998,31 @@ const server = http.createServer(async (req, res) => {
     return;
   }
 
-  // POST /api/verify/run — 검증 오케스트레이터 수동 트리거
+  // POST /api/verify/run — manually trigger the verify orchestrator
   if (req.url === "/api/verify/run" && req.method === "POST") {
-    if (!cliAvailable) { res.writeHead(503, { "Content-Type": "application/json" }); res.end('{"error":"claude CLI 사용 불가"}'); return; }
+    if (!cliAvailable) { res.writeHead(503, { "Content-Type": "application/json" }); res.end('{"error":"claude CLI unavailable"}'); return; }
     runVerifyOrchestrator();
     res.writeHead(202, { "Content-Type": "application/json" }); res.end('{"ok":true,"status":"verifying"}');
     return;
   }
 
-  // POST /api/repair/run — 게이트 카드 수리(문제해결)
+  // POST /api/repair/run — repair (resolve) gated cards
   if (req.url === "/api/repair/run" && req.method === "POST") {
-    if (!cliAvailable) { res.writeHead(503, { "Content-Type": "application/json" }); res.end('{"error":"claude CLI 사용 불가"}'); return; }
+    if (!cliAvailable) { res.writeHead(503, { "Content-Type": "application/json" }); res.end('{"error":"claude CLI unavailable"}'); return; }
     runRepairOrchestrator();
     res.writeHead(202, { "Content-Type": "application/json" }); res.end('{"ok":true,"status":"repairing"}');
     return;
   }
 
-  // POST /api/execute/run — 실행 오케스트레이터 트리거
+  // POST /api/execute/run — trigger the execute orchestrator
   if (req.url === "/api/execute/run" && req.method === "POST") {
-    if (!cliAvailable) { res.writeHead(503, { "Content-Type": "application/json" }); res.end('{"error":"claude CLI 사용 불가"}'); return; }
+    if (!cliAvailable) { res.writeHead(503, { "Content-Type": "application/json" }); res.end('{"error":"claude CLI unavailable"}'); return; }
     runExecOrchestrator();
     res.writeHead(202, { "Content-Type": "application/json" }); res.end('{"ok":true,"status":"executing"}');
     return;
   }
 
-  // GET /api/library — 검증·실행 완료 모듈 목록
+  // GET /api/library — list of verified and executed modules
   if (req.url === "/api/library" && req.method === "GET") {
     let idx = [];
     try { idx = JSON.parse(fs.readFileSync(path.join(HARNESS_ROOT, "library", "index.json"), "utf-8")); } catch(e){}
@@ -2030,14 +2030,14 @@ const server = http.createServer(async (req, res) => {
     return;
   }
 
-  // POST /api/lang — UI 언어 설정 (서버 생성물 언어)
+  // POST /api/lang — UI language setting (language of server-generated content)
   if (req.url === "/api/lang" && req.method === "POST") {
     try { const b = await parseBody(req); if (b.lang === "en" || b.lang === "ko") UI_LANG = b.lang; } catch(e){}
     res.writeHead(200, { "Content-Type": "application/json" }); res.end(JSON.stringify({ ok: true, lang: UI_LANG }));
     return;
   }
 
-  // POST /api/agents/restore-defaults — 삭제된 기본 에이전트 복구
+  // POST /api/agents/restore-defaults — restore deleted default agents
   if (req.url === "/api/agents/restore-defaults" && req.method === "POST") {
     let restored = [];
     try { const defs = JSON.parse(fs.readFileSync(path.join(HARNESS_ROOT, "lib", "default-agents.json"), "utf-8"));
@@ -2046,28 +2046,28 @@ const server = http.createServer(async (req, res) => {
     return;
   }
 
-  // POST /api/agents/add — 커스텀 실행 에이전트 추가
+  // POST /api/agents/add — add a custom execution agent
   if (req.url === "/api/agents/add" && req.method === "POST") {
     try { const b = await parseBody(req); const name = String(b.name || "").trim().toLowerCase().replace(/[^a-z0-9-]/g, "-").replace(/^-+|-+$/g, "");
-      if (!name) { res.writeHead(400, { "Content-Type": "application/json" }); res.end('{"error":"이름이 필요합니다"}'); return; }
+      if (!name) { res.writeHead(400, { "Content-Type": "application/json" }); res.end('{"error":"name is required"}'); return; }
       const p = path.join(HARNESS_ROOT, "agents", name + ".md");
-      if (fs.existsSync(p)) { res.writeHead(409, { "Content-Type": "application/json" }); res.end('{"error":"이미 존재하는 이름"}'); return; }
-      const content = "---\nname: " + name + "\nrole: \"" + (b.role || "커스텀 실행 에이전트") + "\"\ncolor: \"" + (b.color || "#94a3b8") + "\"\nmission: >-\n  " + (b.mission || "사용자 정의 실행 에이전트.") + "\nrunner: claude\ngroup: domain\nmodel_default: sonnet\ntools_allowed: [Read, Bash, Write]\nworktree: isolated\nescalation: human\nowns: []\n---\n\n# " + name + " (커스텀 실행 에이전트)\n\n" + (b.mission || "") + "\n";
+      if (fs.existsSync(p)) { res.writeHead(409, { "Content-Type": "application/json" }); res.end('{"error":"name already exists"}'); return; }
+      const content = "---\nname: " + name + "\nrole: \"" + (b.role || "Custom execution agent") + "\"\ncolor: \"" + (b.color || "#94a3b8") + "\"\nmission: >-\n  " + (b.mission || "User-defined execution agent.") + "\nrunner: claude\ngroup: domain\nmodel_default: sonnet\ntools_allowed: [Read, Bash, Write]\nworktree: isolated\nescalation: human\nowns: []\n---\n\n# " + name + " (custom execution agent)\n\n" + (b.mission || "") + "\n";
       fs.writeFileSync(p, content);
       res.writeHead(201, { "Content-Type": "application/json" }); res.end(JSON.stringify({ ok: true, name: name }));
     } catch(e){ res.writeHead(400, { "Content-Type": "application/json" }); res.end(JSON.stringify({ error: e.message })); }
     return;
   }
 
-  // POST /api/ingest { url | content, channel } — 10XAI: 빌더 콘텐츠/URL → GitHub 연동 → 분해 → 카드
+  // POST /api/ingest { url | content, channel } — 10XAI: builder content/URL → GitHub linking → decompose → cards
   if (req.url === "/api/ingest" && req.method === "POST") {
     try {
       const body = await parseBody(req);
       const input = String(body.url || body.content || "").trim();
-      if (!input) { res.writeHead(400, { "Content-Type": "application/json" }); res.end('{"error":"url 또는 content가 필요합니다"}'); return; }
-      if (!cliAvailable) { res.writeHead(503, { "Content-Type": "application/json" }); res.end('{"error":"claude CLI 사용 불가 — nested session이면 launchd standalone 서버에서 실행하세요"}'); return; }
+      if (!input) { res.writeHead(400, { "Content-Type": "application/json" }); res.end('{"error":"url or content is required"}'); return; }
+      if (!cliAvailable) { res.writeHead(503, { "Content-Type": "application/json" }); res.end('{"error":"claude CLI unavailable — if this is a nested session, run it from the launchd standalone server"}'); return; }
       runIngest(input, body.channel || "x");  // background; cards stream via SSE
-      try { opsAppend("system", M("📥 Ingest started: ","📥 ingest 시작: ") + input.slice(0, 120), null); } catch {}
+      try { opsAppend("system", M("📥 Ingest started: ","📥 Ingest started: ") + input.slice(0, 120), null); } catch {}
       res.writeHead(202, { "Content-Type": "application/json" }); res.end(JSON.stringify({ ok: true, status: "ingesting" }));
     } catch (e) { res.writeHead(400, { "Content-Type": "application/json" }); res.end(JSON.stringify({ error: e.message })); }
     return;
@@ -2099,7 +2099,7 @@ const server = http.createServer(async (req, res) => {
 
   // POST /api/tasks/:id/review  — operator's review decision on an in_review task.
   // body: { action: "approve" | "reject" | "choose" | "feedback", optionId?, text?, by? }
-  //  - approve  → status completed; reportSummary gets a "[검토 승인]" line
+  //  - approve  → status completed; reportSummary gets a "[review approved]" line
   //  - reject   → status pending (back to the doer); review.rejectReason = text
   //  - choose   → review.decision = optionId; status completed if that option has `final:true`, else pending
   //  - feedback → appends {ts,by,text} to review.feedback; status unchanged (a comment, not a decision)
@@ -2111,7 +2111,7 @@ const server = http.createServer(async (req, res) => {
       const id = reviewMatch[1];
       const body = await parseBody(req);
       const action = String(body.action || "").toLowerCase();
-      const by = String(body.by || "운영자").slice(0, 60);
+      const by = String(body.by || "operator").slice(0, 60);
       const text = body.text != null ? String(body.text).trim() : "";
       const cur = readAllTasks().find((x) => String(x.id) === id);
       if (!cur) { res.writeHead(404, { "Content-Type": "application/json" }); res.end('{"error":"Not found"}'); return; }
@@ -2124,12 +2124,12 @@ const server = http.createServer(async (req, res) => {
         review.decision = "approved"; review.decidedBy = by; review.decidedAt = now;
         const prev = (cur.reportSummary || "").trim();
         upd.status = "completed";
-        upd.reportSummary = prev + (prev ? "\n\n" : "") + `[검토 승인 by ${by}${text ? " — " + text : ""}]`;
-        line = `✅ #${id} 검토 승인 by ${by}${text ? " — " + text : ""}`;
+        upd.reportSummary = prev + (prev ? "\n\n" : "") + `[review approved by ${by}${text ? " — " + text : ""}]`;
+        line = `✅ #${id} review approved by ${by}${text ? " — " + text : ""}`;
       } else if (action === "reject" || action === "return") {
         review.decision = "rejected"; review.rejectReason = text; review.decidedBy = by; review.decidedAt = now;
         upd.status = "pending";
-        line = `↩️ #${id} 검토 반려 by ${by}${text ? ": " + text : ""}`;
+        line = `↩️ #${id} review rejected by ${by}${text ? ": " + text : ""}`;
       } else if (action === "choose") {
         const opts = Array.isArray(review.options) ? review.options : [];
         if (!opts.length) { res.writeHead(400, { "Content-Type": "application/json" }); res.end('{"error":"this task has no review.options to choose from"}'); return; }
@@ -2138,12 +2138,12 @@ const server = http.createServer(async (req, res) => {
         if (!opt) { res.writeHead(400, { "Content-Type": "application/json" }); res.end(JSON.stringify({ error: "unknown optionId — valid: " + opts.map((o) => o.id).join(",") })); return; }
         review.decision = optId; review.decidedBy = by; review.decidedAt = now;
         upd.status = opt.final ? "completed" : "pending";
-        line = `▸ #${id} 검토 선택: ${opt.label || optId} by ${by}`;
+        line = `▸ #${id} review choice: ${opt.label || optId} by ${by}`;
       } else if (action === "feedback") {
         if (!text) { res.writeHead(400, { "Content-Type": "application/json" }); res.end('{"error":"feedback text required"}'); return; }
         review.feedback = (Array.isArray(review.feedback) ? review.feedback : []).concat([{ ts: now, by, text }]).slice(-50);
         role = "operator";
-        line = `🧑 ${by}: 💬 #${id} 검토 피드백 — ${text}`;
+        line = `🧑 ${by}: 💬 #${id} review feedback — ${text}`;
       } else {
         res.writeHead(400, { "Content-Type": "application/json" }); res.end('{"error":"unknown action — approve|reject|choose|feedback"}'); return;
       }
@@ -2254,7 +2254,7 @@ const server = http.createServer(async (req, res) => {
       // not via this route, but guard anyway to avoid an echo loop). Tag the sender so
       // the bot's relay isn't mistaken for the bot itself.
       if (body.source !== "telegram" && text) {
-        const tag = role === "claude" ? "🤖 claude: " : role === "agent" ? "🤖 agent: " : (role === "you" || role === "operator") ? "🧑 운영자: " : "";
+        const tag = role === "claude" ? "🤖 claude: " : role === "agent" ? "🤖 agent: " : (role === "you" || role === "operator") ? "🧑 operator: " : "";
         telegramSend(tag + text);
       }
       res.writeHead(200, { "Content-Type": "application/json" });
@@ -2267,11 +2267,11 @@ const server = http.createServer(async (req, res) => {
       const body = await parseBody(req);
       const text = String(body.text == null ? "" : body.text);
       const msg = opsAppend("you", text, null, { source: "kanban" });
-      if (/^\s*실행\s*$/.test(text) || text.indexOf("실행하기")>=0) { try { runExecOrchestrator(); } catch(e){} }
+      if (/^\s*run\s*$/i.test(text) || /run it/i.test(text)) { try { runExecOrchestrator(); } catch(e){} }
       else if (text && cliAvailable) opsAssistantReply(text);
       // Mirror to Telegram TAGGED — the bot relays it, so without a tag it reads as
       // the bot (an agent). Mark it clearly as the operator's panel message.
-      if (text) telegramSend("🧑 운영자: " + text);
+      if (text) telegramSend("🧑 operator: " + text);
       res.writeHead(200, { "Content-Type": "application/json" });
       res.end(JSON.stringify(msg));
     } catch (e) { res.writeHead(400, { "Content-Type": "application/json" }); res.end(JSON.stringify({ error: e.message })); }

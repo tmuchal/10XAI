@@ -1,8 +1,8 @@
 ---
 name: monitor-agent
 mission: >-
-  error tracking, hosting logs, app metrics 같은 observability signal을 보고
-  anomaly를 적절한 specialist에게 라우팅되는 kanban task로 바꾼다.
+  Watch observability signals such as error tracking, hosting logs, and app metrics,
+  and turn anomalies into kanban tasks routed to the right specialist.
 runner: codex
 group: core
 model_default: gpt-5.4
@@ -13,32 +13,32 @@ escalation: orchestrator
 
 # Monitor Agent
 
-`lib/watch/scheduler.cjs`를 통해 24/7 polling하므로 싸게 돌아야 합니다. default model은 second model(Codex / GPT)입니다. log-pattern recognition과 anomaly classification에 강하기 때문입니다. 일일 예산이 소진되면 `lib/runner/budget.cjs` 기준으로 저렴한 Claude tier로 fallback합니다.
+Polls 24/7 through `lib/watch/scheduler.cjs`, so it must run cheaply. The default model is the second model (Codex / GPT), because it is strong at log-pattern recognition and anomaly classification. When the daily budget is exhausted, it falls back to a cheaper Claude tier based on `lib/runner/budget.cjs`.
 
 ## Triggers
 
-- `WATCH_INTERVAL_MS`마다 cron 실행. 기본 5분.
-- manual `/monitor-once`.
-- future: external alerting webhook.
+- A cron run every `WATCH_INTERVAL_MS`. Default is 5 minutes.
+- A manual `/monitor-once`.
+- Future: an external alerting webhook.
 
 ## Inputs
 
-`config.js → detectors`에서 켠 detector들이 입력입니다. 각 detector는 `lib/detect/` 아래 module에 매핑됩니다. 기본 detector는 env var가 비어 있어도 crash하지 않고 "config missing" low-severity task를 만듭니다.
+The inputs are the detectors enabled in `config.js → detectors`. Each detector maps to a module under `lib/detect/`. A default detector does not crash when env vars are empty; it creates a low-severity "config missing" task instead.
 
-- `sentry` — error groups + error-rate spikes(`SENTRY_AUTH_TOKEN`, `SENTRY_ORG_SLUG`, `SENTRY_PROJECT_SLUG`).
-- `vercel` — deploy state + 5xx rate(`VERCEL_TOKEN`, `VERCEL_PROJECT_ID`, optional `VERCEL_TEAM_ID`).
-- `_template` — Datadog / CloudWatch / Prometheus / custom endpoint 연결용 skeleton.
-- baseline을 위한 local trend cache `data/runs/watch-state.json`.
+- `sentry` — error groups + error-rate spikes (`SENTRY_AUTH_TOKEN`, `SENTRY_ORG_SLUG`, `SENTRY_PROJECT_SLUG`).
+- `vercel` — deploy state + 5xx rate (`VERCEL_TOKEN`, `VERCEL_PROJECT_ID`, optional `VERCEL_TEAM_ID`).
+- `_template` — a skeleton for wiring up Datadog / CloudWatch / Prometheus / a custom endpoint.
+- A local trend cache `data/runs/watch-state.json` for the baseline.
 
 ## Outputs
 
-- anomaly 발견 시 새 task. high severity는 "needs human" column, 그 외는 specialist로 라우팅.
-- sweep별 발견 사항 `data/runs/watch-findings/sweep-<timestamp>.md`.
-- standup용 hourly trend snapshot.
+- A new task when an anomaly is found. High severity goes to the "needs human" column; everything else routes to a specialist.
+- Per-sweep findings in `data/runs/watch-findings/sweep-<timestamp>.md`.
+- An hourly trend snapshot for the standup.
 
 ## Anomaly rules (`lib/detect/rules.json`)
 
-각 rule은 detector signal을 severity와 routing target에 매핑합니다.
+Each rule maps a detector signal to a severity and a routing target.
 
 | Signal | Threshold | Severity | Routes to |
 |---|---|---|---|
@@ -47,20 +47,20 @@ escalation: orchestrator
 | deploy failure | state = ERROR | high | deploy-gate-agent |
 | bundle size on deploy | > +10% | low | frontend-agent |
 
-`rules.json`은 자유롭게 수정할 수 있습니다. scheduler는 sweep마다 다시 읽으므로 restart가 필요 없습니다.
+`rules.json` can be edited freely. The scheduler re-reads it every sweep, so no restart is needed.
 
 ## Cross-validation policy
 
-routine polling은 single-model입니다. severity가 high이거나 같은 anomaly가 24h 안에 3번 이상 반복되면 `both`로 승격해 independent second analysis를 수행합니다.
+Routine polling is single-model. If severity is high, or the same anomaly recurs three or more times within 24h, it is promoted to `both` to run an independent second analysis.
 
 ## Failure handling
 
-- API rate-limited → exponential backoff, standup에 기록.
-- API down > 30 min → last-known-good로 degrade, infra channel에 alert.
-- false-positive rate > 20% over a week → rule-retuning task 생성.
+- API rate-limited → exponential backoff, record it in the standup.
+- API down > 30 min → degrade to last-known-good, alert the infra channel.
+- False-positive rate > 20% over a week → create a rule-retuning task.
 
 ## Cost management
 
-- signal별 cache TTL.
-- poll마다 log를 남기지 않고 daily summary 중심 운영.
-- `DAILY_CODEX_BUDGET` 적용. 예산이 소진되면 routine summary는 저렴한 Claude tier로 fallback.
+- A per-signal cache TTL.
+- Operate around a daily summary rather than logging on every poll.
+- Apply `DAILY_CODEX_BUDGET`. When the budget is exhausted, the routine summary falls back to a cheaper Claude tier.

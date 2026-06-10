@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ko">
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -69,7 +69,7 @@ body{display:flex;flex-direction:column;min-height:100vh}
 .skel{height:62px;border-radius:10px;background:linear-gradient(90deg,var(--c-surface-2) 25%,var(--c-surface-3) 50%,var(--c-surface-2) 75%);background-size:200% 100%;animation:skelsh 1.3s infinite;border:1px solid var(--c-border);margin-bottom:6px}
 @keyframes skelsh{0%{background-position:200% 0}100%{background-position:-200% 0}}
 .f-pill[data-flt="core"],.f-pill[data-flt="domain"],.f-pill[data-flt="cross-validated"],.f-pill[data-flt="parents-only"],.f-pill[data-flt="incident"],.filter-bar .f-divider{display:none}
-/* ── pipeline category tabs (검증 / 실행) ── */
+/* ── pipeline category tabs (verify / execute) ── */
 .pipe-nav{display:flex;gap:8px;padding:10px 20px 0;background:var(--c-bg)}
 .pipe-tab{display:flex;align-items:center;gap:8px;background:var(--c-surface);border:1px solid var(--c-border);border-bottom:0;border-radius:10px 10px 0 0;color:var(--c-text-3);font-size:12.5px;font-weight:600;padding:9px 16px;cursor:pointer;transition:color .15s,background .15s}
 .pipe-tab .pt-ic{font-size:13px}
@@ -367,21 +367,21 @@ body.ops-collapsed .ops-reopen{display:inline-flex;align-items:center;gap:6px}
 <header class="hdr">
   <div class="hdr-l">
     <div class="brand">10X<span class="brand-dot">·</span>AI</div>
-    <div class="brand-sub" data-i18n="tagline">빌더 콘텐츠를, 검증된 모듈로</div>
+    <div class="brand-sub" data-i18n="tagline">Builder content, into verified modules</div>
     <span id="board-area-chip" style="display:none;margin-left:8px;padding:3px 9px;border-radius:9999px;font-size:11px;font-weight:700;font-family:'JetBrains Mono',monospace;background:var(--c-accent);color:#fff"></span>
   </div>
   <div class="hdr-r">
     <div class="stats">
-      <div class="stat"><div class="n" id="s-total">0</div><div class="l" data-i18n="stat.total">전체</div></div>
-      <div class="stat"><div class="n" id="s-active">0</div><div class="l" data-i18n="stat.active">진행중</div></div>
-      <div class="stat"><div class="n" id="s-review">0</div><div class="l" data-i18n="stat.review">검토</div></div>
-      <div class="stat"><div class="n" id="s-done">0</div><div class="l" data-i18n="stat.done">완료</div></div>
+      <div class="stat"><div class="n" id="s-total">0</div><div class="l" data-i18n="stat.total">Total</div></div>
+      <div class="stat"><div class="n" id="s-active">0</div><div class="l" data-i18n="stat.active">Active</div></div>
+      <div class="stat"><div class="n" id="s-review">0</div><div class="l" data-i18n="stat.review">Review</div></div>
+      <div class="stat"><div class="n" id="s-done">0</div><div class="l" data-i18n="stat.done">Done</div></div>
     </div>
     <div class="conn" id="conn" data-s="disconnected"><span class="cd"></span><span id="conn-l">Connecting</span></div>
-    <button class="theme-tog" onclick="openLibrary()" title="Library" style="font-size:11px;font-weight:700;color:var(--c-accent)" data-i18n="btn.library">📚 라이브러리</button>
-    <button class="theme-tog" onclick="runExec()" title="Run verified cards" style="font-size:11px;font-weight:800;color:#06210b;background:var(--c-accent);border-color:var(--c-accent)" data-i18n="btn.run">▶ 실행하기</button>
-    <button class="theme-tog" onclick="runRepair()" title="Repair gated cards" style="font-size:11px;font-weight:700" data-i18n="btn.repair">🔧 수리</button>
-    <button class="theme-tog" onclick="openGuide()" title="Guide" style="font-size:11px;font-weight:700;color:var(--c-accent);border-color:var(--c-accent)" data-i18n="btn.guide">📖 가이드</button>
+    <button class="theme-tog" onclick="openLibrary()" title="Library" style="font-size:11px;font-weight:700;color:var(--c-accent)" data-i18n="btn.library">📚 Library</button>
+    <button class="theme-tog" onclick="runExec()" title="Run verified cards" style="font-size:11px;font-weight:800;color:#06210b;background:var(--c-accent);border-color:var(--c-accent)" data-i18n="btn.run">▶ Run</button>
+    <button class="theme-tog" onclick="runRepair()" title="Repair gated cards" style="font-size:11px;font-weight:700" data-i18n="btn.repair">🔧 Repair</button>
+    <button class="theme-tog" onclick="openGuide()" title="Guide" style="font-size:11px;font-weight:700;color:var(--c-accent);border-color:var(--c-accent)" data-i18n="btn.guide">📖 Guide</button>
     <button class="theme-tog" id="ops-tog-hdr" onclick="toggleOps()" title="Toggle ops thread">💬</button>
     <button class="theme-tog" id="lang-tog" onclick="setLang()" title="Language">🌐 EN</button>
     <button class="theme-tog" id="theme-tog" onclick="toggleTheme()" title="Toggle theme">☾</button>
@@ -392,40 +392,40 @@ body.ops-collapsed .ops-reopen{display:inline-flex;align-items:center;gap:6px}
   <code>npx agent-kanban-harness update</code>
 </div>
 <div class="filter-bar">
-  <button class="f-pill active" data-flt="all" onclick="setFilter('all')"><span data-i18n="all">전체</span> <span class="f-cnt" id="fc-all">0</span></button>
-  <button class="f-pill" data-flt="core" onclick="setFilter('core')">코어 <span class="f-cnt" id="fc-core">0</span></button>
-  <button class="f-pill" data-flt="domain" onclick="setFilter('domain')">도메인 <span class="f-cnt" id="fc-domain">0</span></button>
+  <button class="f-pill active" data-flt="all" onclick="setFilter('all')"><span data-i18n="all">All</span> <span class="f-cnt" id="fc-all">0</span></button>
+  <button class="f-pill" data-flt="core" onclick="setFilter('core')">Core <span class="f-cnt" id="fc-core">0</span></button>
+  <button class="f-pill" data-flt="domain" onclick="setFilter('domain')">Domain <span class="f-cnt" id="fc-domain">0</span></button>
   <div class="f-divider"></div>
-  <button class="f-pill" data-flt="cross-validated" onclick="setFilter('cross-validated')">교차검증 <span class="f-cnt" id="fc-cv">0</span></button>
-  <button class="f-pill" data-flt="parents-only" onclick="setFilter('parents-only')">Phase만 <span class="f-cnt" id="fc-par">0</span></button>
-  <button class="f-pill" data-flt="incident" onclick="setFilter('incident')">긴급 대응 <span class="f-cnt" id="fc-incident">0</span></button>
+  <button class="f-pill" data-flt="cross-validated" onclick="setFilter('cross-validated')">Cross-validated <span class="f-cnt" id="fc-cv">0</span></button>
+  <button class="f-pill" data-flt="parents-only" onclick="setFilter('parents-only')">Phase only <span class="f-cnt" id="fc-par">0</span></button>
+  <button class="f-pill" data-flt="incident" onclick="setFilter('incident')">Incident <span class="f-cnt" id="fc-incident">0</span></button>
   <div id="agent-tag-wrap"></div>
   <div class="right">
-    <input class="f-search" id="f-search" type="text" placeholder="검색 #ID·제목·agent" data-i18n-ph="search.ph" oninput="setSearch(this.value)" autocomplete="off">
-    <button class="btn-icon" onclick="openNewTaskModal()" data-i18n="btn.newcard">+ 새 카드</button>
-    <button class="btn-icon" onclick="toggleAgents()" id="ag-toggle-btn">에이전트</button>
+    <input class="f-search" id="f-search" type="text" placeholder="Search #id·title·agent" data-i18n-ph="search.ph" oninput="setSearch(this.value)" autocomplete="off">
+    <button class="btn-icon" onclick="openNewTaskModal()" data-i18n="btn.newcard">+ New</button>
+    <button class="btn-icon" onclick="toggleAgents()" id="ag-toggle-btn">Agents</button>
     <button class="btn-icon" onclick="loadAll()">↻</button>
   </div>
 </div>
 <div class="pri-bar">
-  <span class="pri-lbl">우선순위</span>
-  <button class="pri-pill p-all active" data-pri="all" onclick="setPriority('all')">전체</button>
-  <button class="pri-pill p-critical" data-pri="critical" onclick="setPriority('critical')">긴급</button>
-  <button class="pri-pill p-high" data-pri="high" onclick="setPriority('high')">높음</button>
-  <button class="pri-pill p-medium" data-pri="medium" onclick="setPriority('medium')">보통</button>
-  <button class="pri-pill p-low" data-pri="low" onclick="setPriority('low')">낮음</button>
+  <span class="pri-lbl">Priority</span>
+  <button class="pri-pill p-all active" data-pri="all" onclick="setPriority('all')">All</button>
+  <button class="pri-pill p-critical" data-pri="critical" onclick="setPriority('critical')">Critical</button>
+  <button class="pri-pill p-high" data-pri="high" onclick="setPriority('high')">High</button>
+  <button class="pri-pill p-medium" data-pri="medium" onclick="setPriority('medium')">Medium</button>
+  <button class="pri-pill p-low" data-pri="low" onclick="setPriority('low')">Low</button>
   <span class="pri-bar-right" id="visible-cnt"></span>
 </div>
 <section class="hero" id="ingest-hero">
   <div class="hero-bar">
     <span class="hero-ic">&#9656;</span>
-    <input id="ih-url" class="hero-in" type="text" autocomplete="off" placeholder="X&middot;링크드인 글 URL 또는 GitHub 레포 주소 붙여넣기…" data-i18n-ph="hero.ph" onkeydown="if(event.key==='Enter')submitIngest()">
-    <button id="ih-btn" class="hero-go" onclick="submitIngest()" data-i18n="hero.btn">분해 &middot; 검증 &middot; 실행 &rarr;</button>
+    <input id="ih-url" class="hero-in" type="text" autocomplete="off" placeholder="Paste an X / LinkedIn post URL or a GitHub repo URL…" data-i18n-ph="hero.ph" onkeydown="if(event.key==='Enter')submitIngest()">
+    <button id="ih-btn" class="hero-go" onclick="submitIngest()" data-i18n="hero.btn">Decompose &middot; Verify &middot; Run &rarr;</button>
   </div>
   <div class="ingest-bar" id="ingest-bar"><i></i></div>
-  <div class="hero-sub" id="ih-hint" data-i18n="hero.hint">링크 &rarr; <b>연관 GitHub</b> 분해 &rarr; <b>검증 멀티에이전트</b> &rarr; 게이트 &rarr; <b>실행 멀티에이전트</b> &rarr; 산출물 &rarr; 라이브러리</div>
+  <div class="hero-sub" id="ih-hint" data-i18n="hero.hint">Link &rarr; <b>linked GitHub</b> decompose &rarr; <b>verify multi-agents</b> &rarr; gate &rarr; <b>execute multi-agents</b> &rarr; output &rarr; library</div>
 </section>
-<div class="folder-bar"><span data-i18n="folder.label">📁 출력 폴더:</span> <code id="folder-chip">workspace</code><span class="folder-hint" data-i18n="folder.hint">· GitHub로 배포 후엔 각자 config.js의 repoPath에서 변경 (검증·실행 산출물이 이 폴더에 쌓입니다)</span></div>
+<div class="folder-bar"><span data-i18n="folder.label">📁 Output folder:</span> <code id="folder-chip">workspace</code><span class="folder-hint" data-i18n="folder.hint">· After deploying to GitHub, each user sets repoPath in config.js (verify/execute outputs land here)</span></div>
 <section class="harness-panel" id="harness-panel" style="display:none">
   <div class="harness-head">
     <div>
@@ -435,38 +435,38 @@ body.ops-collapsed .ops-reopen{display:inline-flex;align-items:center;gap:6px}
     <button class="btn-icon" onclick="openResetModal()">Reset</button>
   </div>
   <div class="harness-grid">
-    <div class="h-item"><div class="k">프로젝트명</div><div class="v" id="h-project">—</div></div>
+    <div class="h-item"><div class="k">Project name</div><div class="v" id="h-project">—</div></div>
     <div class="h-item"><div class="k">repoPath</div><div class="v mono" id="h-repo">—</div></div>
     <div class="h-item"><div class="k">goal</div><div class="v" id="h-goal">—</div></div>
-    <div class="h-item"><div class="k">에이전트 목록</div><div class="v" id="h-agents">—</div></div>
-    <div class="h-item"><div class="k">골든 데이터</div><div class="v mono" id="h-golden">—</div></div>
-    <div class="h-item"><div class="k">평가 루프</div><div class="v mono" id="h-eval">—</div></div>
-    <div class="h-item"><div class="k">칸반 포트</div><div class="v mono" id="h-port">—</div></div>
-    <div class="h-item"><div class="k">보드 task 수</div><div class="v mono" id="h-tasks">0</div></div>
-    <div class="h-item"><div class="k">프로젝트 매뉴얼</div><div class="v"><button class="h-link" onclick="openResourceModal('claude-md','CLAUDE.md')">CLAUDE.md 보기</button></div></div>
+    <div class="h-item"><div class="k">Agent list</div><div class="v" id="h-agents">—</div></div>
+    <div class="h-item"><div class="k">Golden data</div><div class="v mono" id="h-golden">—</div></div>
+    <div class="h-item"><div class="k">Eval loop</div><div class="v mono" id="h-eval">—</div></div>
+    <div class="h-item"><div class="k">Kanban port</div><div class="v mono" id="h-port">—</div></div>
+    <div class="h-item"><div class="k">Board task count</div><div class="v mono" id="h-tasks">0</div></div>
+    <div class="h-item"><div class="k">Project manual</div><div class="v"><button class="h-link" onclick="openResourceModal('claude-md','CLAUDE.md')">View CLAUDE.md</button></div></div>
   </div>
-  <div class="h-setup-note">repoPath, goal, 골든 데이터, agents/*.md, 평가 루프, hooks, skills, deployCommands, CLAUDE.md는 <code>npx agent-kanban-harness setup --guided</code>로 다시 바꿀 수 있습니다.</div>
+  <div class="h-setup-note">repoPath, goal, golden data, agents/*.md, eval loop, hooks, skills, deployCommands and CLAUDE.md can be changed again with <code>npx agent-kanban-harness setup --guided</code>.</div>
 </section>
 <section class="agents-panel" id="agents-panel">
   <div class="agents-panel-head">
-    <div class="ttl" data-i18n="registry">리소스 레지스트리 · 에이전트는 클릭 시 해당 task만 필터</div>
+    <div class="ttl" data-i18n="registry">Resource registry · click an agent to filter to its tasks</div>
     <button class="toggle" onclick="toggleAgents()">Collapse ▲</button>
   </div>
   <div class="agents-grid">
     <div class="agents-col">
-      <div class="agents-col-head"><span class="name" data-i18n="agent.verifyTeam">검증 에이전트</span><span class="meta" id="ag-meta-core">· 활성 0</span></div>
+      <div class="agents-col-head"><span class="name" data-i18n="agent.verifyTeam">Verify Agents</span><span class="meta" id="ag-meta-core">· active 0</span></div>
       <div id="ag-rows-core"></div>
     </div>
     <div class="agents-col">
-      <div class="agents-col-head"><span class="name" data-i18n="agent.execTeam">실행 에이전트</span><span class="meta" id="ag-meta-domain">· 활성 0</span><span style="margin-left:auto;display:flex;gap:5px"><button onclick="addExecAgent()" title="Add execute agent" style="font-size:10px;font-weight:700;background:var(--c-accent);color:#06210b;border:0;border-radius:5px;padding:2px 8px;cursor:pointer" data-i18n="agent.add">+ 추가</button><button onclick="restoreDefaults()" title="Restore default agents" style="font-size:10px;font-weight:600;background:var(--c-surface-3);color:var(--c-text-2);border:0;border-radius:5px;padding:2px 8px;cursor:pointer" data-i18n="agent.restore">기본 복구</button></span></div>
+      <div class="agents-col-head"><span class="name" data-i18n="agent.execTeam">Execute Agents</span><span class="meta" id="ag-meta-domain">· active 0</span><span style="margin-left:auto;display:flex;gap:5px"><button onclick="addExecAgent()" title="Add execute agent" style="font-size:10px;font-weight:700;background:var(--c-accent);color:#06210b;border:0;border-radius:5px;padding:2px 8px;cursor:pointer" data-i18n="agent.add">+ Add</button><button onclick="restoreDefaults()" title="Restore default agents" style="font-size:10px;font-weight:600;background:var(--c-surface-3);color:var(--c-text-2);border:0;border-radius:5px;padding:2px 8px;cursor:pointer" data-i18n="agent.restore">Restore defaults</button></span></div>
       <div id="ag-rows-domain"></div>
     </div>
     <div class="agents-col">
-      <div class="agents-col-head"><span class="name">Hooks</span><span class="meta" id="hooks-meta">0개 파일</span></div>
+      <div class="agents-col-head"><span class="name">Hooks</span><span class="meta" id="hooks-meta">0 files</span></div>
       <div id="hook-rows"></div>
     </div>
     <div class="agents-col">
-      <div class="agents-col-head"><span class="name">Skills</span><span class="meta" id="skills-meta">0개 파일</span></div>
+      <div class="agents-col-head"><span class="name">Skills</span><span class="meta" id="skills-meta">0 files</span></div>
       <div id="skill-rows"></div>
     </div>
   </div>
@@ -481,18 +481,18 @@ body.ops-collapsed .ops-reopen{display:inline-flex;align-items:center;gap:6px}
   <div class="modal" style="max-width:660px">
     <div class="modal-head"><span class="m-title" id="guide-title">📖 10XAI Guide</span><button onclick="closeGuide()" style="margin-left:auto;background:transparent;border:0;color:var(--c-text-3);font-size:16px;cursor:pointer">✕</button></div>
     <div class="modal-body" id="guide-body" style="padding:18px 22px;font-size:13px;line-height:1.75;color:var(--c-text-2)">
-      <p style="color:var(--c-text);font-size:14px"><b>소셜이 약속한 것 vs 진짜 되는 것 — 잃기 전에 안다.</b></p>
-      <p style="margin-top:6px">X·링크드인·유튜브에 떠도는 "이 프롬프트로 SaaS 완성" 류 AI 워크플로가 정말 작동하는지 검증하고, 바로 돌릴 수 있는 실행 모듈로 컴파일합니다. 체리피킹·미끼 페이월·숨은 비용을 실측으로 드러냅니다.</p>
-      <h4 style="color:var(--c-accent);margin:16px 0 6px">쓰는 법 (3단계)</h4>
-      <p><b>1.</b> 상단 입력창에 <b>X·링크드인 글 URL</b> 또는 <b>GitHub 레포 주소</b>를 붙여넣고 <b style="color:var(--c-accent)">[분해·검증]</b> 클릭.</p>
-      <p style="margin-top:4px"><b>2. 🔍 검증 파이프라인</b> — 분해 → 갭필(누락 단계 보강) → 검증 멀티에이전트가 보안·정책·재현성 판정 → 위험하면 게이트에서 멈춤.</p>
-      <p style="margin-top:4px"><b>3. ⚙ 실행 파이프라인</b> — "실행으로 넘어갈까요? [예]" 승인 → 샌드박스 N회 실측(성공률·실비용·소요시간) → 산출물 → 라이브러리 누적.</p>
-      <h4 style="color:var(--c-accent);margin:16px 0 6px">X 트윗을 넣으면?</h4>
-      <p>트윗 본문을 가져와(syndication API) 그 안에 연동된 <b>GitHub 레포</b>를 찾아 README·skills를 끌어와 분해합니다.</p>
-      <h4 style="color:var(--c-accent);margin:16px 0 6px">📁 폴더 설정 (배포 시 필수)</h4>
-      <p>검증·실행 <b>산출물 출력 폴더</b>는 <code style="background:var(--c-surface-2);padding:1px 5px;border-radius:4px">config.js</code>의 <code style="background:var(--c-surface-2);padding:1px 5px;border-radius:4px">repoPath</code>로 지정합니다. 이 레포를 GitHub에서 받아 쓰는 사람은 각자 자기 경로로 바꿔야 합니다. 현재 설정된 폴더는 상단 <b>📁 출력 폴더</b> 표시에서 확인됩니다.</p>
-      <h4 style="color:var(--c-accent);margin:16px 0 6px">로컬 서버 / claude</h4>
-      <p>보드는 <code style="background:var(--c-surface-2);padding:1px 5px;border-radius:4px">localhost:8080</code> 로컬 서버(launchd 상시 구동)에서 돕니다. 검증·실행은 로컬 <b>claude CLI</b>가 처리 — API 키 불필요, 구독 인증으로 동작. 출력은 <code style="background:var(--c-surface-2);padding:1px 5px;border-radius:4px">workspace/</code>·<code style="background:var(--c-surface-2);padding:1px 5px;border-radius:4px">library/</code> 폴더에 쌓입니다.</p>
+      <p style="color:var(--c-text);font-size:14px"><b>What social promises vs. what actually works — know before you waste time.</b></p>
+      <p style="margin-top:6px">10XAI verifies whether the "build a SaaS with one prompt" AI workflows floating around X / LinkedIn / YouTube actually work, and compiles them into runnable execution modules. It exposes cherry-picking, bait paywalls and hidden costs with real measurements.</p>
+      <h4 style="color:var(--c-accent);margin:16px 0 6px">How to use (3 steps)</h4>
+      <p><b>1.</b> Paste an <b>X / LinkedIn post URL</b> or a <b>GitHub repo URL</b> into the input at the top and click <b style="color:var(--c-accent)">[Decompose · Verify]</b>.</p>
+      <p style="margin-top:4px"><b>2. 🔍 Verify pipeline</b> — decompose → gap-fill (restore missing steps) → verify multi-agents judge security / policy / reproducibility → risky steps stop at the gate.</p>
+      <p style="margin-top:4px"><b>3. ⚙ Execute pipeline</b> — approve "Move on to execution? [Yes]" → sandbox measures N runs (success rate / real cost / time) → output → accumulates in the library.</p>
+      <h4 style="color:var(--c-accent);margin:16px 0 6px">What if you paste an X tweet?</h4>
+      <p>It fetches the tweet text (syndication API), finds the <b>GitHub repo</b> linked inside it, and pulls its README / skills to decompose.</p>
+      <h4 style="color:var(--c-accent);margin:16px 0 6px">📁 Folder setup (required for deployment)</h4>
+      <p>The <b>output folder</b> for verify/execute artifacts is set via <code style="background:var(--c-surface-2);padding:1px 5px;border-radius:4px">repoPath</code> in <code style="background:var(--c-surface-2);padding:1px 5px;border-radius:4px">config.js</code>. Anyone cloning this repo from GitHub must change it to their own path. The currently configured folder is shown in the <b>📁 Output folder</b> indicator at the top.</p>
+      <h4 style="color:var(--c-accent);margin:16px 0 6px">Local server / claude</h4>
+      <p>The board runs on a local server at <code style="background:var(--c-surface-2);padding:1px 5px;border-radius:4px">localhost:8080</code> (always on via launchd). Verify and execute are handled by the local <b>claude CLI</b> — no API key needed, it works with your subscription auth. Outputs accumulate in the <code style="background:var(--c-surface-2);padding:1px 5px;border-radius:4px">workspace/</code> and <code style="background:var(--c-surface-2);padding:1px 5px;border-radius:4px">library/</code> folders.</p>
     </div>
   </div>
 </div>
@@ -503,17 +503,17 @@ body.ops-collapsed .ops-reopen{display:inline-flex;align-items:center;gap:6px}
       <button class="m-close" onclick="closeNewTaskModal()" title="Close (Esc)">×</button>
     </div>
     <div class="modal-body">
-      <div class="f-row"><label class="f-label">Title</label><input class="f-input" id="n-subject" placeholder="작업 제목"></div>
+      <div class="f-row"><label class="f-label">Title</label><input class="f-input" id="n-subject" placeholder="Task title"></div>
       <div class="f-row"><label class="f-label">Type</label><select class="f-select" id="n-resource-kind" onchange="syncResourceCreateForm()"><option value="">General task</option><option value="hook-create">Create hook</option><option value="skill-create">Create skill</option><option value="agent-create">Create agent</option></select></div>
-      <div class="f-row" id="n-resource-name-row" style="display:none"><label class="f-label">리소스명</label><input class="f-input" id="n-resource-name" placeholder="예: triage-v2"></div>
+      <div class="f-row" id="n-resource-name-row" style="display:none"><label class="f-label">Resource name</label><input class="f-input" id="n-resource-name" placeholder="e.g. triage-v2"></div>
       <div class="f-row"><label class="f-label">Priority</label><select class="f-select" id="n-priority"><option value="medium">medium</option><option value="high">high</option><option value="critical">critical</option><option value="low">low</option></select></div>
       <div class="f-row"><label class="f-label">Owner</label><select class="f-select" id="n-agent"></select></div>
-      <div class="f-row"><label class="f-label">Description</label><textarea class="f-textarea" id="n-desc" rows="4" placeholder="완료 조건 / 참고"></textarea></div>
-      <div class="f-row" id="n-template-row" style="display:none"><label class="f-label">Template</label><textarea class="f-textarea body" id="n-template" placeholder="비워두면 기본 템플릿을 사용합니다."></textarea></div>
+      <div class="f-row"><label class="f-label">Description</label><textarea class="f-textarea" id="n-desc" rows="4" placeholder="Completion criteria / notes"></textarea></div>
+      <div class="f-row" id="n-template-row" style="display:none"><label class="f-label">Template</label><textarea class="f-textarea body" id="n-template" placeholder="Leave blank to use the default template."></textarea></div>
     </div>
     <div class="modal-foot">
       <span class="left">A resource file is created when the card moves to completed.</span>
-      <div class="right"><button class="btn-ghost" onclick="closeNewTaskModal()">Cancel</button><button class="btn-primary" id="n-save" onclick="createNewTask()">생성</button></div>
+      <div class="right"><button class="btn-ghost" onclick="closeNewTaskModal()">Cancel</button><button class="btn-primary" id="n-save" onclick="createNewTask()">Create</button></div>
     </div>
   </div>
 </div>
@@ -534,15 +534,15 @@ body.ops-collapsed .ops-reopen{display:inline-flex;align-items:center;gap:6px}
       <div class="f-row"><label class="f-label">Status</label><select class="f-select" id="t-status"><option value="pending">Pending</option><option value="in_progress">In progress</option><option value="in_review">Review</option><option value="completed">Completed</option></select></div>
       <div class="f-row"><label class="f-label">Owner</label><select class="f-select" id="t-agent"></select></div>
       <div class="f-row"><label class="f-label">Runner</label><select class="f-select" id="t-runner"><option value="">— none —</option><option value="claude">claude</option><option value="codex">codex</option><option value="both">both (cross-check)</option><option value="reviewer:codex">reviewer:codex</option><option value="reviewer:claude">reviewer:claude</option></select></div>
-      <div class="f-row"><label class="f-label">Description</label><textarea class="f-textarea" id="t-desc" rows="6" placeholder="작업 계획 / 완료 기준 / 참고"></textarea></div>
-      <div class="f-row"><label class="f-label">Result summary</label><textarea class="f-textarea" id="t-report" rows="3" placeholder="완료 시 한 줄 요약 + 후속 작업 제안"></textarea></div>
+      <div class="f-row"><label class="f-label">Description</label><textarea class="f-textarea" id="t-desc" rows="6" placeholder="Work plan / completion criteria / notes"></textarea></div>
+      <div class="f-row"><label class="f-label">Result summary</label><textarea class="f-textarea" id="t-report" rows="3" placeholder="One-line summary on completion + suggested follow-ups"></textarea></div>
       <div id="t-related" style="display:flex;flex-direction:column;gap:10px"></div>
       <div id="t-timeline" style="display:none;font-size:11px;color:var(--c-text-3);font-family:'JetBrains Mono',monospace;padding:10px 12px;border:1px solid var(--c-border);border-radius:7px;background:var(--c-surface-2);line-height:1.7"></div>
     </div>
     <div class="modal-foot">
       <span class="left" id="t-meta-info"></span>
       <div class="right">
-        <button class="btn-ghost" onclick="deleteTaskFromModal()" id="t-delete" style="color:#dc2626;border-color:#fca5a5">삭제</button>
+        <button class="btn-ghost" onclick="deleteTaskFromModal()" id="t-delete" style="color:#dc2626;border-color:#fca5a5">Delete</button>
         <button class="btn-ghost" onclick="closeTaskModal()">Cancel</button>
         <button class="btn-primary" id="t-save" onclick="saveTaskModal()">Save</button>
       </div>
@@ -556,13 +556,13 @@ body.ops-collapsed .ops-reopen{display:inline-flex;align-items:center;gap:6px}
       <button class="m-close" onclick="closeAgentModal()" title="Close (Esc)">×</button>
     </div>
     <div class="modal-body">
-      <div class="f-row"><label class="f-label">Mission</label><textarea class="f-textarea" id="f-mission" rows="2" placeholder="이 에이전트가 막아야 할 실패 모드 (한 문장)"></textarea></div>
-      <div class="f-row"><label class="f-label">Display role</label><div><input class="f-input" id="f-role" placeholder="짧은 역할 설명"><div class="f-hint">에이전트 패널 행의 두 번째 컬럼에 표시되는 짧은 라벨입니다.</div></div></div>
+      <div class="f-row"><label class="f-label">Mission</label><textarea class="f-textarea" id="f-mission" rows="2" placeholder="The failure mode this agent must prevent (one sentence)"></textarea></div>
+      <div class="f-row"><label class="f-label">Display role</label><div><input class="f-input" id="f-role" placeholder="Short role description"><div class="f-hint">A short label shown in the second column of the agent panel row.</div></div></div>
       <div class="f-row"><label class="f-label">Runner</label><select class="f-select" id="f-runner"><option value="claude">claude</option><option value="codex">codex</option><option value="both">both (cross-check)</option><option value="reviewer:codex">reviewer:codex</option><option value="reviewer:claude">reviewer:claude</option></select></div>
       <div class="f-row"><label class="f-label">Group</label><select class="f-select" id="f-group"><option value="core">core</option><option value="domain">domain</option></select></div>
       <div class="f-row"><label class="f-label">Color</label><div class="f-color-row"><input type="color" id="f-color" value="#71717a"><input class="f-input" id="f-color-hex" style="max-width:120px;font-family:'JetBrains Mono',monospace" placeholder="#hex"></div></div>
-      <div class="f-row"><label class="f-label">Body</label><div><textarea class="f-textarea body" id="f-body" placeholder="Triggers / Inputs / Outputs / Cross-validation policy / Failure handling / Examples"></textarea><div class="f-hint">Markdown 본문. 저장 시 자동으로 ## Changelog 섹션에 변경 이력이 추가됩니다.</div></div></div>
-      <div class="f-row"><label class="f-label">Change note</label><input class="f-input" id="f-changenote" placeholder="예: 'e.g., why this change'"></div>
+      <div class="f-row"><label class="f-label">Body</label><div><textarea class="f-textarea body" id="f-body" placeholder="Triggers / Inputs / Outputs / Cross-validation policy / Failure handling / Examples"></textarea><div class="f-hint">Markdown body. On save, the change history is automatically appended to the ## Changelog section.</div></div></div>
+      <div class="f-row"><label class="f-label">Change note</label><input class="f-input" id="f-changenote" placeholder="e.g. why this change"></div>
     </div>
     <div class="modal-foot">
       <span class="left" id="m-path"></span>
@@ -578,7 +578,7 @@ body.ops-collapsed .ops-reopen{display:inline-flex;align-items:center;gap:6px}
     </div>
     <div class="modal-body">
       <div class="f-row"><label class="f-label">Content</label><textarea class="f-textarea body" id="r-body" readonly></textarea></div>
-      <div class="f-row" id="r-note-row" style="display:none"><label class="f-label">Change note</label><input class="f-input" id="r-note" placeholder="예: hook 실행 조건 보강"></div>
+      <div class="f-row" id="r-note-row" style="display:none"><label class="f-label">Change note</label><input class="f-input" id="r-note" placeholder="e.g. tighten the hook's run conditions"></div>
     </div>
     <div class="modal-foot">
       <span class="left" id="r-path"></span>
@@ -598,56 +598,56 @@ body.ops-collapsed .ops-reopen{display:inline-flex;align-items:center;gap:6px}
     </div>
     <div class="modal-body">
       <div class="reset-note">
-        터미널에서 <code>npx agent-kanban-harness setup --guided</code> 를 다시 실행하세요.<br>
-        5가지를 다시 묻습니다: repoPath, 골든 데이터 위치, 에이전트 구성, 평가 루프 레벨, goal.<br>
-        기존 <code>config.js</code>가 있으면 보호를 위해 멈춥니다. 의도한 재설정이면 <code>--force</code>를 붙여 실행합니다.
+        Re-run <code>npx agent-kanban-harness setup --guided</code> in your terminal.<br>
+        It asks 5 things again: repoPath, golden data location, agent setup, eval loop level, and goal.<br>
+        If a <code>config.js</code> already exists, it stops to protect it. If the reset is intentional, run it with <code>--force</code>.
       </div>
     </div>
     <div class="modal-foot">
-      <span class="left">CLAUDE.md는 마스터 프롬프트입니다.</span>
-      <div class="right"><button class="btn-primary" onclick="closeResetModal()">확인</button></div>
+      <span class="left">CLAUDE.md is the master prompt.</span>
+      <div class="right"><button class="btn-primary" onclick="closeResetModal()">OK</button></div>
     </div>
   </div>
 </div>
 <div class="pipe-nav">
-  <button class="pipe-tab active" data-pipe="verify" onclick="setPipeline('verify')"><span class="pt-ic">🔍</span><span data-i18n="pipe.verify">검증 파이프라인</span><span class="pt-sub" data-i18n="pipe.verifySub">검증 멀티에이전트</span><span class="pt-cnt" id="ptc-verify">0</span></button>
-  <button class="pipe-tab" data-pipe="exec" onclick="setPipeline('exec')"><span class="pt-ic">⚙</span><span data-i18n="pipe.exec">실행 파이프라인</span><span class="pt-sub" data-i18n="pipe.execSub">실행 멀티에이전트 · 하네스 엔지니어링</span><span class="pt-cnt" id="ptc-exec">0</span></button>
+  <button class="pipe-tab active" data-pipe="verify" onclick="setPipeline('verify')"><span class="pt-ic">🔍</span><span data-i18n="pipe.verify">Verify Pipeline</span><span class="pt-sub" data-i18n="pipe.verifySub">verify multi-agents</span><span class="pt-cnt" id="ptc-verify">0</span></button>
+  <button class="pipe-tab" data-pipe="exec" onclick="setPipeline('exec')"><span class="pt-ic">⚙</span><span data-i18n="pipe.exec">Execute Pipeline</span><span class="pt-sub" data-i18n="pipe.execSub">execute multi-agents · harness engineering</span><span class="pt-cnt" id="ptc-exec">0</span></button>
 </div>
 <div class="pipe-agents" id="pipe-agents"></div>
 <div class="work-area">
 <main class="board">
   <section class="col" data-s="pending">
-    <div class="col-head"><span class="col-dot"></span><span class="col-lbl">분해됨</span><span class="col-cnt" id="cn-pending">0</span></div>
+    <div class="col-head"><span class="col-dot"></span><span class="col-lbl">Decomposed</span><span class="col-cnt" id="cn-pending">0</span></div>
     <div class="col-cards" id="col-pending"></div>
   </section>
   <section class="col" data-s="in_progress">
-    <div class="col-head"><span class="col-dot"></span><span class="col-lbl">검증중</span><span class="col-cnt" id="cn-in_progress">0</span></div>
+    <div class="col-head"><span class="col-dot"></span><span class="col-lbl">Verifying</span><span class="col-cnt" id="cn-in_progress">0</span></div>
     <div class="col-cards" id="col-in_progress"></div>
   </section>
   <section class="col" data-s="in_review">
-    <div class="col-head"><span class="col-dot"></span><span class="col-lbl">실행중</span><span class="col-cnt" id="cn-in_review">0</span></div>
+    <div class="col-head"><span class="col-dot"></span><span class="col-lbl">Running</span><span class="col-cnt" id="cn-in_review">0</span></div>
     <div class="col-cards" id="col-in_review"></div>
   </section>
   <section class="col" data-s="completed">
-    <div class="col-head"><span class="col-dot"></span><span class="col-lbl">산출 완료</span><span class="col-cnt" id="cn-completed">0</span></div>
+    <div class="col-head"><span class="col-dot"></span><span class="col-lbl">Output</span><span class="col-cnt" id="cn-completed">0</span></div>
     <div class="col-cards" id="col-completed"></div>
   </section>
 </main>
 <aside class="ops-thread" id="ops-thread">
   <div class="ops-head">
-    <div class="ttl" id="ops-ttl"><span class="tg-dot"></span><span data-i18n="ops.title">운영 스레드</span><span class="sub" id="ops-tg-state">로컬</span></div>
-    <button class="ops-tog" onclick="toggleOps()" title="패널 접기">▶</button>
+    <div class="ttl" id="ops-ttl"><span class="tg-dot"></span><span data-i18n="ops.title">Ops Thread</span><span class="sub" id="ops-tg-state">local</span></div>
+    <button class="ops-tog" onclick="toggleOps()" title="Collapse panel">▶</button>
   </div>
   <div class="ops-msgs" id="ops-msgs">
-    <div class="ops-empty">메시지 없음.<br><br>입력창에 메시지를 보내면<br>여기와 텔레그램 양쪽에 기록됩니다.<br><br><kbd>Enter</kbd> 전송 · <kbd>Shift+Enter</kbd> 줄바꿈</div>
+    <div class="ops-empty">No messages.<br><br>Send a message in the input box<br>and it's recorded both here and in Telegram.<br><br><kbd>Enter</kbd> to send · <kbd>Shift+Enter</kbd> for a new line</div>
   </div>
   <form class="ops-form" id="ops-form" onsubmit="return sendOps(event)">
-    <textarea id="ops-input" rows="1" placeholder="메시지를 입력하세요…" data-i18n-ph="ops.ph" oninput="autoGrowOps(this)" onkeydown="opsKey(event)" autocomplete="off"></textarea>
-    <button type="submit" id="ops-send-btn">전송</button>
+    <textarea id="ops-input" rows="1" placeholder="Type a message…" data-i18n-ph="ops.ph" oninput="autoGrowOps(this)" onkeydown="opsKey(event)" autocomplete="off"></textarea>
+    <button type="submit" id="ops-send-btn">Send</button>
   </form>
 </aside>
 </div>
-<button class="ops-reopen" onclick="toggleOps()">💬 운영 스레드 열기</button>
+<button class="ops-reopen" onclick="toggleOps()">💬 Open ops thread</button>
 <script>
 // Board area — injected by the server (config.area). Empty ⇒ meta board (shows all tasks).
 const BOARD_AREA="{{AREA}}";
@@ -657,7 +657,7 @@ const state={tasks:[],agents:[],hooks:[],skills:[],harness:null,filter:'all',age
 // the meta board (empty BOARD_AREA) sees everything.
 function filterByArea(tasks){if(!BOARD_AREA)return tasks;return tasks.filter(t=>t&&((t.metadata&&t.metadata.area===BOARD_AREA)||t.project===BOARD_AREA));}
 function getCol(t){const s=(t.status||'pending').toLowerCase();if(s.includes('progress')||s==='running')return 'in_progress';if(s.includes('review'))return 'in_review';if(s==='done'||s==='completed')return 'completed';return 'pending';}
-function statusLabel(c){return(L==='en'?{pending:'Pending',in_progress:'In progress',in_review:'Review',completed:'Completed'}:{pending:'대기',in_progress:'진행중',in_review:'사람검토',completed:'완료'})[c]||c}
+function statusLabel(c){return(L==='en'?{pending:'Pending',in_progress:'In progress',in_review:'Review',completed:'Completed'}:{pending:'Pending',in_progress:'In progress',in_review:'Human review',completed:'Completed'})[c]||c}
 function escapeHtml(s){return String(s||'').replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
 async function loadAll(){await Promise.all([loadAgents(),loadResources(),loadTasks(),loadHarness()]);renderAll()}
 async function loadAgents(){const r=await fetch(`/api/agents?project=${state.project}`);const j=await r.json();state.agents=j.agents||[]}
@@ -668,12 +668,12 @@ async function loadResources(){
 }
 async function loadTasks(){const r=await fetch('/api/tasks');state.tasks=filterByArea(await r.json());renderAll()}
 async function loadHarness(){try{const r=await fetch('/api/harness');if(!r.ok)return;state.harness=await r.json();renderHarness();}catch{}}
-var I18N={en:{'tagline':'Builder content, into verified modules','stat.total':'Total','stat.active':'Active','stat.review':'Review','stat.done':'Done','btn.library':'📚 Library','btn.run':'▶ Run','btn.repair':'🔧 Repair','btn.guide':'📖 Guide','btn.newcard':'+ New','search.ph':'Search #id·title·agent','hero.ph':'Paste an X / LinkedIn post URL or a GitHub repo URL…','hero.btn':'Decompose · Verify · Run →','agent.verifyTeam':'Verify Agents','agent.execTeam':'Execute Agents','agent.add':'+ Add','agent.restore':'Restore defaults','ops.ph':'Type a message…','pipe.verify':'Verify Pipeline','pipe.verifySub':'verify multi-agents','pipe.exec':'Execute Pipeline','pipe.execSub':'execute multi-agents · harness engineering','pa.verify':'🔍 Verify multi-agents · deployed','pa.exec':'⚙ Execute multi-agents · waiting for verified','r.plan':'plan','r.decompose':'decompose','r.gapfill':'gap-fill','r.route':'route','r.security':'security','r.env':'env setup','r.secrets':'secrets','r.build':'build','r.tool':'tool call','r.measure':'measure','r.repair':'repair','r.integrate':'integrate','r.deploy':'deploy','registry':'Agents · Verify (fixed) / Execute (add·edit)','folder.label':'📁 Output folder:','folder.hint':'· After deploying to GitHub, each user sets repoPath in config.js (outputs land here)','ops.title':'Ops Thread','newcard.btn':'+ New','all':'All','hero.hint':'Link → linked GitHub → decompose → verify agents → gate → execute agents → output → library','agent.details':'Details','conn.connected':'Connected','conn.reconnecting':'Reconnecting','conn.connecting':'Connecting','tg.local':'local'},ko:{'tagline':'빌더 콘텐츠를, 검증된 모듈로','stat.total':'전체','stat.active':'진행중','stat.review':'검토','stat.done':'완료','btn.library':'📚 라이브러리','btn.run':'▶ 실행하기','btn.repair':'🔧 수리','btn.guide':'📖 가이드','btn.newcard':'+ 새 카드','search.ph':'검색 #ID·제목·agent','hero.ph':'X·링크드인 글 URL 또는 GitHub 레포 주소 붙여넣기…','hero.btn':'분해 · 검증 · 실행 →','agent.verifyTeam':'검증 에이전트','agent.execTeam':'실행 에이전트','agent.add':'+ 추가','agent.restore':'기본 복구','ops.ph':'메시지를 입력하세요…','pipe.verify':'검증 파이프라인','pipe.verifySub':'검증 멀티에이전트','pipe.exec':'실행 파이프라인','pipe.execSub':'실행 멀티에이전트 · 하네스 엔지니어링','pa.verify':'🔍 검증 멀티에이전트 · 배치 완료','pa.exec':'⚙ 실행 멀티에이전트 · 검증 통과분 대기','r.plan':'계획','r.decompose':'분해','r.gapfill':'갭필','r.route':'할당','r.security':'보안·정책','r.env':'환경','r.secrets':'비밀값','r.build':'빌드','r.tool':'도구호출','r.measure':'실측','r.repair':'수리','r.integrate':'통합','r.deploy':'배포','registry':'에이전트 · 검증 멀티에이전트(고정) / 실행 멀티에이전트(자동생성·편집)','folder.label':'📁 출력 폴더:','folder.hint':'· GitHub로 배포 후엔 각자 config.js의 repoPath에서 변경 (검증·실행 산출물이 이 폴더에 쌓입니다)','ops.title':'운영 스레드','newcard.btn':'+ 새 카드','all':'전체','hero.hint':'링크 → 연관 GitHub 분해 → 검증 멀티에이전트 → 게이트 → 실행 멀티에이전트 → 산출물 → 라이브러리','agent.details':'상세','conn.connected':'연결됨','conn.reconnecting':'재연결중','conn.connecting':'연결중','tg.local':'로컬'}};
-var COL_LABELS={en:{verify:{pending:'Decomposed',in_progress:'Verifying',in_review:'Gate · Review',completed:'Verified'},exec:{pending:'Queued',in_progress:'Running',in_review:'Review',completed:'Output'}},ko:{verify:{pending:'분해됨',in_progress:'검증중',in_review:'게이트·검토',completed:'검증완료'},exec:{pending:'실행 대기',in_progress:'실행중',in_review:'검수',completed:'산출 완료'}}};
+var I18N={en:{'tagline':'Builder content, into verified modules','stat.total':'Total','stat.active':'Active','stat.review':'Review','stat.done':'Done','btn.library':'📚 Library','btn.run':'▶ Run','btn.repair':'🔧 Repair','btn.guide':'📖 Guide','btn.newcard':'+ New','search.ph':'Search #id·title·agent','hero.ph':'Paste an X / LinkedIn post URL or a GitHub repo URL…','hero.btn':'Decompose · Verify · Run →','agent.verifyTeam':'Verify Agents','agent.execTeam':'Execute Agents','agent.add':'+ Add','agent.restore':'Restore defaults','ops.ph':'Type a message…','pipe.verify':'Verify Pipeline','pipe.verifySub':'verify multi-agents','pipe.exec':'Execute Pipeline','pipe.execSub':'execute multi-agents · harness engineering','pa.verify':'🔍 Verify multi-agents · deployed','pa.exec':'⚙ Execute multi-agents · waiting for verified','r.plan':'plan','r.decompose':'decompose','r.gapfill':'gap-fill','r.route':'route','r.security':'security','r.env':'env setup','r.secrets':'secrets','r.build':'build','r.tool':'tool call','r.measure':'measure','r.repair':'repair','r.integrate':'integrate','r.deploy':'deploy','registry':'Agents · Verify (fixed) / Execute (add·edit)','folder.label':'📁 Output folder:','folder.hint':'· After deploying to GitHub, each user sets repoPath in config.js (outputs land here)','ops.title':'Ops Thread','newcard.btn':'+ New','all':'All','hero.hint':'Link → linked GitHub → decompose → verify agents → gate → execute agents → output → library','agent.details':'Details','conn.connected':'Connected','conn.reconnecting':'Reconnecting','conn.connecting':'Connecting','tg.local':'local'},ko:{'tagline':'Builder content, into verified modules','stat.total':'Total','stat.active':'Active','stat.review':'Review','stat.done':'Done','btn.library':'📚 Library','btn.run':'▶ Run','btn.repair':'🔧 Repair','btn.guide':'📖 Guide','btn.newcard':'+ New','search.ph':'Search #id·title·agent','hero.ph':'Paste an X / LinkedIn post URL or a GitHub repo URL…','hero.btn':'Decompose · Verify · Run →','agent.verifyTeam':'Verify Agents','agent.execTeam':'Execute Agents','agent.add':'+ Add','agent.restore':'Restore defaults','ops.ph':'Type a message…','pipe.verify':'Verify Pipeline','pipe.verifySub':'verify multi-agents','pipe.exec':'Execute Pipeline','pipe.execSub':'execute multi-agents · harness engineering','pa.verify':'🔍 Verify multi-agents · deployed','pa.exec':'⚙ Execute multi-agents · waiting for verified','r.plan':'plan','r.decompose':'decompose','r.gapfill':'gap-fill','r.route':'route','r.security':'security','r.env':'env setup','r.secrets':'secrets','r.build':'build','r.tool':'tool call','r.measure':'measure','r.repair':'repair','r.integrate':'integrate','r.deploy':'deploy','registry':'Agents · Verify (fixed) / Execute (add·edit)','folder.label':'📁 Output folder:','folder.hint':'· After deploying to GitHub, each user sets repoPath in config.js (outputs land here)','ops.title':'Ops Thread','newcard.btn':'+ New','all':'All','hero.hint':'Link → linked GitHub → decompose → verify agents → gate → execute agents → output → library','agent.details':'Details','conn.connected':'Connected','conn.reconnecting':'Reconnecting','conn.connecting':'Connecting','tg.local':'local'}};
+var COL_LABELS={en:{verify:{pending:'Decomposed',in_progress:'Verifying',in_review:'Gate · Review',completed:'Verified'},exec:{pending:'Queued',in_progress:'Running',in_review:'Review',completed:'Output'}},ko:{verify:{pending:'Decomposed',in_progress:'Verifying',in_review:'Gate · Review',completed:'Verified'},exec:{pending:'Queued',in_progress:'Running',in_review:'Review',completed:'Output'}}};
 var AGENT_ROLE_EN={'decompose-agent':'Content → task cards','gapfill-agent':'Restore omitted steps','router-agent':'Assign card types','verify-agent':'Security & policy + gate','verify-orchestrator':'Plan & fan out verify workers','exec-orchestrator':'Plan & distribute execution','env-agent':'Env setup (clone·deps·runtime)','secrets-agent':'.env & API keys','build-agent':'Build & compile','tool-runner':'Real tool / API / CLI calls','exec-runner':'Sandbox N-run measure','repair-agent':'Debug & fix loop','integration-agent':'Integrate & wire cards','deploy-agent':'Export module · deploy to library','harness-builder':'Auto-generate sub-agents'};
 var L=(localStorage.getItem('lang')||'en');
 function t(k){return (I18N[L]&&I18N[L][k]!=null)?I18N[L][k]:((I18N.en&&I18N.en[k]!=null)?I18N.en[k]:k);}
-function applyLang(lang){L=lang;localStorage.setItem('lang',lang);fetch('/api/lang',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({lang:lang})}).catch(function(){});document.querySelectorAll('[data-i18n]').forEach(function(el){var v=t(el.getAttribute('data-i18n'));if(v!=null)el.textContent=v;});document.querySelectorAll('[data-i18n-ph]').forEach(function(el){var v=t(el.getAttribute('data-i18n-ph'));if(v!=null)el.setAttribute('placeholder',v);});var lb=document.getElementById('lang-tog');if(lb)lb.textContent=lang==='en'?'🌐 EN':'🌐 KO';if(typeof renderBoard==='function')renderBoard();if(typeof renderPipeAgents==='function')renderPipeAgents();if(typeof renderAgents==='function')renderAgents();var atb=document.getElementById('ag-toggle-btn');if(atb)atb.textContent=(L==='en'?(state.collapsed?'Agents':'Hide agents'):(state.collapsed?'에이전트':'에이전트 접기'));var cl=document.getElementById('conn-l');}
+function applyLang(lang){L=lang;localStorage.setItem('lang',lang);fetch('/api/lang',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({lang:lang})}).catch(function(){});document.querySelectorAll('[data-i18n]').forEach(function(el){var v=t(el.getAttribute('data-i18n'));if(v!=null)el.textContent=v;});document.querySelectorAll('[data-i18n-ph]').forEach(function(el){var v=t(el.getAttribute('data-i18n-ph'));if(v!=null)el.setAttribute('placeholder',v);});var lb=document.getElementById('lang-tog');if(lb)lb.textContent=lang==='en'?'🌐 EN':'🌐 KO';if(typeof renderBoard==='function')renderBoard();if(typeof renderPipeAgents==='function')renderPipeAgents();if(typeof renderAgents==='function')renderAgents();var atb=document.getElementById('ag-toggle-btn');if(atb)atb.textContent=(L==='en'?(state.collapsed?'Agents':'Hide agents'):(state.collapsed?'Agents':'Hide agents'));var cl=document.getElementById('conn-l');}
 function setLang(){applyLang(L==='en'?'ko':'en');}
 function renderAll(){renderAgents();renderResources();renderBoard();renderPipeAgents();updateStats();updateFilterCounts();renderHarness()}
 function compareVersions(a,b){
@@ -695,7 +695,7 @@ function renderHarness(){
   document.getElementById('h-tasks').textContent=String(state.tasks.length);
   document.getElementById('h-version').textContent=h.installedVersion?`v${h.installedVersion}`:'v—';
   const banner=document.getElementById('version-banner');
-  // 버전 업데이트 알림 배너 비활성화 — 항상 숨김
+  // version update notification banner disabled — always hidden
   banner.classList.remove('show');
 }
 function updateFilterCounts(){
@@ -714,16 +714,16 @@ function renderAgents(){
   document.getElementById('ag-rows-domain').innerHTML=domain.map(agentRowHTML).join('');
   const coreBusy=core.reduce((n,a)=>n+state.tasks.filter(t=>t.agent===a.name&&getCol(t)==='in_progress').length,0);
   const domainBusy=domain.reduce((n,a)=>n+state.tasks.filter(t=>t.agent===a.name&&getCol(t)==='in_progress').length,0);
-  document.getElementById('ag-meta-core').textContent=core.length+(L==='en'?' · active ':'개 · 활성 ')+coreBusy;
-  document.getElementById('ag-meta-domain').textContent=domain.length+(L==='en'?' · active ':'개 · 활성 ')+domainBusy;
+  document.getElementById('ag-meta-core').textContent=core.length+(L==='en'?' · active ':' · active ')+coreBusy;
+  document.getElementById('ag-meta-domain').textContent=domain.length+(L==='en'?' · active ':' · active ')+domainBusy;
   document.querySelectorAll('.ag-row').forEach(el=>{
     el.onclick=()=>{const name=el.dataset.agent;state.agentFilter=state.agentFilter===name?null:name;document.querySelectorAll('.ag-row').forEach(r=>r.classList.toggle('active',r.dataset.agent===state.agentFilter));renderAgentTag();renderBoard();};
   });
   if(state.agentFilter)document.querySelector(`.ag-row[data-agent="${state.agentFilter}"]`)?.classList.add('active');
 }
 function renderResources(){
-  document.getElementById('hooks-meta').textContent=`${state.hooks.length}개 파일`;
-  document.getElementById('skills-meta').textContent=`${state.skills.length}개 파일`;
+  document.getElementById('hooks-meta').textContent=`${state.hooks.length} files`;
+  document.getElementById('skills-meta').textContent=`${state.skills.length} files`;
   document.getElementById('hook-rows').innerHTML=state.hooks.length?state.hooks.map(h=>`<div class="res-row" onclick="openResourceModal('hook','${escapeHtml(h.name)}')"><span class="res-name">${escapeHtml(h.name)}</span><span class="res-meta">${escapeHtml(h.kind||'file')}</span></div>`).join(''):'<div class="col-empty">No hooks</div>';
   document.getElementById('skill-rows').innerHTML=state.skills.length?state.skills.map(s=>`<div class="res-row" onclick="openResourceModal('skill','${escapeHtml(s.name)}')"><span class="res-name">${escapeHtml(s.name)}</span><span class="res-meta">${escapeHtml(s.file||'skill')}</span>${s.description?`<span class="res-desc">${escapeHtml(s.description)}</span>`:''}</div>`).join(''):'<div class="col-empty">No skills</div>';
 }
@@ -735,7 +735,7 @@ function clearAgentFilter(){state.agentFilter=null;document.querySelectorAll('.a
 function agentRowHTML(a){
   const color=a.color||'#71717a';const runner=a.runner||'—';const rcls='r-'+(runner||'').replace(/[^a-z0-9]/gi,'-').toLowerCase();const role=(L==='en'&&AGENT_ROLE_EN[a.name])?AGENT_ROLE_EN[a.name]:(a.role||'');
   const busy=state.tasks.filter(t=>t.agent===a.name&&getCol(t)==='in_progress').length;const total=state.tasks.filter(t=>t.agent===a.name).length;const isActive=state.agentFilter===a.name?' active':'';
-  return `<div class="ag-row${isActive}" data-agent="${escapeHtml(a.name)}"><span class="ag-dot" style="background:${color}"></span><span class="ag-name">${escapeHtml(a.name)}</span><span class="ag-role ag-role-cell">${escapeHtml(role)}</span><span class="ag-runner ${rcls} ag-runner-cell">${escapeHtml(runner)}</span><span class="ag-runner ag-runner-cell" style="background:${a.model==='opus'?'rgba(121,216,108,0.18)':'rgba(160,160,160,0.12)'};color:${a.model==='opus'?'var(--c-accent)':'var(--c-text-3)'}">${escapeHtml(a.model||'sonnet')}</span><span class="ag-load ${busy>0?'busy':''}"><span class="lp"></span>${busy}/${total}</span><button class="ag-detail-btn" onclick="event.stopPropagation();openAgentModal('${escapeHtml(a.name)}')">${L==='en'?'Details':'상세'}</button></div>`;
+  return `<div class="ag-row${isActive}" data-agent="${escapeHtml(a.name)}"><span class="ag-dot" style="background:${color}"></span><span class="ag-name">${escapeHtml(a.name)}</span><span class="ag-role ag-role-cell">${escapeHtml(role)}</span><span class="ag-runner ${rcls} ag-runner-cell">${escapeHtml(runner)}</span><span class="ag-runner ag-runner-cell" style="background:${a.model==='opus'?'rgba(121,216,108,0.18)':'rgba(160,160,160,0.12)'};color:${a.model==='opus'?'var(--c-accent)':'var(--c-text-3)'}">${escapeHtml(a.model||'sonnet')}</span><span class="ag-load ${busy>0?'busy':''}"><span class="lp"></span>${busy}/${total}</span><button class="ag-detail-btn" onclick="event.stopPropagation();openAgentModal('${escapeHtml(a.name)}')">${L==='en'?'Details':'Details'}</button></div>`;
 }
 function applyFilters(tasks){
   let v=tasks.slice();
@@ -781,9 +781,9 @@ function taskCardHTML(t){
   const kids=state.tasks.filter(x=>x.parentId===t.id);const kdone=kids.filter(c=>getCol(c)==='completed').length;const kinp=kids.filter(c=>getCol(c)==='in_progress').length;const kt=kids.length;const kpct=kt?Math.round(kdone/kt*100):0;
   return `<div class="tc${isSub?' subtask':''}${dis?' disagreed':''}" data-id="${t.id}" style="border-left-color:${dis?'var(--st-flag-dot)':agentColor}">
     <div class="tc-top"><span class="tc-id">#${t.id}${isSub?`<span class="pref"> ←#${t.parentId}</span>`:''}</span><span class="tc-pri pri-${priority}">${priority}</span>${resourceAction?`<span class="tc-resource">${escapeHtml((resourceAction.kind||'resource').replace('-create',''))}</span>`:''}${tags.map(tg=>`<span class="tc-tag ${tg.cls}">${escapeHtml(tg.label)}</span>`).join('')}</div>
-    <div class="tc-title">${escapeHtml(t.subject||'제목 없음')}</div>
+    <div class="tc-title">${escapeHtml(t.subject||'Untitled')}</div>
     <div class="tc-meta"><span class="tc-ag"><span class="agd" style="background:${agentColor}"></span>${escapeHtml(agentLabel)}</span>${runner?`<span class="tc-rn">${renderRunner(runner)}</span>`:''}${agreement?`<span class="tc-agree ${agreement}">${agreement==='agreed'?'✓':agreement==='disagreed'?'✗':'⋯'}</span>`:''}</div>
-    ${kt>0?`<div class="tc-prog"><div class="fill${kpct===100?' done':''}" style="width:${kpct}%"></div></div><div class="tc-sub"><span>${kdone}/${kt}${kinp?` · ${kinp}진행`:''}</span><span>${kpct}%</span></div>`:''}
+    ${kt>0?`<div class="tc-prog"><div class="fill${kpct===100?' done':''}" style="width:${kpct}%"></div></div><div class="tc-sub"><span>${kdone}/${kt}${kinp?` · ${kinp} running`:''}</span><span>${kpct}%</span></div>`:''}
   </div>`;
 }
 function renderRunner(r){
@@ -797,7 +797,7 @@ function updateStats(){const t=state.tasks;document.getElementById('s-total').te
 function setFilter(f){state.filter=f;document.querySelectorAll('.f-pill').forEach(b=>b.classList.toggle('active',b.dataset.flt===f));renderBoard();}
 function setPriority(p){state.priorityFilter=p==='all'?null:p;document.querySelectorAll('.pri-pill').forEach(b=>b.classList.toggle('active',b.dataset.pri===(p||'all')));renderBoard();}
 function setSearch(q){state.search=q.trim();renderBoard();}
-function toggleAgents(){state.collapsed=!state.collapsed;document.body.classList.toggle('agents-collapsed',state.collapsed);const t=document.querySelector('.agents-panel-head .toggle');if(t)t.textContent=state.collapsed?'Expand ▼':'Collapse ▲';document.getElementById('ag-toggle-btn').textContent=(L==='en'?(state.collapsed?'Agents':'Hide agents'):(state.collapsed?'에이전트':'에이전트 접기'));}
+function toggleAgents(){state.collapsed=!state.collapsed;document.body.classList.toggle('agents-collapsed',state.collapsed);const t=document.querySelector('.agents-panel-head .toggle');if(t)t.textContent=state.collapsed?'Expand ▼':'Collapse ▲';document.getElementById('ag-toggle-btn').textContent=(L==='en'?(state.collapsed?'Agents':'Hide agents'):(state.collapsed?'Agents':'Hide agents'));}
 function toggleTheme(){const cur=document.body.dataset.theme;const next=cur==='light'?'dark':'light';document.body.dataset.theme=next;document.getElementById('theme-tog').textContent=next==='light'?'☾':'☀';localStorage.setItem('kanban-theme',next);}
 (function initTheme(){const t=localStorage.getItem('kanban-theme')||'dark';document.body.dataset.theme=t;document.getElementById('theme-tog').textContent=t==='light'?'☾':'☀'})();
 function agentOptionsHTML(){
@@ -823,13 +823,13 @@ function syncResourceCreateForm(){
   document.getElementById('n-template-row').style.display=show?'grid':'none';
 }
 async function createNewTask(){
-  const btn=document.getElementById('n-save');btn.disabled=true;btn.textContent='생성 중...';
+  const btn=document.getElementById('n-save');btn.disabled=true;btn.textContent='Creating...';
   const kind=document.getElementById('n-resource-kind').value;
   const name=document.getElementById('n-resource-name').value.trim();
-  const subject=document.getElementById('n-subject').value.trim()||(kind&&name?`${kind.replace('-create','')} created: ${name}`:'제목 없음');
+  const subject=document.getElementById('n-subject').value.trim()||(kind&&name?`${kind.replace('-create','')} created: ${name}`:'Untitled');
   const payload={subject,description:document.getElementById('n-desc').value,priority:document.getElementById('n-priority').value,agent:document.getElementById('n-agent').value,metadata:{}};
   if(kind){
-    if(!name){showToast('리소스명을 입력하세요','err');btn.disabled=false;btn.textContent='생성';return;}
+    if(!name){showToast('Enter a resource name','err');btn.disabled=false;btn.textContent='Create';return;}
     payload.metadata.resourceAction={kind,name};
     const template=document.getElementById('n-template').value;
     if(template.trim())payload.metadata.resourceAction.template=template;
@@ -838,10 +838,10 @@ async function createNewTask(){
     const r=await fetch('/api/tasks',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
     if(!r.ok)throw new Error((await r.json()).error||'create failed');
     const task=await r.json();
-    showToast(`#${task.id} 생성 완료`,'ok');
+    showToast(`#${task.id} created`,'ok');
     closeNewTaskModal();
     await loadTasks();
-  }catch(e){showToast('생성 실패: '+e.message,'err');}finally{btn.disabled=false;btn.textContent='생성';}
+  }catch(e){showToast('Create failed: '+e.message,'err');}finally{btn.disabled=false;btn.textContent='Create';}
 }
 let modalTaskId=null;
 function openTaskModal(id){
@@ -851,18 +851,18 @@ function openTaskModal(id){
   document.getElementById('t-agent-dot').style.background=agentColor;
   document.getElementById('t-agent-tag').textContent=t.agent||'unassigned';
   const sp=document.getElementById('t-status-pill');sp.dataset.s=col;sp.innerHTML=`<span class="sd"></span>${statusLabel(col)}`;
-  document.getElementById('t-title-h').textContent=t.subject||'제목 없음';
+  document.getElementById('t-title-h').textContent=t.subject||'Untitled';
   const cv=(t.metadata&&t.metadata.crossValidation)||t.crossValidation;const cvBar=document.getElementById('t-cv-bar');
   if(cv){const a=cv.agreement||'pending';const labels={agreed:'✓ Claude·Codex agree',disagreed:'✗ Claude·Codex disagree — needs human review',pending:'⋯ Cross-validation pending'};const colors={agreed:'var(--st-pass-fg)',disagreed:'var(--st-flag-fg)',pending:'var(--c-text-3)'};const bgs={agreed:'var(--st-pass-bg)',disagreed:'var(--st-flag-bg)',pending:'var(--c-surface-2)'};cvBar.style.display='block';cvBar.style.color=colors[a];cvBar.style.background=bgs[a];cvBar.textContent=labels[a];}else{cvBar.style.display='none';}
   document.getElementById('t-status').value=col;document.getElementById('t-runner').value=(t.metadata&&t.metadata.runner)||'';document.getElementById('t-desc').value=t.description||'';document.getElementById('t-report').value=t.reportSummary||'';
   const agSel=document.getElementById('t-agent');agSel.innerHTML=agentOptionsHTML();agSel.value=t.agent||'';
   const rel=document.getElementById('t-related');let relHTML='';
-  if(t.parentId){const p=state.tasks.find(x=>String(x.id)===String(t.parentId));if(p)relHTML+=`<div style="font-size:11px;color:var(--c-text-3)">상위 Phase</div><div style="padding:8px 10px;background:var(--c-surface-2);border-radius:6px;cursor:pointer;font-size:12px" onclick="openTaskModal('${p.id}')"><strong style="font-family:'JetBrains Mono',monospace">#${p.id}</strong> ${escapeHtml(p.subject)}</div>`;}
+  if(t.parentId){const p=state.tasks.find(x=>String(x.id)===String(t.parentId));if(p)relHTML+=`<div style="font-size:11px;color:var(--c-text-3)">Parent phase</div><div style="padding:8px 10px;background:var(--c-surface-2);border-radius:6px;cursor:pointer;font-size:12px" onclick="openTaskModal('${p.id}')"><strong style="font-family:'JetBrains Mono',monospace">#${p.id}</strong> ${escapeHtml(p.subject)}</div>`;}
   const kids=state.tasks.filter(x=>String(x.parentId)===String(t.id));
-  if(kids.length>0){const kdone=kids.filter(c=>getCol(c)==='completed').length;relHTML+=`<div style="font-size:11px;color:var(--c-text-3);margin-top:6px">하위 작업 (${kdone}/${kids.length})</div><div style="display:flex;flex-direction:column;gap:4px">`+kids.map(c=>{const ccol=getCol(c);const ca=state.agents.find(a=>a.name===c.agent);const ccolor=ca?.color||'#a1a1aa';return `<div style="padding:6px 10px;background:var(--c-surface-2);border-radius:5px;cursor:pointer;font-size:11.5px;display:flex;align-items:center;gap:8px;border-left:3px solid ${ccolor}" onclick="openTaskModal('${c.id}')"><span class="tc-st" data-s="${ccol}"><span class="sd"></span>${statusLabel(ccol)}</span><strong style="font-family:'JetBrains Mono',monospace">#${c.id}</strong><span style="flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${escapeHtml(c.subject)}</span></div>`;}).join('')+'</div>';}
+  if(kids.length>0){const kdone=kids.filter(c=>getCol(c)==='completed').length;relHTML+=`<div style="font-size:11px;color:var(--c-text-3);margin-top:6px">Subtasks (${kdone}/${kids.length})</div><div style="display:flex;flex-direction:column;gap:4px">`+kids.map(c=>{const ccol=getCol(c);const ca=state.agents.find(a=>a.name===c.agent);const ccolor=ca?.color||'#a1a1aa';return `<div style="padding:6px 10px;background:var(--c-surface-2);border-radius:5px;cursor:pointer;font-size:11.5px;display:flex;align-items:center;gap:8px;border-left:3px solid ${ccolor}" onclick="openTaskModal('${c.id}')"><span class="tc-st" data-s="${ccol}"><span class="sd"></span>${statusLabel(ccol)}</span><strong style="font-family:'JetBrains Mono',monospace">#${c.id}</strong><span style="flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${escapeHtml(c.subject)}</span></div>`;}).join('')+'</div>';}
   rel.innerHTML=relHTML;
   const tl=document.getElementById('t-timeline');const times=[];
-  if(t.createdAt)times.push(`Created   ${new Date(t.createdAt).toLocaleString('ko-KR')}`);if(t.startedAt)times.push(`Started   ${new Date(t.startedAt).toLocaleString('ko-KR')}`);if(t.completedAt)times.push(`Completed ${new Date(t.completedAt).toLocaleString('ko-KR')}`);if(t.updatedAt&&t.updatedAt!==t.createdAt)times.push(`Updated   ${new Date(t.updatedAt).toLocaleString('ko-KR')}`);
+  if(t.createdAt)times.push(`Created   ${new Date(t.createdAt).toLocaleString('en-US')}`);if(t.startedAt)times.push(`Started   ${new Date(t.startedAt).toLocaleString('en-US')}`);if(t.completedAt)times.push(`Completed ${new Date(t.completedAt).toLocaleString('en-US')}`);if(t.updatedAt&&t.updatedAt!==t.createdAt)times.push(`Updated   ${new Date(t.updatedAt).toLocaleString('en-US')}`);
   if(times.length){tl.style.display='block';tl.innerHTML=times.join('<br>');}else{tl.style.display='none';}
   document.getElementById('t-meta-info').textContent=`priority: ${t.priority||'medium'} · session: ${(t._session||'kanban').slice(0,12)}`;
   document.getElementById('t-delete').style.display=t._editable===false?'none':'inline-block';
@@ -870,20 +870,20 @@ function openTaskModal(id){
 }
 function closeTaskModal(){document.getElementById('task-modal').classList.remove('open');modalTaskId=null;}
 async function saveTaskModal(){
-  if(!modalTaskId)return;const btn=document.getElementById('t-save');btn.disabled=true;btn.textContent='저장 중...';
+  if(!modalTaskId)return;const btn=document.getElementById('t-save');btn.disabled=true;btn.textContent='Saving...';
   const status=document.getElementById('t-status').value;const agent=document.getElementById('t-agent').value;const runner=document.getElementById('t-runner').value;const desc=document.getElementById('t-desc').value;const report=document.getElementById('t-report').value.trim();
   const payload={status,agent,description:desc};if(report)payload.reportSummary=report;if(runner)payload.metadata={runner};
-  try{const r=await fetch(`/api/tasks/${modalTaskId}`,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});if(!r.ok)throw new Error('save failed');showToast(`#${modalTaskId} saved`,'ok');closeTaskModal();await loadTasks();}catch(e){showToast('저장 실패: '+e.message,'err');}finally{btn.disabled=false;btn.textContent='저장';}
+  try{const r=await fetch(`/api/tasks/${modalTaskId}`,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});if(!r.ok)throw new Error('save failed');showToast(`#${modalTaskId} saved`,'ok');closeTaskModal();await loadTasks();}catch(e){showToast('Save failed: '+e.message,'err');}finally{btn.disabled=false;btn.textContent='Save';}
 }
 async function deleteTaskFromModal(){
-  if(!modalTaskId)return;if(!confirm(`#${modalTaskId} 카드를 삭제할까요?`))return;
-  try{const r=await fetch(`/api/tasks/${modalTaskId}`,{method:'DELETE'});if(!r.ok&&r.status!==204)throw new Error('delete failed');showToast(`#${modalTaskId} deleted`,'ok');closeTaskModal();await loadTasks();}catch(e){showToast('삭제 실패: '+e.message,'err');}
+  if(!modalTaskId)return;if(!confirm(`Delete card #${modalTaskId}?`))return;
+  try{const r=await fetch(`/api/tasks/${modalTaskId}`,{method:'DELETE'});if(!r.ok&&r.status!==204)throw new Error('delete failed');showToast(`#${modalTaskId} deleted`,'ok');closeTaskModal();await loadTasks();}catch(e){showToast('Delete failed: '+e.message,'err');}
 }
 let modalCurrentAgent=null;
 async function openAgentModal(name){
   modalCurrentAgent=name;const overlay=document.getElementById('agent-modal');const a=state.agents.find(x=>x.name===name)||{};
   document.getElementById('m-title').textContent=name;document.getElementById('m-dot').style.background=a.color||'#71717a';document.getElementById('m-group').textContent=a.group||'—';
-  try{const r=await fetch(`/api/agents/${encodeURIComponent(name)}/full`);if(!r.ok)throw new Error('failed to load');const j=await r.json();const m=j.meta||{};document.getElementById('f-mission').value=m.mission||'';document.getElementById('f-role').value=m.role||a.role||'';document.getElementById('f-runner').value=m.runner||a.runner||'claude';document.getElementById('f-group').value=m.group||a.group||'core';const color=m.color||a.color||'#71717a';document.getElementById('f-color').value=color;document.getElementById('f-color-hex').value=color;document.getElementById('f-body').value=j.body||'';document.getElementById('f-changenote').value='';document.getElementById('m-path').textContent=j.path||'';}catch(e){showToast('로딩 실패: '+e.message,'err');}
+  try{const r=await fetch(`/api/agents/${encodeURIComponent(name)}/full`);if(!r.ok)throw new Error('failed to load');const j=await r.json();const m=j.meta||{};document.getElementById('f-mission').value=m.mission||'';document.getElementById('f-role').value=m.role||a.role||'';document.getElementById('f-runner').value=m.runner||a.runner||'claude';document.getElementById('f-group').value=m.group||a.group||'core';const color=m.color||a.color||'#71717a';document.getElementById('f-color').value=color;document.getElementById('f-color-hex').value=color;document.getElementById('f-body').value=j.body||'';document.getElementById('f-changenote').value='';document.getElementById('m-path').textContent=j.path||'';}catch(e){showToast('Load failed: '+e.message,'err');}
   overlay.classList.add('open');
   document.getElementById('f-color').oninput=(e)=>document.getElementById('f-color-hex').value=e.target.value;
   document.getElementById('f-color-hex').oninput=(e)=>{const v=e.target.value;if(/^#[0-9a-f]{6}$/i.test(v))document.getElementById('f-color').value=v;};
@@ -899,7 +899,7 @@ async function openResourceModal(kind,name){
   document.getElementById('r-group').textContent=kind==='claude-md'?'CLAUDE.md':kind;
   const bodyEl=document.getElementById('r-body');
   bodyEl.readOnly=true;
-  bodyEl.value='불러오는 중...';
+  bodyEl.value='Loading...';
   document.getElementById('r-edit').style.display='inline-block';
   document.getElementById('r-save').style.display='none';
   document.getElementById('r-note-row').style.display='none';
@@ -912,7 +912,7 @@ async function openResourceModal(kind,name){
     const j=await r.json();
     bodyEl.value=j.raw||j.content||'';
     document.getElementById('r-path').textContent=j.path||j.file||'';
-  }catch(e){document.getElementById('r-body').value='';showToast('로딩 실패: '+e.message,'err');}
+  }catch(e){document.getElementById('r-body').value='';showToast('Load failed: '+e.message,'err');}
 }
 function enableResourceEdit(){
   document.getElementById('r-body').readOnly=false;
@@ -924,7 +924,7 @@ function enableResourceEdit(){
 function closeResourceModal(){document.getElementById('resource-modal').classList.remove('open');modalResource=null;}
 async function saveResourceModal(){
   if(!modalResource)return;
-  const btn=document.getElementById('r-save');btn.disabled=true;btn.textContent='저장 중...';
+  const btn=document.getElementById('r-save');btn.disabled=true;btn.textContent='Saving...';
   const content=document.getElementById('r-body').value;
   const note=document.getElementById('r-note').value.trim();
   const {kind,name}=modalResource;
@@ -933,17 +933,17 @@ async function saveResourceModal(){
   try{
     const r=await fetch(url,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
     if(!r.ok)throw new Error((await r.json()).error||'save failed');
-    showToast(`${name} 저장 완료`,'ok');
+    showToast(`${name} saved`,'ok');
     closeResourceModal();
     await loadResources();renderResources();
-  }catch(e){showToast('저장 실패: '+e.message,'err');}finally{btn.disabled=false;btn.textContent='저장';}
+  }catch(e){showToast('Save failed: '+e.message,'err');}finally{btn.disabled=false;btn.textContent='Save';}
 }
 function openResetModal(){document.getElementById('reset-modal').classList.add('open');}
 function closeResetModal(){document.getElementById('reset-modal').classList.remove('open');}
 async function saveAgentModal(){
-  if(!modalCurrentAgent)return;const saveBtn=document.getElementById('m-save');saveBtn.disabled=true;saveBtn.textContent='저장 중...';
+  if(!modalCurrentAgent)return;const saveBtn=document.getElementById('m-save');saveBtn.disabled=true;saveBtn.textContent='Saving...';
   const payload={meta:{mission:document.getElementById('f-mission').value.trim(),role:document.getElementById('f-role').value.trim(),runner:document.getElementById('f-runner').value,group:document.getElementById('f-group').value,color:document.getElementById('f-color-hex').value||document.getElementById('f-color').value},body:document.getElementById('f-body').value,changeNote:document.getElementById('f-changenote').value.trim()||undefined};
-  try{const r=await fetch(`/api/agents/${encodeURIComponent(modalCurrentAgent)}`,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});if(!r.ok)throw new Error((await r.json()).error||'save failed');showToast(`${modalCurrentAgent} saved`,'ok');closeAgentModal();await loadAgents();renderAll();}catch(e){showToast('저장 실패: '+e.message,'err');}finally{saveBtn.disabled=false;saveBtn.textContent='저장';}
+  try{const r=await fetch(`/api/agents/${encodeURIComponent(modalCurrentAgent)}`,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});if(!r.ok)throw new Error((await r.json()).error||'save failed');showToast(`${modalCurrentAgent} saved`,'ok');closeAgentModal();await loadAgents();renderAll();}catch(e){showToast('Save failed: '+e.message,'err');}finally{saveBtn.disabled=false;saveBtn.textContent='Save';}
 }
 function showToast(msg,type){let c=document.getElementById('toast-stack');if(!c){c=document.createElement('div');c.id='toast-stack';c.style.cssText='position:fixed;bottom:20px;right:20px;z-index:300;display:flex;flex-direction:column;gap:8px;pointer-events:none';document.body.appendChild(c);}const t=document.createElement('div');t.textContent=msg;t.style.cssText=`padding:9px 14px;border-radius:8px;font-size:12px;font-weight:600;color:#fff;box-shadow:0 4px 12px rgba(0,0,0,0.2);max-width:300px;background:${type==='ok'?'#059669':type==='err'?'#dc2626':'#27272a'};pointer-events:auto`;c.appendChild(t);setTimeout(()=>{t.style.opacity='0';t.style.transition='opacity 0.3s';setTimeout(()=>t.remove(),300);},2500);}
 document.addEventListener('keydown',(e)=>{if(e.key==='Escape'){if(document.getElementById('new-task-modal').classList.contains('open'))closeNewTaskModal();else if(document.getElementById('task-modal').classList.contains('open'))closeTaskModal();else if(document.getElementById('agent-modal').classList.contains('open'))closeAgentModal();else if(document.getElementById('resource-modal').classList.contains('open'))closeResourceModal();else if(document.getElementById('reset-modal').classList.contains('open'))closeResetModal();}});
@@ -961,14 +961,14 @@ function renderOpsMsg(m){
     return `<div class="ops-msg system">${linkifyTaskRefs(m.text||'')}</div>`;
   }
   const cls=['ops-msg',escapeHtml(m.role||'system')].join(' ');
-  const time=m.ts?new Date(m.ts).toLocaleTimeString('ko-KR',{hour:'2-digit',minute:'2-digit'}):'';
+  const time=m.ts?new Date(m.ts).toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit'}):'';
   const src=m.source==='telegram'?' · tg':'';
   const tag=m.taskId?` · #${escapeHtml(m.taskId)}`:'';
   return `<div class="${cls}">${linkifyTaskRefs(m.text||'')}<div class="meta">${time}${tag}${src}</div></div>`;
 }
 function renderOpsAll(){
   const c=document.getElementById('ops-msgs');
-  if(!ops.msgs.length){c.innerHTML=`<div class="ops-empty">메시지 없음.<br><br>입력창에 메시지를 보내면<br>여기와 텔레그램 양쪽에 기록됩니다.<br><br><kbd>Enter</kbd> 전송 · <kbd>Shift+Enter</kbd> 줄바꿈</div>`;return}
+  if(!ops.msgs.length){c.innerHTML=`<div class="ops-empty">No messages.<br><br>Send a message in the input box<br>and it's recorded both here and in Telegram.<br><br><kbd>Enter</kbd> to send · <kbd>Shift+Enter</kbd> for a new line</div>`;return}
   c.innerHTML=ops.msgs.map(renderOpsMsg).join('');
   c.scrollTop=c.scrollHeight;
 }
@@ -992,7 +992,7 @@ async function sendOps(ev){
   const ta=document.getElementById('ops-input');const btn=document.getElementById('ops-send-btn');const text=(ta.value||'').trim();if(!text)return false;
   btn.disabled=true;ta.disabled=true;
   try{const r=await fetch('/api/ops-thread/send',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({text})});if(!r.ok)throw new Error('send failed');ta.value='';autoGrowOps(ta);showOpsTyping();}
-  catch(e){showToast('전송 실패: '+e.message,'err');}
+  catch(e){showToast('Send failed: '+e.message,'err');}
   finally{btn.disabled=false;ta.disabled=false;ta.focus();}
   return false;
 }
@@ -1000,8 +1000,8 @@ function opsKey(e){if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendOps()
 function autoGrowOps(ta){ta.style.height='32px';ta.style.height=Math.min(120,ta.scrollHeight)+'px';}
 function toggleOps(){ops.collapsed=!ops.collapsed;document.body.classList.toggle('ops-collapsed',ops.collapsed);localStorage.setItem('kbn-ops-collapsed',ops.collapsed?'1':'0');if(!ops.collapsed){setTimeout(()=>{const c=document.getElementById('ops-msgs');c.scrollTop=c.scrollHeight;},200);}}
 (function initOps(){if(ops.collapsed)document.body.classList.add('ops-collapsed');})();
-function initBoardAreaChip(){const c=document.getElementById('board-area-chip');if(!c)return;if(BOARD_AREA){c.textContent='영역 '+BOARD_AREA;c.style.display='inline-block';c.title='이 보드는 영역 '+BOARD_AREA+'의 task만 표시합니다';}else{c.style.display='none';}}
-(async function init(){initBoardAreaChip();if(state.collapsed){document.body.classList.add('agents-collapsed');const t=document.querySelector('.agents-panel-head .toggle');if(t)t.textContent='Expand ▼';document.getElementById('ag-toggle-btn').textContent='에이전트';}await loadAll();applyLang(L);fetch('/api/harness').then(r=>r.json()).then(h=>{const el=document.getElementById('folder-chip');if(el&&h.repoPath)el.textContent=h.repoPath;}).catch(()=>{});await loadOpsThread();refreshTelegramState();setInterval(refreshTelegramState,30000);connectSSE();})();
+function initBoardAreaChip(){const c=document.getElementById('board-area-chip');if(!c)return;if(BOARD_AREA){c.textContent='Area '+BOARD_AREA;c.style.display='inline-block';c.title='This board only shows tasks for area '+BOARD_AREA;}else{c.style.display='none';}}
+(async function init(){initBoardAreaChip();if(state.collapsed){document.body.classList.add('agents-collapsed');const t=document.querySelector('.agents-panel-head .toggle');if(t)t.textContent='Expand ▼';document.getElementById('ag-toggle-btn').textContent='Agents';}await loadAll();applyLang(L);fetch('/api/harness').then(r=>r.json()).then(h=>{const el=document.getElementById('folder-chip');if(el&&h.repoPath)el.textContent=h.repoPath;}).catch(()=>{});await loadOpsThread();refreshTelegramState();setInterval(refreshTelegramState,30000);connectSSE();})();
 // ── 10XAI ingest: URL/content → /api/ingest → cards stream via SSE ──
 var _ingestTimer=null;
 function startIngestProgress(){state.ingesting=true;var b=document.getElementById('ingest-bar');if(b)b.classList.add('on');renderBoard();clearTimeout(_ingestTimer);_ingestTimer=setTimeout(function(){state.ingesting=false;var x=document.getElementById('ingest-bar');if(x)x.classList.remove('on');renderBoard();},100000);}
@@ -1012,24 +1012,24 @@ async function submitIngest(){
   const url=(el.value||'').trim();
   const channel=/(?:twitter\.com|x\.com)\//i.test(url)?'x':/linkedin\.com\//i.test(url)?'linkedin':/github\.com\//i.test(url)?'github':'other';
   if(!url){el.focus();return;}
-  btn.disabled=true; const old=btn.textContent; btn.textContent='분해 중…';
-  hint.textContent=(L==='en'?'Linking GitHub + decomposing… (10–40s, cards will appear on the board)':'연관 GitHub 연동 + 분해 중… (10~40초 소요, 카드가 보드에 올라옵니다)');
+  btn.disabled=true; const old=btn.textContent; btn.textContent='Decomposing…';
+  hint.textContent=(L==='en'?'Linking GitHub + decomposing… (10–40s, cards will appear on the board)':'Linking GitHub + decomposing… (10–40s, cards will appear on the board)');
   try{
     const r=await fetch('/api/ingest',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({url,channel})});
     const j=await r.json().catch(()=>({}));
-    if(!r.ok){hint.textContent='⚠ '+(j.error||((L==='en'?'failed (':'실패 (')+r.status+')'));}
-    else{hint.textContent=(L==='en'?'🔗 Analyzing related GitHub + decomposing into cards… (usually 20–40s)':'🔗 연관 GitHub 분석 + 작업 카드 분해 중… (보통 20~40초)'); el.value=''; startIngestProgress();}
-  }catch(e){hint.textContent='⚠ '+(L==='en'?'request failed: ':'요청 실패: ')+e.message;}
+    if(!r.ok){hint.textContent='⚠ '+(j.error||((L==='en'?'failed (':'failed (')+r.status+')'));}
+    else{hint.textContent=(L==='en'?'🔗 Analyzing related GitHub + decomposing into cards… (usually 20–40s)':'🔗 Analyzing related GitHub + decomposing into cards… (usually 20–40s)'); el.value=''; startIngestProgress();}
+  }catch(e){hint.textContent='⚠ '+(L==='en'?'request failed: ':'request failed: ')+e.message;}
   finally{btn.disabled=false; btn.textContent=old;}
 }
-function openLibrary(){var m=document.getElementById('lib-modal');m.style.display='flex';fetch('/api/library').then(function(r){return r.json();}).then(function(list){var b=document.getElementById('lib-body');if(!list.length){b.innerHTML='<div class="col-empty" style="padding:30px">'+(L==='en'?'No modules yet. Paste a link, verify and run — they accumulate here.':'아직 모듈이 없습니다. 링크를 넣고 검증 → 실행하면 여기에 쌓입니다.')+'</div>';return;}b.innerHTML=list.map(function(m){var cards=(m.cardsData||[]).map(function(cd){var mm=cd.measured||{};var cl=cd.claim||{};var unit=(L==='en'?'min':'분');var ct=(cl.timeMin!=null?cl.timeMin+unit:'-');var cc=(cl.free?(L==='en'?'free':'무료'):(cl.cost!=null?'$'+cl.cost:'-'));var rt=(mm.timeMin!=null?mm.timeMin+unit:'-');var rc=(mm.cost!=null?'$'+mm.cost:'-');var rs=(mm.successRate!=null?Math.round(mm.successRate*100)+'%':'-');var lblC=(L==='en'?'claimed ':'주장 ');var lblM=(L==='en'?' → measured ':' → 실측 ');var lblS=(L==='en'?'·success ':'·성공 ');return '<div style="font-size:11px;padding:6px 0;border-top:1px solid var(--c-border)"><div style="color:var(--c-text-2)">'+escapeHtml(cd.subject||'')+'</div><div style="color:var(--c-text-4);margin-top:2px">'+lblC+ct+'·'+cc+lblM+'<b style="color:var(--c-accent)">'+rt+'·'+rc+lblS+rs+'</b></div></div>';}).join('');return '<div style="padding:12px 14px;border:1px solid var(--c-border);border-radius:10px;margin-bottom:10px;background:var(--c-surface-2)"><div style="font-weight:700;color:var(--c-text)">📦 '+escapeHtml(m.name||'')+'</div><div style="font-size:11px;color:var(--c-text-3);margin-top:3px;font-family:monospace">'+escapeHtml(m.channel||'')+' · 카드 '+m.cards+'</div>'+cards+(m.sourceUrl?'<a href="'+escapeHtml(m.sourceUrl)+'" target="_blank" style="font-size:11px;color:var(--c-accent)">'+(L==='en'?'source →':'출처 →')+'</a>':'')+'</div>';}).join('');}).catch(function(){});}
+function openLibrary(){var m=document.getElementById('lib-modal');m.style.display='flex';fetch('/api/library').then(function(r){return r.json();}).then(function(list){var b=document.getElementById('lib-body');if(!list.length){b.innerHTML='<div class="col-empty" style="padding:30px">'+(L==='en'?'No modules yet. Paste a link, verify and run — they accumulate here.':'No modules yet. Paste a link, verify and run — they accumulate here.')+'</div>';return;}b.innerHTML=list.map(function(m){var cards=(m.cardsData||[]).map(function(cd){var mm=cd.measured||{};var cl=cd.claim||{};var unit=(L==='en'?'min':'min');var ct=(cl.timeMin!=null?cl.timeMin+unit:'-');var cc=(cl.free?(L==='en'?'free':'free'):(cl.cost!=null?'$'+cl.cost:'-'));var rt=(mm.timeMin!=null?mm.timeMin+unit:'-');var rc=(mm.cost!=null?'$'+mm.cost:'-');var rs=(mm.successRate!=null?Math.round(mm.successRate*100)+'%':'-');var lblC=(L==='en'?'claimed ':'claimed ');var lblM=(L==='en'?' → measured ':' → measured ');var lblS=(L==='en'?'·success ':'·success ');return '<div style="font-size:11px;padding:6px 0;border-top:1px solid var(--c-border)"><div style="color:var(--c-text-2)">'+escapeHtml(cd.subject||'')+'</div><div style="color:var(--c-text-4);margin-top:2px">'+lblC+ct+'·'+cc+lblM+'<b style="color:var(--c-accent)">'+rt+'·'+rc+lblS+rs+'</b></div></div>';}).join('');return '<div style="padding:12px 14px;border:1px solid var(--c-border);border-radius:10px;margin-bottom:10px;background:var(--c-surface-2)"><div style="font-weight:700;color:var(--c-text)">📦 '+escapeHtml(m.name||'')+'</div><div style="font-size:11px;color:var(--c-text-3);margin-top:3px;font-family:monospace">'+escapeHtml(m.channel||'')+' · cards '+m.cards+'</div>'+cards+(m.sourceUrl?'<a href="'+escapeHtml(m.sourceUrl)+'" target="_blank" style="font-size:11px;color:var(--c-accent)">'+(L==='en'?'source →':'source →')+'</a>':'')+'</div>';}).join('');}).catch(function(){});}
 function closeLibrary(){document.getElementById('lib-modal').style.display='none';}
-function addExecAgent(){var name=prompt('추가할 실행 에이전트 이름 (영문, 예: docker-agent):');if(!name)return;var role=prompt('역할 (한 줄):')||'';var mission=prompt('미션 (하는 일):')||'';fetch('/api/agents/add',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name:name,role:role,mission:mission})}).then(function(r){return r.json();}).then(function(j){if(j.error){alert(j.error);return;}loadAll();}).catch(function(){});}
-function restoreDefaults(){if(!confirm('삭제된 기본 에이전트를 모두 복구할까요?'))return;fetch('/api/agents/restore-defaults',{method:'POST'}).then(function(r){return r.json();}).then(function(j){alert('복구됨: '+(j.restored&&j.restored.length?j.restored.join(', '):'없음 (이미 모두 존재)'));loadAll();}).catch(function(){});}
+function addExecAgent(){var name=prompt('Name of the execute agent to add (in English, e.g. docker-agent):');if(!name)return;var role=prompt('Role (one line):')||'';var mission=prompt('Mission (what it does):')||'';fetch('/api/agents/add',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name:name,role:role,mission:mission})}).then(function(r){return r.json();}).then(function(j){if(j.error){alert(j.error);return;}loadAll();}).catch(function(){});}
+function restoreDefaults(){if(!confirm('Restore all deleted default agents?'))return;fetch('/api/agents/restore-defaults',{method:'POST'}).then(function(r){return r.json();}).then(function(j){alert('Restored: '+(j.restored&&j.restored.length?j.restored.join(', '):'none (all already exist)'));loadAll();}).catch(function(){});}
 function runExec(){fetch('/api/execute/run',{method:'POST'}).then(r=>r.json()).then(j=>{if(j.error)alert(j.error);}).catch(()=>{});}
 function runRepair(){fetch('/api/repair/run',{method:'POST'}).then(r=>r.json()).then(j=>{if(j.error)alert(j.error);}).catch(()=>{});}
-function guideHTML(){var a=(L==='en');var hh=(t)=>'<h4 style="color:var(--c-accent);margin:16px 0 6px">'+t+'</h4>';if(a){return '<p style="color:var(--c-text);font-size:14px"><b>What social promises vs. what actually works — know before you waste time.</b></p><p style="margin-top:6px">10XAI verifies whether the "build a SaaS with one prompt" AI workflows on X / LinkedIn / YouTube actually work, and compiles them into runnable execution modules — exposing cherry-picking, bait paywalls and hidden costs with real measurements.</p>'+hh('How to use (3 steps)')+'<p><b>1.</b> Paste an <b>X / LinkedIn post URL</b> or a <b>GitHub repo URL</b> at the top and click <b style="color:var(--c-accent)">[Decompose · Verify · Run]</b>.</p><p style="margin-top:4px"><b>2. 🔍 Verify pipeline</b> — decompose → gap-fill → verify multi-agents judge security / policy / reproducibility → risky steps stop at the gate.</p><p style="margin-top:4px"><b>3. ⚙ Execute pipeline</b> — verified cards wait in the queue → press <b>[▶ Run]</b> → sandbox measures success / cost / time → output → accumulates in the <b>📚 Library</b>.</p>'+hh('Paste an X tweet?')+'<p>It fetches the tweet text, follows the linked product site, finds the related <b>GitHub repo</b>, and pulls its README / skills to decompose.</p>'+hh('Local server / claude')+'<p>The board runs at <b>localhost:8080</b> (launchd, always on). Verify & execute run via the local <b>claude CLI</b> — no API key, uses your subscription. Outputs go to the <b>workspace/</b> and <b>library/</b> folders.</p>';}return '<p style="color:var(--c-text);font-size:14px"><b>소셜이 약속한 것 vs 진짜 되는 것 — 잃기 전에 안다.</b></p><p style="margin-top:6px">X·링크드인·유튜브의 "이 프롬프트로 SaaS 완성" 류 AI 워크플로가 정말 작동하는지 검증하고, 바로 돌릴 수 있는 실행 모듈로 컴파일합니다. 체리피킹·미끼 페이월·숨은 비용을 실측으로 드러냅니다.</p>'+hh('쓰는 법 (3단계)')+'<p><b>1.</b> 상단에 <b>X·링크드인 글 URL</b> 또는 <b>GitHub 레포 주소</b>를 붙여넣고 <b style="color:var(--c-accent)">[분해·검증·실행]</b> 클릭.</p><p style="margin-top:4px"><b>2. 🔍 검증 파이프라인</b> — 분해 → 갭필 → 검증 멀티에이전트가 보안·정책·재현성 판정 → 위험은 게이트.</p><p style="margin-top:4px"><b>3. ⚙ 실행 파이프라인</b> — 통과분이 대기 → <b>[▶ 실행하기]</b> → 샌드박스 실측 → 산출물 → <b>📚 라이브러리</b> 누적.</p>'+hh('X 트윗을 넣으면?')+'<p>트윗 본문을 가져와 연결된 제품 사이트를 따라가 <b>GitHub 레포</b>를 찾고 README·skills를 끌어와 분해합니다.</p>'+hh('로컬 서버 / claude')+'<p>보드는 <b>localhost:8080</b>(launchd 상시)에서 돕니다. 검증·실행은 로컬 <b>claude CLI</b> — API 키 불필요, 구독 인증. 산출물은 <b>workspace/</b>·<b>library/</b>에 쌓입니다.</p>';}
-function openGuide(){var gt=document.getElementById('guide-title');if(gt)gt.textContent=(L==='en'?'📖 10XAI Guide':'📖 10XAI 사용 가이드');var gb=document.getElementById('guide-body');if(gb)gb.innerHTML=guideHTML();document.getElementById('guide-modal').style.display='flex';}
+function guideHTML(){var a=(L==='en');var hh=(t)=>'<h4 style="color:var(--c-accent);margin:16px 0 6px">'+t+'</h4>';if(a){return '<p style="color:var(--c-text);font-size:14px"><b>What social promises vs. what actually works — know before you waste time.</b></p><p style="margin-top:6px">10XAI verifies whether the "build a SaaS with one prompt" AI workflows on X / LinkedIn / YouTube actually work, and compiles them into runnable execution modules — exposing cherry-picking, bait paywalls and hidden costs with real measurements.</p>'+hh('How to use (3 steps)')+'<p><b>1.</b> Paste an <b>X / LinkedIn post URL</b> or a <b>GitHub repo URL</b> at the top and click <b style="color:var(--c-accent)">[Decompose · Verify · Run]</b>.</p><p style="margin-top:4px"><b>2. 🔍 Verify pipeline</b> — decompose → gap-fill → verify multi-agents judge security / policy / reproducibility → risky steps stop at the gate.</p><p style="margin-top:4px"><b>3. ⚙ Execute pipeline</b> — verified cards wait in the queue → press <b>[▶ Run]</b> → sandbox measures success / cost / time → output → accumulates in the <b>📚 Library</b>.</p>'+hh('Paste an X tweet?')+'<p>It fetches the tweet text, follows the linked product site, finds the related <b>GitHub repo</b>, and pulls its README / skills to decompose.</p>'+hh('Local server / claude')+'<p>The board runs at <b>localhost:8080</b> (launchd, always on). Verify & execute run via the local <b>claude CLI</b> — no API key, uses your subscription. Outputs go to the <b>workspace/</b> and <b>library/</b> folders.</p>';}return '<p style="color:var(--c-text);font-size:14px"><b>What social promises vs. what actually works — know before you waste time.</b></p><p style="margin-top:6px">10XAI verifies whether the "build a SaaS with one prompt" AI workflows on X / LinkedIn / YouTube actually work, and compiles them into runnable execution modules — exposing cherry-picking, bait paywalls and hidden costs with real measurements.</p>'+hh('How to use (3 steps)')+'<p><b>1.</b> Paste an <b>X / LinkedIn post URL</b> or a <b>GitHub repo URL</b> at the top and click <b style="color:var(--c-accent)">[Decompose · Verify · Run]</b>.</p><p style="margin-top:4px"><b>2. 🔍 Verify pipeline</b> — decompose → gap-fill → verify multi-agents judge security / policy / reproducibility → risky steps stop at the gate.</p><p style="margin-top:4px"><b>3. ⚙ Execute pipeline</b> — verified cards wait in the queue → press <b>[▶ Run]</b> → sandbox measures → output → accumulates in the <b>📚 Library</b>.</p>'+hh('Paste an X tweet?')+'<p>It fetches the tweet text, follows the linked product site, finds the related <b>GitHub repo</b>, and pulls its README / skills to decompose.</p>'+hh('Local server / claude')+'<p>The board runs at <b>localhost:8080</b> (launchd, always on). Verify & execute run via the local <b>claude CLI</b> — no API key, uses your subscription. Outputs go to the <b>workspace/</b> and <b>library/</b> folders.</p>';}
+function openGuide(){var gt=document.getElementById('guide-title');if(gt)gt.textContent=(L==='en'?'📖 10XAI Guide':'📖 10XAI Guide');var gb=document.getElementById('guide-body');if(gb)gb.innerHTML=guideHTML();document.getElementById('guide-modal').style.display='flex';}
 function closeGuide(){document.getElementById('guide-modal').style.display='none';}
 </script>
 </body>

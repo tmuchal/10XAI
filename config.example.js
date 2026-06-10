@@ -15,16 +15,16 @@ module.exports = {
   // Display name for the board UI + Slack messages.
   projectName: "My Project",
 
-  // goal = 1주차에 고른 "타겟 업무 1개".
-  // 이번 6주 동안 / 이 프로젝트로 무엇을 완성할지 적는다.
-  goal: "6주 후 — 주간 보고서 자동 생성 자동화 1개 완성",
+  // goal = the "one target task" chosen in week 1.
+  // Write down what you will complete over these 6 weeks / with this project.
+  goal: "After 6 weeks — complete 1 automation that auto-generates the weekly report",
 
   // Absolute path to the application repo this harness drives.
   // The gate runs build/test commands here; runners create git worktrees here.
   repoPath: "/absolute/path/to/your/app-repo",
 
-  // 골든 데이터 = 이상적 입력+출력. setup --guided 가 물어본다.
-  // 교안 기본 구조: golden/input-example.md + golden/output-example.md
+  // Golden data = ideal input + output. setup --guided asks for this.
+  // Default course structure: golden/input-example.md + golden/output-example.md
   goldenDir: "golden/",
 
   // Port for the kanban dashboard. Env var PORT overrides this.
@@ -132,11 +132,11 @@ module.exports = {
   // show *what* needs checking and *what decision* is wanted (instead of just sitting
   // there). The operator acts via `POST /api/tasks/:id/review`:
   //   metadata.review = {
-  //     what: "이 문항 3개의 답안키가 전부 B인 게 의도인지 검토 — 의도면 OK, 우연이면 재배치",
-  //     kind: "approve"            // ✅ 승인(→completed) / ↩️ 반려(→pending)
-  //         | "choose"             // 옵션 중 선택: options:[{id,label,final?:bool}]  (final ⇒ completed, else pending)
-  //         | "feedback",          // (주관식 피드백은 kind와 무관하게 항상 가능 — 코멘트만 남기고 상태 안 바꿈)
-  //     options: [ { id: "a", label: "그대로 진행", final: true }, { id: "b", label: "01로 반려 — 재배치" } ],
+  //     what: "Check whether it is intentional that the answer keys for these 3 items are all B — OK if intended, rearrange if coincidental",
+  //     kind: "approve"            // ✅ approve (→completed) / ↩️ reject (→pending)
+  //         | "choose"             // choose among options: options:[{id,label,final?:bool}]  (final ⇒ completed, else pending)
+  //         | "feedback",          // (free-form feedback is always allowed regardless of kind — leaves a comment only, does not change state)
+  //     options: [ { id: "a", label: "Proceed as is", final: true }, { id: "b", label: "Reject to 01 — rearrange" } ],
   //   }
   // (runtime fields the endpoint writes: decision, decidedBy, decidedAt, rejectReason, feedback:[{ts,by,text}])
 

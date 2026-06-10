@@ -1,4 +1,4 @@
-# local config & secrets (절대 커밋 금지)
+# local config & secrets (never commit)
 config.js
 .env
 
@@ -6,7 +6,7 @@ config.js
 *.log
 server.log
 
-# runtime output (검증·실행 산출물)
+# runtime output (verification & execution artifacts)
 library/
 workspace/
 data/
