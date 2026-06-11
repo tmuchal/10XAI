@@ -25,9 +25,7 @@
   "scripts": {
     "start": "node server/kanban.cjs",
     "dev": "node server/kanban.cjs",
-    "gate": "node lib/gate/index.cjs",
-    "watch": "node lib/watch/scheduler.cjs",
-    "watch:once": "node lib/watch/scheduler.cjs --once"
+    "gate": "node lib/gate/index.cjs"
   },
   "dependencies": {
     "@slack/bolt": "^4.1.0"

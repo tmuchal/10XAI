@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * agent-kanban-harness — real-time multi-agent kanban dashboard + REST API.
+ * 10XAI — local multi-agent content-verification board + REST API.
  *
  *   ~/.claude/tasks/  →  file watch  →  SSE  →  browser auto-update
  *   POST/PUT/DELETE /api/tasks       →  server-side CRUD
@@ -28,7 +28,7 @@ const { execSync, spawn } = require("child_process");
 const PORT = config.port;
 const PROJECT_NAME = config.projectName;
 const REPO_PATH = config.repoPath;          // the application repo this harness drives
-const HARNESS_ROOT = config.repoRoot;       // this agent-kanban-harness checkout
+const HARNESS_ROOT = config.repoRoot;       // this 10XAI checkout
 const INSTALLED_VERSION = (() => {
   try { return require(path.join(HARNESS_ROOT, "package.json")).version || null; }
   catch { return null; }
@@ -635,32 +635,9 @@ function listSkills() {
 
 let latestVersionCache = { ts: 0, value: null };
 function fetchLatestVersion() {
-  const now = Date.now();
-  if (latestVersionCache.ts && now - latestVersionCache.ts < 10 * 60 * 1000) {
-    return Promise.resolve(latestVersionCache.value);
-  }
-  return new Promise((resolve) => {
-    const req = https.get("https://registry.npmjs.org/agent-kanban-harness/latest", {
-      headers: { Accept: "application/json", "User-Agent": "agent-kanban-harness" },
-      timeout: 2500,
-    }, (registryRes) => {
-      let body = "";
-      registryRes.on("data", (chunk) => { body += chunk; if (body.length > 200000) req.destroy(); });
-      registryRes.on("end", () => {
-        try {
-          if (registryRes.statusCode < 200 || registryRes.statusCode >= 300) throw new Error("registry status " + registryRes.statusCode);
-          const parsed = JSON.parse(body);
-          latestVersionCache = { ts: Date.now(), value: parsed.version || null };
-          resolve(latestVersionCache.value);
-        } catch {
-          latestVersionCache = { ts: Date.now(), value: null };
-          resolve(null);
-        }
-      });
-    });
-    req.on("timeout", () => { try { req.destroy(); } catch {} resolve(null); });
-    req.on("error", () => resolve(null));
-  });
+  // 10XAI runs locally and is not distributed as a package — no remote
+  // update check.
+  return Promise.resolve(null);
 }
 
 async function harnessOverview() {
@@ -1626,10 +1603,10 @@ function parseBody(req) {
 const HTML_PATH = path.join(HARNESS_ROOT, "ui", "kanban.html");
 function getHTML() { return fs.readFileSync(HTML_PATH, "utf-8").replace(/\{\{PORT\}\}/g, String(PORT)).replace(/\{\{AREA\}\}/g, String(config.area || "")); }
 
-const STATIC_ROOTS = [path.join(HARNESS_ROOT, "ui"), path.join(HARNESS_ROOT, "playbooks")];
+const STATIC_ROOTS = [path.join(HARNESS_ROOT, "ui")];
 const MIME = { ".css": "text/css", ".js": "application/javascript", ".html": "text/html; charset=utf-8", ".svg": "image/svg+xml", ".json": "application/json", ".png": "image/png" };
 function serveStatic(req, res) {
-  // /styles/foo.css  → ui/styles/foo.css ; /playbooks/foo.html → playbooks/foo.html
+  // /styles/foo.css  → ui/styles/foo.css
   let urlPath = decodeURIComponent((req.url.split("?")[0] || ""));
   if (urlPath === "/" || urlPath === "") return false;
   if (urlPath.includes("..")) return false;
@@ -2417,7 +2394,7 @@ clearStaleExecClaims();   // a crashed board may have left an execClaim with a d
 watchTasks();
 server.listen(PORT, () => {
   console.log("");
-  console.log("  " + PROJECT_NAME + " · agent-kanban-harness");
+  console.log("  " + PROJECT_NAME);
   console.log("  ─────────────────────────");
   console.log("  http://localhost:" + PORT);
   console.log("  Tasks:   " + TASKS_DIR);

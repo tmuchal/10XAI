@@ -66,43 +66,29 @@ Three things 10XAI surfaces that the original post hides:
 
 ---
 
-## Run it locally
+## How it runs
 
-10XAI runs entirely on your machine. The board is an always-on local daemon; verify & execute run through your local **Claude CLI** on your own subscription — **no API key to wire up.**
+10XAI is implemented as a **local application** — a Kanban server at `localhost:8080` driven by the multi-agent pipeline. Verification and execution run through the local Claude CLI on your own subscription, so there's no hosted backend and no API key. Untrusted content is decomposed, risk-scored, and executed inside an isolated sandbox on your own machine, and verified modules accumulate in a local Library.
 
-```bash
-git clone https://github.com/tmuchal/10XAI.git
-cd 10XAI
-cp config.example.js config.js && cp .env.example .env
-npm start
-```
-
-Open **http://localhost:8080**, paste a link into the Hero input, and watch the board fill. Verified outputs accumulate in a local **Library**.
-
-> Requires Node ≥ 20 and the `claude` CLI on your PATH. `npm install` is only needed for the optional Slack/Telegram mirror — the core board, ingest, verify, and gate run with zero dependencies.
+This repository is a **product overview**, not a distributable build.
 
 ---
 
-## Architecture — we didn't build a tool, we re-aimed a harness
+## Architecture
 
-10XAI is built on a battle-tested multi-agent **Kanban harness** that already ships the hard infrastructure: task CRUD, free-form metadata, live SSE updates, a status machine with human review/approval, git-worktree isolation (= our sandbox), budget/cost tracking, and skill export.
+10XAI runs as a local Kanban server driving a multi-agent verification pipeline. Paste a link and the content flows through five stages, each handled by its own agents:
 
-So we only had to build **three new things**:
-
-1. **Decompose entry** — ingest API → content/repo → cards (`agents/decompose-agent.md`, `agents/gapfill-agent.md`)
-2. **Sandbox measurement adapter** — real cost/time/success (`lib/runner/`)
-3. **Export exit** — verified board → SKILL.md / JSON / CLI + reports
-
-Everything else is reused as-is: storage, metadata, live updates, the gate, human approval, sandbox isolation, cost tracking, agent routing.
-
-**The re-aim, in one line:** change the *input* from "my work" to "someone else's builder content," and change the *verification target* from "code safety" to "content reproducibility & cost gap."
+1. **Decompose** — turn the post into ordered task cards and extract each author claim (`agents/decompose-agent.md`)
+2. **Gap-fill** — surface the prerequisite steps the author skipped, as gray cards (`agents/gapfill-agent.md`)
+3. **Verify** — score security / policy / reproducibility risk per card; high-risk cards stop at the gate (`agents/verify-agent.md`, `agents/verify-orchestrator.md`)
+4. **Execute & measure** — run verified cards in an isolated git-worktree sandbox and record real cost, time, and success (`agents/exec-orchestrator.md`, `agents/exec-runner.md`, `lib/runner/`)
+5. **Export** — package the verified board into a runnable module — SKILL.md / JSON / CLI — and accumulate it in the Library (`agents/deploy-agent.md`)
 
 ```
-agents/      five-stage verification pipeline (decompose → gapfill → verify → measure → export)
-server/      local kanban daemon (SSE, task CRUD, gate)  ·  http://localhost:8080
-ui/          the product board — Hero ingest, 4 columns, claim-vs-measured cards
-lib/         runner adapters · sandbox isolation · risk/gate · detectors
-docs/        product spec & build plan (10xai-build-plan, ux-spec, genspark-brief)
+agents/   verification pipeline — decompose → gap-fill → verify → execute → export
+server/   local Kanban server: REST API, live SSE updates, the review gate · http://localhost:8080
+ui/       the board — paste-to-ingest hero, four stage columns, claim-vs-measured cards
+lib/      agent runners, isolated git-worktree sandboxes, risk scoring & gate, cost tracking
 ```
 
 ---
@@ -112,7 +98,7 @@ docs/        product spec & build plan (10xai-build-plan, ux-spec, genspark-brie
 **Now:** X (Twitter), LinkedIn, GitHub repos.
 **Next:** YouTube scripts, Medium, newsletters — same pipeline, just a new input parser.
 
-- **Phase 1 (done):** Ingest → decompose → verify → gate, with a fully re-designed product UI.
+- **Phase 1 (done):** Ingest → decompose → verify → gate, with a full product UI.
 - **Phase 2:** Sandbox measurement adapter (real cost/time), claim-vs-measured detail in every card.
 - **Phase 3:** Export to runnable modules + 5 report types (reproducibility / cost-gap / security / failed-steps / summary); landing page; multi-channel demos.
 
@@ -120,4 +106,4 @@ docs/        product spec & build plan (10xai-build-plan, ux-spec, genspark-brie
 
 **Builders sell the 10X dream. 10XAI hands you the receipts — verified, measured, and runnable — before you waste a weekend.**
 
-MIT License.
+Licensed under MIT — free to use, modify, and redistribute.

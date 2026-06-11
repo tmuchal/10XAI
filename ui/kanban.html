@@ -389,7 +389,6 @@ body.ops-collapsed .ops-reopen{display:inline-flex;align-items:center;gap:6px}
 </header>
 <div class="version-banner" id="version-banner">
   <span id="version-banner-text"></span>
-  <code>npx agent-kanban-harness update</code>
 </div>
 <div class="filter-bar">
   <button class="f-pill active" data-flt="all" onclick="setFilter('all')"><span data-i18n="all">All</span> <span class="f-cnt" id="fc-all">0</span></button>
@@ -445,7 +444,6 @@ body.ops-collapsed .ops-reopen{display:inline-flex;align-items:center;gap:6px}
     <div class="h-item"><div class="k">Board task count</div><div class="v mono" id="h-tasks">0</div></div>
     <div class="h-item"><div class="k">Project manual</div><div class="v"><button class="h-link" onclick="openResourceModal('claude-md','CLAUDE.md')">View CLAUDE.md</button></div></div>
   </div>
-  <div class="h-setup-note">repoPath, goal, golden data, agents/*.md, eval loop, hooks, skills, deployCommands and CLAUDE.md can be changed again with <code>npx agent-kanban-harness setup --guided</code>.</div>
 </section>
 <section class="agents-panel" id="agents-panel">
   <div class="agents-panel-head">
@@ -593,14 +591,12 @@ body.ops-collapsed .ops-reopen{display:inline-flex;align-items:center;gap:6px}
 <div class="modal-overlay" id="reset-modal" onclick="if(event.target===this)closeResetModal()">
   <div class="modal" role="dialog" aria-modal="true" style="max-width:560px">
     <div class="modal-head">
-      <div class="m-name"><span class="m-title">Harness reset</span><span class="m-group">setup --guided</span></div>
+      <div class="m-name"><span class="m-title">Reset</span></div>
       <button class="m-close" onclick="closeResetModal()" title="Close (Esc)">×</button>
     </div>
     <div class="modal-body">
       <div class="reset-note">
-        Re-run <code>npx agent-kanban-harness setup --guided</code> in your terminal.<br>
-        It asks 5 things again: repoPath, golden data location, agent setup, eval loop level, and goal.<br>
-        If a <code>config.js</code> already exists, it stops to protect it. If the reset is intentional, run it with <code>--force</code>.
+        Reconfigure the board from its local config. An existing <code>config.js</code> is left in place and protected.
       </div>
     </div>
     <div class="modal-foot">

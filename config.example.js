@@ -1,31 +1,17 @@
 /**
- * agent-kanban-harness — per-project configuration.
+ * 10XAI — configuration.
  *
- * Copy to config.js and edit. config.js is gitignored — keep it out of version
- * control if it contains anything you would not want public. (Tokens belong in
- * .env, not here.)
- *
- * Everything here is read by:
- *   - server/kanban.cjs   (port, projectName, slack, repoPath)
- *   - lib/gate/index.cjs  (repoPath, deployCommands)
- *   - lib/runner/*        (repoPath for git worktrees, agents)
- *   - lib/watch + detect  (detectors)
+ * Read by:
+ *   - server/kanban.cjs   (port, projectName, slack)
+ *   - lib/runner/*        (the verify/execute agent pipeline + git-worktree sandbox)
  */
 module.exports = {
-  // Display name for the board UI + Slack messages.
-  projectName: "My Project",
+  // Display name for the board UI.
+  projectName: "10XAI",
 
-  // goal = the "one target task" chosen in week 1.
-  // Write down what you will complete over these 6 weeks / with this project.
-  goal: "After 6 weeks — complete 1 automation that auto-generates the weekly report",
-
-  // Absolute path to the application repo this harness drives.
-  // The gate runs build/test commands here; runners create git worktrees here.
-  repoPath: "/absolute/path/to/your/app-repo",
-
-  // Golden data = ideal input + output. setup --guided asks for this.
-  // Default course structure: golden/input-example.md + golden/output-example.md
-  goldenDir: "golden/",
+  // Where content modules are cloned, sandboxed, and stored. Defaults to this
+  // repo — verified runs land in workspace/ and library/. No setup needed.
+  repoPath: ".",
 
   // Port for the kanban dashboard. Env var PORT overrides this.
   kanbanPort: 8080,
@@ -53,55 +39,23 @@ module.exports = {
   // null / unset ⇒ ordinary single-board mode (only boardDir is read).
   // aggregateDirs: ["kanban", "camp-lms"],
 
-  // Commands the pre-deploy gate runs, in order, from repoPath. Fail-fast.
-  // Empty = the gate is a no-op pass — fill this in for your stack. Examples:
-  //   Node/Vite:   [{ name: "01-typecheck", cmd: "npx", args: ["tsc", "--noEmit"] },
-  //                 { name: "02-build",     cmd: "npm", args: ["run", "build"] }]
-  //                 // optional E2E:  { name: "03-e2e", cmd: "npx", args: ["playwright","test","e2e/golden-path.spec.ts","--reporter=list"] }
-  //   Rust:        [{ name: "01-build", cmd: "cargo", args: ["build", "--release"] },
-  //                 { name: "02-test",  cmd: "cargo", args: ["test"] }]
-  //   Go:          [{ name: "01-vet",   cmd: "go", args: ["vet", "./..."] },
-  //                 { name: "02-test",  cmd: "go", args: ["test", "./..."] }]
-  //   Python:      [{ name: "01-lint",  cmd: "ruff", args: ["check", "."] },
-  //                 { name: "02-test",  cmd: "pytest", args: ["-q"] }]
-  deployCommands: [],
-
-  // The built-output directory the gate inspects for bundle-size deltas.
-  // Set to null to skip bundle inspection.
-  buildOutputDir: "dist",
-
-  // Specialist agents the orchestrator can route to. The `owns` globs are
-  // relative to repoPath and are used for "which agent owns this file?" routing.
-  // Edit these to match your directory layout.
+  // The verification → execution agent pipeline. Each stage maps to an
+  // agents/*.md definition (full registry is auto-loaded from agents/ frontmatter).
   agents: [
-    {
-      name: "orchestrator",
-      def: "agents/orchestrator.md",
-      runner: "claude",
-    },
-    {
-      name: "frontend-agent",
-      def: "agents/frontend-agent.md",
-      runner: "reviewer:codex",
-      owns: ["src/**", "app/**", "components/**", "pages/**", "styles/**", "public/**"],
-    },
-    {
-      name: "backend-agent",
-      def: "agents/backend-agent.md",
-      runner: "both",
-      owns: ["server/**", "api/**", "db/**", "migrations/**", "lib/**", "functions/**"],
-    },
-    {
-      name: "deploy-gate-agent",
-      def: "agents/deploy-gate-agent.md",
-      runner: "reviewer:codex",
-      owns: [".git/hooks/pre-push"],
-    },
-    {
-      name: "monitor-agent",
-      def: "agents/monitor-agent.md",
-      runner: "codex",
-    },
+    { name: "decompose-agent",      def: "agents/decompose-agent.md",      runner: "claude" },
+    { name: "gapfill-agent",        def: "agents/gapfill-agent.md",        runner: "claude" },
+    { name: "verify-agent",         def: "agents/verify-agent.md",         runner: "reviewer:codex" },
+    { name: "verify-orchestrator",  def: "agents/verify-orchestrator.md",  runner: "claude" },
+    { name: "router-agent",         def: "agents/router-agent.md",         runner: "claude" },
+    { name: "exec-orchestrator",    def: "agents/exec-orchestrator.md",    runner: "claude" },
+    { name: "exec-runner",          def: "agents/exec-runner.md",          runner: "claude" },
+    { name: "tool-runner",          def: "agents/tool-runner.md",          runner: "claude" },
+    { name: "env-agent",            def: "agents/env-agent.md",            runner: "claude" },
+    { name: "build-agent",          def: "agents/build-agent.md",          runner: "claude" },
+    { name: "secrets-agent",        def: "agents/secrets-agent.md",        runner: "claude" },
+    { name: "integration-agent",    def: "agents/integration-agent.md",    runner: "claude" },
+    { name: "repair-agent",         def: "agents/repair-agent.md",         runner: "claude" },
+    { name: "deploy-agent",         def: "agents/deploy-agent.md",         runner: "claude" },
   ],
 
   // Auto-pickup (optional — content-line boards). When `autoPickup: true`, the
@@ -117,15 +71,6 @@ module.exports = {
   // auto-pickup) — work is started deliberately, not fire-and-forget. Leave unset
   // (false) on normal boards.
   // manualOnly: true,
-
-  // Monitoring detectors to run on the 24h watch loop. Each maps to a module in
-  // lib/detect/. Add { detector: "<name>", enabled: true } and provide the
-  // matching env vars (see .env.example). No monitoring? Leave this empty —
-  // copy lib/detect/_template.cjs to write your own.
-  detectors: [
-    { detector: "sentry", enabled: false },
-    { detector: "vercel", enabled: false },
-  ],
 
   // ── In_review tasks: declare what to review + the post-review action ──────────
   // When a task goes to `in_review`, give it `metadata.review` so the board UI can
@@ -143,15 +88,5 @@ module.exports = {
   // Slack reporting (optional). Tokens come from .env, not here.
   slack: {
     command: "/kanban",
-  },
-
-  // Telegram Ops Thread mirror (optional). botToken + chatId come from .env;
-  // these are knobs you may want to override per-project. Empty token/chatId
-  // ⇒ the right-side Ops Thread panel still works locally; nothing is sent
-  // to Telegram and no inbound polling happens.
-  telegram: {
-    // allowedChatIds: ["6131488858"],  // optional allowlist; empty ⇒ chatId only
-    pollEnabled: true,
-    pollIntervalMs: 1500,
   },
 };
