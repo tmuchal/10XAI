@@ -66,11 +66,43 @@ Three things 10XAI surfaces that the original post hides:
 
 ---
 
-## How it runs
+## Run it locally
 
-10XAI is implemented as a **local application** — a Kanban server at `localhost:8080` driven by the multi-agent pipeline. Verification and execution run through the local Claude CLI on your own subscription, so there's no hosted backend and no API key. Untrusted content is decomposed, risk-scored, and executed inside an isolated sandbox on your own machine, and verified modules accumulate in a local Library.
+10XAI runs entirely on your machine — a Kanban server at `localhost:8080` driven by the multi-agent pipeline. Verification and execution go through your local Claude CLI on your own subscription, so there's no hosted backend and no API key.
 
-This repository is a **product overview**, not a distributable build.
+```bash
+git clone https://github.com/tmuchal/10XAI.git
+cd 10XAI
+cp config.example.js config.js
+cp .env.example .env
+npm start
+```
+
+Then open **http://localhost:8080**, paste a tweet / LinkedIn post / GitHub repo URL into the input at the top, and click **Decompose**. The board fills with cards; verified, measured modules accumulate in `library/`.
+
+> Requirements: Node ≥ 20 and the `claude` CLI on your PATH (it provides verification/execution auth). No `npm install` is needed for the core board — it runs dependency-free.
+
+### What you get when you paste a link
+
+Pasting `github.com/OpenHands/OpenHands` decomposes the content into ordered cards on the board:
+
+```
+[ Verifying ]  Install the OpenHands SDK as your agentic engine
+[ Verifying ]  Run the OpenHands CLI as your starting point
+[ Gate ]       Run agents on your laptop with the Local GUI      ⚠ risk: arbitrary shell execution
+[ Pending ]    Try OpenHands Cloud free with the Minimax model   claim: "free" → check OAuth scope
+```
+
+Each verified module is exported with real measurements, e.g. from a `nutlope/llamacoder` run:
+
+```
+# nutlope/llamacoder — verified execution module
+1. Clone the LlamaCoder repository        measured: 0.3 min · $0    · 97% success
+2. Sign up and get a Together AI API key  measured: 5 min   · $0    · 92% success
+   ...
+```
+
+The gap between the author's claim and the measured reality is the output.
 
 ---
 
