@@ -83,6 +83,10 @@ THE BAND rule strict — A single slim band, thin, close-fitting, plain matte ch
 ```
 
 ```
+NO ROBOT WITHOUT A BAND rule strict — A MAX unit only works for a certified person. Work begins when a person holds their LEFT wrist close to the unit's chrome forearm and the amber bar dips once in acknowledgement, and only then does the machine pick anything up. With a bare wrist nothing happens at all: the unit does not respond, does not refuse out loud, does not speak, does not push anyone away and does not treat them badly — it simply stays where it is, and after a beat it turns and walks on to the next call. Uncertified people therefore do every task by hand, and no machine works alongside an unbanded person anywhere in this video, not once.
+```
+
+```
 ORDINARY CLOTHES rule strict — Everyone except the founder wears ordinary everyday clothing of their own and no two people are dressed alike in any frame. No uniform, matching outfit, robe, jumpsuit or institutional garment anywhere.
 ```
 
