@@ -12,7 +12,8 @@
 | 4 | [04_citizen_enrolment.md](04_citizen_enrolment.md) | 시민 등록, 왼쪽 손목 팔찌, 24시간 데이터 |
 | 5 | [05_coexistence_gap.md](05_coexistence_gap.md) | 로봇과 공존, 가입자와 미가입자의 격차 |
 | 6 | [06_sea_city_shield.md](06_sea_city_shield.md) | 바다 개간, 해상 도시, 방어막, 핵심 칩 설계 |
-| 7 | [07_selection.md](07_selection.md) | 자산가들의 훈련생 모집과 평가, 정예 4인 선발 |
+| 7 | [07_unfair_and_backers.md](07_unfair_and_backers.md) | 배제된 넷의 불공정한 삶, 독점에 죽은 기업들이 손을 구한다 |
+| 8 | [08_training_selection.md](08_training_selection.md) | 지원, 훈련, 두 번의 평가, 정예 4인 선발 |
 
 공용 규칙과 자주 깨지는 것들의 대책은 [00_RULES.md](00_RULES.md).
 
@@ -30,6 +31,8 @@
 - **MAX 스티커** — 1편 모니터 베젤 → 2편에서 떼어 드라이브에 붙임 → 3편 테스트 하우징
 - **검은 케이스** — 2편 마지막 빈 펜트하우스 바닥 = 3편 첫 장면
 - **왼손목 밴드** — 4편에서 채우고 5편 내내 보임
+- **무표식 밴** — 7편 마지막에 문이 열리고, 8편 첫 컷에서 그 문으로 올라탄다
+- **네 개의 케이스** — 8편에서 각자 발 앞에 놓인 장비가 이후 전투편의 무기가 된다
 
 ## 아직 파일로 안 만든 것
 
