@@ -12,7 +12,7 @@
 | 4 | [04_citizen_enrolment.md](04_citizen_enrolment.md) | 시민 등록, 왼쪽 손목 팔찌, 24시간 데이터 |
 | 5 | [05_coexistence_gap.md](05_coexistence_gap.md) | 로봇과 공존, 가입자와 미가입자의 격차 |
 | 6 | [06_sea_city_shield.md](06_sea_city_shield.md) | 바다 개간, 해상 도시, 방어막, 핵심 칩 설계 |
-| 7 | [07_rebellion_formed.md](07_rebellion_formed.md) | 미가입자의 실직과 빈곤, 자산가의 후원, 반란군 결성 |
+| 7 | [07_selection.md](07_selection.md) | 자산가들의 훈련생 모집과 평가, 정예 4인 선발 |
 
 공용 규칙과 자주 깨지는 것들의 대책은 [00_RULES.md](00_RULES.md).
 
