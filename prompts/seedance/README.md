@@ -12,6 +12,7 @@
 | 4 | [04_citizen_enrolment.md](04_citizen_enrolment.md) | 시민 등록, 왼쪽 손목 팔찌, 24시간 데이터 |
 | 5 | [05_coexistence_gap.md](05_coexistence_gap.md) | 로봇과 공존, 가입자와 미가입자의 격차 |
 | 6 | [06_sea_city_shield.md](06_sea_city_shield.md) | 바다 개간, 해상 도시, 방어막, 핵심 칩 설계 |
+| 7 | [07_rebellion_formed.md](07_rebellion_formed.md) | 미가입자의 실직과 빈곤, 자산가의 후원, 반란군 결성 |
 
 공용 규칙과 자주 깨지는 것들의 대책은 [00_RULES.md](00_RULES.md).
 
@@ -32,4 +33,12 @@
 
 ## 아직 파일로 안 만든 것
 
-반란군 아크 (기획 / 기동병기 전투 / 대면 / 칩 셧다운) 는 별도. 요청하면 같은 형식으로 정리.
+반란군 아크의 나머지 (기동병기 전투 / 대면 / 칩 셧다운) 는 아직 별도. 요청하면 같은 형식으로 정리.
+
+## 등장 엘리먼트
+
+- `@AIIA_uchal_villain` — 창업자. 1~6편.
+- `@AIIA_squad_02` — 반란군 리더 (앞머리). 7편부터.
+- `@AIIA_squad_01` / `@AIIA_squad_03` / `@AIIA_squad_04` — 스쿼드. 7편부터.
+
+엘리먼트 4개까지는 안정적이고, 5개 이상은 거부되거나 얼굴이 뭉개진다.
