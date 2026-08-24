@@ -1,4 +1,4 @@
-# Seedance 2.5 프롬프트 — MAX 기원 5부작
+# Seedance 2.5 프롬프트 — MAX 기원
 
 각 파일은 **그대로 복사해서 힉스필드에 붙이면 되는** 완성 프롬프트다.
 
@@ -11,6 +11,7 @@
 | 3 | [03_max_chip.md](03_max_chip.md) | MAX 칩 개발 → 모든 보안 무력화 → 대기업 |
 | 4 | [04_citizen_enrolment.md](04_citizen_enrolment.md) | 시민 등록, 왼쪽 손목 팔찌, 24시간 데이터 |
 | 5 | [05_coexistence_gap.md](05_coexistence_gap.md) | 로봇과 공존, 가입자와 미가입자의 격차 |
+| 6 | [06_sea_city_shield.md](06_sea_city_shield.md) | 바다 개간, 해상 도시, 방어막, 핵심 칩 설계 |
 
 공용 규칙과 자주 깨지는 것들의 대책은 [00_RULES.md](00_RULES.md).
 
