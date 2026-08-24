@@ -29,6 +29,7 @@
 | 6 | [06_sea_city_shield.md](06_sea_city_shield.md) | 해상 도시 | 1 |
 | 7 | [07_the_gap.md](07_the_gap.md) | 시장 | 1 |
 | 8 | [08_training_selection.md](08_training_selection.md) | 격납고 | 4 |
+| 9 | [09_freedom_cyberpunk.md](09_freedom_cyberpunk.md) | 타워 → 거리 | 2 |
 
 공용 규칙과 자주 깨지는 것들의 대책은 [00_RULES.md](00_RULES.md).
 
