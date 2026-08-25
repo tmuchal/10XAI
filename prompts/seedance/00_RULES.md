@@ -115,6 +115,37 @@ THE HANDOVER rule strict — The street changes inside ONE continuous locked-off
 
 ---
 
+## 검열 거부 대응 — 부정문 금지
+
+**힉스필드 필터는 부정문을 못 읽는다.** `no violence` 라고 써도 `violence` 를 쓴 걸로 센다.
+안전하려고 넣은 문장이 거부 원인이 된다. 금지어를 아예 프롬프트에 넣지 말 것.
+
+| 절대 쓰지 말 것 | 대신 |
+|---|---|
+| `no violence` `no fighting` `no riot` `no protest march` | `TONE` 블록에 `calm, patient, orderly, quiet` |
+| `no weapon` `nobody is armed` `no army, no police, no soldier` | 안 쓰면 안 나온다. 그냥 삭제 |
+| `no blood, no injury, no body` | 삭제 |
+| `fully clothed` | `dressed for cold wet weather in heavy work clothes, coats and boots` |
+| `nothing suggestive, adult or explicit` | 단어 화이트리스트 + `No other word appears anywhere` |
+| `never a fist, never a salute` | `Nobody raises an arm above shoulder height` |
+| `no flag, no banner, no slogan, no mask, no armband` | 삭제 |
+| `where it was cut off` (절단) | `the joint is capped with a plate` |
+| 군중이 팔을 **들어올리는** 동작 | 팔뚝을 **뒤집어 내미는** 동작 |
+
+### 군사 어휘가 룩도 망친다
+`armour panels` `sealed helmet` `armoured infantry` `soldier` `stormtrooper` —
+이 단어들이 흰 로봇을 스톰트루퍼로 만든다. 부정문에 넣어도 마찬가지다. 긍정 서술로 바꾼다.
+
+```
+THE UNITS rule strict — Two metres tall, humanoid, on two legs, with a head, two arms and two hands, and TALLER THAN EVERY PERSON IN FRAME by a clear head and shoulders. The whole body is covered in smooth moulded white shell panels with clean panel lines, scuffed and stained from real work. A smooth moulded head with a plain blank front and one horizontal amber light bar across it. The left forearm and hand are bare polished chrome and are the only chrome on the body. It reads as a civilian work machine: no crest on the head, no chest plate detail, no shoulder pads, no belt, no webbing and no straps, and no exposed struts, pistons, rods or wiring anywhere. It is never a chrome skeleton, never wheeled, never waist-height and never shorter than a person. Its hands are always empty, it moves alone at a walking pace and it is always outdoors on a street.
+```
+
+```
+TONE — This is a calm, patient, rainy night on a working street. People are orderly and quiet, they wait their turn and they keep to themselves. Everyone is dressed for cold wet weather in heavy work clothes, coats and boots. Every surface is plain and carries no emblem. The city is anonymous.
+```
+
+---
+
 ## 자주 깨지는 것 — 원인과 대책
 
 | 증상 | 원인 | 대책 |
