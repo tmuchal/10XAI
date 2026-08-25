@@ -99,6 +99,22 @@ THE SURVEILLANCE WALL rule strict — A vast curved wall of thousands of small l
 
 ---
 
+## 간판 / 장소 고정 (9~10편)
+
+```
+ENGLISH SIGNAGE rule strict — Every sign, every neon tube and every piece of writing in this video is in plain English, correctly spelled, in ordinary block capitals, and is a short real English word or two-word phrase. Use only these: POWER, WATER, FUEL, PAY HERE, NO POWER, CLOSED, PARTS, HOT FOOD, REPAIR, TOOLS, BEDS. Every sign is hand-painted, stencilled or bent by hand out of neon tube, crooked and never manufactured. There are no invented letterforms, no scrambled, misspelled or partial words, no random letters, no numbers or digits, and no Korean, Chinese or Japanese characters anywhere. Nothing suggestive, adult or explicit appears on any sign at any point.
+```
+
+```
+ONE STREET rule strict — These stages are ONE street seen from ONE fixed camera position that does not move: a wide two-lane boulevard, four-storey buildings down both sides, a row of bare trees along the right kerb, parked cars, a pedestrian crossing in the near foreground. The buildings, the trees, the parked cars and one fallen white machine lying in the road stay in the identical positions in every stage. It is never a narrow alley, never a covered arcade, never a market lane, never a Chinatown and never a stacked megacity canyon. There are no flying vehicles, no holograms, no projections and no animated billboards.
+```
+
+```
+THE HANDOVER rule strict — The street changes inside ONE continuous locked-off shot with no cut, no dissolve, no fade, no wipe, no timelapse, no montage and no caption. Things are carried into frame and put in place one at a time while the camera does not move at all. Nobody ages and nothing is rebuilt — what arrives one by one is the only thing that shows time passing.
+```
+
+---
+
 ## 자주 깨지는 것 — 원인과 대책
 
 | 증상 | 원인 | 대책 |
@@ -110,3 +126,8 @@ THE SURVEILLANCE WALL rule strict — A vast curved wall of thousands of small l
 | 얼굴만 20초 나옴 | 얼굴 강조 문구 | HUMAN SHOT BUDGET / SHOT SCALE rule |
 | 간판 글자 깨짐 | 빈 간판 요구 | 간판을 프레임에 넣지 말라고 촬영 지시로 금지 |
 | 인물이 엘리먼트가 아님 | 엘리먼트 미첨부 | 렌더 전에 Elements 확인 |
+| 네온에 `SEX` `PAE` `OGT` 같은 가짜 글자 | "읽히는 글자 금지"만 씀 | 비우라고 하지 말고 **쓸 영어 단어 목록을 주기.** 성인 문구 금지도 따로 |
+| 흰 로봇이 스톰트루퍼로 나옴 | 흰 장갑 + 밀폐 헬멧의 기본값 | 부정 목록에 `never a white stormtrooper, never armoured infantry, never a soldier` |
+| 컷 넘기면 다른 도시가 됨 | 스테이지마다 장소가 바뀜 | ONE STREET rule — 거리 하나 · 카메라 위치 하나 고정 |
+| 시간 경과가 몽타주·디졸브로 나옴 | `weeks later` 같은 문구 | THE HANDOVER rule — 컷 없이 **프레임 안에서** 변하게 |
+| 사이버펑크가 차이나타운 골목으로 나옴 | `cyberpunk` `neon` 의 기본값 | 골목·아케이드·메가시티 협곡·날아다니는 차·홀로그램을 명시적으로 금지 |
