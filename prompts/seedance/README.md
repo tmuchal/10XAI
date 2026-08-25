@@ -33,7 +33,8 @@
 | 7 | [07_the_gap.md](07_the_gap.md) | 시장 | 1 |
 | 8 | [08_training_selection.md](08_training_selection.md) | 격납고 | 4 |
 | 9 | [09_after_max.md](09_after_max.md) | 타워 → 대로 | 1 |
-| 10 | [10_bring_max_back.md](10_bring_max_back.md) | 같은 대로 | 1 |
+| 10-A | [10A_what_they_leave.md](10A_what_they_leave.md) | 길모퉁이 | 0 |
+| 10-B | [10B_above_and_below.md](10B_above_and_below.md) | 같은 거리 | 1 |
 
 공용 규칙과 자주 깨지는 것들의 대책은 [00_RULES.md](00_RULES.md).
 
