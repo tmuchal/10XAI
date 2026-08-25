@@ -22,6 +22,8 @@
 | 편 | 파일 | 장소 | 엘리먼트 |
 |---|---|---|---|
 | 0 | [00_origin_valley.md](00_origin_valley.md) | 올드카 → 패스트푸드점 | 1 |
+| 0-A | [0A_alley_aimed.md](0A_alley_aimed.md) | 뒷골목 | 2 |
+| 0-B | [0B_alley_fight.md](0B_alley_fight.md) | 같은 뒷골목 | 2 |
 | 1 | [01_development.md](01_development.md) | 어두운 방 | 1 |
 | 2 | [02_adoption_sale.md](02_adoption_sale.md) | 회의실 | 1 |
 | 3 | [03_max_chip.md](03_max_chip.md) | 시험 복도 | 1 |
