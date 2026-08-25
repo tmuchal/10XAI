@@ -22,6 +22,10 @@ TIMELINE LOCK — Everything happens over a short span and there is no time-jump
 @AIIA_uchal_villain — partial-preserve for facial identity only. Wardrobe, grooming and lighting are taken from this prompt and never from the reference image. Fully clothed in every shot: a sharply cut black suit, white shirt buttoned to the collar, no tie, matte black rectangular sunglasses, a heavy steel watch. He is young, clean-shaven, jet black hair, and is never shown old, greying, lined, tired or frail.
 ```
 
+### 안경 — 시기별로 다르다
+- **0 ~ 2편 stage 1** (무명 시절): 두꺼운 각진 검정 **뿔테**. `thick square black horn-rimmed glasses`
+- **2편 stage 2 이후** (매각 후): 매트 블랙 사각 **선글라스**. 뿔테로 바뀌면 안 됨
+
 ```
 ONLY HE IS YOUNG rule strict — The founder is the only visibly young person in the video and the only person wearing sunglasses. Every other adult looks their natural age. Nobody else wears sunglasses at any point.
 ```
