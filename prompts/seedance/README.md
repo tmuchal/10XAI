@@ -26,6 +26,7 @@
 | 0-B | [0B_alley_fight.md](0B_alley_fight.md) | 같은 뒷골목 | 2 |
 | 1 | [01_development.md](01_development.md) | 어두운 방 | 1 |
 | 2 | [02_adoption_sale.md](02_adoption_sale.md) | 회의실 | 1 |
+| 2-B | [02B_the_world.md](02B_the_world.md) | 28개국 | 1 |
 | 3 | [03_max_chip.md](03_max_chip.md) | 시험 복도 | 1 |
 | 4 | [04_citizen_enrolment.md](04_citizen_enrolment.md) | 길가 흰 박스 | 1 |
 | 5 | [05_coexistence.md](05_coexistence.md) | 정비소 | 0 |
