@@ -388,7 +388,7 @@ scene(40, 72, (R, s) => {
       const y = 150 + 44 + REF_MARKS[i][0] * H - off + 20;
       const vis = t > 60.5 && y > 190 && y < 830 ? 1 : 0;
       const pp = back(seg(t, 60.6 + i * 0.15, 60.9 + i * 0.15));
-      m.style.opacity = vis * (pp > 0 ? 1 : 0) * (1 - 0.6 * dimK);
+      m.style.opacity = vis * (pp > 0 ? 1 : 0) * (1 - dimK);
       m.style.top = clamp(y, 190, 830) + "px";
       m.style.transform = `scale(${pp * (i === act ? 1.12 : 1)}) rotate(-3deg)`;
     });
@@ -500,7 +500,7 @@ scene(40, 72, (R, s) => {
     const pcT = Math.round(pct) + "%"; if (c02_mPc.textContent !== pcT) c02_mPc.textContent = pcT;
     const lbT = t > 69.5 ? "회복 완료! 😎" : t > 66.6 && t < 67.6 ? "멘탈 회복 중… (역주행)" : "멘탈 회복 중…";
     if (c02_mLb.textContent !== lbT) c02_mLb.textContent = lbT;
-    c02_burst.fire(t, 69.55, 910, 360, 0.8);
+    c02_burst.fire(t, 69.55, 1120, 400, 0.8);
     shakeCam(t, 69.55, 7, 0.35);
     drops.forEach((d, i) => d.setAttribute("transform", `translate(0 ${((t * 1.8 + i * 0.3) % 1) * 40})`));
     // GUIDE badge flies onto Noa and stays with him on the road
@@ -514,8 +514,8 @@ scene(40, 72, (R, s) => {
       mapProp.style.transform = `translate(${hx}px, ${hy}px) rotate(${-10 + 20 * Math.sin(t * 5)}deg)`; }
     sayBubble(bub, t, 43.3, 45.1, "주인공은 내가 아니라… 손님이래 😤", 690, 470);
     sayBubble(bubN, t, 47.9, 48.9, "지도 받아!", nx + 110, ny - 70);
-    if (t > 64.5 && t < 67.4) sayBubble(bubN, t, 64.6, 67.4, "괜찮아… 길잡이도 멋져… 😢", 1080, 560);
-    if (t > 69.5) sayBubble(bubN, t, 69.6, 71.6, "명대사는 내 몫! 😎", 1080, 560);
+    if (t > 64.5 && t < 67.4) sayBubble(bubN, t, 64.6, 67.4, "괜찮아… 길잡이도 멋져… 😢", 990, 560);
+    if (t > 69.5) sayBubble(bubN, t, 69.6, 71.6, "명대사는 내 몫! 😎", 990, 560);
     if (t > 57.9 && t < 59.3) sayBubble(bubN, t, 57.9, 59.3, "317%… 어지러워", nx + 120, ny - 70);
     dizzy.style.opacity = t > 56.6 && t < 57.9 ? 1 : 0;
     dizzy.style.transform = `translate(${nx + 30 + 30 * Math.cos(t * 9)}px, ${ny + 10 + 8 * Math.sin(t * 9)}px)`;

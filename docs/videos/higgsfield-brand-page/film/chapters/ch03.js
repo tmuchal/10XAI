@@ -90,7 +90,7 @@ scene(72, 106, (R, s) => {
   const gag = el("div", "left:0;top:0;width:1920px;height:1080px;transform-origin:960px 560px", "", R); gag.className = "abs";
   const GAG = [["beach", { body: "#9fd3f0" }], ["park", { glasses: true, scarf: "#6fb3d9", beret: "#3f8f7a" }], ["lilac", { spiky: true, body: "#f7c6d4", scarf: null }]];
   const board = c03_box(gag, 120, 262, 1680, 372, "#e8c48f", "background-image:radial-gradient(rgba(120,70,30,.18) 2px,transparent 2.5px);background-size:22px 22px");
-  const wanted = el("div", `left:760px;top:574px;z-index:37;padding:4px 22px 6px;border:4px solid ${c03_INK};border-radius:10px;background:#fffaf0;font-size:30px;color:#c8372d;white-space:nowrap`, "WANTED · 진짜 노아는?", gag); wanted.className = "abs";
+  const wanted = el("div", `left:790px;top:214px;z-index:37;padding:4px 22px 6px;border:4px solid ${c03_INK};border-radius:10px;background:#fffaf0;font-size:30px;color:#c8372d;white-space:nowrap`, "WANTED · 진짜 노아는?", gag); wanted.className = "abs";
   const shots = GAG.map(([pal, v], i) => {
     const f = c03_frame(gag, 150 + i * 560, 300, 500, 290, c03_PAL[pal], `AI 생성 컷 ${i + 1}`, v);
     f.st = c03_stamp(gag, 150 + i * 560 + 250, 528, "✗ 다른 얼굴", "#c8372d", -10 + i * 5);
@@ -283,12 +283,16 @@ scene(72, 106, (R, s) => {
       f.style.opacity = clamp(p * 3) * (1 - gagOut);
       f.style.transform = `translateY(${-420 * (1 - p) - 640 * gagOut * (1 + i * .2)}px) rotate(${[-3, 1.5, -2][i] * (1 - gagOut) + (i - 1) * 30 * gagOut}deg)`;
       f.sc.update(t + i * 4, .6);
-      const said = seg(t, 77.3 + i * .12, 77.85 + i * .12);
-      poseNoa(f.n, t, { x: 165, y: 92, look: [1, 0, -1][i], talk: t > 77.3 && t < 78.6, hop: said > 0 && said < 1 ? said : 0, mood: t > 79.8 ? "pout" : "happy" });
-      c03_slam(f.st, t, 79.6 + i * .22);
+      const nameAt = [77.95, 78.75, 79.5][i], said = seg(t, nameAt, nameAt + .55);
+      const hl = back(seg(t, nameAt, nameAt + .3)) * (1 - ease(seg(t, nameAt + .7, nameAt + 1.0)));
+      f.style.transform += ` translateY(${-26 * hl}px) scale(${1 + .1 * hl})`;
+      f.style.zIndex = hl > .01 ? 5 : 1;
+      poseNoa(f.n, t, { x: 165, y: 92, look: [1, 0, -1][i], talk: t > nameAt && t < nameAt + .6, hop: said > 0 && said < 1 ? said : 0, mood: t > 80.4 ? "pout" : "happy" });
+      c03_slam(f.st, t, 80.35 + i * .2);
       f.st.style.opacity = +f.st.style.opacity * (1 - gagOut);
-      sayBubble(meB[i], t, 77.3 + i * .12, 79.4, "나야.", 150 + i * 560 + 170, 212);
+      sayBubble(meB[i], t, nameAt, 80.3, ["나야. (파랑)", "나야. (범생)", "나야. (삐죽)"][i], 150 + i * 560 + 150, 212);
     });
+    [80.35, 80.55, 80.75].forEach(a => shakeCam(t, a, 6, .25));
     const rp = back(seg(t, 74.4, 75.0));
     const jump = seg(t, 75.0, 75.5), recoil = seg(t, 77.6, 78.1);
     poseNoa(real, t, { x: 860, y: 672 + 260 * (1 - rp) + 30 * gagOut, s: .95, mood: t > 75 && t < 81 ? "shock" : "happy", talk: t > 75.3 && t < 76.8,
@@ -400,7 +404,7 @@ scene(72, 106, (R, s) => {
 
     // ---- D: machines
     MACH.forEach((m, i) => {
-      const mIn = back(seg(t, 90.9 + i * .15, 91.45 + i * .15)), mOut = ease(seg(t, 94.55, 95.05));
+      const mIn = back(seg(t, 91.2 + i * .15, 91.7 + i * .15)), mOut = ease(seg(t, 94.55, 95.05));
       const vis = t > 90.8 && t < 95.1;
       m.style.display = vis ? "block" : "none"; m.chip.style.display = vis ? "flex" : "none";
       const arrive = m.at + .6, outAt = arrive + .75;
@@ -420,7 +424,7 @@ scene(72, 106, (R, s) => {
       // flying reference chip: from the docked card into the machine's top slot
       const fp = seg(t, m.at, arrive), fe = ease(fp);
       const sx = 290, sy = 470, [tx, ty] = m.sl;
-      const cx = lerp(sx, tx, fe) - 65, cy = lerp(sy, ty, fe) - 260 * Math.sin(Math.PI * fe) - 43 - 30 * seg(t, arrive - .1, arrive);
+      const cx = lerp(sx, tx, fe) - 65, cy = lerp(sy, ty, fe) - 110 * Math.sin(Math.PI * fe) - 43 - 30 * seg(t, arrive - .1, arrive);
       m.chip.style.opacity = fp > 0 && t < arrive ? 1 : 0;
       m.chip.style.transform = `translate(${cx}px, ${cy}px) rotate(${360 * fe}deg) scale(${1 - .35 * seg(fp, .8, 1)})`;
     });
