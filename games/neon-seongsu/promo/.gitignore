@@ -1,0 +1,7 @@
+# big intermediates: rendered frames, models, wav stems, logs
+build/
+*.onnx
+*.bin
+# fonts are downloaded by build.py (common.ensure_fonts)
+assets/fonts/
+__pycache__/
