@@ -113,7 +113,7 @@ scene(40, 72, (R, s) => {
   const rPaths = ["r0", "r1", "r2"].map(c => roadEl.querySelector("." + c));
   // stations: numbered badge + label, plus a prop
   const LBL = [["주인공", "Hero"], ["문제", "Problem"], ["가이드", "Guide"], ["계획", "Plan"], ["행동", "Action"], ["성공", "Success"]];
-  const LPOS = [[175, 568], [470, 640], [790, 430], [560, 420], [175, 290], [740, 250]];
+  const LPOS = [[175, 568], [470, 640], [730, 440], [540, 420], [175, 290], [740, 250]];
   const stations = ST.map((p, i) => {
     const d = el("div", `left:${LPOS[i][0]}px;top:${LPOS[i][1]}px;z-index:20;white-space:nowrap;display:flex;align-items:center;gap:8px;padding:4px 14px 6px 6px;background:#fffaf0;border:3px solid ${INK2};border-radius:999px;box-shadow:4px 5px 0 rgba(43,35,32,.2);transform-origin:20% 100%`,
       `<span style="display:grid;place-items:center;width:40px;height:40px;border-radius:50%;background:${C02_COL[i]};border:3px solid ${INK2};font-size:24px">${i + 1}</span><span style="font-size:30px">${LBL[i][0]}</span><span style="font-size:22px;color:#6b5d52">${LBL[i][1]}</span>`, cam);
@@ -164,7 +164,7 @@ scene(40, 72, (R, s) => {
     d.bd = d.querySelector(".bd"); return d;
   });
   // one big section card at a time (40.5–53), plus a pill strip that assembles the page
-  const sec = el("div", `left:1000px;top:196px;width:760px;height:470px;z-index:9;background:#fffaf0;border:5px solid ${INK2};border-radius:22px;overflow:hidden;box-shadow:10px 12px 0 rgba(43,35,32,.22);word-break:keep-all`, `
+  const sec = el("div", `left:1000px;top:200px;width:760px;height:400px;z-index:9;background:#fffaf0;border:5px solid ${INK2};border-radius:22px;overflow:hidden;box-shadow:10px 12px 0 rgba(43,35,32,.22);word-break:keep-all`, `
     <div style="height:56px;background:#f6d9a0;border-bottom:4px solid ${INK2};display:flex;align-items:center;padding:0 20px;font-size:28px">내 페이지 설계도 · <span class="sn" style="margin-left:8px;color:#c8372d">섹션 1/6</span></div>
     <div class="panes" style="position:absolute;left:0;right:0;top:60px;bottom:0"></div>`, cam); sec.className = "abs";
   const secN = sec.querySelector(".sn");
@@ -181,7 +181,7 @@ scene(40, 72, (R, s) => {
     d.bd = d.querySelector(".bd"); d.ex = d.querySelector(".ex"); return d;
   });
   const h1 = panes[0].querySelector(".h1"), h2 = panes[0].querySelector(".h2"), strike = panes[0].querySelector(".strike path");
-  const pills = SECT.map((r, i) => { const d = el("div", `left:${1000 + i * 128}px;top:700px;width:118px;height:104px;z-index:9;border:4px solid ${INK2};border-radius:14px;background:#efe6d6;text-align:center;padding-top:6px;box-shadow:4px 5px 0 rgba(43,35,32,.18)`,
+  const pills = SECT.map((r, i) => { const d = el("div", `left:${1000 + i * 128}px;top:640px;width:118px;height:104px;z-index:9;border:4px solid ${INK2};border-radius:14px;background:#efe6d6;text-align:center;padding-top:6px;box-shadow:4px 5px 0 rgba(43,35,32,.18)`,
     `<div style="display:grid;place-items:center;width:40px;height:40px;margin:0 auto;border-radius:50%;background:#fffaf0;border:3px solid ${INK2};font-size:24px">${i + 1}</div><div style="font-size:28px;white-space:nowrap">${r[0]}</div>`, cam); d.className = "abs"; return d; });
   // scroll-as-scene-change sections below the rows
   const SCN = [[PAL.dawn, "장면 1 · 새벽의 첫 컷"], [PAL.forest, "장면 2 · 숲으로 스크롤"], [PAL.sea, "장면 3 · 바다에서 CTA"]];
@@ -202,7 +202,7 @@ scene(40, 72, (R, s) => {
   const baseLine = el("div", `left:180px;top:${BASE}px;width:620px;height:6px;background:${INK2};border-radius:3px;z-index:11;transform-origin:0 50%`, "", cam); baseLine.className = "abs";
   const nums = [[338, "+62%", 62], [678, "+317%", 317]].map(([cx, txt, v], i) => { const d = el("div", `left:${cx - 230}px;top:0;width:460px;text-align:center;z-index:12;font-size:${i ? 160 : 136}px;line-height:1;white-space:nowrap;color:#c8372d;text-shadow:4px 4px 0 #f7d774;-webkit-text-stroke:4px ${INK2};text-shadow:7px 7px 0 #f7d774;opacity:0`, txt, cam); d.className = "abs"; d.v = v; return d; });
   const blabels = [[288, "평균 체류시간"], [628, "스크롤 깊이"]].map(([cx, txt]) => { const d = el("div", `left:${cx - 140}px;top:${BASE + 12}px;width:280px;text-align:center;z-index:12;font-size:36px;white-space:nowrap;opacity:0`, txt, cam); d.className = "abs"; return d; });
-  const legend = el("div", `left:180px;top:220px;z-index:12;font-size:28px;white-space:nowrap;opacity:0`, `<span style="display:inline-block;width:22px;height:22px;background:#d7cfc4;border:3px solid ${INK2};vertical-align:-3px"></span> 정적 페이지 &nbsp; <span style="display:inline-block;width:22px;height:22px;background:#e8894f;border:3px solid ${INK2};vertical-align:-3px"></span> 인터랙티브`, cam); legend.className = "abs";
+  const legend = el("div", `left:560px;top:140px;z-index:12;font-size:28px;white-space:nowrap;opacity:0`, `<span style="display:inline-block;width:22px;height:22px;background:#d7cfc4;border:3px solid ${INK2};vertical-align:-3px"></span> 정적 페이지 &nbsp; <span style="display:inline-block;width:22px;height:22px;background:#e8894f;border:3px solid ${INK2};vertical-align:-3px"></span> 인터랙티브`, cam); legend.className = "abs";
   const dizzy = el("div", `left:0;top:0;z-index:33;font-size:30px;color:#d98c1f;opacity:0;white-space:nowrap`, "★ ✦ ★", cam); dizzy.className = "abs";
 
   // ================= reference (60–72) =================
