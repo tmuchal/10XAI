@@ -126,7 +126,7 @@
     }
     // gate: risky work waits for a human
     const gt = k(lt, c[3], .45);
-    const gOut = 1 - k(lt, c[5], .4);
+    const gOut = 1 - k(lt, c[4] - .1, .4);
     if (gt > 0 && gOut > 0) s += `<g opacity="${n(Math.min(gt, gOut))}">${gate(430, STAND, 0, 200)}${card(650, 452, 190, 40, 'rm -rf content/', { kind: 'risk', z: 15, badge: 'RISK 78' })}<g opacity="${n(.6 + .4 * Math.sin(lt * 6))}">${chip(900, 480, '⏳ WAITING · 사람 대기', '#e0352b', { z: 15 })}</g></g>`;
     // seatbelt gag
     const sb = k(lt, c[4] + .6, .4);
@@ -210,7 +210,7 @@
       const x = lerp(cx(0), cx(2), mv) - 150 * drop, y = lerp(rowY(1), rowY(2), mv) - (mv > 0 && mv < 1 ? Math.sin(mv * Math.PI) * 40 : 0) + 300 * drop;
       if (dq < 1) s += `<g opacity="${n(1 - k(drop, .45, .55))}">` + g(x + cw / 2, y + 17, pop(fp), `<g transform="rotate(${n(-35 * drop)})">` + card(-cw / 2, -17, cw, 34, 'post · "FREE!!"', { stripe: '#f7b3c8', z: 13, kind: mv >= 1 ? 'risk' : 'orig', badge: mv >= 1 ? 'NO EVIDENCE' : null }) + `</g>`) + `</g>`;
       s += stampMark(cx(2) + cw / 2 - 150 * drop, rowY(2) + 17 + 300 * drop, 'REJECT', k(lt, c[2] + 3.9, .5) * (1 - k(drop, .45, .55)), -12);
-      if (dq > 0 && dq < .6) s += burst(cx(2) + cw / 2, rowY(2) + 60, 30, 'NOPE', { z: 13, fill: '#ffd0c8' });
+      if (lt > c[2] + 4.65 && dq < .8) s += burst(cx(2) + cw / 2 + 60, rowY(2) - 30, 30, 'NOPE', { z: 13, fill: '#ffd0c8' });
       if (lt > c[2] + 3.9 && lt < c[2] + 5.1) s += popAt(lt, c[2] + 3.9, cx(2) + cw / 2, 150, chip(0, 0, '근거 없음 → 발행 불가', '#e0352b', { z: 14 }));
     }
     // the hero card walks every column, and waits at the gate
@@ -235,7 +235,7 @@
       for (let r = 0; r < 3; r++) { const q = ((lt - c[3]) * .7 + r / 3) % 1; s += `<rect x="${n(300 - 26 * q)}" y="${n(170 - 26 * q)}" width="${n(720 + 52 * q)}" height="${n(300 + 52 * q)}" rx="${n(12 + 20 * q)}" fill="none" stroke="#5b8def" stroke-width="3" opacity="${n(.5 * (1 - q) * wp)}"/>`; }
       // two tiny crew cursors keep dragging cards: the board is alive
       [[1, 1, 3, .0], [0, 2, 1, .5]].forEach(([from, row, to, ph], i) => { const q = k(lt, c[3] + .3 + ph, 1.6), x = lerp(cx(from), cx(to), ease(q)); s += card(x, rowY(row) + 2, cw * .8, 28, i ? 'post · "$0.40"' : 'script · reel', { z: 12, stripe: i ? '#ffd84d' : '#f0a92a' }) + member(i ? 'decompose' : 'runner', x + cw * .8, rowY(row) + 44, .3, { eyes: 'focus', label: null }); });
-      s += popAt(lt, c[3] + 2.8, 640, 506, chip(0, 0, 'One source of truth · 진실의 원천은 하나', '#26386b', { z: 19 }));
+      s += popAt(lt, c[3] + 2.8, 640, 518, chip(0, 0, 'One source of truth · 진실의 원천은 하나', '#26386b', { z: 19 }));
     }
     const peek = c[3] + 2.4;
     if (lt > peek - .15 && lt < peek + .35) s += burst(190, STAND - 70, 26, 'zip!', { z: 12, fill: '#e3ecff' });
@@ -315,11 +315,11 @@
     // conveyor belt that carries the outputs in
     if (mOut > 0 && lt > c[1]) { let belt = `<rect x="600" y="${STAND - 18}" width="560" height="22" rx="11" fill="#6d6f86" stroke="${INK}" stroke-width="2.4"/>`; for (let i = 0; i < 14; i++) { const x = 606 + ((lt * 120 + i * 40) % 548); belt += `<line x1="${n(x)}" y1="${STAND - 14}" x2="${n(x + 10)}" y2="${STAND}" stroke="#a9abc0" stroke-width="3"/>`; } s += fade(k(lt, c[1], .4) * mOut, belt); }
     O.forEach(([kind, x, y, sc, x2, y2, t0]) => { const p = k(lt, t0, .45); if (p > 0 && mOut > .5) s += `<path d="M590,330 Q${(590 + x) / 2},${y - 90} ${x},${y}" fill="none" stroke="#f0a92a" stroke-width="3" stroke-dasharray="${n(500 * p)} 999" opacity="${n(.8 * mOut)}"/>`; });
-    O.forEach(([kind, x, y, sc, x2, y2, t0, tFix]) => { if (lt > tFix - .4 && lt < tFix + .6) s += `<path d="M470,204 Q${(470 + x) / 2},${y - 170} ${x},${n(y + (kind === 'reel' ? 112 : kind === 'long' ? 78 : 90) * (1 + .2 * big))}" fill="none" stroke="#2fb67a" stroke-width="4" stroke-dasharray="${n(700 * k(lt, tFix - .4, .4))} 999"/>`; });
+    O.forEach(([kind, x, y, sc, x2, y2, t0, tFix]) => { if (lt > tFix - .4 && lt < tFix + .6) s += `<path d="M560,204 Q${(560 + x) / 2},${y - 170} ${x},${n(y + (kind === 'reel' ? 112 : kind === 'long' ? 78 : 90) * (1 + .2 * big))}" fill="none" stroke="#2fb67a" stroke-width="4" stroke-dasharray="${n(700 * k(lt, tFix - .4, .4))} 999"/>`; });
     O.forEach(([kind, x, y, sc, x2, y2, t0, tFix]) => {
       const p = k(lt, t0, .45), slide = 1 - ease(k(lt, t0, .6));
       const fixed = lt > tFix;
-      s += output(kind, lerp(x, x2, row) + 360 * slide, lerp(y, y2, row), lerp(sc, .62, row) * (1 + .2 * big), fixed ? '12 min' : '5 min', fixed ? k(lt, tFix, .6) : 0, p);
+      s += output(kind, lerp(x, x2, row) + 360 * slide, lerp(y, y2, row) - (kind === 'long' ? 40 * big : 0), lerp(sc, .62, row) * (1 + .2 * big), fixed ? '12 min' : '5 min', fixed ? k(lt, tFix, .6) : 0, p);
     });
     [['same facts', '같은 사실'], ['same voice', '같은 목소리'], ['same cast', '같은 캐릭터']].forEach(([en, ko], i) => { const p = k(lt, c[2] + .3 + i * .7, .35); if (p > 0 && mOut > 0) s += g(500, 470 + i * 36, pop(p), chip(0, 0, '✓ ' + en + ' · ' + ko, '#2fb67a', { z: 14 }), mOut); });
     // the critic's scoreboard

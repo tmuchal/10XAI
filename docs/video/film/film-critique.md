@@ -365,3 +365,48 @@ Fixes 1–5 are polish and each is a few lines; together they take Polish to 8.5
    - **Auto, "Watch all three change":** one deliberate camera push. In `S.auto`, add `if (lt > c[4] + 1.6 && lt < c[5]) cam = [1.06, 900, 330];`, so the camera eases toward the three outputs as they flip to 12 min. `camAt` clamps `cx` to 640 ± (z−1)·600, which is 676 at z=1.06, so the push is mostly a zoom with a slight drift right. That is enough. If more drift is wanted, allow it for this beat only with a `res.camFree` flag that skips the `cx` clamp; `cy` stays clamped. It pulls back to `[1.02, 640, 330]` for the critic panel. Because Noa is in screen space and the camera is clamped, nothing crops.
 
 **Projected score with Fixes 1–6:** Hook 7.5, Immersion 8, Fun 8, Polish 8.5, everything else unchanged. That gives 55 + 36.75 = 91.75 / 11.5 = **about 8.0**.
+
+---
+
+# Round 5: film v6 (155.8 s, commit 105b614)
+
+Reviewed the same way as before:
+- Frames every 2 s: 7 contact sheets.
+- Transitions: 18 frames around every scene boundary at −0.2 / 0 / +0.3 s.
+- Full-size stills at 0.5, 38, 81.3, 81.8, 85.5, 131, 132 and 153 s. These cover the slam-in open, the seatbelt CLICK, the reject beat, Noa's pop-up, the fix-once camera push and the finale orbit.
+
+**Verdict: the film is at 8.** It clears the bar narrowly, at 7.96, and the weakest axis is still Polish. All six Round 4 fixes are visible on screen:
+- The FREE!! post slams in on an open stage at 0.5 s.
+- The chapter tag and source pill no longer sit on top of the dropping flats.
+- The peeking Noa is full color.
+- The live board has no duplicate cards; each dragged card moves once and parks.
+- The FREE!! card falls clear of APPROVE and Uchu and lands on the floor (81.8 s).
+- The seatbelt gets its CLICK! with an orb squash.
+- The camera push on "Watch all three change" gives the thesis beat real emphasis.
+
+## Scorecard, v5 → v6
+
+| Axis | v5 | v6 | Reason (v6) |
+|---|---|---|---|
+| Hook | 7 | **7.5** | Three posts slam in on an open stage before any words. It is still a static tableau, not an event. |
+| Content depth & accuracy | 8.5 | **8.5** | Unchanged and correct. |
+| Through-line to automation + consistency | 8.5 | **8.5** | The FREE!! thread and the fix-once demo carry the argument end to end. |
+| Immersion & cinematic feel ×1.5 | 7.5 | **8** | Seamless flats, readable lighting cues, a pop-up staging break, and one deliberate camera push on the key beat. |
+| Fantastical & fun ×1.5 | 7.5 | **8** | CLICK!, NOPE, the pop-up and the orbit: every chapter now has one physical gag. |
+| Professional polish ×1.5 | 7.5 | **8** | The Round 4 defects are fixed. The remaining blemishes are listed below, and only the first is on a key beat. |
+| Character (Noa size, Uchu) | 8 | **8** | Noa's size is consistent, and Uchu is active in every chapter. |
+| Style match to reference | 7.5 | **7.5** | Faithful. The props are still generic panels and chips. |
+| Subtitles (EN+KR) | 7.5 | **8** | Four rounds with no subtitle defects: balanced wrap, natural Korean, legible. |
+| Pacing | 7.5 | **7.5** | Beats land with room. Noa still carries most lines. |
+
+**Overall weighted score: 8.0 / 10 (7.96)** (v2 5.1 → v3 6.6 → v4 7.2 → v5 7.7 → v6 8.0)
+(7.5+8.5+8.5+8+7.5+8+7.5 = 55.5; (8+8+8)×1.5 = 36; 91.5 / 11.5 = 7.96)
+
+## Remaining polish (optional; the first three would make it a safe 8.2)
+
+1. **The long-form label is hidden during the camera push.** At 131–132 s the card news at (1010, 420), scaled ×1.2, covers the "Long-form" label; only "Lo" / "Le" shows. This happens on the money shot. Fix: during `big`, move the card-news `y` to 470 instead of 420, or anchor its label under the frame (`y = h/2 + 22`) and move the long-form label to the *left* of its badge.
+2. **The reject is a jumble for about 0.5 s (81.3 s).** The card, the NO EVIDENCE badge, the NOPE burst and the REJECT stamp all overlap in the Gate column before the fall. Fix: offset the NOPE burst to `(cx(2) + cw/2 + 60, rowY(2) - 30)`, and start it 0.25 s after the stamp.
+3. **The green fix arcs cross the claim text (132 s).** The three propagation arcs start at (470, 204), on top of "claim · setup". Fix: start them at the card's right edge, `(560, 204)`.
+4. At 85.5 s the APPROVE pill touches the left end of the "One source of truth" chip. Nudge the chip to y + 12.
+5. At 38 s Uchu stands inside the gate barrier during the seatbelt beat. Either fade the gate out at `c[4]` (it already fades later) or stop Uchu at x = 600.
+6. Hook headroom: have the three posts argue for a beat, jostling each other with a small rotation wobble and overlapping speech pops, before Uchu speaks. That would turn the open from a tableau into an event. It is optional and not needed for the 8.
