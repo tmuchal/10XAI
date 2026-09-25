@@ -700,8 +700,8 @@ function renderPanel() {
   if (!G) return;
   const body = $('#tab-body'), top = body.scrollTop;
   body.innerHTML = ({ sel: panelSel, power: panelPower, nation: panelNation, arms: panelArms, tech: panelTech, diplo: panelDiplo, war: panelWar })[UI.tab]();
-  body.scrollTop = UI.keepScroll || UI.tab === 'war' ? top : 0;
-  UI.keepScroll = false;
+  body.scrollTop = (UI.keepScroll || UI.tab === 'war') && UI.lastTab === UI.tab ? top : 0;
+  UI.keepScroll = false; UI.lastTab = UI.tab;
   renderTop();
 }
 function panelSel() {
@@ -710,7 +710,7 @@ function panelSel() {
   if (UI.sel?.kind === 'tile') return tileCard(UI.sel.i, false);
   const sc = SCENARIOS.find(s => s.id === G.scen);
   const inTransit = G.transit.filter(t => t.u.n === me());
-  return `<div class="sec"><h3>작전 개요</h3><h2>${esc(sc.name)}</h2><p class="sub">${esc(sc.blurb)}</p></div>
+  return `<div class="sec"><h3>지난 달 정세 보고</h3>${reportHtml(G.report)}</div><div class="sec"><h3>작전 개요</h3><h2>${esc(sc.name)}</h2><p class="sub">${esc(sc.blurb)}</p></div>
   <div class="sec"><h3>이번 턴</h3><div class="rows">
     <div class="row"><span>명령 대기 부대</span><span class="num">${idleUnits().length}</span></div>
     <div class="row"><span>교전국</span><span class="sub">${enemiesOf(me()).slice(0, 8).map(nName).join(', ') || '없음'}${enemiesOf(me()).length > 8 ? ` 외 ${enemiesOf(me()).length - 8}` : ''}</span></div>
@@ -737,6 +737,8 @@ function unitCard(u) {
     if (C.dom === 'air') { a.push(btn('출격 (공습)', 'air-strike', u.id, { disabled: u.acted || u.hp <= 15 })); a.push(btn('재배치', 'air-rebase', u.id, { disabled: u.acted })); }
     else a.push(btn('대기 · 참호', 'wait', u.id, { disabled: u.mv <= 0 }));
     a.push(btn('전략 전개', 'deploy', u.id, { disabled: u.acted || u.moved || !!u.carrier, title: '철도·해상·공중 장거리 이동' }));
+    const mc = modernizeCheck(u);
+    if (mc.ok || mc.why !== '최신 설계') a.push(btn(mc.ok ? `개량 → ${esc(mc.to.name)} (${mc.cost}억$)` : `개량 불가: ${esc(mc.why)}`, 'modernize', u.id, { disabled: !mc.ok }));
     if (C.slbm || d.slbm) a.push(btn('SLBM 발사', 'arms-tab'));
     a.push(btn('해산', 'disband', u.id, { cls: 'sm danger' }));
     actions = `<div class="btnrow">${a.join('')}</div>`;
@@ -777,11 +779,13 @@ function cityCard(ci) {
     ${cy.port && blockaded(ci) ? '<p class="sub neg">해상 봉쇄 중 — 수입 -40%, 연료 수입 감소</p>' : ''}
   </div>`;
   if (air.length) html += `<div class="sec"><h3>비행단 (${air.length}/4)</h3>${air.map(u => `<div class="list-unit">${svgUnit(u.t, NATIONS[u.n].color)}<div class="grow"><div>${esc(dsg(u).name)}</div><div class="sub">${esc(NATIONS[u.n].short)} · 체력 ${u.hp} · 반경 ${fmt(unitKm(u))}km${u.acted ? ' · 출격 완료' : ''}</div></div>${u.n === me() ? btn('출격', 'air-strike', u.id, { disabled: u.acted || u.hp <= 15 }) + btn('이동', 'air-rebase', u.id, { disabled: u.acted }) : ''}</div>`).join('')}</div>`;
+  const q = G.queue.filter(x => x.ci === ci && friendly(me(), x.n));
+  if (q.length) html += `<div class="sec"><h3>조선소·공장 건조 중</h3><div class="rows">${q.map(x => `<div class="row"><span>${esc(bestDesign(x.n, x.t).name)}</span><span class="sub">${Math.max(0, x.done - G.turn)}개월 후 취역</span></div>`).join('')}</div></div>`;
   if (canBase && !UI.busy) {
     html += `<div class="sec"><h3>부대 편성 · 이번 턴 ${c.rec}/${cityRecruitCap(ci)}</h3><div class="unit-grid">${CLASS_ORDER.map(t => {
       const r = recruitCheck(me(), ci, t), d = bestDesign(me(), t);
       if (!r.ok && r.why.startsWith('기술') && !['mech', 'marine'].includes(t)) return '';
-      return `<button class="btn ubtn" type="button" data-act="recruit" data-arg="${ci}:${t}"${r.ok ? '' : ' disabled'} title="${esc(d.spec)}">${svgUnit(t, NATIONS[me()].color)}<span><span class="nm">${esc(d.name)}</span><span class="cs">${esc(CLASSES[t].abbr)} · ${unitCost(me(), t)}억$ · 인력 ${unitMp(me(), t)}</span>${r.ok ? '' : `<span class="why">${esc(r.why)}</span>`}</span></button>`;
+      return `<button class="btn ubtn" type="button" data-act="recruit" data-arg="${ci}:${t}"${r.ok ? '' : ' disabled'} title="${esc(d.spec)}">${svgUnit(t, NATIONS[me()].color)}<span><span class="nm">${esc(d.name)}</span><span class="cs">${esc(CLASSES[t].abbr)} · ${unitCost(me(), t)}억$ · 인력 ${unitMp(me(), t)}${BUILD_TURNS[t] ? ` · ${BUILD_TURNS[t]}개월` : ''}</span>${r.ok ? '' : `<span class="why">${esc(r.why)}</span>`}</span></button>`;
     }).join('')}</div></div>`;
   }
   if (own && !UI.busy) html += `<div class="sec"><h3>건설</h3><div class="rows">${Object.entries(BUILDINGS).map(([k, B]) => { const r = buildCheck(me(), ci, k); return `<div class="row"><span><b>${B.name}</b> <span class="sub">${B.desc}</span></span>${btn(r.ok ? `${r.cost}억$` : esc(r.why), 'build', `${ci}:${k}`, { disabled: !r.ok })}</div>`; }).join('')}</div></div>`;
@@ -802,9 +806,34 @@ function panelPower() {
     ${kv([['권력 기반', Math.round(N.power)], ['쿠데타 위험', `<span style="color:${riskColor(coup)}">${pct(coup)}</span>`], ['봉기 위험', `<span style="color:${riskColor(rev)}">${pct(rev)}</span>`], ['국제 평판', sgn(N.rep)]])}
     <p class="sub">안정도는 세력 충성도의 가중 평균으로 수렴합니다. 군부·보안기관 충성이 낮으면 쿠데타가, 민중이 등을 돌리면 봉기가 일어납니다.${R.elections ? ' 선거에서 지면 정권을 잃습니다.' : ''}</p></div>
   <div class="sec"><h3>권력 세력 충성도</h3>${facRows}</div>
+  ${cabinetSection()}
+  ${slushSection()}
   <div class="sec"><h3>국가 특성</h3><div class="rows">${(NATIONS[me()].traits || []).map(t => `<div class="row"><b>${esc(TRAITS[t].name)}</b><span class="sub">${esc(TRAITS[t].desc)}</span></div>`).join('') || '<p class="sub">없음</p>'}</div></div>
   <div class="sec"><h3>국제 제재</h3><p class="sub">${sanc.length ? `${sanc.map(nName).join(', ')} — 수입 -${pct(sanctionPenalty(me()))}, 석유 수입 감소` : '제재 없음'}${hasTrait(me(), 'juche') ? ' (주체: 피해 절반)' : ''}</p></div>
   ${decrees}`;
+}
+function stars(k) { return '★'.repeat(clamp(k, 0, 5)) + '☆'.repeat(clamp(5 - k, 0, 5)); }
+function cabinetSection() {
+  const cards = POSTS.map(p => {
+    const m = G.cabinet[p.id], title = postTitle(me(), p.id);
+    if (!m) return `<div class="minister vacant"><div class="row"><span><b>${esc(title)}</b> <span class="sub">공석 — 효과 -2등급</span></span>${btn('임명', 'appoint', p.id)}</div><div class="sub">${esc(p.desc)}</div></div>`;
+    const danger = m.ambition - m.loyalty > 25;
+    return `<div class="minister${danger ? ' plot' : ''}">
+      <div class="row"><span><span class="sub">${esc(title)}</span><br><b>${esc(m.name)}</b> <span class="mtrait" title="${esc(MINISTER_TRAITS[m.trait].desc)}">${esc(MINISTER_TRAITS[m.trait].name)}</span></span><span class="num skill" title="능력">${stars(m.skill)}</span></div>
+      <div class="mbars"><span class="sub">충성 ${Math.round(m.loyalty)}</span>${bar(m.loyalty, m.loyalty > 55 ? 'var(--ok)' : m.loyalty > 35 ? 'var(--warn)' : 'var(--danger)')}<span class="sub">야망 ${Math.round(m.ambition)}</span>${bar(m.ambition, m.ambition > 65 ? 'var(--danger)' : 'var(--muted)')}</div>
+      <div class="sub">${esc(p.desc)} · ${esc(FACTION_BASE[m.fac] === FACTION_BASE.party ? factionLabel(me(), 'party') : FACTION_BASE[m.fac])} 계열 · 재임 ${G.turn - m.since}개월${danger ? ' · <span class="neg">반역 징후</span>' : ''}</div>
+      <div class="btnrow">${btn('교체', 'appoint', p.id)}${btn('숙청', 'purge-min', p.id, { cls: 'sm danger' })}${btn('비자금 매수 (30)', 'bribe-min', p.id, { disabled: (P().slush || 0) < 30 })}</div></div>`;
+  }).join('');
+  return `<div class="sec"><h3>내각 · 군 수뇌부</h3><p class="sub">각료의 능력은 전투·경제·첩보·치안에 반영됩니다. 야망이 충성보다 25 이상 높은 각료는 반역을 꾀하고, 군·보안 계열이면 쿠데타 위험을 키웁니다. 숙청하면 나머지 각료가 두려움에 충성합니다.</p><div class="ministers">${cards}</div></div>`;
+}
+function slushSection() {
+  const N = P(), e = economyPreview(me());
+  return `<div class="sec"><h3>통치 자금 (비자금)</h3>
+    ${kv([['해외 계좌', `${fmt(N.slush || 0)}억$`], ['이번 달 착복', `${fmt(e.skim, 1)}`], ['폭로 위험', pct((N.skim || 0) * 1.2)], ['망명 가능', (N.slush || 0) >= 150 ? '예' : '150 필요']])}
+    <label for="skim-slider" class="sub">국가 예산 착복률 — ${Math.round((N.skim || 0) * 100)}%</label>
+    <input id="skim-slider" type="range" min="0" max="15" step="1" value="${Math.round((N.skim || 0) * 100)}">
+    <p class="sub">비자금으로 각료와 권력 세력을 매수하고, 실각 위기에 해외 망명(150억$ 이상)을 택할 수 있습니다. 착복률이 높을수록 폭로 스캔들 위험이 커집니다.</p>
+    <div class="btnrow">${FACTIONS.map(f => btn(`${esc(factionLabel(me(), f))} 매수 (40)`, 'bribe-fac', f, { disabled: (N.slush || 0) < 40 })).join('')}</div></div>`;
 }
 function panelNation() {
   const N = P(), e = economyPreview(me());
@@ -910,10 +939,56 @@ function panelWar() {
   const rowsHtml = MAJOR_IDS.map(n => { const N = G.nations[n]; return `<tr><td><span class="chip" style="background:${NATIONS[n].color};width:10px;height:10px"></span> ${esc(NATIONS[n].short)}${N.capitulated ? ' <span class="sub">(항복)</span>' : N.puppet ? ' <span class="sub">(괴뢰)</span>' : ''}</td><td>${citiesOf(n).length}</td><td>${G.units.filter(u => u.n === n).length}</td><td>${Math.round(N.stab)}</td><td>${N.kills}</td><td>${N.losses}</td><td>${score(n)}</td></tr>`; }).join('');
   const logs = G.log.slice(-150).reverse().map(l => `<div class="lg-${l.kind}"><span class="num sub">${l.t}</span> ${esc(l.text)}</div>`).join('');
   const nukes = G.nukeLog.map(x => `<div class="row"><span>${x.t}턴 · ${esc(nName(x.by))}</span><span class="sub">${W.tiles[x.at].city >= 0 ? esc(W.cities[W.tiles[x.at].city].name) : '표적 지역'} · ${x.kt}kt</span></div>`).join('');
-  return `<div class="sec"><h3>종말 시계</h3><div class="doom"><span class="num">${G.doom}</span><span>초 전 자정</span></div>${bar(G.doom / 89 * 100, G.doom < 40 ? 'var(--danger)' : 'var(--warn)')}${nukes ? `<div class="rows">${nukes}</div>` : '<p class="sub">아직 핵무기가 사용되지 않았습니다.</p>'}</div>
+  return `${trendSection()}<div class="sec"><h3>종말 시계</h3><div class="doom"><span class="num">${G.doom}</span><span>초 전 자정</span></div>${bar(G.doom / 89 * 100, G.doom < 40 ? 'var(--danger)' : 'var(--warn)')}${nukes ? `<div class="rows">${nukes}</div>` : '<p class="sub">아직 핵무기가 사용되지 않았습니다.</p>'}</div>
   <div class="sec"><h3>강대국 현황</h3><div style="overflow-x:auto"><table class="stats"><thead><tr><th>국가</th><th>도시</th><th>부대</th><th>안정</th><th>격파</th><th>손실</th><th>점수</th></tr></thead><tbody>${rowsHtml}</tbody></table></div></div>
   <div class="sec"><h3>작전 일지</h3><div class="log">${logs}</div></div>`;
 }
+
+// ---------- trend charts (small multiples, one series each) ----------
+function spark(id, title, vals, turns, unit) {
+  const Wd = 320, Ht = 96, x0 = 36, x1 = 312, y0 = 12, y1 = 76;
+  if (vals.length < 2) return `<figure class="spark-fig"><figcaption>${esc(title)}</figcaption><p class="sub">2개월 이상 지나면 추이가 표시됩니다.</p></figure>`;
+  let lo = Math.min(...vals), hi = Math.max(...vals);
+  if (hi - lo < 1) { hi += 1; lo -= 1; }
+  const pad = (hi - lo) * 0.1; lo -= pad; hi += pad;
+  const X = i => x0 + (x1 - x0) * i / (vals.length - 1), Y = v => y1 - (y1 - y0) * (v - lo) / (hi - lo);
+  const pts = vals.map((v, i) => `${X(i).toFixed(1)},${Y(v).toFixed(1)}`).join(' ');
+  const last = vals[vals.length - 1];
+  const ticks = [hi - pad, lo + pad].map(v => `<text x="${x0 - 6}" y="${Y(v) + 3}" text-anchor="end" class="ax">${fmt(v)}</text><line x1="${x0}" x2="${x1}" y1="${Y(v)}" y2="${Y(v)}" class="grid"/>`).join('');
+  return `<figure class="spark-fig"><figcaption>${esc(title)} <span class="num">${fmt(last)}${unit}</span></figcaption>
+    <svg class="spark" viewBox="0 0 ${Wd} ${Ht}" role="img" aria-label="${esc(title)} 추이, 현재 ${fmt(last)}${unit}" data-vals="${vals.join(',')}" data-turns="${turns.join(',')}" data-unit="${esc(unit)}" data-x0="${x0}" data-x1="${x1}" data-lo="${lo}" data-hi="${hi}" data-y0="${y0}" data-y1="${y1}">
+      ${ticks}
+      <polygon points="${x0},${y1} ${pts} ${x1},${y1}" class="area"/>
+      <polyline points="${pts}" class="line"/>
+      <circle cx="${X(vals.length - 1)}" cy="${Y(last)}" r="4" class="end"/>
+      <text x="${x0}" y="${Ht - 4}" class="ax">${turns[0]}턴</text><text x="${x1}" y="${Ht - 4}" text-anchor="end" class="ax">${turns[turns.length - 1]}턴</text>
+      <g class="hov" visibility="hidden"><line y1="${y0}" y2="${y1}" class="cross"/><circle r="4" class="end"/><text class="tipt" text-anchor="middle"></text></g>
+    </svg></figure>`;
+}
+function trendSection() {
+  const rows = G.hist.filter(r => r.me).slice(-48);
+  const T = rows.map(r => r.t);
+  const table = rows.slice(-12).reverse().map(r => `<tr><td>${r.t}</td><td>${r.me.s}</td><td>${fmt(r.me.m)}</td><td>${r.me.c}</td><td>${r.me.p}</td></tr>`).join('');
+  return `<div class="sec"><h3>통치 지표 추이</h3><div class="sparks">
+    ${spark('s', '안정도', rows.map(r => r.me.s), T, '')}
+    ${spark('m', '국고 (억$)', rows.map(r => r.me.m), T, '')}
+    ${spark('c', '지배 도시 (보호국 포함)', rows.map(r => r.me.c), T, '')}
+    ${spark('p', '권력 기반', rows.map(r => r.me.p), T, '')}</div>
+    <details><summary class="sub">표로 보기 (최근 12개월)</summary><div style="overflow-x:auto"><table class="stats"><thead><tr><th>턴</th><th>안정</th><th>국고</th><th>도시</th><th>권력</th></tr></thead><tbody>${table}</tbody></table></div></details></div>`;
+}
+document.addEventListener('pointermove', e => {
+  const svg = e.target.closest && e.target.closest('svg.spark');
+  document.querySelectorAll('svg.spark .hov').forEach(g => { if (!svg || g.parentNode !== svg) g.setAttribute('visibility', 'hidden'); });
+  if (!svg) return;
+  const d = svg.dataset, vals = d.vals.split(',').map(Number), turns = d.turns.split(','), x0 = +d.x0, x1 = +d.x1, lo = +d.lo, hi = +d.hi, y0 = +d.y0, y1 = +d.y1;
+  const r = svg.getBoundingClientRect(), vx = (e.clientX - r.left) / r.width * 320;
+  const i = clamp(Math.round((vx - x0) / (x1 - x0) * (vals.length - 1)), 0, vals.length - 1);
+  const X = x0 + (x1 - x0) * i / (vals.length - 1), Y = y1 - (y1 - y0) * (vals[i] - lo) / (hi - lo);
+  const g = svg.querySelector('.hov'); g.setAttribute('visibility', 'visible');
+  const [ln, c, t] = g.children;
+  ln.setAttribute('x1', X); ln.setAttribute('x2', X); c.setAttribute('cx', X); c.setAttribute('cy', Y);
+  t.setAttribute('x', clamp(X, x0 + 30, x1 - 30)); t.setAttribute('y', Math.max(10, Y - 8)); t.textContent = `${turns[i]}턴 · ${fmt(vals[i])}${d.unit}`;
+});
 
 // ---------- actions ----------
 function idleUnits() { return G ? G.units.filter(u => u.n === me() && !u.skip && CLASSES[u.t].dom !== 'air' && u.mv > 0 && !u.acted) : []; }
@@ -954,7 +1029,7 @@ function act(a, arg) {
       if (!UI.mtargets.size) toast('전개 가능한 도시가 없습니다 (예산·항구·교전 여부 확인)');
       renderModebar(); UI.dirty = true; return;
     }
-    case 'recruit': { const [ci, t] = arg.split(':'); const u = recruit(me(), +ci, t); if (u) toast(`${W.cities[+ci].name}: ${dsg(u).name} 편성`, 'good'); UI.keepScroll = true; return after(); }
+    case 'recruit': { const [ci, t] = arg.split(':'); const u = recruit(me(), +ci, t); if (u) toast(u.queued ? `${W.cities[+ci].name}: ${DESIGNS[u.d].name} 건조 착수 (${BUILD_TURNS[t]}개월)` : `${W.cities[+ci].name}: ${dsg(u).name} 편성`, 'good'); UI.keepScroll = true; return after(); }
     case 'build': { const [ci, b] = arg.split(':'); if (build(me(), +ci, b)) toast(`${W.cities[+ci].name}: ${BUILDINGS[b].name} 완료`, 'good'); UI.keepScroll = true; return after(); }
     case 'fire': return setMissileMode(arg, false);
     case 'fire-nuke': return setMissileMode(arg, true);
@@ -977,6 +1052,11 @@ function act(a, arg) {
     case 'ultimatum': return confirmBox('최후통첩', `${NATIONS[n].name}에 보호국 편입을 요구합니다. 수락 가능성 ${pct(ultimatumOdds(me(), n))}. 거부하면 관계 -30.`, '최후통첩 전달', () => { const r = ultimatum(me(), n); toast(r ? `${nName(n)}이(가) 굴복했습니다` : `${nName(n)}이(가) 거부했습니다`, r ? 'good' : 'bad'); after(); });
     case 'arms-deal': return showArmsDeal(n);
     case 'ops': return showOps(n);
+    case 'modernize': { const u = uById.get(+arg); if (u && modernize(u)) toast(`${dsg(u).name}(으)로 개량 완료`, 'good'); UI.keepScroll = true; return after(); }
+    case 'appoint': return showCandidates(arg);
+    case 'purge-min': { const m = G.cabinet[arg]; return confirmBox('각료 숙청', `${postTitle(me(), arg)} ${m.name}을(를) 반역 혐의로 체포합니다. ${FACTION_BASE[m.fac]} 계열 충성 -10, 권력 기반 +6, 다른 각료들의 충성 +8.`, '체포 명령', () => { purgeMinister(arg); UI.keepScroll = true; after(); }, true); }
+    case 'bribe-min': bribeMinister(arg); UI.keepScroll = true; return after();
+    case 'bribe-fac': if (bribeFaction(arg)) toast('비밀 자금 전달 완료', 'good'); UI.keepScroll = true; return after();
     case 'menu': return showMenu();
     case 'new': closeModal(); return showStart();
   }
@@ -992,11 +1072,21 @@ document.addEventListener('click', e => {
 document.addEventListener('input', e => {
   if (!G) return;
   if (e.target.id === 'rd-slider') { P().rd = +e.target.value / 100; UI.keepScroll = true; const v = e.target.value; renderPanel(); const s = $('#rd-slider'); if (s) { s.value = v; s.focus(); } }
+  if (e.target.id === 'skim-slider') { P().skim = +e.target.value / 100; UI.keepScroll = true; const v = e.target.value; renderPanel(); const sl = $('#skim-slider'); if (sl) { sl.value = v; sl.focus(); } }
   if (e.target.id === 'dip-search') { UI.dipSearch = e.target.value; UI.keepScroll = true; renderPanel(); const s = $('#dip-search'); if (s) { s.focus(); s.setSelectionRange(s.value.length, s.value.length); } }
 });
 $('#btn-end').addEventListener('click', () => endTurn());
 $('#btn-menu').addEventListener('click', () => showMenu());
 
+function showCandidates(post) {
+  const list = candidates(post), cur = G.cabinet[post];
+  openModal(`<div class="title-block"><span class="eyebrow">인사 검증 보고서</span><h2>${esc(postTitle(me(), post))} 후보</h2></div>
+    ${cur ? `<p class="sub">현직: ${esc(cur.name)} (${esc(MINISTER_TRAITS[cur.trait].name)}, 능력 ${stars(cur.skill)}) — 경질 시 해당 세력 충성 -5</p>` : ''}
+    <div class="rows">${list.map((c, k) => `<div class="minister"><div class="row"><span><b>${esc(c.name)}</b> <span class="mtrait">${esc(MINISTER_TRAITS[c.trait].name)}</span> <span class="sub">${c.age}세</span></span><button class="btn sm primary" type="button" data-cand="${k}">임명</button></div><div class="sub">능력 ${stars(c.skill)} · 충성 ${c.loyalty} · 야망 ${c.ambition} · ${esc(MINISTER_TRAITS[c.trait].desc)}</div></div>`).join('')}</div>
+    <p class="sub">후보 명단은 매달 새로 올라옵니다.</p><div class="btnrow"><button class="btn" type="button" id="cd-close">닫기</button></div>`, true);
+  $('#modal-card').querySelectorAll('[data-cand]').forEach(b => b.onclick = () => { appoint(post, +b.dataset.cand); closeModal(); UI.keepScroll = true; after(); });
+  $('#cd-close').onclick = closeModal;
+}
 function showArmsDeal(seller) {
   const items = armsOffer(me(), seller);
   openModal(`<div class="title-block"><span class="eyebrow">방산 협력 · ${esc(NATIONS[seller].name)}</span><h2>무기 도입 계약</h2></div>
@@ -1028,6 +1118,7 @@ async function endTurn() {
   if (!G || UI.busy || G.over) return;
   UI.busy = true; UI.mode = null; UI.sel = null; UI.reach = null; UI.targets = new Map(); UI.mtargets = null;
   renderModebar(); renderTop(); renderPanel();
+  const before = snapshotForReport();
   overlay('세계 각국이 행동 중…');
   await wait(20);
   let k = 0;
@@ -1045,7 +1136,9 @@ async function endTurn() {
     checkVictory();
   }
   overlay(''); UI.busy = false; UI.lowDirty = true;
+  G.report = buildReport(before);
   refreshVision(); after(); saveGame(false);
+  if (G.flags.brief !== false && !G.over) await showReport();
   if (G.over) return showGameOver();
   for (const c of politicalCrises(me())) { await presentCrisis(c); if (G.over) return showGameOver(); }
   await presentEvent(rollEvent(me()));
@@ -1054,20 +1147,81 @@ async function endTurn() {
   after();
   if (G.over) showGameOver();
 }
+function snapshotForReport() {
+  const N = P();
+  return { turn: G.turn, money: N.money, cities: new Set(citiesOf(me()).map(c => c.id)), losses: N.losses, kills: N.kills, mark: G.log[G.log.length - 1], stab: N.stab };
+}
+function buildReport(b) {
+  const N = P(), now = new Set(citiesOf(me()).map(c => c.id));
+  const gained = [...now].filter(x => !b.cities.has(x)).map(x => W.cities[x].name);
+  const lost = [...b.cities].filter(x => !now.has(x)).map(x => W.cities[x].name);
+  const k = G.log.indexOf(b.mark);
+  const since = G.log.slice(k + 1);
+  const world = since.filter(l => (l.kind === 'nuke') || (l.kind === 'capitulate') || (l.kind === 'war' && NATIONS[l.who]?.tier === 'major') || (l.kind === 'capture' && /수도/.test(l.text))).slice(-8).map(l => l.text);
+  const threats = [];
+  for (const cy of citiesOf(me())) {
+    let e = 0;
+    for (const j of tilesWithin(cy.tile, 2)) { const g = groundAt(j); if (g && atWar(me(), g.n) && seenUnit(g)) e++; }
+    if (e) threats.push([cy.name, e]);
+  }
+  threats.sort((a, c) => c[1] - a[1]);
+  return { turn: b.turn, date: dateLabel(), dMoney: N.money - b.money, dStab: N.stab - b.stab, gained, lost, losses: N.losses - b.losses, kills: N.kills - b.kills, world, threats: threats.slice(0, 4), coup: coupRisk(me()), revolt: revoltRisk(me()), plots: plotters().length };
+}
+function reportHtml(r) {
+  if (!r) return '<p class="sub">첫 달이 끝나면 정세 보고가 올라옵니다.</p>';
+  const li = a => a.length ? a.map(esc).join(', ') : '없음';
+  return `<div class="report">
+    ${kv([['예산 변화', `<span class="${r.dMoney >= 0 ? 'pos' : 'neg'}">${sgn(r.dMoney)}</span>`], ['안정도', `<span class="${r.dStab >= 0 ? 'pos' : 'neg'}">${sgn(r.dStab)}</span>`], ['적 격파', r.kills], ['아군 손실', r.losses]])}
+    <div class="rows">
+      <div class="row"><span>점령한 도시</span><span class="sub pos">${li(r.gained)}</span></div>
+      <div class="row"><span>잃은 도시</span><span class="sub neg">${li(r.lost)}</span></div>
+      <div class="row"><span>위협받는 도시</span><span class="sub">${r.threats.length ? r.threats.map(([n, e]) => `${esc(n)}(적 ${e})`).join(', ') : '없음'}</span></div>
+      <div class="row"><span>정권 위험</span><span class="sub">쿠데타 ${pct(r.coup)} · 봉기 ${pct(r.revolt)}${r.plots ? ` · 반역 징후 각료 ${r.plots}명` : ''}</span></div>
+    </div>
+    ${r.world.length ? `<h3>세계 주요 사건</h3><div class="log">${r.world.map(t => `<div>${esc(t)}</div>`).join('')}</div>` : ''}
+  </div>`;
+}
+async function showReport() {
+  await modalChoice(`<div class="title-block"><span class="eyebrow">${esc(G.report.date)} · 월간 정세 보고</span><h2>${esc(G.leader.title)}께 올리는 보고</h2></div>${reportHtml(G.report)}`, [{ label: '확인' }, { label: '보고서 자동 표시 끄기' }]).then(k => { if (k === 1) G.flags.brief = false; });
+}
 function modalChoice(html, choices) {
   return new Promise(res => {
     openModal(html + `<div class="btnrow">${choices.map((c, k) => `<button class="btn ${c.cls || (k ? '' : 'primary')}" type="button" data-choice="${k}">${esc(c.label)}</button>`).join('')}</div>`);
     $('#modal-card').querySelectorAll('[data-choice]').forEach(b => b.onclick = () => { closeModal(); res(+b.dataset.choice); });
   });
 }
+function exile() {
+  const N = P();
+  if ((N.slush || 0) >= 150) G.over = { win: false, id: 'exile', title: '망명 성공', text: `${G.leader.title} ${G.leader.name}은(는) 전용기로 수도를 빠져나가 해외 계좌 ${fmt(N.slush)}억$와 함께 여생을 보냅니다. 조국의 운명은 이제 다른 이의 손에 있습니다.` };
+  else N.flags.overthrown = '빈손 망명 — 정권 포기';
+}
 async function presentCrisis(kind) {
+  if (kind.startsWith('plot:')) {
+    const post = kind.slice(5), m = G.cabinet[post];
+    if (!m) return;
+    const ev = SLUSH_EVENTS.plot, N = P();
+    const k = await modalChoice(`<div class="title-block"><span class="eyebrow nuke">${esc(dateLabel())} · 정보 보고</span><h2>${esc(ev.title)}</h2></div><p>${esc(ev.text)}</p><p><b>${esc(postTitle(me(), post))} ${esc(m.name)}</b> — 충성 ${Math.round(m.loyalty)} · 야망 ${Math.round(m.ambition)} · ${esc(MINISTER_TRAITS[m.trait].name)}</p>`,
+      [{ label: '즉시 체포·숙청', cls: 'danger' }, { label: (N.slush || 0) >= 30 ? '비자금으로 회유 (30)' : '회유 (자금 부족)' }, { label: '감시만 한다' }]);
+    if (k === 0) purgeMinister(post);
+    else if (k === 1 && (N.slush || 0) >= 30) { bribeMinister(post); m.ambition = clamp(m.ambition - 15, 0, 100); }
+    else { m.ambition = clamp(m.ambition + 5, 0, 100); if (m.fac === 'army' || m.fac === 'sec') N.fac[m.fac] = clamp(N.fac[m.fac] - 5, 0, 100); }
+    after(); return;
+  }
+  if (kind === 'scandal') {
+    const ev = SLUSH_EVENTS.scandal, N = P();
+    const k = await modalChoice(`<div class="title-block"><span class="eyebrow nuke">${esc(dateLabel())} · 폭로</span><h2>${esc(ev.title)}</h2></div><p>${esc(ev.text)}</p>`,
+      [{ label: '가짜뉴스로 규정·언론 탄압' }, { label: '측근에게 책임 전가 (경제장관 경질)' }]);
+    if (k === 0) { N.fac.people = clamp(N.fac.people - 8, 0, 100); N.rep = clamp(N.rep - 5, -100, 100); N.fac.sec = clamp(N.fac.sec + 3, 0, 100); }
+    else { const old = G.cabinet.economy; if (old) { G.cabinet.economy = null; logMsg(`[${nName(me())}] ${old.name} 경제장관 비리로 구속`, 'decree', me()); } N.fac.people = clamp(N.fac.people - 3, 0, 100); }
+    after(); return;
+  }
   const N = P(), ev = POL_EVENTS[kind], head = `<div class="title-block"><span class="eyebrow nuke">${esc(dateLabel())} · 정권 위기</span><h2>${esc(ev.title)}</h2></div><p>${esc(ev.text)}</p>`;
   if (kind === 'coup') {
     const p = clamp(0.25 + N.fac.sec / 150 + N.power / 200 - (N.fac.army < 30 ? 0.1 : 0), 0.1, 0.95);
-    const k = await modalChoice(head + `<p class="sub">군부 충성 ${Math.round(N.fac.army)} · 보안기관 충성 ${Math.round(N.fac.sec)} · 권력 기반 ${Math.round(N.power)}</p>`, [{ label: `보안군 투입 진압 (성공 ${pct(p)})` }, { label: '군부와 타협 (60억$, 권력 -15)' }, { label: '해외 망명', cls: 'danger' }]);
+    const k = await modalChoice(head + `<p class="sub">군부 충성 ${Math.round(N.fac.army)} · 보안기관 충성 ${Math.round(N.fac.sec)} · 권력 기반 ${Math.round(N.power)} · 비자금 ${fmt(N.slush || 0)}억$</p>`, [{ label: `보안군 투입 진압 (성공 ${pct(p)})` }, { label: '군부와 타협 (60억$, 권력 -15)' }, { label: (N.slush || 0) >= 150 ? `해외 망명 (계좌 ${fmt(N.slush)}억$)` : '해외 망명 (빈손)', cls: 'danger' }]);
     if (k === 0) { if (Math.random() < p) { N.fac.army = 55; N.power = clamp(N.power + 10, 0, 100); N.rep -= 3; N.stab = clamp(N.stab - 3, 0, 100); logMsg(`[${nName(me())}] 쿠데타 진압 — 주모자 처형`, 'decree', me()); toast('쿠데타를 진압했습니다', 'good'); } else N.flags.overthrown = '쿠데타로 실각'; }
     else if (k === 1) { N.fac.army = clamp(N.fac.army + 20, 0, 100); N.money -= 60; N.power = clamp(N.power - 15, 0, 100); N.stab = clamp(N.stab - 4, 0, 100); logMsg(`[${nName(me())}] 군부와 권력 분점 합의`, 'decree', me()); }
-    else N.flags.overthrown = '망명 — 정권 포기';
+    else exile();
   } else if (kind === 'uprising') {
     const p = clamp(N.fac.sec / 100 + 0.2, 0.1, 0.95);
     const k = await modalChoice(head + `<p class="sub">민중 지지 ${Math.round(N.fac.people)} · 보안기관 충성 ${Math.round(N.fac.sec)}</p>`, [{ label: `유혈 진압 (성공 ${pct(p)}, 평판 -20)`, cls: 'danger' }, { label: '개혁 약속 (권력 -20)' }]);
@@ -1137,7 +1291,7 @@ function showMenu() {
     ${G ? '<button class="btn" type="button" id="m-save">저장</button>' : ''}
     <button class="btn" type="button" id="m-load" ${hasSave ? '' : 'disabled'}>불러오기</button>
     <button class="btn" type="button" id="m-new">새 게임</button><button class="btn" type="button" id="m-help">규칙</button>
-    ${G ? `<button class="btn" type="button" id="m-fog">전장의 안개: ${G.fog ? '켜짐' : '꺼짐'}</button>` : ''}
+    ${G ? `<button class="btn" type="button" id="m-fog">전장의 안개: ${G.fog ? '켜짐' : '꺼짐'}</button><button class="btn" type="button" id="m-brief">월간 보고 팝업: ${G.flags.brief !== false ? '켜짐' : '꺼짐'}</button>` : ''}
     <button class="btn" type="button" id="m-close">닫기</button></div>
     <p class="sub">매 턴 종료 시 이 브라우저에 자동 저장됩니다. 단축키: E 턴 종료 · N 다음 부대 · F 대기 · Esc 선택 해제 · 방향키 · +/- 확대.</p>`);
   const on = (id, fn) => { const b = $(id); if (b) b.onclick = fn; };
@@ -1146,12 +1300,15 @@ function showMenu() {
   on('#m-new', () => showStart());
   on('#m-help', () => showHelp());
   on('#m-fog', () => { G.fog = !G.fog; refreshVision(); after(); closeModal(); });
+  on('#m-brief', () => { G.flags.brief = G.flags.brief === false; closeModal(); });
   on('#m-close', closeModal);
 }
 function showHelp() {
   openModal(`<div class="title-block"><span class="eyebrow">통치 교범</span><h2>규칙 요약</h2></div><div class="help">
     <p><b>지도</b> — 전 세계 1도(약 89km) 헥스. 동서가 이어져 있습니다. 축소하면 정세도, 확대하면 전술 지도가 됩니다. 1턴은 1개월입니다.</p>
     <p><b>권력</b> — 군부·정보기관·관료(당·왕실·성직자)·재계·민중의 충성도가 안정도를 결정합니다. 칙령으로 선전·숙청·계엄·국유화·총동원을 하고, 쿠데타·봉기·선거를 넘겨야 합니다. 민주국가는 계엄으로 선거를 없앨 수 있지만 제재와 평판 하락을 부릅니다.</p>
+    <p><b>내각과 비자금</b> — 국방·합참·정보·치안·경제·외교 각료 6명의 능력과 특성이 전투력·첩보·봉기 위험·수입·외교에 반영됩니다. 야망이 충성을 앞지른 각료는 반역을 꾀합니다. 교체·숙청하거나 비자금으로 매수하세요. 예산을 착복해 해외 계좌를 불리면 매수와 망명(150억$ 이상 시 '망명 성공' 엔딩)이 가능하지만 폭로 위험이 따릅니다.</p>
+    <p><b>생산과 개량</b> — 항모(4개월)·전략핵잠(3개월)·구축함·잠수함·핵잠·폭격기·상륙함(2개월)은 건조 기간이 걸립니다. 구형 부대는 자국 도시에서 최신 설계로 개량할 수 있습니다. 포병·MLRS 사거리 안의 적을 공격하면 화력 지원 +10%.</p>
     <p><b>병기</b> — 각국은 실제 무기 체계(K2 흑표, F-35A, 055형 구축함, 화성-18 등)를 운용합니다. 설계마다 품질 계수가 달라 같은 병종도 전투력이 다릅니다. 기술 개발이나 무기 도입 계약으로 상위 설계를 확보합니다.</p>
     <p><b>전투</b> — 공격력/방어력 비율로 피해가 정해지며 체력·경험·사기·보급·연료·지형·요새·참호·측면 포위가 반영됩니다. 포병·MLRS·구축함은 원거리 사격, 공군은 작전반경(km) 내 공습, 방공·전투기는 요격합니다.</p>
     <p><b>이동</b> — 자국·동맹 영토에서는 철도·도로로 이동 비용이 절반입니다. "전략 전개"로 철도·해상·공중 장거리 이동(수 턴 소요)을 합니다. 평화 관계인 나라의 영토에는 들어갈 수 없습니다.</p>

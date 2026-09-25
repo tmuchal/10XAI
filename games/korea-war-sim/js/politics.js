@@ -87,3 +87,45 @@ const NATION_EVENTS = [
   { n: ['EGY'], title: '수에즈 운하 통행료 급감', text: '홍해 위기로 선박들이 희망봉으로 우회하고 있습니다.', choices: [{ label: '홍해 호위 참여', fx: { money: 15, rel: 5 } }, { label: '관망', fx: { money: -15 } }] },
   { n: ['POL', 'LTU', 'LVA', 'EST', 'FIN'], title: '국경 하이브리드 도발', text: '국경에 난민을 밀어내는 하이브리드 공격이 시작되었습니다.', choices: [{ label: '국경 장벽 강화', fx: { money: -15, fac: { people: 5, army: 4 } } }, { label: '인도적 수용', fx: { rep: 6, fac: { people: -4 } } }] },
 ];
+
+// ---------- cabinet ----------
+const POSTS = [
+  { id: 'defense',  name: '국방장관',     fac: 'army',  desc: '지상·해상 공격력 ±2%/등급' },
+  { id: 'chief',    name: '합참의장',     fac: 'army',  desc: '전투 사기 ±2%/등급, 전략가면 공격 +5%' },
+  { id: 'intel',    name: '정보기관장',   fac: 'sec',   desc: '첩보 성공률 ±5%/등급, 적 공작 방어' },
+  { id: 'interior', name: '내무·치안장관', fac: 'sec',   desc: '봉기 위험 ∓2%p/등급' },
+  { id: 'economy',  name: '경제·재무장관', fac: 'biz',   desc: '예산 수입 ±3%/등급' },
+  { id: 'foreign',  name: '외교장관',     fac: 'party', desc: '강화 수락 ±5%/등급, 관계 개선 효과 증가' },
+];
+// Regime-specific titles for the same posts
+const POST_TITLES = {
+  PRK: { defense: '국방상', chief: '총참모장', intel: '국가보위상', interior: '사회안전상', economy: '내각총리', foreign: '외무상' },
+  CHN: { defense: '중앙군사위 부주석', chief: '연합참모부 참모장', intel: '국가안전부장', interior: '공안부장', economy: '국무원 총리', foreign: '외교부장' },
+  RUS: { defense: '국방장관', chief: '총참모장', intel: 'FSB 국장', interior: '국가근위대 사령관', economy: '총리', foreign: '외무장관' },
+  USA: { defense: '국방장관', chief: '합참의장', intel: 'CIA 국장', interior: '국토안보부 장관', economy: '재무장관', foreign: '국무장관' },
+  IRN: { defense: '국방장관', chief: '혁명수비대 총사령관', intel: '정보부 장관', interior: '내무장관', economy: '경제장관', foreign: '외무장관' },
+  JPN: { defense: '방위대신', chief: '통합막료장', intel: '내각정보관', interior: '국가공안위원장', economy: '재무대신', foreign: '외무대신' },
+};
+const MINISTER_TRAITS = {
+  loyal:     { name: '충신',     desc: '충성도가 매달 오른다' },
+  ambitious: { name: '야심가',   desc: '야망이 매달 커진다' },
+  corrupt:   { name: '부패',     desc: '담당 분야 효율 -1등급, 비자금 상납 +3/턴' },
+  hawk:      { name: '강경파',   desc: '군부 충성 +, 국제 평판 -' },
+  technocrat:{ name: '기술관료', desc: '능력 +1등급으로 취급' },
+  demagogue: { name: '선동가',   desc: '민심 +0.5/턴' },
+  strategist:{ name: '전략가',   desc: '합참의장이면 공격 +5%' },
+  inept:     { name: '무능',     desc: '능력 -1등급으로 취급' },
+};
+const NAME_POOLS = {
+  ko: { sur: ['김', '이', '박', '최', '정', '강', '조', '윤', '장', '임', '한', '오', '서', '신', '권', '황', '안', '송', '류', '홍'], given: ['영철', '성호', '민준', '정훈', '태식', '광수', '재혁', '동원', '상철', '명길', '혜진', '수영', '경희', '병철', '용남', '철민', '정일', '승우', '현주', '대성'], order: 'sg' },
+  zh: { sur: ['왕', '리', '장', '류', '천', '양', '황', '자오', '저우', '우', '쉬', '쑨', '마', '주', '후'], given: ['젠궈', '웨이', '밍', '하이펑', '즈창', '샤오린', '융', '창칭', '리핑', '궈량', '신화', '쥔', '롱', '타오'], order: 'sg' },
+  ja: { sur: ['사토', '스즈키', '다카하시', '다나카', '와타나베', '이토', '야마모토', '나카무라', '고바야시', '가토'], given: ['히로시', '다케시', '겐지', '유키', '아키라', '마사오', '도모코', '신지', '료', '가즈키'], order: 'sg' },
+  ru: { sur: ['이바노프', '페트로프', '스미르노프', '볼코프', '소콜로프', '쿠즈네초프', '모로조프', '파블로프', '코발렌코', '셰브첸코'], given: ['세르게이', '알렉세이', '드미트리', '이고르', '니콜라이', '안드레이', '올가', '유리', '파벨', '빅토르'], order: 'gs' },
+  me: { sur: ['호세이니', '라시디', '카리미', '알하셈', '유수프', '하다드', '사이드', '만수르', '아지즈', '칸'], given: ['하산', '알리', '레자', '아흐마드', '모하마드', '파티마', '오마르', '카림', '타리크', '자밀'], order: 'gs' },
+  we: { sur: ['존슨', '밀러', '해리스', '워커', '클라크', '베르나르', '슈미트', '로시', '코발스키', '마르탱', '헤이스', '브룩스'], given: ['제임스', '로버트', '마이클', '데이비드', '캐서린', '엘리자베스', '토마스', '안나', '마르코', '장', '클라우스', '헬렌'], order: 'gs' },
+};
+const CULTURE = { KOR: 'ko', PRK: 'ko', CHN: 'zh', TWN: 'zh', JPN: 'ja', RUS: 'ru', UKR: 'ru', BLR: 'ru', KAZ: 'ru', IRN: 'me', SAU: 'me', EGY: 'me', PAK: 'me', TUR: 'me', IRQ: 'me', SYR: 'me', AFG: 'me' };
+const SLUSH_EVENTS = {
+  plot: { title: '각료의 비밀 회동', text: '정보 보고에 따르면 한 각료가 군 지휘관들과 심야에 비밀 회동을 가졌습니다. 권력 공백을 노리는 움직임으로 보입니다.' },
+  scandal: { title: '비자금 의혹 보도', text: '해외 언론이 지도자 일가의 해외 계좌 내역을 입수해 보도했습니다.' },
+};

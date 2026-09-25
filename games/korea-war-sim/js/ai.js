@@ -291,7 +291,11 @@ function aiEconomy(n, enemies, zone) {
     if (opts.length && Object.values(N.arsenal).reduce((s, v) => s + v, 0) < 12) buyMissile(n, opts[Math.floor(Math.random() * opts.length)].id);
   }
   if (!minor && has(n, 'nuke') && N.nukes < 3 && N.money > reserve + 150 && Math.random() < 0.2) produceNuke(n);
-  let count = mine;
+  if (!minor && N.money > reserve + 140) {
+    let k = 0;
+    for (const u of G.units) { if (k >= 2) break; if (u.n === n && W.tiles[u.pos].city >= 0 && modernizeCheck(u).ok) { modernize(u); k++; } }
+  }
+  let count = mine + G.queue.filter(q => q.n === n).length;
   const mix = minor ? { inf: 1 } : mixOf(n);
   for (const { cy, th } of cities) {
     if (count >= cap || N.money < reserve + 18) break;
@@ -421,7 +425,12 @@ function aiDiplomacy(n) {
       if (common && rel(n, o) >= 45 && Math.random() < 0.06 && !G.pending.some(x => x.from === n)) G.pending.push({ type: 'alliance', from: n });
     } else if (allianceCheck(n, o).ok && Math.random() < 0.05) proposeAlliance(n, o);
     const truceOk = (G.truce[pk(n, o)] ?? -99) + 6 <= G.turn;
-    if (truceOk && rel(n, o) < -50 && militaryPower(n) > 2 * militaryPower(o) && Math.random() < 0.012 && !(o === p && G.turn < 6)) declareWar(n, o);
+    if (!truceOk || G.flags.aiWarTurn === G.turn || rel(n, o) >= -55 || (o === p && G.turn < 12)) continue;
+    if (militaryPower(n) < 2 * militaryPower(o)) continue;
+    const capA = capitalOf(n), capB = capitalOf(o);
+    if (!capA || !capB || kmDist(capA.tile, capB.tile) > 3500) continue;   // only neighbours start wars of choice
+    const deterred = G.nations[o].nukes > 0 || NATION_IDS.some(x => G.ally[pk(x, o)] && G.nations[x].nukes > 0 && !allied(x, n));
+    if (Math.random() < (deterred ? 0.002 : 0.01)) { G.flags.aiWarTurn = G.turn; declareWar(n, o); }
   }
 }
 function aiCyber(n) {

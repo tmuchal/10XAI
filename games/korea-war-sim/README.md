@@ -19,6 +19,9 @@ python3 -m http.server -d games/korea-war-sim   # then open http://localhost:800
   - Stability converges on the weighted average of those loyalties.
   - 21 decrees: propaganda, a personality cult, martial law (which cancels elections), a lifetime rule amendment, purges, nationalization, mobilization, secret police, election rigging, a nuclear program and energy blackmail.
   - Crises: coups, uprisings, elections and assassination attempts. Losing one of these ends the game.
+- **Cabinet and slush fund** (권력 tab): six ministers or generals, each with skill, loyalty, ambition and a trait (loyal, ambitious, corrupt, hawk, technocrat and others). The titles depend on the country, for example 총참모장 and 국가보위상 in North Korea or FSB 국장 in Russia. Their skill affects combat, espionage, unrest, income and diplomacy. Ambitious ministers plot, and you can reshuffle, purge or bribe them. You can embezzle from the budget into a foreign account, which lets you bribe factions and ministers and escape into exile when a coup comes, at the risk of a scandal.
+- **Production**: carriers, SSBNs, destroyers, submarines, bombers and amphibious ships take 2–4 months to build. Older units can be refitted to the newest design. Attacks inside friendly artillery or MLRS range get +10% fire support.
+- **Monthly briefing**: a report each turn covering the budget change, cities won and lost, threatened cities, regime risk and major world events. The 전황 tab has trend charts with hover values and a table view.
 - **Weapons** (병기 tab):
   - About 220 real systems assigned per country, each with specs and a quality factor. Examples: K2 흑표, T-14, M1E3, F-35A, KF-21, J-20, Su-57, B-21, Type 055, Burke Flight III, KSS-III, Virginia, Ford-class carriers, THAAD, S-400 and Iron Dome.
   - 18 unit classes, including SSN, SSBN, carriers that hold 4 air wings, amphibious ships, long-range SAM/BMD, MLRS and marines.

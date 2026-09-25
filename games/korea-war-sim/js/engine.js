@@ -323,7 +323,7 @@ function newGame(scenId, player, opts = {}) {
     leader: { name: opts.leaderName || '지도자', title: opts.leaderTitle || NATIONS[player].leader },
     nations: {}, cities: W.cities.map(c => ({ owner: c.occ || c.nat, hp: 100, pop: c.pop, ind: c.ind, fort: c.cap ? 1 : 0, factory: 0, sam: c.cap ? 1 : 0, rec: 0 })),
     units: [], nextId: 1, war: {}, ally: {}, rel: {}, truce: {}, vassal: {}, sanc: {}, fallout: {}, transit: [], doom: 89,
-    log: [], over: null, won: [], flags: {}, pending: [], hist: [], nukeLog: [],
+    log: [], over: null, won: [], flags: {}, pending: [], hist: [], nukeLog: [], cabinet: {}, cand: {}, queue: [], nextPid: 1, report: null,
   };
   for (const id of NATION_IDS) {
     const N = NATIONS[id], gov = N.gov;
@@ -339,6 +339,8 @@ function newGame(scenId, player, opts = {}) {
     G.nations[id].fac = initFactions(id);
   }
   const P = G.nations[player];
+  P.slush = 0; P.skim = 0;
+  initCabinet(player);
   if (sc.worldVsPlayer) { P.money *= 3; P.manpower *= 2; G.flags.coalition = true; }
   if (!sc.worldVsPlayer) for (const [a, b] of BASE_ALLIANCES) G.ally[pk(a, b)] = 1;
   for (const a of NATION_IDS) for (const b of NATION_IDS) if (a < b) {
@@ -404,7 +406,13 @@ function deployForces(only) {
   }
 }
 function serialize() { return JSON.parse(JSON.stringify(G)); }
-function loadGame(obj) { G = obj; reindex(); cache.supply = {}; cache.comp = {}; }
+function loadGame(obj) {
+  G = obj;
+  G.cabinet ||= {}; G.cand ||= {}; G.queue ||= []; G.nextPid ||= 1;
+  const P0 = G.nations[G.player]; P0.slush ||= 0; P0.skim ||= 0;
+  if (!Object.keys(G.cabinet).length) initCabinet(G.player);
+  reindex(); cache.supply = {}; cache.comp = {};
+}
 function logMsg(text, kind = 'info', who = null) {
   G.log.push({ t: G.turn, text, kind, who });
   if (G.log.length > 500) G.log.splice(0, G.log.length - 500);
@@ -547,7 +555,7 @@ function moveUnit(u, j, reach) {
 
 // ---------- combat ----------
 const vet = u => Math.min(3, Math.floor(u.xp / 3));
-function morale(n) { return 0.8 + 0.4 * G.nations[n].stab / 100; }
+function morale(n) { return 0.8 + 0.4 * G.nations[n].stab / 100 + 0.02 * mSkill(n, 'chief'); }
 function homeDefense(u) {
   const t = W.tiles[u.pos];
   if (t.nat !== u.n || tileOwner(u.pos) !== u.n) return 1;
@@ -562,6 +570,8 @@ function unitStr(u, role, vs) {
   const C = CLASSES[u.t], d = dsg(u), n = u.n, dom = C.dom;
   let s = (role === 'atk' ? C.atk : C.def) * d.q;
   if (hasTrait(n, 'precision')) s *= 1.05;
+  if (role === 'atk' && dom !== 'air') s *= 1 + 0.02 * mSkill(n, 'defense');
+  if (role === 'atk' && n === G.player && G.cabinet.chief?.trait === 'strategist') s *= 1.05;
   if (dom === 'sea' && (hasTrait(n, 'royal_navy') || hasTrait(n, 'hegemon_navy'))) s *= 1.1;
   if (u.t === 'mbt' && role === 'atk' && has(n, 'mbt35')) s *= 1.1;
   if (u.t === 'mbt' && role === 'def' && has(n, 'mbt4')) s *= 1.15;
@@ -610,6 +620,11 @@ function flank(n, j, exceptId) {
   let k = 0;
   for (const nb of W.tiles[j].nb) { const g = groundAt(nb); if (g && g.id !== exceptId && g.n === n && !g.emb) k++; }
   return 1 + 0.1 * Math.min(3, k);
+}
+// Combined arms: friendly artillery/rocket brigades in range of the target lay down preparatory fire
+function supportBonus(n, j) {
+  for (const k of tilesWithin(j, 3)) { const g = groundAt(k); if (g && g.n === n && (g.t === 'spg' || g.t === 'mlrs') && hexDist(k, j) <= CLASSES[g.t].rng) return 1.1; }
+  return 1;
 }
 function dmgPair(A, D, ranged) { const r = A / D; return { def: clamp(30 * Math.pow(r, 1.15), 2, 100), att: ranged ? 0 : clamp(30 * Math.pow(1 / r, 1.15), 1, 100) }; }
 function isRanged(u) { return CLASSES[u.t].rng > 0; }
@@ -690,7 +705,7 @@ function preview(u, j) {
     pre += ic.aas.reduce((s, a) => s + aaDamage(a) * st, 0) + ic.sam * 10 * st;
     if (ic.ftr) pre += dmgPair(unitStr(ic.ftr, 'atk', u), unitStr(u, 'def', ic.ftr), false).def * st;
   }
-  const A = unitStr(u, 'atk', tg.unit) * (C.dom === 'land' && !ranged ? flank(u.n, j, u.id) : 1) * (u.t === 'bmr' && !tg.unit ? 1.5 : 1);
+  const A = unitStr(u, 'atk', tg.unit) * (C.dom === 'land' && !ranged ? flank(u.n, j, u.id) * supportBonus(u.n, j) : 1) * (u.t === 'bmr' && !tg.unit ? 1.5 : 1);
   if (tg.unit) {
     const d = dmgPair(A, unitStr(tg.unit, 'def', u), ranged);
     return { tg, dealt: d.def, taken: d.att + pre, kill: d.def >= tg.unit.hp, city: tg.city, pre };
@@ -732,7 +747,7 @@ function doAttack(u, j) {
     }
     if (u.hp <= 0) { killUnit(u, tg.unit ? tg.unit.n : G.cities[tg.city]?.owner, '요격으로 격추'); out.died = true; return out; }
   }
-  const A = unitStr(u, 'atk', tg.unit) * (C.dom === 'land' && !ranged ? flank(u.n, j, u.id) : 1) * (u.t === 'bmr' && !tg.unit ? 1.5 : 1);
+  const A = unitStr(u, 'atk', tg.unit) * (C.dom === 'land' && !ranged ? flank(u.n, j, u.id) * supportBonus(u.n, j) : 1) * (u.t === 'bmr' && !tg.unit ? 1.5 : 1);
   if (tg.unit) {
     const d = tg.unit;
     const dmg = dmgPair(A, unitStr(d, 'def', u), ranged);
@@ -824,6 +839,7 @@ function recruit(n, ci, t) {
   if (!r.ok) return null;
   const N = G.nations[n];
   N.money -= r.cost; N.manpower -= unitMp(n, t); G.cities[ci].rec++;
+  if (BUILD_TURNS[t]) { const q = { n, ci, t, done: G.turn + BUILD_TURNS[t] }; G.queue.push(q); return { queued: true, t, done: q.done, d: bestDesign(n, t).id }; }
   return addUnit(n, t, r.slot, true);
 }
 const BUILDINGS = {
@@ -1025,6 +1041,7 @@ function nuclearDetonation(n, j, kt, weapon) {
   }
   G.doom -= kt >= 100 ? 12 : 6;
   G.nukeLog.push({ t: G.turn, by: n, at: j, kt });
+  if (n === G.player) G.flags.aggr = (G.flags.aggr || 0) + 3;
   logMsg(`☢ [${nName(n)}] ${weapon} 핵폭발 (${kt}kt) — ${W.tiles[j].city >= 0 ? W.cities[W.tiles[j].city].name : '표적 지역'} 궤멸, 부대 ${killed}개 소멸. 종말 시계 자정 ${Math.max(0, G.doom)}초 전`, 'nuke', n);
   Hooks.fx({ k: 'nuke', i: j, r: radius });
   nuclearAftermath(n, tgt, true, kt);
@@ -1078,7 +1095,7 @@ function cyberAttack(n, target) {
 }
 function opChance(n, target, op) {
   const O = OPS.find(o => o.id === op);
-  let p = O.base + (has(n, 'intel') ? 0.15 : 0) + (hasTrait(n, 'mossad') ? 0.25 : 0);
+  let p = O.base + (has(n, 'intel') ? 0.15 : 0) + (hasTrait(n, 'mossad') ? 0.25 : 0) + 0.05 * mSkill(n, 'intel') - 0.05 * mSkill(target, 'intel');
   if (op === 'proxy' && hasTrait(n, 'axis_resist')) p += 0.2;
   if (op === 'assassinate' && has(n, 'sof2')) p += 0.1;
   if (op === 'coup') p += (50 - G.nations[target].stab) / 120 + (G.nations[target].gov === 'democracy' ? -0.05 : 0.05);
@@ -1150,7 +1167,7 @@ function declareWar(a, b, provoked = false) {
   if (!provoked) {
     const defensive = enemiesOf(b).some(e => e !== a && allied(e, a));
     A.stab = clamp(A.stab - (A.gov === 'democracy' ? 5 : 2) - (hasTrait(a, 'peace_const') ? 8 : 0), 0, 100);
-    if (!defensive) { A.rep = clamp(A.rep - 15, -100, 100); G.flags.unPending = G.flags.unPending || { by: a, why: `${nName(b)} 침공` }; }
+    if (!defensive) { A.rep = clamp(A.rep - 15, -100, 100); G.flags.unPending = G.flags.unPending || { by: a, why: `${nName(b)} 침공` }; if (a === G.player) G.flags.aggr = (G.flags.aggr || 0) + 1; }
     G.nations[b].stab = clamp(G.nations[b].stab + 3, 0, 100);
   }
   logMsg(`[${nName(a)}] → [${nName(b)}] 선전포고`, 'war', a);
@@ -1194,7 +1211,7 @@ function warScore(a, b) {
 }
 function peaceAcceptance(ai, other) {
   const N = G.nations[ai];
-  let p = 0.25 - warScore(ai, other) / 60 + (50 - N.stab) / 80;
+  let p = 0.25 - warScore(ai, other) / 60 + (50 - N.stab) / 80 + 0.05 * mSkill(other, 'foreign');
   if (G.flags.coalition && other === G.player) p -= 0.25;
   if (G.scen === 'korea' && ai === 'PRK' && warScore(ai, other) > 10) p -= 0.3;
   return clamp(p, 0, 1);
@@ -1234,7 +1251,7 @@ function breakAlliance(a, b) {
 function improveRelations(a, b) {
   const N = G.nations[a];
   if (N.money < 15 || N.diploCd[b] === G.turn) return false;
-  N.money -= 15; N.diploCd[b] = G.turn; addRel(a, b, (atWar(a, b) ? 4 : 8) * (hasTrait(a, 'nonaligned') ? 2 : 1));
+  N.money -= 15; N.diploCd[b] = G.turn; addRel(a, b, (atWar(a, b) ? 4 : 8) * (hasTrait(a, 'nonaligned') ? 2 : 1) + 2 * mSkill(a, 'foreign'));
   return true;
 }
 function requestAid(a, b) {
@@ -1331,11 +1348,12 @@ function coalitionCheck() {
   const p = G.player, P = G.nations[p];
   if (G.flags.coalition || P.capitulated) return;
   const share = controlled(p) / W.cities.length;
-  if (share < 0.15 && P.rep > -60) return;
+  const aggr = G.flags.aggr || 0;
+  if (share < 0.15 && !(aggr >= 2 && P.rep < -50)) return;
   const joiners = [];
   for (const o of MAJOR_IDS) {
     if (o === p || atWar(o, p) || allied(o, p) || G.nations[o].capitulated) continue;
-    const chance = (share - 0.1) * 1.5 + (-P.rep - 50) / 150 + (rel(o, p) < 0 ? 0.15 : 0);
+    const chance = Math.max(0, share - 0.1) * 1.5 + Math.max(0, -P.rep - 50) / 150 * Math.min(1, aggr / 3) + (rel(o, p) < 0 ? 0.1 : 0);
     if (Math.random() < chance * 0.3) { declareWar(o, p, true); joiners.push(nName(o)); }
   }
   if (joiners.length) logMsg(`대(對)${nName(p)} 연합 확대 — ${joiners.join(', ')} 참전`, 'war');
@@ -1348,12 +1366,12 @@ function loyaltyAvg(n) { const N = G.nations[n], w = regime(n).w; return FACTION
 function coupRisk(n) {
   const N = G.nations[n], f = N.fac;
   const r = ((45 - f.army) * 1.1 + (40 - f.sec) * 0.5 + (35 - f.party) * 0.3 + (N.stab < 30 ? 8 : 0) - (flag(n, 'successor') ? 4 : 0) - N.power * 0.08) * regime(n).coupMult;
-  return clamp(r / 100, 0, 0.5);
+  return clamp(r / 100 + (n === G.player ? cabinetCoupRisk() : 0), 0, 0.5);
 }
 function revoltRisk(n) {
   const N = G.nations[n], f = N.fac;
   const r = (35 - f.people) * 1.2 + (30 - N.stab) * 0.8 - f.sec * 0.15 - (flag(n, 'media') ? 4 : 0);
-  return clamp(r / 100, 0, 0.4);
+  return clamp(r / 100 - 0.02 * mSkill(n, 'interior'), 0, 0.4);
 }
 function decreeCheck(n, id) {
   const D = DECREES.find(d => d.id === id), N = G.nations[n], need = D.need || {};
@@ -1421,7 +1439,11 @@ function politicsTurn(n) {
 }
 function politicalCrises(n) {
   const N = G.nations[n], out = [];
-  if (Math.random() < coupRisk(n)) out.push('coup');
+  if (G.flags.forceCoup) { G.flags.forceCoup = false; out.push('coup'); }
+  else if (Math.random() < coupRisk(n)) out.push('coup');
+  const pl = plotters().sort((a, b) => (b.ambition - b.loyalty) - (a.ambition - a.loyalty))[0];
+  if (pl && Math.random() < (pl.ambition - pl.loyalty - 25) / 120) out.push('plot:' + pl.post);
+  if (N.skim > 0 && Math.random() < N.skim * 1.2) out.push('scandal');
   else if (Math.random() < revoltRisk(n)) out.push('uprising');
   if (regime(n).elections && N.nextElection && G.turn >= N.nextElection) out.push('election');
   if (N.rep < -40 && Math.random() < 0.05) out.push('assassination');
@@ -1482,7 +1504,7 @@ function majorCapitalsHeld(p) {
   return k;
 }
 function score(n) {
-  return Math.round(citiesOf(n).reduce((s, c) => s + 8 + G.cities[c.id].pop, 0) + G.nations[n].stab + G.nations[n].techs.length * 3 + militaryPower(n) / 60 + NATION_IDS.filter(o => G.vassal[o] === n).length * 15);
+  return Math.round((n === G.player ? (G.nations[n].slush || 0) / 10 : 0) + citiesOf(n).reduce((s, c) => s + 8 + G.cities[c.id].pop, 0) + G.nations[n].stab + G.nations[n].techs.length * 3 + militaryPower(n) / 60 + NATION_IDS.filter(o => G.vassal[o] === n).length * 15);
 }
 function checkVictory() {
   if (G.over) return G.over;
@@ -1550,7 +1572,7 @@ function economyPreview(n) {
   if (flag(n, 'econShock')) mult *= 0.85;
   if (flag(n, 'mobilized')) mult *= 0.9;
   if (flag(n, 'purgeParty')) mult *= 0.9;
-  let gross = base * 0.72 * mult;
+  let gross = base * 0.72 * mult * (1 + 0.03 * mSkill(n, 'economy'));
   if (G.vassal[n]) gross *= 0.85;
   let tribute = 0;
   for (const o of NATION_IDS) if (G.vassal[o] === n) tribute += (G.nations[o].last.gross || 0) * 0.15;
@@ -1567,11 +1589,13 @@ function economyPreview(n) {
   const surplus = Math.max(0, domestic - fuelUse);
   const oilx = flag(n, 'embargo') ? 0 : surplus * 0.35 * (hasTrait(n, 'energy_super') ? 2 : 1) * (1 - pen);
   const mpGain = mp * (hasTrait(n, 'reserve') ? 1.3 : 1) * (hasTrait(n, 'peoples_war') ? 1.5 : 1) * (hasTrait(n, 'demographic') ? 1.5 : 1) * (0.6 + 0.4 * N.stab / 100) + (hasTrait(n, 'legion') ? 8 : 0);
-  return { gross, upkeep, rp, rdCost, oilx, tribute, net: gross - rdCost - upkeep + oilx + tribute, fuel: fuelIn - fuelUse, mp: mpGain, blockaded: blk, ports, sanc: pen };
+  const skim = n === G.player ? gross * (N.skim || 0) : 0;
+  return { gross, upkeep, rp, rdCost, oilx, tribute, skim, net: gross - rdCost - upkeep + oilx + tribute - skim, fuel: fuelIn - fuelUse, mp: mpGain, blockaded: blk, ports, sanc: pen };
 }
 function startPhase(n) {
   const N = G.nations[n];
   processTransit(n);
+  processQueue(n);
   const winter = [12, 1, 2].includes(curMonth());
   for (const u of G.units.slice()) {
     if (u.n !== n) continue;
@@ -1639,7 +1663,7 @@ function endRound() {
     if (wars && N.stab < 40) ds += 0.4;
     ds -= e.sanc * 4;
     N.stab = clamp(N.stab + ds, 0, 100);
-    if (n === G.player) politicsTurn(n); else aiPoliticsTurn(n);
+    if (n === G.player) { politicsTurn(n); cabinetTurn(); N.slush = (N.slush || 0) + e.skim; } else aiPoliticsTurn(n);
     N.rep = clamp(N.rep + (N.rep < 0 ? 0.3 : -0.1), -100, 100);
     if (N.cyberCd > 0) N.cyberCd--;
     if (N.aidCd > 0) N.aidCd--;
@@ -1698,6 +1722,8 @@ function scenarioTriggers() {
 function snapshotHist() {
   const row = { t: G.turn };
   for (const n of MAJOR_IDS) row[n] = { c: citiesOf(n).length, s: Math.round(G.nations[n].stab) };
+  const Pn = G.nations[G.player];
+  row.me = { m: Math.round(Pn.money), s: Math.round(Pn.stab), c: controlled(G.player), p: Math.round(Pn.power), slush: Math.round(Pn.slush || 0) };
   G.hist.push(row);
   if (G.hist.length > 200) G.hist.shift();
 }
@@ -1721,4 +1747,121 @@ function applyEvent(n, ev, idx) {
   const ch = ev.choices[idx ?? Math.floor(Math.random() * ev.choices.length)];
   applyFx(n, ch.fx);
   if (n === G.player || NATIONS[n].tier === 'major') logMsg(`[${nName(n)}] ${ev.title} → ${ch.label}`, 'event', n);
+}
+
+// ---------- build queue & refits ----------
+const BUILD_TURNS = { cv: 4, ssbn: 3, ssn: 2, bmr: 2, dd: 2, lhd: 2, ss: 2 };
+function processQueue(n) {
+  for (const q of G.queue.slice()) {
+    if (q.n !== n || q.done > G.turn) continue;
+    const cy = W.cities[q.ci];
+    if (G.cities[q.ci].owner !== n) { G.queue.splice(G.queue.indexOf(q), 1); logMsg(`[${nName(n)}] ${cy.name} 조선소 함락 — 건조 중이던 ${CLASSES[q.t].name} 손실`, 'loss', n); continue; }
+    const j = freeSlotNear(n, cy.tile, CLASSES[q.t].dom, 2);
+    if (j < 0) continue;
+    G.queue.splice(G.queue.indexOf(q), 1);
+    const u = addUnit(n, q.t, j, true);
+    if (n === G.player || NATIONS[n].tier === 'major' && (q.t === 'cv' || q.t === 'ssbn')) logMsg(`[${nName(n)}] ${cy.name}: ${dsg(u).name} 취역`, 'tech', n);
+  }
+}
+function modernizeCost(u) { return Math.round(CLASSES[u.t].cost * 0.4); }
+function modernizeCheck(u) {
+  const best = bestDesign(u.n, u.t), cur = dsg(u);
+  if (!best || best.id === u.d || best.q <= cur.q + 0.01) return { ok: false, why: '최신 설계' };
+  if (u.acted || u.moved) return { ok: false, why: '이번 턴 행동함' };
+  const ci = W.tiles[u.pos].city;
+  if (ci < 0 || G.cities[ci].owner !== u.n) return { ok: false, why: '자국 도시·항구에서만' };
+  if (G.nations[u.n].money < modernizeCost(u)) return { ok: false, why: '예산 부족' };
+  return { ok: true, to: best, cost: modernizeCost(u) };
+}
+function modernize(u) {
+  const c = modernizeCheck(u);
+  if (!c.ok) return false;
+  G.nations[u.n].money -= c.cost;
+  const from = dsg(u).name;
+  u.d = c.to.id; u.acted = true; u.moved = true; u.mv = 0;
+  if (u.n === G.player) logMsg(`[${nName(u.n)}] ${from} → ${c.to.name} 개량 완료`, 'tech', u.n);
+  return true;
+}
+
+// ---------- cabinet & slush fund (player regime only) ----------
+function postTitle(n, post) { return (POST_TITLES[n] || {})[post] || POSTS.find(p => p.id === post).name; }
+function makePerson(n, post) {
+  const pool = NAME_POOLS[CULTURE[n] || 'we'];
+  const pick = a => a[Math.floor(Math.random() * a.length)];
+  const sur = pick(pool.sur), giv = pick(pool.given);
+  const keys = Object.keys(MINISTER_TRAITS);
+  let trait = pick(keys);
+  if (trait === 'strategist' && post !== 'chief') trait = pick(['loyal', 'hawk', 'technocrat']);
+  const r = Math.random();
+  const skill = r < 0.12 ? 1 : r < 0.88 ? 2 + Math.floor(Math.random() * 3) : 5;
+  return {
+    id: G.nextPid++, name: pool.order === 'sg' ? sur + giv : `${giv} ${sur}`, post, fac: POSTS.find(p => p.id === post).fac, skill,
+    loyalty: Math.round(45 + Math.random() * 35), ambition: Math.round(trait === 'ambitious' ? 60 + Math.random() * 30 : 15 + Math.random() * 55), trait, since: G.turn, age: 45 + Math.floor(Math.random() * 25),
+  };
+}
+function initCabinet(n) { G.cabinet = {}; for (const p of POSTS) G.cabinet[p.id] = makePerson(n, p.id); }
+function mSkill(n, post) {
+  if (!G || !G.cabinet || n !== G.player) return 0;
+  const m = G.cabinet[post];
+  if (!m) return -2;
+  let s = m.skill - 3;
+  if (m.trait === 'technocrat') s++;
+  if (m.trait === 'inept' || m.trait === 'corrupt') s--;
+  return s;
+}
+function candidates(post) {
+  if (!G.cand[post] || G.cand[post].t !== G.turn) G.cand[post] = { t: G.turn, list: [0, 1, 2].map(() => makePerson(G.player, post)) };
+  return G.cand[post].list;
+}
+function appoint(post, idx) {
+  const list = candidates(post), c = list[idx], N = G.nations[G.player];
+  if (!c) return false;
+  const old = G.cabinet[post];
+  if (old) N.fac[old.fac] = clamp(N.fac[old.fac] - 5, 0, 100);
+  c.since = G.turn; G.cabinet[post] = c; list.splice(idx, 1);
+  logMsg(`[${nName(G.player)}] ${postTitle(G.player, post)} ${old ? `${old.name} 경질, ` : ''}${c.name} 임명`, 'decree', G.player);
+  return true;
+}
+function purgeMinister(post) {
+  const m = G.cabinet[post], N = G.nations[G.player];
+  if (!m) return false;
+  N.fac[m.fac] = clamp(N.fac[m.fac] - 10, 0, 100); N.power = clamp(N.power + 6, 0, 100); N.rep = clamp(N.rep - 3, -100, 100);
+  for (const o of Object.values(G.cabinet)) if (o && o !== m) { o.loyalty = clamp(o.loyalty + 8, 0, 100); o.ambition = clamp(o.ambition - 10, 0, 100); }
+  G.cabinet[post] = null;
+  logMsg(`[${nName(G.player)}] ${postTitle(G.player, post)} ${m.name} 숙청 — 반역 혐의로 체포`, 'decree', G.player);
+  if (m.fac === 'army' && N.fac.army < 35 && Math.random() < 0.3) G.flags.forceCoup = true;
+  return true;
+}
+function bribeMinister(post) {
+  const m = G.cabinet[post], N = G.nations[G.player];
+  if (!m || (N.slush || 0) < 30) return false;
+  N.slush -= 30; m.loyalty = clamp(m.loyalty + 20, 0, 100);
+  return true;
+}
+function bribeFaction(f) {
+  const N = G.nations[G.player];
+  if ((N.slush || 0) < 40) return false;
+  N.slush -= 40; N.fac[f] = clamp(N.fac[f] + 10, 0, 100);
+  logMsg(`[${nName(G.player)}] ${factionLabel(G.player, f)} 핵심 인사들에게 비밀 자금 전달`, 'decree', G.player);
+  return true;
+}
+function cabinetTurn() {
+  const N = G.nations[G.player];
+  for (const p of POSTS) {
+    const m = G.cabinet[p.id];
+    if (!m) continue;
+    m.loyalty += ((N.power + N.fac[m.fac]) / 2 - m.loyalty) * 0.05 + (m.trait === 'loyal' ? 1 : 0) - (m.ambition > 70 ? 0.5 : 0);
+    if (m.trait === 'ambitious') m.ambition += 0.6;
+    if (N.stab < 35) m.ambition += 0.8;
+    m.loyalty = clamp(m.loyalty, 0, 100); m.ambition = clamp(m.ambition, 0, 100);
+    if (m.trait === 'corrupt') N.slush = (N.slush || 0) + 3;
+    if (m.trait === 'demagogue') N.fac.people = clamp(N.fac.people + 0.5, 0, 100);
+    if (m.trait === 'hawk') { N.fac.army = clamp(N.fac.army + 0.3, 0, 100); N.rep = clamp(N.rep - 0.2, -100, 100); }
+  }
+}
+function plotters() { return POSTS.map(p => G.cabinet[p.id]).filter(m => m && m.ambition - m.loyalty > 25); }
+function cabinetCoupRisk() {
+  let r = 0;
+  for (const m of Object.values(G.cabinet || {})) if (m && (m.fac === 'army' || m.fac === 'sec')) r += Math.max(0, m.ambition - m.loyalty) / 400;
+  return r;
 }
