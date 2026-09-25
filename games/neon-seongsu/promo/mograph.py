@@ -145,6 +145,8 @@ def paste(dst, src, xy, alpha=1.0, anchor='mm'):
         x, y = int(x), int(y - src.height / 2)
     else:
         x, y = int(x), int(y)
+    if x >= dst.width or y >= dst.height or x + src.width <= 0 or y + src.height <= 0:
+        return dst
     dst.alpha_composite(src, (max(0, x), max(0, y)),
                         (max(0, -x), max(0, -y)))
     return dst

@@ -50,6 +50,7 @@ def frame_list(kind, name):
     return d, sorted(f for f in os.listdir(d) if f.endswith('.png'))
 
 
+SHIFT = {'C_tower': 90}
 GRADE = {  # per-shot colour grade: channel gains + shadow lift (r, g, b)
     'A_aerial': ((1.0, 0.97, 1.08), (6, 3, 12)),
     'B_brick': ((1.08, 0.98, 0.9), (8, 4, 2)),
@@ -82,6 +83,10 @@ def blender_frame(seg, lf):
     a = a * np.array(gain, np.float32) + np.array(lift, np.float32) * (1 - a / 255.0)
     a += bloom(Image.fromarray(np.clip(a, 0, 255).astype(np.uint8)), thr=140 if seg['name'] != 'B_brick' else 170)
     im = Image.fromarray(np.clip(a, 0, 255).astype(np.uint8)).resize((W, H), Image.BICUBIC)
+    dy = SHIFT.get(seg['name'], 0)
+    if dy:
+        # move the picture down so the letterbox keeps the top of frame (the tower's holo ring)
+        im = im.crop((0, -dy, W, H - dy))
     return im
 
 

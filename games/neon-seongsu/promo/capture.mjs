@@ -35,7 +35,7 @@ const tl = JSON.parse(fs.readFileSync(path.join(BUILD, 'timeline.json'), 'utf8')
 const need = {};
 for (const s of tl.segments) if (s.kind === 'gameplay') need[s.name] = Math.max(need[s.name] || 0, s.frames + 12);
 // seconds to simulate (without screenshots) before recording, so each clip opens on action
-const PREROLL = { title: 0.0, drive: 0.4, chase: 0.6, drones: 0.8, switch: 0.0, phone: 0.0, rob: 0.2, heist: 0.5, race: 0.6, forest: 0.3 };
+const PREROLL = { title: 0.0, drive: 0.4, chase: 0.6, drones: 0.8, switch: 0.0, phone: 0.0, rob: 0.2, combat: 0.5, lights: 0.3, heist: 0.5, race: 0.6, forest: 0.3 };
 let scenes = Object.keys(need);
 if (opt('--scenes')) scenes = opt('--scenes').split(',');
 if (opt('--frames')) for (const k of scenes) need[k] = +opt('--frames');

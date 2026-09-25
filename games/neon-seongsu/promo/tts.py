@@ -107,7 +107,7 @@ def build_timeline(durs):
     add('gameplay', 'drive', cuts[0], cuts[1], line=9, callout='car')
     rob_at = cuts[1] + (cuts[2] - cuts[1]) * 0.62
     add('gameplay', 'chase', cuts[1], rob_at, line=9, callout='stars')
-    add('gameplay', 'rob', rob_at, cuts[2], line=9)
+    add('gameplay', 'combat', rob_at, cuts[2], line=9)
     add('gameplay', 'drones', cuts[2], cuts[3], line=9, callout='emp')
     m10 = (s(10) + e(10)) / 2 + 0.3
     add('gameplay', 'forest', s(10) - 0.25, m10, line=10)
