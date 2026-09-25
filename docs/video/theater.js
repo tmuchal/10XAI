@@ -18,7 +18,7 @@
   const esc = (s) => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
   const n = (v) => +(+v).toFixed(1);
   const T = (x, y, s, z, o) => { o = o || {}; z = z || 20; return `<text x="${n(x)}" y="${n(y)}" font-size="${n(z)}" text-anchor="${o.a || 'middle'}" fill="${o.f || INK}" font-family="${o.font || FONT}" font-weight="${o.w || 700}"${o.r ? ` transform="rotate(${o.r} ${n(x)} ${n(y)})"` : ''}${o.stroke ? ` stroke="${o.stroke}" stroke-width="${o.sw || 6}" paint-order="stroke" stroke-linejoin="round"` : ''}>${esc(s)}</text>`; };
-  const G = (s, extra) => `<g filter="url(#ink)"${extra || ''}>${s}</g>`;
+  const G = (s, extra) => `<g filter="url(#ink)"${extra || ''}>${s}</g>`; // #ink uses a 20% margin; keep text inside its shape
   function rng(seed) { let s = seed % 2147483647; if (s <= 0) s += 2147483646; return () => { s = s * 16807 % 2147483647; return (s - 1) / 2147483646; }; }
   function shade(hex, amt) { // amt −1..1 : darken..lighten
     const c = parseInt(hex.slice(1), 16); let r = c >> 16, g = (c >> 8) & 255, b = c & 255;
@@ -29,9 +29,9 @@
 
   /* ---------- defs ---------- */
   const DEFS = `<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false"><defs>
-  <filter id="ink" x="-10%" y="-10%" width="120%" height="120%"><feTurbulence type="fractalNoise" baseFrequency="0.03" numOctaves="2" seed="3" result="n"/><feDisplacementMap in="SourceGraphic" in2="n" scale="3.2" xChannelSelector="R" yChannelSelector="G"/></filter>
-  <filter id="ink2" x="-10%" y="-10%" width="120%" height="120%"><feTurbulence type="fractalNoise" baseFrequency="0.03" numOctaves="2" seed="9" result="n"/><feDisplacementMap in="SourceGraphic" in2="n" scale="3.2" xChannelSelector="R" yChannelSelector="G"/></filter>
-  <filter id="ink3" x="-10%" y="-10%" width="120%" height="120%"><feTurbulence type="fractalNoise" baseFrequency="0.03" numOctaves="2" seed="17" result="n"/><feDisplacementMap in="SourceGraphic" in2="n" scale="3.2" xChannelSelector="R" yChannelSelector="G"/></filter>
+  <filter id="ink" x="-20%" y="-20%" width="140%" height="140%"><feTurbulence type="fractalNoise" baseFrequency="0.03" numOctaves="2" seed="3" result="n"/><feDisplacementMap in="SourceGraphic" in2="n" scale="3.2" xChannelSelector="R" yChannelSelector="G"/></filter>
+  <filter id="ink2" x="-20%" y="-20%" width="140%" height="140%"><feTurbulence type="fractalNoise" baseFrequency="0.03" numOctaves="2" seed="9" result="n"/><feDisplacementMap in="SourceGraphic" in2="n" scale="3.2" xChannelSelector="R" yChannelSelector="G"/></filter>
+  <filter id="ink3" x="-20%" y="-20%" width="140%" height="140%"><feTurbulence type="fractalNoise" baseFrequency="0.03" numOctaves="2" seed="17" result="n"/><feDisplacementMap in="SourceGraphic" in2="n" scale="3.2" xChannelSelector="R" yChannelSelector="G"/></filter>
   <filter id="wash" x="-5%" y="-5%" width="110%" height="110%"><feTurbulence type="fractalNoise" baseFrequency="0.011" numOctaves="3" seed="4" result="n"/><feDisplacementMap in="SourceGraphic" in2="n" scale="22" xChannelSelector="R" yChannelSelector="G"/></filter>
   <filter id="soft" x="-40%" y="-40%" width="180%" height="180%"><feGaussianBlur stdDeviation="16"/></filter>
   <filter id="grain" x="0" y="0" width="100%" height="100%"><feTurbulence type="fractalNoise" baseFrequency="0.85" numOctaves="2" seed="5" stitchTiles="stitch"/><feColorMatrix type="matrix" values="0 0 0 0 0.36  0 0 0 0 0.25  0 0 0 0 0.14  0 0 0 0.14 0"/></filter>
@@ -79,7 +79,7 @@
     o = o || {}; if (!en && !ko) return ''; const w = o.w || 960, h = o.h || 540;
     const z1 = o.z1 || (w < h ? 24 : 26), z2 = o.z2 || (w < h ? 21 : 22);
     const bw = Math.min(w - 28, Math.max(textW(en || '', z1), textW(ko || '', z2)) + 44);
-    const bh = (en ? z1 * 1.2 : 0) + (ko ? z2 * 1.25 : 0) + 18, y = o.y != null ? o.y : h - bh - 16, x = w / 2;
+    const bh = (en ? z1 * 1.2 : 0) + (ko ? z2 * 1.25 : 0) + 18, y = o.y != null ? o.y : h - bh - 16, x = o.cx != null ? o.cx : w / 2;
     let g = `<rect x="${n(x - bw / 2 + 4)}" y="${n(y + 5)}" width="${n(bw)}" height="${n(bh)}" rx="12" fill="${INK}" opacity=".9"/><rect x="${n(x - bw / 2)}" y="${n(y)}" width="${n(bw)}" height="${n(bh)}" rx="12" fill="#fffdf5" stroke="${INK}" stroke-width="3"/>`;
     let yy = y + 9;
     if (en) { yy += z1; g += rich(x, yy - 2, en, z1, '#23243a', o.hi || '#e0357a'); }
@@ -355,7 +355,7 @@
     const w = o.w || 960, h = o.h || 540;
     const st = Object.assign({ w, h }, o.st || {});
     const body = (o.noStage ? `<rect width="${w}" height="${h}" fill="${o.bgColor || '#fff4dc'}"/>` : stage(st)) + (o.draw ? o.draw() : '') + (o.noCurtains || o.noStage ? '' : curtains({ w, h }));
-    return `<svg viewBox="0 0 ${w} ${h}" role="img" aria-label="${esc(o.label || o.en || '')}" xmlns="http://www.w3.org/2000/svg"><g class="cam">${body}</g>${o.hook || ''}${sub2(o.en, o.ko, { w, h, y: o.subY })}<rect width="${w}" height="${h}" filter="url(#grain)" opacity=".5" style="mix-blend-mode:multiply" pointer-events="none"/></svg>`;
+    return `<svg viewBox="0 0 ${w} ${h}" role="img" aria-label="${esc(o.label || o.en || '')}" xmlns="http://www.w3.org/2000/svg"><g class="cam">${body}</g>${o.hook || ''}${sub2(o.en, o.ko, { w, h, y: o.subY, z1: o.z1, z2: o.z2, cx: o.subX })}<rect width="${w}" height="${h}" filter="url(#grain)" opacity=".5" style="mix-blend-mode:multiply" pointer-events="none"/></svg>`;
   }
 
   root.Theater = { INK, FONT, esc, n, T, G, rich, rng, shade, textW, install, stage, curtains, sub2, hook, face, box, PAL, AGENTS, agent, doc, hand, card, kanban, COLS, sign, bubble, meter, pump, machine, gate, sandbox, fence, door, rope, board, banner, pkg, browser, star, burst, motion, confetti, dice, bomb, stopwatch, coin, arrow, phone, scene };

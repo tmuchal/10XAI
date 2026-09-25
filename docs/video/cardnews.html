@@ -9,11 +9,11 @@
 .track::-webkit-scrollbar{display:none}
 .slide{flex:0 0 100%;scroll-snap-align:center;scroll-snap-stop:always}
 .slide svg{display:block;width:100%;height:auto}
-.vctl{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:16px}
+.vctl{display:flex;align-items:center;justify-content:space-between;gap:6px;margin-top:16px}
 .navbtn{width:48px;height:48px;flex:none;border-radius:50%;border:3px solid var(--ink);background:var(--yellow);box-shadow:2px 3px 0 var(--ink);font-family:var(--hand);font-weight:700;font-size:26px;line-height:1;display:grid;place-items:center}
 .navbtn:disabled{background:var(--card);color:var(--muted);box-shadow:none;cursor:default}
 .dots{display:flex;flex-wrap:wrap;justify-content:center;gap:2px}
-.dots button{width:26px;height:26px;border:0;background:none;padding:0;display:grid;place-items:center}
+.dots button{width:22px;height:26px;border:0;background:none;padding:0;display:grid;place-items:center}
 .dots button::before{content:"";width:12px;height:12px;border-radius:50%;border:2px solid var(--ink);background:var(--card)}
 .dots button[aria-current="true"]::before{background:var(--pink);transform:scale(1.25)}
 .vcount{text-align:center;font-family:var(--mono);font-size:13px;color:var(--ink-2);margin-top:6px}
@@ -34,9 +34,9 @@
     </nav>
     <div class="eyebrow">Harness Theater #1 · Ontology + harness engineering · with Dr. Harness</div>
     <h1><span class="hl">10-Slide</span> Card News<small>An Instagram carousel about the 10XAI multi-agent Kanban board</small></h1>
-    <p class="logline">A viral post says "free, 5 minutes, one prompt." Dr. Harness, a hamster in sunglasses, pastes it onto a Kanban board run by AI agents. The ontology gives every card typed fields, the harness checks them, and the carousel ends on claimed vs. measured numbers.</p>
+    <p class="logline">A viral post says "free, 5 minutes, one prompt." Dr. Harness, a hip hamster in black sunglasses, a backwards snapback and a gold "10X" chain, pastes it onto a Kanban board run by AI agents. The ontology gives every card typed fields, the harness checks them, and the carousel ends on claimed vs. measured numbers.</p>
     <div class="facts">
-      <span><b>10</b> slides</span><span><b>4:5</b> · 1080×1350 PNG</span><span>grid-safe center <b>3:4</b></span><span>EN headline + <b>KR</b> line</span><span>host: <b>Dr. Harness</b> (hamster)</span>
+      <span><b>10</b> slides</span><span><b>4:5</b> · 1080×1350 PNG</span><span>grid-safe center <b>3:4</b></span><span>EN headline + <b>KR</b> line</span><span>host: <b>Dr. Harness</b>, hip hamster</span>
     </div>
   </div>
 </header>
@@ -68,11 +68,11 @@
       <div class="panel">
         <h3>Caption &amp; hashtags</h3>
         <p class="src">Copy-ready. Korean first for the feed, English below.</p>
-        <div class="copy" id="caption">'무료'라더니, 재보니? 🐹
-SNS에서 본 AI 워크플로, 그대로 따라 해도 될까요?
-10XAI는 게시물을 칸반 보드로 쪼개고, 에이전트 팀이 빠진 단계를 채우고, 위험 70점 이상은 사람이 승인하고, 샌드박스에서 실제 비용과 시간을 잽니다.
-에이전트 = 모델 + 하네스. 온톨로지 = 명사, 연결, 동사.
-📌 저장해 두고, 바이럴 프롬프트를 그대로 붙여넣는 팀원에게 공유하세요.
+        <div class="copy" id="caption">'무료'라며? 직접 재봤어요 🐹
+SNS에서 본 AI 꿀팁, 그대로 따라 해도 될까요?
+10XAI는 게시물을 칸반 카드로 쪼개요. 에이전트 팀이 빠진 단계를 채우고 위험도를 매겨요. 70점 이상이면 사람이 승인해요. 그다음 샌드박스에서 진짜 비용과 시간을 재요.
+에이전트 = 모델 + 하네스. 온톨로지는 명사, 연결, 동사예요.
+📌 저장해 두고, 바이럴 프롬프트를 그대로 붙여넣는 팀원한테 보내 주세요.
 
 It said FREE. We measured.
 10XAI turns a viral AI post into a Kanban board run by agents: decompose, fill the gaps, gate the risky steps for a human, then measure cost and time in a sandbox.
@@ -87,8 +87,9 @@ Repo: github.com/tmuchal/10XAI · 하네스 극장 #1</div>
         <h3>Why this works</h3>
         <ul>
           <li><b>8–10 slides.</b> Ten slides tells one story in one sitting, and Instagram now allows up to 20 per carousel, so there is room without padding.</li>
-          <li><b>Cover hook of 15 Korean characters or fewer.</b> "'무료'라더니, 재보니?" is 13 characters. The cover works as the thumbnail, the way 고구마팜 treats it.</li>
-          <li><b>Mascot-led voice.</b> Dr. Harness carries every slide, in the spirit of 뉴닉's explainer mascot.</li>
+          <li><b>Cover hook of 15 Korean characters or fewer.</b> "'무료'라며? 직접 재봤어요" is 15 characters with spaces and punctuation (9 Hangul syllables). The cover works as the thumbnail, the way 고구마팜 treats it.</li>
+          <li><b>Mascot-led voice.</b> Dr. Harness carries every slide, in the spirit of 뉴닉's explainer mascot. He even peeks in from the right edge as the swipe cue.</li>
+          <li><b>Native Korean lines.</b> The Korean copy is written in short 해요체 sentences in the 뉴닉/캐릿 tone, with no translationese, and uses terms the way Korean creators do (에이전트, 칸반, 샌드박스, 하네스).</li>
           <li><b>Big type, one tip per slide.</b> The Ruben Hassid pattern: a 30–44 px (logical) headline, then a single visual.</li>
           <li><b>Step-by-step flow.</b> Slides 5 to 8 follow the board left to right, the way ByteByteGo draws a pipeline.</li>
           <li><b>Save/share CTA.</b> The last slide asks for a save and a send to one specific teammate, which gives the reader a reason to act.</li>
@@ -216,12 +217,12 @@ Theater.install();
         ['"It deploys itself!"', 'With your prod keys? Hold on.', '내 운영 키로 셸 명령을 돌려요']
       ];
       rows.forEach(([hype, reply, ko], i) => {
-        const y = 232 + i * 90;
+        const y = 230 + i * 92;
         // hype bubble (left, gold) and hamster reply (right, white)
         g += `<rect x="34" y="${y}" width="232" height="40" rx="20" fill="#fff0a8" stroke="${INK}" stroke-width="3"/><polygon points="60,${y + 38} 82,${y + 38} 54,${y + 56}" fill="#fff0a8" stroke="${INK}" stroke-width="3" stroke-linejoin="round"/><rect x="61" y="${y + 33}" width="20" height="6" fill="#fff0a8"/>` + tx(150, y + 27, hype, 19, { f: '#9c5a12' });
-        g += `<rect x="190" y="${y + 46}" width="318" height="48" rx="16" fill="#fffdf5" stroke="${INK}" stroke-width="3"/><polygon points="486,${y + 92} 506,${y + 92} 500,${y + 108}" fill="#fffdf5" stroke="${INK}" stroke-width="3" stroke-linejoin="round"/><rect x="484" y="${y + 88}" width="22" height="5" fill="#fffdf5"/>`;
-        g += `<circle cx="212" cy="${y + 70}" r="13" fill="${a}" stroke="${INK}" stroke-width="2.5"/>` + tx(212, y + 76, String(i + 1), 17, { f: '#fff' });
-        g += tx(234, y + 66, reply, 17, { a: 'start' }) + tx(234, y + 86, ko, 14, { a: 'start', body: true, f: KR });
+        g += `<polygon points="486,${y + 84} 506,${y + 84} 500,${y + 98}" fill="#fffdf5" stroke="${INK}" stroke-width="3" stroke-linejoin="round"/><rect x="190" y="${y + 42}" width="318" height="46" rx="16" fill="#fffdf5" stroke="${INK}" stroke-width="3"/><rect x="484" y="${y + 82}" width="22" height="5" fill="#fffdf5"/>`;
+        g += `<circle cx="212" cy="${y + 65}" r="13" fill="${a}" stroke="${INK}" stroke-width="2.5"/>` + tx(212, y + 71, String(i + 1), 17, { f: '#fff' });
+        g += tx(234, y + 61, reply, 17, { a: 'start' }) + tx(234, y + 81, ko, 14, { a: 'start', body: true, f: KR });
       });
       g += Theater.box(104, FY, 92, Object.assign({ mood: 'star', label: 'HYPE' }, Theater.PAL.gold));
       g += Theater.card(168, 556, 70, 26, '.env ?', { kind: 'gap' }) + Theater.card(36, 496, 64, 24, 'keys ?', { kind: 'gap' });
@@ -285,7 +286,7 @@ Theater.install();
       // callouts: name tag (noun), rope (link), buttons (verbs)
       g += `<g transform="rotate(8 470 256)"><rect x="420" y="238" width="86" height="34" rx="6" fill="#ffd23f" stroke="${INK}" stroke-width="2.5"/><circle cx="430" cy="255" r="4" fill="${INK}"/>${tx(468, 261, 'NOUN', 18)}</g>`;
       g += `<path d="M458,${cy + 64} C500,${cy + 60} 500,${cy + 96} 458,${cy + 91}" fill="none" stroke="#8a5a2b" stroke-width="5" stroke-linecap="round"/><path d="M458,${cy + 64} C500,${cy + 60} 500,${cy + 96} 458,${cy + 91}" fill="none" stroke="#e2bd86" stroke-width="2" stroke-dasharray="4 6"/>`;
-      g += `<rect x="440" y="${cy + 104}" width="62" height="24" rx="12" fill="#fffdf5" stroke="${INK}" stroke-width="2"/>` + tx(471, cy + 121, 'LINK', 15, { mono: true });
+      g += `<rect x="440" y="${cy + 132}" width="62" height="24" rx="12" fill="#fffdf5" stroke="${INK}" stroke-width="2"/>` + tx(471, cy + 149, 'LINK', 15, { mono: true }) + `<path d="M478,${cy + 86} L472,${cy + 130}" stroke="#8a5a2b" stroke-width="2" stroke-dasharray="3 4"/>`;
       ['verify', 'run', 'approve'].forEach((t, i) => { const x = cx + 4 + i * 105; g += `<rect x="${x}" y="${cy + ch + 12}" width="96" height="32" rx="16" fill="${a}" stroke="${INK}" stroke-width="2.5"/>` + tx(x + 48, cy + ch + 33, t + '()', 15, { f: '#fff', mono: true }); });
       g += tx(cx + 158, cy + ch + 68, 'VERBS = the only way agents act', 15, { mono: true, w: 400 }) + tx(cx + 158, cy + ch + 88, '에이전트는 동사(액션)로만 움직여요', 14, { body: true, f: KR });
       g += foot('Palantir: objects, links, actions');
@@ -443,15 +444,15 @@ Theater.install();
   ];
 
   const META = [
-    { name: 'Cover', layout: 'hero', en: 'It said FREE. We measured.', ko: "'무료'라더니, 재보니?", purpose: 'Stop the scroll. The cover doubles as the grid thumbnail.', design: 'Yellow hook type with ink outline. The Hype Box (star eyes) holds the FREE sign; a red RISK 72 card is tagged GATED. Dr. Harness gasps. The KR hook is 13 characters.' },
+    { name: 'Cover', layout: 'hero', en: 'It said FREE. We measured.', ko: "'무료'라며? 직접 재봤어요", purpose: 'Stop the scroll. The cover doubles as the grid thumbnail.', design: 'Yellow hook type with ink outline. The Hype Box (star eyes) holds the FREE sign; a red RISK 72 card is tagged GATED. Dr. Harness, in shades and snapback, gasps. The KR hook is 15 characters with spaces.' },
     { name: 'The problem', layout: 'dialogue', en: 'Viral AI workflows hide three things', ko: 'SNS AI 꿀팁, 이건 안 알려줘요', purpose: 'Name the pain: skipped steps, hidden costs, risky actions.', design: 'Speech-bubble dialogue. Gold hype bubbles on the left, the hamster’s numbered replies on the right, with gray gap cards falling out of the Hype Box.' },
     { name: 'Agent = Model + Harness', layout: 'split', en: 'Agent = Model + Harness', ko: '에이전트 = 모델 + 하네스', purpose: 'Define the harness as guides (before) plus sensors (after).', design: 'Split panel: reins for guides, a bell for sensors. Below, the hamster runs a wheel that drives the AGENT machine: the model is the engine, the harness gives it direction. Credits Hashimoto and Böckeler.' },
     { name: 'Ontology', layout: 'zoom-in', en: 'Ontology = nouns, links, verbs', ko: '온톨로지는 명사, 연결, 동사예요', purpose: 'Show the typed fields on a 10XAI card: kind, claim, measured, risk, gate.', design: 'A loupe zooms from a tiny board into one card. Name tag = noun, rope = link, buttons = verbs. The hamster’s cheek pouches are stuffed with cards. The measured value is an example.' },
     { name: 'Mission control', layout: 'board map', en: 'Mission control: agents run the board', ko: '칸반 보드는 에이전트 팀이 굴려요', purpose: 'Map every agent to its column on the Kanban board.', design: 'The board is the map. Decompose and Gap-fill in Decomposed, Verify and Router in Verifying, the hamster at the gate, Runner, Repair and Deploy in Verified. The Orchestrator conducts from the headline.' },
     { name: 'The gate', layout: 'stage scene', en: 'Risk ≥ 70? A human decides.', ko: '70점 이상이면 사람이 승인해요', purpose: 'State the safety contract: risky cards wait for a person.', design: 'RISK meter at 72, a hard-flag list from card.cjs, the closed gate barrier, and the Verify agent holding a "prod deploy" card. The hamster holds the stamp.' },
-    { name: 'Claimed vs. measured', layout: 'chalkboard', en: 'Claimed vs. measured', ko: '말한 숫자 vs 재본 숫자', purpose: 'Show the product output: numbers from a sandbox run.', design: 'Chalkboard rows marked EXAMPLE ($0.40 and 12 min are placeholders). Sunflower seeds stand in for cost. The runner works in the sandbox; the hamster pushes his sunglasses up for the reveal.' },
+    { name: 'Claimed vs. measured', layout: 'chalkboard', en: 'Claimed vs. measured', ko: '말한 숫자 vs 재본 숫자', purpose: 'Show the product output: numbers from a sandbox run.', design: 'Chalkboard rows marked EXAMPLE ($0.40 and 12 min are placeholders). Sunflower seeds stand in for cost. The runner works in the sandbox; the hamster pushes his sunglasses up for the reveal (eyes:true).' },
     { name: 'Export', layout: 'shelf', en: 'Verified steps become a module', ko: '검증된 단계만 모듈로 묶어요', purpose: 'Show the deliverable: SKILL.md, JSON or CLI in the Library.', design: 'Bookcase with three gift-wrapped packages. The Deploy agent carries the hamster on its head. Two rules: safe steps auto-run, risky steps keep a manual OK.' },
-    { name: 'Build your own', layout: 'checklist', en: 'Build your own content harness', ko: '내 콘텐츠에도 하네스 달기, 5단계', purpose: 'Give a takeaway the reader can save and reuse.', design: 'Five checked items, EN step + KR line + mono detail. The Hype Box now wears a harness and smiles.' },
+    { name: 'Build your own', layout: 'checklist', en: 'Build your own content harness', ko: '내 콘텐츠에도 하네스 달기, 5단계', purpose: 'Give a takeaway the reader can save and reuse.', design: 'Five checked items: an EN step and a KR 해요체 line. The Hype Box now wears a harness and smiles; sunflower seeds (the cost coin) spill at the hamster’s feet.' },
     { name: 'Save & share', layout: 'curtain call', en: 'Save this. Send it to the teammate who pastes viral prompts.', ko: '저장하고 팀에 공유하세요', purpose: 'Ask for the save and the share; point to the repo.', design: 'Spotlight, confetti, all eight agents take a bow around the hamster. Save and Share buttons, the repo URL, and the series tag. No swipe cue.' }
   ];
 

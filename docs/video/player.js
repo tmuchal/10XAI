@@ -8,6 +8,7 @@
  */
 (function (root) {
   const CSS = `
+  .p-wrap[hidden]{display:none!important}
   .p-wrap{position:fixed;inset:0;z-index:50;background:rgba(255,248,236,.97);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:calc(16px + env(safe-area-inset-top,0px)) 16px calc(16px + env(safe-area-inset-bottom,0px))}
   .p-screen{max-width:100%;border-radius:14px;overflow:hidden;background:#fff4dc;box-shadow:0 0 0 3px #3a2418,8px 10px 0 #3a2418}
   .p-screen svg{display:block;width:100%;height:100%}
@@ -33,7 +34,7 @@
   .boil g[filter="url(#ink)"]{animation:boil .5s steps(1,end) infinite}
   @media (prefers-reduced-motion: reduce){.boil g[filter="url(#ink)"]{animation:none}.cam{animation:none!important}}`;
   const fmt = (s) => { s = Math.max(0, Math.floor(s + 1e-6)); return Math.floor(s / 60) + ':' + String(s % 60).padStart(2, '0'); };
-  const esc = (s) => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;');
+  const esc = (s) => String(s).replace(/\*/g, '').replace(/&/g, '&amp;').replace(/</g, '&lt;');
 
   function mount(opts) {
     const shots = opts.shots, frames = opts.frames, [aw, ah] = opts.aspect || [16, 9];

@@ -20,6 +20,7 @@
 .alt div{padding:12px 14px}
 .alt b{font-family:var(--hand);font-size:22px;line-height:1.1;display:block}
 .alt small{display:block;color:#c2361f;font-size:14px;margin-top:4px}
+.shot dd.vo mark,.alt mark{background:linear-gradient(transparent 55%,#ffd23f 55%);color:inherit;padding:0 1px}
 .alt p{margin:8px 0 0;font-size:13.5px;color:var(--ink-2)}
 .kit dl{display:grid;grid-template-columns:minmax(0,1fr);gap:4px;margin:0}
 .kit dt{font-family:var(--mono);font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin-top:10px}
@@ -87,7 +88,19 @@
           <li><b>A change every 2 to 4 seconds.</b> After the hook, every shot runs 2.5 to 3.5 seconds, and each one adds a new prop or a new agent.</li>
           <li><b>Loop ending.</b> The last line, "Paste the next…", runs straight into "It said FREE." A seamless loop turns the end of the video into a replay.</li>
           <li><b>Safe zones.</b> Key text sits inside logical x 30–480 and y 110–765 (1080×1920: x 60–960, y 220–1530), clear of the top bar, the caption area and the icon column. The guides follow outfy, kreatli and veeso.</li>
-          <li><b>Two languages at once.</b> English VO with a burned-in EN + KR subtitle strip, so the Reel works with the sound off in both markets. The Korean line is written as a native Shorts caption (해요체, about 16 characters), so it carries the meaning in its own words.</li>
+          <li><b>Two languages at once.</b> English VO with a burned-in EN + KR subtitle strip, so the Reel works with the sound off in both markets. The Korean line is written as a native Shorts caption in the hamster's own voice, so it carries the meaning in its own words.</li>
+        </ul>
+      </div>
+      <div class="panel">
+        <h3>Korean subtitle style</h3>
+        <ul>
+          <li><b>Voice.</b> The hamster talks in 반말 with 음슴체 punch lines ("채움", "잡음", "까봄"). No 해요체 mixed in.</li>
+          <li><b>Signature ending.</b> "~햄" appears twice (R02 "나왔햄", R10 "돌렸햄"), plus once in the mascot hook alternative. Like 뉴닉's 고슴체, the ending becomes the brand, so it is never on every line.</li>
+          <li><b>Length.</b> 16 Korean characters or fewer, one line per language.</li>
+          <li><b>Key tokens.</b> *Asterisks* mark the key word in both lines (공짜, 72, 70, $0.40, SKILL.md). <code>Theater.sub2</code> draws them in a highlight color at 1.12× size.</li>
+          <li><b>Meaning over wording.</b> Each Korean line says the point in its own words. Subjects and pronouns are cut. No passives, no "~에 대해", no "~을 가지고 있다".</li>
+          <li><b>Terms.</b> Keep the forms Korean creators use: 칸반, 에이전트, 샌드박스, 온톨로지, 하네스, SKILL.md.</li>
+          <li><b>References.</b> 조코딩, 안될공학, ITSub잇섭, 뉴닉 고슴이, 빵빵이의 일상, 영국남자, 올리버쌤.</li>
         </ul>
       </div>
       <div class="panel">
@@ -95,7 +108,7 @@
         <ul>
           <li><b>Placeholder numbers.</b> RISK 72, $0.40, 12 min and 8 cards are placeholders. Replace them with the numbers from your own dry run before the final render (CLAUDE.md rule 5: claimed vs. measured).</li>
           <li><b>Facts on screen.</b> Cards hold at <code>RISK_GATE_THRESHOLD = 70</code>. Verify runs on Claude + Codex. Pasting goes through <code>POST /api/ingest</code>. Each run gets its own git worktree. Card tags come from <code>metadata</code>: <code>kind</code>, <code>claim</code>, <code>measured</code>, <code>risk</code>, <code>gate</code>.</li>
-          <li><b>Subtitle length.</b> English lines are 36 characters or fewer and Korean lines about 16, so the strip stays inside the safe zone at 24 px logical.</li>
+          <li><b>Subtitle length.</b> English lines are 36 characters or fewer and Korean lines 16 or fewer, so the strip stays inside the safe zone at 24 px logical.</li>
           <li><b>Sound.</b> Ukulele and toy piano at about 110 BPM, with a record-scratch rewind at 0:02, a kazoo sting on the reveal at 0:23 and a mic thud at 0:27.</li>
         </ul>
         <h3 style="margin-top:14px">Sources</h3>
@@ -105,6 +118,7 @@
           <li>Meta for Business: share of 3-second viewers who reach 10 seconds.</li>
           <li>Safe-zone guides for Reels and Shorts: outfy, kreatli, veeso.</li>
           <li>10XAI repo: <code>CLAUDE.md</code>, <code>agents/*.md</code>, <code>lib/gate/index.cjs</code>.</li>
+          <li>Korean caption references: 조코딩, 안될공학, ITSub잇섭, 뉴닉 (고슴이), 빵빵이의 일상, 영국남자, 올리버쌤.</li>
           <li>Series guide: <code>docs/video/SERIES.md</code>.</li>
         </ul>
       </div>
@@ -208,6 +222,8 @@
   const Th = Theater, { T, G, n, INK } = Th;
   const W = 540, H = 960, FY = 668, SUBY = 688, MONO = "'IBM Plex Mono', monospace";
   const esc = (s) => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+  const plain = (s) => String(s).replace(/\*/g, '');
+  const rich = (s) => esc(s).replace(/\*([^*]+)\*/g, '<mark>$1</mark>');
   const fmt = (s) => { const m = Math.floor(s / 60), r = s - m * 60; return m + ':' + (r < 10 ? '0' : '') + (Number.isInteger(r) ? r + '.0' : r.toFixed(1)); };
 
   /* ---------- local helpers (theater.js is shared; extras live here) ---------- */
@@ -215,7 +231,7 @@
   const hook = (lines, o) => Th.hook(lines, Object.assign({ w: W }, o));
   function rays(c, op, cx, cy) { cx = cx || 270; cy = cy || 420; let g = ''; for (let i = 0; i < 28; i += 2) { const a0 = i / 28 * 2 * Math.PI, a1 = (i + 1) / 28 * 2 * Math.PI; g += `<polygon points="${cx},${cy} ${n(cx + 1100 * Math.cos(a0))},${n(cy + 1100 * Math.sin(a0))} ${n(cx + 1100 * Math.cos(a1))},${n(cy + 1100 * Math.sin(a1))}" fill="${c}" opacity="${op}"/>`; } return g; }
   function vhs() { let g = `<rect width="${W}" height="${H}" fill="#9fd4ff" opacity=".28"/>`; [180, 260, 410, 520, 590].forEach((y, i) => { g += `<rect x="0" y="${y}" width="${W}" height="${4 + i % 3 * 3}" fill="#ffffff" opacity=".55"/>`; }); return g; }
-  function stampMark(x, y, text, rot, c) { c = c || '#e5533f'; const w = Th.textW(text, 28) + 30; return G(`<g transform="rotate(${rot || -10} ${x} ${y})"><rect x="${n(x - w / 2)}" y="${y - 24}" width="${n(w)}" height="48" rx="9" fill="#fffdf5" fill-opacity=".85" stroke="${c}" stroke-width="5"/><rect x="${n(x - w / 2 + 5)}" y="${y - 19}" width="${n(w - 10)}" height="38" rx="6" fill="none" stroke="${c}" stroke-width="2"/>${T(x, y + 10, text, 28, { f: c })}</g>`); }
+  function stampMark(x, y, text, rot, c) { c = c || '#e5533f'; const w = Th.textW(text, 26) * 1.2 + 34; return G(`<g transform="rotate(${rot || -10} ${x} ${y})"><rect x="${n(x - w / 2)}" y="${y - 24}" width="${n(w)}" height="48" rx="9" fill="#fffdf5" fill-opacity=".85" stroke="${c}" stroke-width="5"/><rect x="${n(x - w / 2 + 5)}" y="${y - 19}" width="${n(w - 10)}" height="38" rx="6" fill="none" stroke="${c}" stroke-width="2"/>${T(x, y + 9, text, 26, { f: c })}</g>`); }
   function rubber(x, y, label) { return G(`<circle cx="${x}" cy="${y - 46}" r="13" fill="#e5533f" stroke="${INK}" stroke-width="3"/><rect x="${x - 7}" y="${y - 36}" width="14" height="26" fill="#8a5a2b" stroke="${INK}" stroke-width="2.5"/><rect x="${x - 34}" y="${y - 12}" width="68" height="26" rx="5" fill="#6d5aa8" stroke="${INK}" stroke-width="3"/>` + T(x, y + 7, label || 'OK', 15, { f: '#fff' })); }
   function nameTag(x, y, key, val, c, rot) {
     const w = 168, h = 68;
@@ -271,7 +287,7 @@
     ${T(255, 846, 'CAPTION + BUTTONS (195)', 20, { font: MONO, w: 500, f: '#153b8c' })}
     ${T(255, 876, 'key text stays above y 765', 16, { font: MONO, w: 500, f: '#153b8c' })}
     ${T(516, 330, 'ICONS (60)', 16, { font: MONO, w: 500, f: '#8a1f5a', r: 90 })}
-    ${T(255, 136, 'safe: x 30–480 · y 110–765', 15, { font: MONO, w: 500, f: '#153b8c' })}
+    ${T(255, 756, 'safe: x 30–480 · y 110–765', 15, { font: MONO, w: 500, f: '#153b8c' })}
   </g>`;
 
   /* ---------- beats ---------- */
@@ -294,7 +310,7 @@
    */
   const SHOTS = [
     { id: 'R01', beat: 0, dur: 1,
-      en: 'It said FREE.', ko: '무료라며?',
+      en: 'It said *FREE*.', ko: '*공짜*라며?',
       cam: 'Snap zoom, low angle', k: 'push',
       action: 'Payoff first. A red "paste API key" card slams into the closed gate barrier and bounces. A RISK 72 burst pops above it. Verify flinches behind its magnifier.',
       onscreen: 'Hook: IT SAID "FREE". Burst: RISK 72 (placeholder). Card badge: HARD FLAG. BONK!',
@@ -315,7 +331,7 @@
         return g;
       } },
     { id: 'R02', beat: 0, dur: 1,
-      en: 'Risk: seventy-two.', ko: '위험도 72? 실화냐',
+      en: 'Risk score: *72*.', ko: '위험도 *72점* 나왔햄',
       cam: 'Whip-pan to the meter', k: 'push',
       action: 'The RISK meter redlines past the dashed 70 line. Verify has stomped the pump handle flat. Dr. Harness, the hip hamster in sunglasses, jumps back with a "!".',
       onscreen: 'Hook: RISK 72! Meter bulb: 72 (placeholder). Threshold line: 70.',
@@ -334,7 +350,7 @@
         return g;
       } },
     { id: 'R03', beat: 0, dur: 1,
-      en: "Let's rewind.", ko: '처음부터 까볼게요',
+      en: "Let's rewind.", ko: '처음부터 까봄',
       cam: 'Rewind, crash zoom out', k: 'pull',
       action: 'Dr. Harness clicks a remote with a smirk. The frame rewinds: tracking bands roll, cards fly backwards off the board, and the Hype Box moonwalks out of frame.',
       onscreen: 'Hook: REWIND. Big ◀◀ glyph. Corner: ◀◀ −0:27.',
@@ -356,7 +372,7 @@
         return g;
       } },
     { id: 'R04', beat: 1, dur: 2.5,
-      en: 'Viral post: free, 5 min, 1 prompt.', ko: '공짜에 5분, 프롬프트 한 줄이래요',
+      en: 'Viral post: *free*, 5 min, 1 prompt.', ko: '이 AI 꿀팁, *공짜*에 5분이래',
       cam: 'Push in on the phone', k: 'push',
       action: 'The viral post on a phone: "Build an AI agent. FREE. 5 MIN. 1 PROMPT." The star-eyed Hype Box points at it and chatters. Stickers slap on: FREE!, 1 PROMPT.',
       onscreen: 'Post: FREE · 5 MIN · 1 PROMPT. Likes 48.2K (illustrative). Stickers: FREE!, 1 PROMPT.',
@@ -377,7 +393,7 @@
         return g;
       } },
     { id: 'R05', beat: 1, dur: 3,
-      en: 'Paste it in. The agents split it.', ko: '붙이면 에이전트들이 나눠 가요',
+      en: 'Paste it in. The agents split it.', ko: '붙여넣으면 에이전트들이 나눠 감',
       cam: 'Spotlight, slow orbit', k: 'static',
       action: 'The post lands in the Decomposed column with a PASTE! burst. Center stage, the crowned Orchestrator waves its baton and three work cards fly out to Decompose, Gap-fill and Verify, who catch them overhead at the same time.',
       onscreen: 'Board card: viral post. Burst: PASTE! Carried cards: cut · fill · check. Burst: x3 at once. Label: POST /api/ingest.',
@@ -387,7 +403,7 @@
       st: { floorY: 640, spots: [270] },
       draw() {
         let g = kb(85, 128, 370, 210, [[{ t: 'viral post', k: 'amber' }], [], [], []], { hl: 0 });
-        g += Th.burst(150, 196, 40, 'PASTE!', { fill: '#ffd23f', z: 16, r: -10 });
+        g += Th.burst(196, 236, 40, 'PASTE!', { fill: '#ffd23f', z: 16, r: -10 });
         g += T(270, 364, 'POST /api/ingest', 17, { font: MONO, w: 500, f: '#6b3f22' });
         g += G(`<rect x="200" y="470" width="140" height="18" rx="4" fill="#c98543" stroke="${INK}" stroke-width="3"/>`);
         g += Th.agent('orchestrator', 270, 470, 96, { mood: 'star' });
@@ -399,7 +415,7 @@
         return g;
       } },
     { id: 'R06', beat: 2, dur: 2.5,
-      en: 'Cut into cards. Fill skipped steps.', ko: '카드로 쪼개고, 빠진 단계 채우고',
+      en: 'Cut into cards. Fill skipped steps.', ko: '카드로 쪼개고 빠진 단계 채움',
       cam: 'Crane down the card stack', k: 'pan',
       action: 'Decompose snips the post strip into numbered cards. Gap-fill pencils in two gray, dashed cards for the steps the author skipped: install Node, create the .env file.',
       onscreen: 'Strip: clone → add key → deploy! Cards: 1 Clone the repo, + Install Node 20, 2 Add API key, + Create .env file, 3 Deploy it. Sign: +2 skipped steps.',
@@ -441,7 +457,7 @@
         return g;
       } },
     { id: 'R08', beat: 3, dur: 3,
-      en: 'Harness: reins guide. Bells catch.', ko: '하네스: 고삐로 끌고, 종으로 잡고',
+      en: 'Harness: reins guide. Bells catch.', ko: '하네스: 고삐로 끌고 종으로 잡음',
       cam: 'Split stage, slow pan', k: 'pan',
       action: 'Left, GUIDES: a mission scroll feeds reins down to Dr. Harness jogging in a hamster wheel. Right, SENSORS: the bell fence DINGs and an LLM judge (Verify) watches from a podium.',
       onscreen: 'Hook: HARNESS. Signs: GUIDES (feedforward) / SENSORS (feedback). Scroll: mission, one card at a time, tools_allowed. Podium: LLM judge. DING!',
@@ -464,7 +480,7 @@
         return g;
       } },
     { id: 'R09', beat: 4, dur: 3,
-      en: 'Over 70? Nope. A human signs off.', ko: '70 넘으면? 사람이 봐야 돼요',
+      en: 'Over *70*? Nope. A human signs off.', ko: '*70점* 넘으면 사람이 승인',
       cam: '3D board flip, then wide', k: 'static',
       action: 'The red box walks up carrying its card and bonks it on the gate barrier. Dr. Harness leans in and shoots finger-guns at the gate: pew pew. The HUMAN ONLY stamp lands on the frame.',
       onscreen: 'Hanging sign: GATE / REVIEW · risk ≥ 70 waits. Stamp: HUMAN ONLY. Text: pew pew.',
@@ -474,7 +490,7 @@
       st: { floorY: 640 },
       draw() {
         let g = Th.sign(270, 148, 260, ['GATE / REVIEW', 'risk ≥ 70 waits'], { z: 28, z2: 20, f2: '#c9362f', fill: '#ffe1dc', hang: true });
-        g += stampMark(190, 330, 'HUMAN ONLY', -12);
+        g += stampMark(232, 330, 'HUMAN ONLY', -12);
         g += Th.box(290, FY, 88, Object.assign({}, Th.PAL.red, { mood: 'worried', carry: 'API key', carryKind: 'risk' }));
         g += Th.gate(112, FY, false, 256);
         g += Th.doc(420, FY, .95, { m: 'grin', la: [-58, -96], ra: [-20, -80] });
@@ -485,7 +501,7 @@
         return g;
       } },
     { id: 'R10', beat: 5, dur: 3,
-      en: 'Safe cards run in a sandbox. Timed.', ko: '안전한 건 샌드박스에서 돌려요',
+      en: 'Safe cards run in a sandbox. Timed.', ko: '안전한 건 샌드박스에서 돌렸햄',
       cam: 'Track along the sandbox', k: 'pan',
       action: 'Inside a glass-lidded sand tray (its own git worktree), the Exec runner sprints with a green card while a giant stopwatch ticks. Repair tightens a wobbly card. A sunflower seed marks the cost.',
       onscreen: 'Sign: SANDBOX · own git worktree. Labels: time, cost. Pill: safe ✓.',
@@ -508,7 +524,7 @@
         return g;
       } },
     { id: 'R11', beat: 5, dur: 3.5,
-      en: 'Claimed: free. Measured: 40 cents.', ko: '무료라며? 재보니 40센트던데요',
+      en: 'Claimed: *free*. Measured: *$0.40*.', ko: '말은 *0원*, 재보니 *$0.40*',
       cam: 'Push to the chalkboard', k: 'push',
       action: 'The reveal. Dr. Harness pushes the sunglasses up and points at the chalkboard: free → $0.40, 5 min → 12 min, 1 prompt → 8 cards. The Hype Box blushes.',
       onscreen: 'Hook: WE MEASURED. Board: CLAIMED / MEASURED. free → $0.40, 5 min → 12 min, 1 prompt → 8 cards (all placeholders).',
@@ -531,7 +547,7 @@
         return g;
       } },
     { id: 'R12', beat: 6, dur: 3.5,
-      en: 'Ship what works. Paste the next…', ko: '통과한 건 출고! 다음 글 가져와요',
+      en: 'Ship *SKILL.md*. Paste the next…', ko: '*SKILL.md*로 출고, 다음 글 ㄱㄱ',
       cam: 'Board flip, then the host at the lens', k: 'push',
       action: 'The chalkboard flips into the Verified column. Deploy ties a bow on the SKILL.md package. Dr. Harness drops the mic, walks up to the lens and taps the screen glass, leaving paw prints, as a new Hype Box rushes in with another FREE!! card. Cut straight back to R01.',
       onscreen: 'Hook: NEXT POST? Package: SKILL.md. Pills: JSON · CLI. Card: FREE!! Paw prints on the glass. Loop icon.',
@@ -550,7 +566,7 @@
         g += Th.doc(150, FY + 6, 1.1, { m: 'grin', ra: [34, -150], la: [-40, -58], hoodie: '#f062a8' });
         const hp = Th.hand(150, FY + 6, 1.1, [34, -150]);
         g += G(`<path d="M${n(hp[0] + 8)},${n(hp[1] - 8)} l18,-10 M${n(hp[0] + 12)},${n(hp[1] + 4)} l20,0" stroke="${INK}" stroke-width="3" stroke-linecap="round"/>`) + T(236, 452, 'tap tap', 24, { f: '#c2361f', r: -8 });
-        g += G(`<g transform="rotate(-28 92 640)"><rect x="84" y="604" width="14" height="44" rx="5" fill="#2c2e47" stroke="${INK}" stroke-width="2.5"/><circle cx="91" cy="598" r="13" fill="#9aa0ad" stroke="${INK}" stroke-width="2.5"/></g>`) + T(122, 588, 'thud', 20, { f: INK, r: -12 });
+        g += G(`<g transform="rotate(-28 92 640)"><rect x="84" y="604" width="14" height="44" rx="5" fill="#2c2e47" stroke="${INK}" stroke-width="2.5"/><circle cx="91" cy="598" r="13" fill="#9aa0ad" stroke="${INK}" stroke-width="2.5"/></g>`) + T(100, 552, 'thud', 20, { f: INK, r: -12 });
         g += Th.confetti(24, 33, [220, 400, 450, 520]);
         return g;
       } }
@@ -558,26 +574,26 @@
 
   /* hook alternatives (first second only) */
   const ALTS = [
-    { head: ['5 MINUTES?', 'TRY 12.'], en: 'Five minutes? It took twelve.', ko: '5분이라며? 12분 걸림 ㅋㅋ', note: 'Time contradiction. Opens on the stopwatch. 12 min is a placeholder.',
+    { head: ['FREE?', 'WE TIMED IT.'], en: '*Free*? We put a clock on it.', ko: '*공짜*라며? 재보니까…', note: 'Contradiction hook. Opens on the giant stopwatch mid-sweep, then cuts to the R02 meter.',
       draw: () => scaleAt(Th.stopwatch(270, 470), 270, 470, 3) + Th.doc(420, FY, .9, { m: 'o', bang: true }) },
-    { head: ['"ONE PROMPT"', '= 8 CARDS'], en: 'One prompt? It was eight cards.', ko: '한 줄이라며? 카드가 8장인데요', note: 'Scope contradiction. Opens on the card stack spilling out of a cheek pouch. 8 is a placeholder.',
+    { head: ['REALLY', 'FREE?'], en: 'Is this AI hack really *free*?', ko: '이 AI 꿀팁, 진짜 *공짜*야?', note: 'Question hook. Opens on the 8-card stack the one-prompt post turned into. 8 is a placeholder.',
       draw: () => [0, 1, 2, 3, 4, 5, 6, 7].map((i) => Th.card(150 + (i % 2) * 20, 330 + i * 30, 220, 30, 'step ' + (i + 1), { kind: i === 3 ? 'risk' : i % 3 === 1 ? 'gap' : 'orig', small: true })).join('') },
-    { head: ["DON'T RUN", 'THIS. YET.'], en: "Don't run this. Not yet.", ko: '이거 아직 돌리지 마요', note: 'Warning hook. Opens on the red box stuck at the gate with the HUMAN ONLY stamp.',
+    { head: ['THE "FREE"', 'WORKFLOW'], en: 'That *free* workflow? Measured.', ko: "그 '무료' 워크플로우, 재봤햄", note: 'Mascot hook. Uses the hamster sign-off ending up front. Opens on the red box stuck at the gate with the HUMAN ONLY stamp.',
       draw: () => Th.box(300, FY, 90, Object.assign({}, Th.PAL.red, { mood: 'worried', carry: 'rm -rf', carryKind: 'risk' })) + Th.gate(118, FY, false, 256) + stampMark(260, 420, 'HUMAN ONLY', -10) }
   ];
 
   /* ---------- render ---------- */
   const withSZ = (svg) => svg.replace(/<\/svg>$/, SZ + '</svg>');
-  const frames = SHOTS.map((s) => withSZ(Th.scene({ w: W, h: H, st: s.st, draw: s.draw, en: s.en, ko: s.ko, subY: SUBY, hook: s.hook ? s.hook() : '', label: s.id + '. ' + s.action })));
+  const frames = SHOTS.map((s) => withSZ(Th.scene({ w: W, h: H, st: s.st, draw: s.draw, en: s.en, ko: s.ko, subY: SUBY, hook: s.hook ? s.hook() : '', label: s.id + '. ' + plain(s.en) + ' ' + s.action })));
   let t = 0; SHOTS.forEach((s) => { s.t0 = t; t += s.dur; });
   const total = t;
   if (Math.abs(total - 30) > 1e-6) console.warn('Reel runtime is ' + total + ' s, expected 30 s.');
   document.getElementById('factShots').textContent = SHOTS.length;
 
   const colorOf = (s) => BEATS[s.beat].c;
-  const open = Player.mount({ shots: SHOTS, frames, aspect: [9, 16], colorOf });
+  const open = Player.mount({ shots: SHOTS.map((s) => Object.assign({}, s, { en: plain(s.en) })), frames, aspect: [9, 16], colorOf });
 
-  document.getElementById('tl').innerHTML = SHOTS.map((s, i) => `<button type="button" data-i="${i}" style="flex:${s.dur} 1 0;background:${colorOf(s)}" title="${s.id} · ${fmt(s.t0)} · ${esc(s.en)}" aria-label="Play from ${s.id}, ${fmt(s.t0)}"><span>${s.id.slice(1)}</span></button>`).join('');
+  document.getElementById('tl').innerHTML = SHOTS.map((s, i) => `<button type="button" data-i="${i}" style="flex:${s.dur} 1 0;background:${colorOf(s)}" title="${s.id} · ${fmt(s.t0)} · ${esc(plain(s.en))}" aria-label="Play from ${s.id}, ${fmt(s.t0)}"><span>${s.id.slice(1)}</span></button>`).join('');
   document.getElementById('tlLegend').innerHTML = BEATS.map((b, bi) => { const sh = SHOTS.filter((s) => s.beat === bi), a = sh[0].t0, z = sh[sh.length - 1].t0 + sh[sh.length - 1].dur; return `<span><i style="background:${b.c}"></i>${b.name} <span style="font-family:var(--mono)">${fmt(a)}–${fmt(z)}</span></span>`; }).join('');
 
   document.getElementById('shots').innerHTML = SHOTS.map((s, i) => `
@@ -586,7 +602,7 @@
       <div class="shot-meta"><span class="id">${s.id}</span><span>${fmt(s.t0)}–${fmt(s.t0 + s.dur)}</span><span class="dur">${s.dur}s</span><span>${esc(s.cam)}</span></div>
       <dl>
         <dt>Action</dt><dd>${esc(s.action)}</dd>
-        <dt>VO</dt><dd class="vo">${esc(s.en)}<small>${esc(s.ko)}</small></dd>
+        <dt>VO</dt><dd class="vo">${rich(s.en)}<small>${rich(s.ko)}</small></dd>
         <dt>On-screen text</dt><dd>${esc(s.onscreen)}</dd>
         <dt>Sound</dt><dd>${esc(s.sfx)}</dd>
         <dt>Animate</dt><dd>${esc(s.anim)}</dd>
@@ -594,7 +610,7 @@
       </dl>
     </article>`).join('');
 
-  document.getElementById('alts').innerHTML = ALTS.map((a) => `<figure class="alt" style="margin:0">${withSZ(Th.scene({ w: W, h: H, st: { floorY: 640 }, draw: a.draw, en: a.en, ko: a.ko, subY: SUBY, hook: hook(a.head, { y: 180, z: 58 }), label: 'Alternative hook: ' + a.head.join(' ') }))}<div><b>${esc(a.head.join(' '))}</b><span>${esc(a.en)}</span><small>${esc(a.ko)}</small><p>${esc(a.note)}</p></div></figure>`).join('');
+  document.getElementById('alts').innerHTML = ALTS.map((a) => `<figure class="alt" style="margin:0">${withSZ(Th.scene({ w: W, h: H, st: { floorY: 640 }, draw: a.draw, en: a.en, ko: a.ko, subY: SUBY, hook: hook(a.head, { y: 180, z: 58 }), label: 'Alternative hook: ' + a.head.join(' ') }))}<div><b>${esc(a.head.join(' '))}</b><span>${rich(a.en)}</span><small>${rich(a.ko)}</small><p>${esc(a.note)}</p></div></figure>`).join('');
 
   document.getElementById('shots').addEventListener('click', (e) => { const b = e.target.closest('.frame'); if (b) open(+b.dataset.i); });
   document.getElementById('tl').addEventListener('click', (e) => { const b = e.target.closest('button'); if (b) open(+b.dataset.i); });
