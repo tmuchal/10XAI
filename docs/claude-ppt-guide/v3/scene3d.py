@@ -304,7 +304,7 @@ def pose_uchu(U, f):
         pv.rotation_euler = Euler((math.radians(-20 - 30 * k), math.radians(-sd * (15 + 120 * k)), 0))
 
 # ---------------------------------------------------------------- lights
-def area(name, loc, target, color, power, size, spec=0.15):
+def area(name, loc, target, color, power, size, spec=0.0):
     ld = bpy.data.lights.new(name, "AREA"); ld.color = hexc(color)[:3]; ld.energy = power; ld.size = size; ld.specular_factor = spec
     o = bpy.data.objects.new(name, ld); sc.collection.objects.link(o); o.location = loc
     d = Vector(target) - Vector(loc); o.rotation_euler = d.to_track_quat("-Z", "Y").to_euler()
@@ -400,7 +400,7 @@ elif SHOT == "chart":
     glossy_floor(); neon_grid(60, 48)
     vals = [368, 385, 408, 410, 412, 447, 482]
     names = ["25.1Q", "25.2Q", "25.3Q", "25.4Q", "26.1Q", "26.2Q", "26.3Q"]
-    H = build_uchu((-1.7, -0.4, 0), s=0.62)
+    H = build_uchu((-3.3, 0.2, 0), s=0.62)
     H["root"].rotation_euler = (0, 0, math.radians(-22))
     rig_lights((1.5, 0, 1.5))
     bars = []
@@ -423,8 +423,8 @@ elif SHOT == "chart":
     T0 = 3.2
     def per_frame(f):
         t = f / FPS; lt = t - T0; p = smooth(lt / 6.3)
-        cam.location = (lerp(-4.2, 3.2, p), lerp(-13.2, -12.2, p), lerp(2.2, 3.8, p))
-        aim.location = (lerp(2.0, 4.4, p), 0, lerp(1.7, 2.2, p))
+        cam.location = (lerp(-4.6, 1.8, p), lerp(-15.8, -15.6, p), lerp(2.4, 3.9, p))
+        aim.location = (lerp(1.6, 3.4, p), 0, lerp(1.6, 1.9, p))
         for (b, x, h, i, cp) in bars:
             g = smooth((lt - 0.25 - i * 0.32) / 0.7)
             over = 1 + 0.06 * math.sin(math.pi * min(1, max(0, (lt - 0.25 - i * 0.32) / 0.9))) if g > 0 else 1
@@ -434,7 +434,7 @@ elif SHOT == "chart":
             project(cam, f"bar{i}", (x, 0, h * g + 0.35), f)
             project(cam, f"base{i}", (x, -0.6, 0), f)
         pose_uchu_narrator(H, f)
-        project(cam, "hammyHead", (-1.7, -0.4, 2.7), f)
+        project(cam, "hammyHead", (-3.3, 0.2, 2.7), f)
 
 elif SHOT == "road":
     glossy_floor(200); neon_grid(140, 90)

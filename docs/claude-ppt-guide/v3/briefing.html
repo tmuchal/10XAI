@@ -71,12 +71,10 @@
     <div style="font-size:78px;font-weight:800;line-height:1"><span data-count="5.2 1.4 482 0">0</span><span style="font-size:38px;font-weight:700"> 억 원</span></div>
     <div style="display:flex;flex-direction:column;gap:8px">
       <span class="pill" style="background:var(--lime);color:#0B0C10" data-a="6.3 .4 pop">▲ 18.1% YoY</span>
-      <span class="pill" style="background:rgba(124,92,255,.22);color:#CFC6FF;border:1px solid rgba(124,92,255,.5)" data-a="3.8 .4 pop">6분기 연속 성장</span>
+      <span class="pill" style="background:rgba(124,92,255,.22);color:#CFC6FF;border:1px solid rgba(124,92,255,.5)" data-a="3.8 .4 pop">6분기 연속 성장 · 25.1Q 대비 +31%</span>
     </div>
   </div>
-  <svg class="abs" style="left:0;top:0" width="1920" height="1080"><path id="trend" fill="none" stroke="#C6F432" stroke-width="4" stroke-dasharray="10 10" stroke-linecap="round" opacity=".9"/></svg>
   <div id="barLabels"></div>
-  <div class="lbl" id="trendTag" style="transform:translate(-100%,-160%)"><span class="pill" style="background:rgba(12,14,22,.75);border:1px solid var(--lime);color:var(--lime)">25.1Q 대비 +31%</span></div>
 </section>
 
 <!-- C · PRESENT (dashboard) -->
@@ -262,10 +260,6 @@ function seek(f) {
       if (a) { e.style.left = a[0]*1920 + 'px'; e.style.top = a[1]*1080 + 'px'; tops.push([a[0]*1920, a[1]*1080 + 30]); }
       if (b) { q.style.left = b[0]*1920 + 'px'; q.style.top = b[1]*1080 + 'px'; }
       e.style.opacity = on ? eo((t - (3.2 + 0.25 + i*0.32 + 0.45)) / 0.3) : 0; q.style.opacity = e.style.opacity; });
-    const tr = document.getElementById('trend'), tt = document.getElementById('trendTag');
-    if (tops.length === 7) { tr.setAttribute('d', tops.map((p, i) => (i ? 'L' : 'M') + p[0] + ' ' + (p[1] - 70)).join(' '));
-      const L = tr.getTotalLength(); const p = eo((t - 6.6) / 1.2); tr.style.strokeDasharray = `${L*p} ${L}`; tr.style.opacity = p > 0 ? .9 : 0;
-      tt.style.left = tops[6][0] + 'px'; tt.style.top = (tops[6][1] - 70) + 'px'; tt.style.opacity = eo((t - 7.6) / 0.4); }
   }
   if (id === 'C') {
     document.getElementById('wrect').setAttribute('width', 640 * eio((t - 10.2) / 1.6));
