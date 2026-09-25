@@ -74,7 +74,7 @@
   #btn-end { font-family: var(--f-display); font-weight: 400; font-size: 16px; letter-spacing: .02em; padding: 7px 18px; }
 
   /* ---------- main ---------- */
-  #main { display: grid; grid-template-columns: minmax(0, 1fr) 380px; min-height: 0; }
+  #main { display: grid; grid-template-columns: minmax(0, 1fr) 400px; min-height: 0; }
   #mapwrap { position: relative; min-width: 0; min-height: 0; overflow: hidden; touch-action: none; }
   #map { position: absolute; inset: 0; width: 100%; height: 100%; display: block; cursor: crosshair; }
   #hud { position: absolute; left: 12px; bottom: 12px; display: flex; gap: 6px; flex-wrap: wrap; align-items: center; }
@@ -177,6 +177,31 @@
   .help { display: grid; gap: 10px; font-size: 13.5px; color: var(--ink-2); max-width: 70ch; }
   .help b { color: var(--ink); }
 
+
+  /* ---------- v2: politics, arms, world ---------- */
+  #modebar.nuke { background: #C6F04A; color: #1B2403; }
+  .eyebrow.nuke { color: #FF8A5B !important; }
+  .spec { margin: 0; font: 12px/1.5 var(--f-mono); color: var(--ink-2); background: var(--panel-2); border-left: 2px solid var(--line); padding: 6px 8px; border-radius: 0 4px 4px 0; }
+  .fac { display: grid; gap: 3px; }
+  .decrees, .designs { display: grid; gap: 6px; }
+  .decree, .missile, .design, .op { display: grid; gap: 4px; padding: 8px 10px; border-radius: 6px; background: var(--panel-2); }
+  .decree.off, .design.off { opacity: .62; }
+  .decree .row b, .missile .row b { font-size: 13px; }
+  .mspec { font: 11.5px var(--f-mono); color: var(--accent); }
+  .doom { display: flex; align-items: baseline; gap: 8px; }
+  .doom .num { font: 700 34px var(--f-mono); color: var(--danger); }
+  .nat-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(92px, 1fr)); gap: 6px; }
+  .natpick { display: flex; align-items: center; gap: 6px; background: var(--panel-2); border: 1px solid var(--line); border-radius: 6px; padding: 6px 8px; cursor: pointer; font-size: 13px; text-align: left; }
+  .natpick[aria-pressed="true"] { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent) inset; }
+  .nat-detail { background: var(--panel-2); border-radius: 8px; padding: 10px 12px; display: grid; gap: 6px; }
+  .nat-detail b { font: 18px var(--f-display); }
+  .nat-detail p { font-size: 13px; }
+  .traits { display: flex; flex-wrap: wrap; gap: 6px; }
+  .trait { font-size: 11.5px; border: 1px solid var(--accent); color: var(--accent); border-radius: 10px; padding: 1px 8px; }
+  input[type=text], input[type=search], select { background: var(--panel-2); border: 1px solid var(--line); border-radius: 6px; padding: 5px 8px; min-width: 0; }
+  #dip-search { width: 100%; }
+  label { display: inline-flex; gap: 8px; align-items: center; }
+  .log .lg-nuke { border-left-color: #C6F04A; font-weight: 700; } .log .lg-decree { border-left-color: var(--ally); } .log .lg-intel { border-left-color: #B08CF0; } .log .lg-move { opacity: .75; }
   @media (max-width: 860px) {
     #main { grid-template-columns: minmax(0, 1fr); grid-template-rows: minmax(0, 1fr) 42%; }
     #panel { border-left: 0; border-top: 1px solid var(--line); }
@@ -210,13 +235,16 @@
         <button class="btn sm" type="button" data-act="zoom-in" aria-label="확대">＋</button>
         <button class="btn sm" type="button" data-act="zoom-out" aria-label="축소">－</button>
         <button class="btn sm" type="button" data-act="home" title="수도로 이동">수도</button>
-        <span class="scale">1칸 ≈ 54 km</span>
+        <button class="btn sm" type="button" data-act="world">세계</button>
+        <span class="scale">1칸 = 경도 1° (≈89 km @37°N)</span>
       </div>
     </section>
     <aside id="panel">
       <nav id="tabs" role="tablist">
         <button class="tab" role="tab" data-tab="sel" type="button">상황</button>
-        <button class="tab" role="tab" data-tab="nation" type="button">국가</button>
+        <button class="tab" role="tab" data-tab="power" type="button">권력</button>
+        <button class="tab" role="tab" data-tab="nation" type="button">경제</button>
+        <button class="tab" role="tab" data-tab="arms" type="button">병기</button>
         <button class="tab" role="tab" data-tab="tech" type="button">연구</button>
         <button class="tab" role="tab" data-tab="diplo" type="button">외교</button>
         <button class="tab" role="tab" data-tab="war" type="button">전황</button>
@@ -227,7 +255,10 @@
 </div>
 <div id="modal" hidden><div class="card" id="modal-card" role="dialog" aria-modal="true"></div></div>
 
-<script src="js/data.js"></script>
+<script src="js/world.js"></script>
+<script src="js/nations.js"></script>
+<script src="js/weapons.js"></script>
+<script src="js/politics.js"></script>
 <script src="js/engine.js"></script>
 <script src="js/ai.js"></script>
 <script src="js/ui.js"></script>
