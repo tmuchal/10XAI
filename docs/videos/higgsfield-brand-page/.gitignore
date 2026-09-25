@@ -7,3 +7,9 @@ __pycache__/
 # theater-final-preview.mp4 is the one tracked preview
 *.mp4
 !theater-final-preview.mp4
+# stand-in test outputs until the real site is captured
+film/ref/page*.png
+film/ref/layout.js
+film/ref/layout.json
+film/ref/roles.json
+film/ref/compare.png
