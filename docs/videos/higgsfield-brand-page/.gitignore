@@ -1,6 +1,9 @@
+# build outputs (rebuild: see README.md)
 audio/*.wav
 audio/lines/
+audio/mix.m4a
 __pycache__/
-theater-v2.mp4
-theater-v3.mp4
-theater-final.mp4
+# renders: full-length and preview MP4s stay local (publish as release assets);
+# theater-final-preview.mp4 is the one tracked preview
+*.mp4
+!theater-final-preview.mp4

@@ -1,5 +1,7 @@
 # 대본 — 사람을 붙잡는 브랜드 페이지 (Claude × Higgsfield)
 
+> **Archived script.** Written for the retired v2 immersive render (`immersive-film.html` / `render.cjs`, removed). The chapter content lives on in `film/`; timing now comes from `film/timeline.js` (see `README.md`).
+
 **길이** 약 3분 12초 · **형식** 1920×1080 모션 그래픽 · **가이드 캐릭터** 노아(Noa): 베레모·골드 스카프, 전편 동일 디자인
 **레퍼런스** 제가 만든 페이지 `noainostory.higgsfield.app`이 4번 등장 (01·02·06장 + 오프닝)
 
@@ -67,13 +69,13 @@
 ---
 
 ## 레퍼런스 교체 방법
-화면 속 레퍼런스 페이지는 `ref/page.png`(제 홈페이지 **전체 페이지 스크린샷**, 폭 1440px 권장)를 불러옵니다. 파일이 없으면 예시 목업이 대신 나옵니다. 스크린샷을 넣고 다시 렌더링하세요:
+화면 속 레퍼런스 페이지는 `film/ref/page.png`(제 홈페이지 **전체 페이지 스크린샷**, 폭 1440px 권장)를 불러옵니다. 파일이 없으면 예시 목업이 대신 나옵니다. 스크린샷을 넣고 다시 렌더링하세요 (`film/ref/README.md` 참고):
 
 ```bash
-node render.cjs 30 immersive.mp4 immersive-film.html
+source tools/env.sh && node tools/render-parallel.cjs film/index.html theater-final.mp4 30 4 audio/final.wav
 ```
 
-`immersive-film.html` 상단의 `REF_MARKS`로 `훅/증거/행동` 라벨 위치(페이지 높이 대비 비율)를 조정합니다.
+`film/core.js` 상단의 `REF_MARKS`로 `훅/증거/행동` 라벨 위치(페이지 높이 대비 비율)를 조정합니다.
 
 ## 출처
 - Lindgaard, G. et al. (2006). *Attention web designers: You have 50 milliseconds to make a good first impression!* Behaviour & IT 25(2). https://www.tandfonline.com/doi/abs/10.1080/01449290500330448

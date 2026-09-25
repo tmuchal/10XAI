@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
 """Build the narration, captions and music mix for the Higgsfield brand-page film.
 
-Reads tools/narration.json and writes:
-  audio/narration.wav   voice only, 48 kHz mono, exactly <duration> s
+Reads tools/narration.json (cues anchored as {"ch", "at"}) and film/timeline.js (film length, chapter
+boundaries, curtain timing) and writes:
+  audio/narration.wav   voice only, 48 kHz mono, exactly the timeline's total length
   audio/music.wav       synthesized music bed, 48 kHz stereo
   audio/mix.wav         voice + ducked music, 48 kHz stereo, exactly <duration> s
   film/captions.js      window.CAPTIONS = [{ start, end, en, ko }]
@@ -12,9 +13,9 @@ The model comes from the npm package `kokoro-q8-shards`, the voice styles from t
 npm package `kokoro-js` (voices/*.bin). `--setup` fetches both with `npm pack`.
 
 Usage (see tools/README.md):
-  python3 -m venv /tmp/kokoro-venv && /tmp/kokoro-venv/bin/pip install kokoro-onnx soundfile numpy scipy
-  /tmp/kokoro-venv/bin/python tools/build-narration.py --setup     # once
-  /tmp/kokoro-venv/bin/python tools/build-narration.py             # build everything
+  python3 -m venv /tmp/tts/venv && /tmp/tts/venv/bin/pip install kokoro-onnx soundfile numpy scipy
+  /tmp/tts/venv/bin/python tools/build-narration.py --setup     # once
+  /tmp/tts/venv/bin/python tools/build-narration.py             # build everything
 Options: --check (timing report only), --music-db, --duck-db. Lines are cached in $KOKORO_CACHE/lines.
 """
 import argparse, hashlib, json, os, subprocess, sys, tarfile, glob, re
@@ -24,6 +25,8 @@ import soundfile as sf
 from scipy import signal
 
 HERE = os.path.dirname(os.path.abspath(__file__))
+sys.path.insert(0, HERE)
+import timeline
 ROOT = os.path.dirname(HERE)
 CACHE = os.environ.get("KOKORO_CACHE", "/tmp/kokoro-cache")
 MODEL = os.path.join(CACHE, "kokoro-q8.onnx")
@@ -33,6 +36,7 @@ SR = 48000
 GAP = 0.30          # min silence between two lines
 TAIL = 0.30         # caption stays this long after speech ends
 MAX_DRIFT = 1.2     # warn if a line starts later than this after its beat anchor
+EPS = 0.005         # curtain-guard tolerance (s)
 
 
 # ----------------------------------------------------------------------------- setup
@@ -86,19 +90,31 @@ def tts(text, voice, speed):
     return x
 
 
+def curtain_limits(cfg):
+    """(boundary, film time the curtain starts closing) for every chapter change and the film end.
+    Same constants as boot.js curtainC(): close starts at B - closeLead, the final one at total - endClose."""
+    cur = cfg["curtain"]
+    return ([(B, B - cur["closeLead"]) for B in cfg["boundaries"]]
+            + [(cfg["duration"], cfg["duration"] - cur["endClose"])])
+
+
 def layout(cfg, lines):
-    """Place lines on the timeline; returns list of (start, dur) and a list of problems."""
-    B = cfg["boundaries"] + [cfg["duration"] + cfg["curtain"][0] - 0.1]
-    close = cfg["curtain"][0]
+    """Place lines on the timeline; returns list of (start, dur) and a list of problems.
+    OVER (fatal): the speech itself runs into a curtain that is already closing (or past the film end).
+    TAIL (warning): only the 0.3 s caption tail overlaps the closing curtain; the caption fades with it.
+    """
+    B = curtain_limits(cfg)
     placed, problems, prev_end = [], [], 0.0
     for cue, x in zip(cfg["cues"], lines):
         dur = len(x) / SR
         start = max(cue["at"], prev_end + GAP)
-        limit = next(b for b in B if b > cue["at"]) - close  # curtain starts closing
+        limit = next(lim for b, lim in B if b > cue["at"])  # the next curtain starts closing here
         if start - cue["at"] > MAX_DRIFT:
             problems.append(f"drift {start - cue['at']:.2f}s  @{cue['at']}: {cue['en']}")
-        if start + dur + TAIL > limit:
-            problems.append(f"OVER curtain by {start + dur + TAIL - limit:.2f}s  @{cue['at']}: {cue['en']}")
+        if start + dur > limit + EPS:
+            problems.append(f"OVER curtain by {start + dur - limit:.2f}s  @{cue['at']}: {cue['en']}")
+        elif start + dur + TAIL > limit + EPS:
+            problems.append(f"TAIL caption tail into the closing curtain by {start + dur + TAIL - limit:.2f}s  @{cue['at']}: {cue['en']}")
         placed.append((start, dur))
         prev_end = start + dur
     return placed, problems
@@ -246,6 +262,10 @@ def main():
         return setup()
 
     cfg = json.load(open(os.path.join(HERE, "narration.json"), encoding="utf-8"))
+    # timing comes from film/timeline.js; cues {"ch", "at"} resolve to film seconds (in memory only)
+    T = timeline.load()
+    cfg["duration"] = float(T["total"]); cfg["boundaries"] = list(T["bounds"]); cfg["curtain"] = T["curtain"]
+    cfg["cues"] = [dict(c, at=timeline.resolve(T, c)) for c in cfg["cues"]]
     D = cfg["duration"]; n = int(round(D * SR))
     lines = []
     for i, c in enumerate(cfg["cues"]):
@@ -274,7 +294,7 @@ def main():
 
     mus = music(cfg)
     # music level relative to speech, then ducking under the voice
-    mus *= 10 ** ((-19 + args.music_db - rms_db(mus[:, int(10 * SR):int(180 * SR)].mean(0))) / 20)
+    mus *= 10 ** ((-19 + args.music_db - rms_db(mus[:, int(cfg["boundaries"][0] * SR):int((D - 12) * SR)].mean(0))) / 20)
     fr = int(0.02 * SR)
     lvl = np.sqrt(np.convolve(voice ** 2, np.ones(fr) / fr, "same"))
     gate = (lvl > 10 ** (-45 / 20)).astype(np.float32)

@@ -1,16 +1,19 @@
 # Blender 3D shots
 
-Four short toon-shaded Blender inserts for the 192 s explainer, rendered headless with the
+Four short toon-shaded Blender inserts for the brand-page film, rendered headless with the
 `bpy` wheel from PyPI. There's no GPU and no display: the shots use Cycles on the CPU.
 
-| Shot | Script | Film time | Frames | Output |
-|---|---|---|---|---|
-| A fly-through | `shot_a_flythrough.py` | 0.0–2.4 s | 72 | 1920×1080 JPG, opaque |
-| B photo booth | `shot_b_photobooth.py` | 86.5–89.5 s | 90 | 1080×1080 PNG, RGBA |
-| C coin funnel | `shot_c_coinfunnel.py` | 163–166 s | 90 | 1080×1080 PNG, RGBA |
-| D curtain call | `shot_d_curtaincall.py` | 187–190 s | 90 | 1920×1080 PNG, RGBA |
+| Shot | Script | Anchor (`film/timeline.js`) | Film time today | Frames | Output |
+|---|---|---|---|---|---|
+| A fly-through | `shot_a_flythrough.py` | `ch00` + 0 | 0.0–2.4 s | 72 | 1920×1080 JPG, opaque |
+| B photo booth | `shot_b_photobooth.py` | `ch03` + 14.5 | 86.5–89.5 s | 90 | 1080×1080 PNG, RGBA |
+| C coin funnel | `shot_c_coinfunnel.py` | `ch06` + 3.0 | 163–166 s | 90 | 1080×1080 PNG, RGBA |
+| D curtain call | `shot_d_curtaincall.py` | `ch07` + 3.0 | 187–190 s | 90 | 1920×1080 PNG, RGBA |
 
-Output goes to `film/assets/3d/<shot>/0001.*`, and the manifest to `film/assets/3d/manifest.json`.
+Output goes to `film/assets/3d/<shot>/0001.*`, and the manifest to `film/assets/3d/manifest.js` (loaded by
+`film/boot.js`) plus `manifest.json` (same data). The manifest has no start times: each shot starts at its
+`{ch, at}` anchor in `film/timeline.js` ("shots3d"), so re-timing or inserting a chapter moves the shot with
+its chapter without re-running Blender.
 `film/seq.js` plays the sequences inside the HTML timeline.
 
 ## Setup (once)
@@ -29,13 +32,14 @@ tools/blender/render_all.sh            # all shots (a b c d), then finalize.py
 tools/blender/render_all.sh b          # only the photo booth (then re-run finalize)
 # a subset of frames for look-dev (0-based frame numbers, written to a scratch dir):
 /tmp/bpyenv/bin/python tools/blender/shot_c_coinfunnel.py -- --frames 0,30,60,89 --out /tmp/look
-/tmp/bpyenv/bin/python tools/blender/finalize.py      # PNG masters -> film/assets/3d + manifest.json
+/tmp/bpyenv/bin/python tools/blender/finalize.py      # PNG masters -> film/assets/3d + manifest.js/.json
+/tmp/bpyenv/bin/python tools/blender/finalize.py --manifest-only   # only rewrite the manifests (no re-encode)
 ```
 
 The shot scripts write PNG masters to `/tmp/blender-shots/<shot>/`. `finalize.py` then:
 - converts the fly-through to JPG at quality 90
 - turns the RGBA shots into 256-colour palette PNGs, which are about 10× smaller and look the same
-- writes `manifest.json`
+- writes `manifest.js` and `manifest.json`
 
 ## How the look works (`toonlib.py`)
 

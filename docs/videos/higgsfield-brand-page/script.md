@@ -1,5 +1,7 @@
 # 대본 — Claude × Higgsfield로 만든 브랜드 비즈니스 페이지
 
+> **Archived script.** This describes the retired v1 explainer render (`explainer.html` / `render.cjs`, removed). The current film is `film/` (see `README.md`).
+
 **길이** 약 66초 · **형식** 1920×1080 모션 그래픽 · **예시 주소** `noainostory.higgsfield.app`
 
 > 한 줄 요약: **Claude가 브랜드와 대본을 쓰고 → Higgsfield가 영상·이미지를 만들고 → 한 페이지로 조립하면 → Higgsfield가 바로 호스팅한다.** 서버·도메인·배포 설정이 따로 필요 없다.

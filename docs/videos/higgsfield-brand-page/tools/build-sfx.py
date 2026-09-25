@@ -1,18 +1,21 @@
 #!/usr/bin/env python3
 """Build the sound-effects layer and the final mix for the Higgsfield brand-page film.
 
-Reads  tools/sfx-cues.json   [{t, type, gain?, pan?, ...}]  (times in film seconds)
+Reads  tools/sfx-cues.json   [{ch, at, type, gain?, pan?, ...}]  (at = seconds after chapter ch starts,
+                             resolved through film/timeline.js; a plain {t} in film seconds also works)
        audio/mix.wav         narration + ducked music (from tools/build-narration.py)
        audio/narration.wav   voice only (drives the SFX ducking)
        film/captions.js      spoken lines (to protect key spoken numbers)
 Writes audio/sfx.wav         the SFX bus alone, at the level it has in the final mix
-       audio/final.wav       mix.wav + SFX bus, loudness-normalized, 48 kHz stereo, exactly 192.0 s
+       audio/final.wav       mix.wav + SFX bus, loudness-normalized, 48 kHz stereo, exactly the film length
 
 Every sound is synthesized here (numpy/scipy, fixed seeds), so the build is offline and reproducible.
 Usage:  /tmp/tts/venv/bin/python tools/build-sfx.py [--sfx-lufs -22] [--target-lufs -16] [--tp -1] [--duck-db -6]
         [--report]  (only print the cue report, write nothing)
 
 Cue fields
+  ch, at chapter id + seconds after its film start (negative = curtain lead-in before it); the build
+         resolves them to t (film seconds) through film/timeline.js.
   t      start time (s). Impacts (pop, stamp, ding, ...) put their transient at t; sweeps start at t.
   type   see SYNTH below.  gain  dB (default 0).  pan  -1 (left) .. 1 (right).
   dur, pitch (semitones), n, step, rate, dir, kind, ...  per-type options (see each synth).
@@ -27,8 +30,11 @@ from scipy.ndimage import maximum_filter1d
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.dirname(HERE)
+sys.path.insert(0, HERE)
+import timeline
 SR = 48000
-DURATION = 192.0
+TL = timeline.load()
+DURATION = float(TL["total"])
 D5, A5, D6 = 587.33, 880.0, 1174.66     # D major, like the music bed (96 bpm, I-V-vi-IV)
 MAJ = [0, 2, 4, 5, 7, 9, 11, 12, 14, 16]  # scale steps from A (A B C# D E F# G# A ...) - used by pop_run
 
@@ -527,10 +533,11 @@ def main():
     args = ap.parse_args()
 
     cues = json.load(open(os.path.join(HERE, "sfx-cues.json"), encoding="utf-8"))
+    cues = [dict(c, t=timeline.resolve(TL, c, "t")) for c in cues]     # {ch, at} -> film seconds
     n = int(round(DURATION * SR))
     mix, sr = sf.read(os.path.join(ROOT, "audio", "mix.wav"), dtype="float64", always_2d=True)
     voice, sr2 = sf.read(os.path.join(ROOT, "audio", "narration.wav"), dtype="float64")
-    assert sr == sr2 == SR and len(mix) == n and len(voice) == n, "mix/narration must be 48 kHz, 192.0 s (run build-narration.py)"
+    assert sr == sr2 == SR and len(mix) == n and len(voice) == n, f"mix/narration must be 48 kHz, {DURATION} s (run build-narration.py)"
     mix = mix.T
     duck_sm, gate = speech_env(voice)
     duck = 1 - (1 - 10 ** (args.duck_db / 20)) * duck_sm

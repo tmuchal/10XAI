@@ -1,9 +1,10 @@
 // ============================================================================
 // Deterministic timeline. window.render(t) draws the frame at t seconds;
-// render.cjs steps it frame by frame. Opened normally, it autoplays.
+// tools/render-parallel.cjs steps it frame by frame. Opened normally, it autoplays.
+// Chapter order, durations, signs and 3D shot anchors live in timeline.js (loaded before this file).
 //
-// REFERENCE: drop a full-page screenshot of your site at ref/page.png
-// (1440px wide works best). Without it, an example mockup is shown.
+// REFERENCE: drop a full-page screenshot of your site at film/ref/page.png
+// (1440px wide works best). Without it, an example mockup is shown. window.READY waits for it.
 // REF_MARKS: where the hook / proof / action labels sit (0..1 of page height).
 //
 // ---------------------------------------------------------------- HELPER API
@@ -38,7 +39,7 @@
 const REF_URL = "noainostory.higgsfield.app";
 const REF_MARKS = [[0.02, "훅 · Hook"], [0.4, "증거 · Proof"], [0.86, "행동 · Action"]];
 
-const DURATION = 192, FADE = 0.6;
+const DURATION = TIMELINE.total, FADE = TIMELINE.fade;
 const $ = id => document.getElementById(id);
 const clamp = (v, a = 0, b = 1) => Math.min(b, Math.max(a, v));
 const seg = (t, a, b) => clamp((t - a) / (b - a));
@@ -376,8 +377,10 @@ function brandPage() {
   return p;
 }
 
-// A browser window showing the reference page: ref/page.png if present, else the mockup.
-const REFS = [];
+// A browser window showing the reference page: film/ref/page.png if present, else the mockup.
+// REF_READY (awaited by window.READY) settles once the image has loaded + decoded, or failed, so every
+// render worker decides mock vs real page before its first frame.
+const REFS = [], REF_READY = [];
 function refWindow(parent, x, y, w, h) {
   const win = el("div", `left:${x}px;top:${y}px;width:${w}px;height:${h}px`, "", parent); win.className = "win";
   win.innerHTML = `<div class="bar"><div class="dot" style="background:#ff6f61"></div><div class="dot" style="background:#ffc43d"></div><div class="dot" style="background:#4cc38a"></div><div class="addr mono">🔒&nbsp;${REF_URL}</div></div>`;
@@ -385,7 +388,11 @@ function refWindow(parent, x, y, w, h) {
   const k = w / 1440;
   const mock = brandPage(); mock.style.transform = `scale(${k})`; view.appendChild(mock);
   const img = el("img", `position:absolute;left:0;top:0;width:${w}px;display:none`, null, view);
-  img.onload = () => { img.style.display = "block"; mock.style.display = "none"; win.real = true; };
+  REF_READY.push(new Promise(res => {
+    img.onload = () => { const d = img.decode ? img.decode().catch(() => {}) : Promise.resolve();
+      d.then(() => { img.style.display = "block"; mock.style.display = "none"; win.real = true; res(); }); };
+    img.onerror = () => res();
+  }));
   img.src = "ref/page.png";
   const tag = el("div", "right:16px;top:58px", "REFERENCE · 제가 만든 페이지", win); tag.className = "reftag";
   win.view = view; win.k = k; win.mock = mock; win.img = img; win.viewH = h - 44;
@@ -399,15 +406,34 @@ function refWindow(parent, x, y, w, h) {
 }
 
 // ============================================================================ SCENES
+// scene(a, b, build): a chapter file registers its scene with its AUTHORED window [a, b] (the clock it is
+// written in, TIMELINE chapter.authoredAt). The chapter id comes from the script filename (chapters/<id>.js);
+// its film window is the timeline's [start, end], and everything the scene sees is on the authored clock:
+// s.update(t - s.shift), s.caps / s.cite times, uchuHook(fn(t)). So inserting or re-timing a chapter in
+// timeline.js moves later chapters without touching their time literals.
+//   s.a / s.b  film window     s.a0 / s.b0  authored window     s.shift = film - authored
 const SC = [];
+let SCENE_CH = null;   // timeline chapter whose scene is being built (chapter() reads its label)
 function scene(a, b, build) {
+  const src = (document.currentScript && document.currentScript.src) || "";
+  const m = src.match(/chapters\/([\w-]+)\.js(?:[?#].*)?$/), id = m ? m[1] : null;
+  const C = id && TIMELINE.byId[id];
+  if (id && !C) console.warn(`scene ${id}: not in timeline.js; using its authored window as film time`);
+  if (C && C.authoredAt !== a) console.warn(`scene ${id}: authored start ${a} != timeline authoredAt ${C.authoredAt}`);
+  if (C && Math.abs((b - a) - C.dur) > 1e-6) console.warn(`scene ${id}: authored ${b - a}s != timeline ${C.dur}s`);
+  const shift = C ? C.shift : 0;
   const root = el("div", "", "", $("scenes")); root.className = "scene";
-  const s = { a, b, root, caps: [], cite: [] };
-  s.update = build(root, s) || (() => {});
+  const s = { id, a: C ? C.start : a, b: C ? C.end : b, a0: a, b0: b, shift, root, caps: [], cite: [] };
+  SCENE_CH = C || null;
+  try { s.update = build(root, s) || (() => {}); } finally { SCENE_CH = null; }
   SC.push(s);
   return s;
 }
-function chapter(root, k, t) { const c = el("div", "", `<div class="k">${k}</div><div class="t">${t}</div>`, root); c.className = "chap"; return c; }
+// title card; the kicker k is replaced by the timeline label of the chapter being built (when it has one)
+function chapter(root, k, t) {
+  const kk = SCENE_CH && SCENE_CH.label ? SCENE_CH.label : k;
+  const c = el("div", "", `<div class="k">${kk}</div><div class="t">${t}</div>`, root); c.className = "chap"; return c;
+}
 
 // ---------------------------------------------------------------- Uchu (the excitable co-host)
 // Uchu is a little guy in a glossy RED one-piece hooded suit: round red ear-pods on the hood,

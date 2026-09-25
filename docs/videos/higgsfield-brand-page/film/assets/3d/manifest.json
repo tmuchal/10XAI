@@ -1,7 +1,6 @@
 [
   {
     "name": "flythrough",
-    "start": 0.0,
     "frames": 72,
     "fps": 30,
     "alpha": false,
@@ -17,7 +16,6 @@
   },
   {
     "name": "photobooth",
-    "start": 86.5,
     "frames": 90,
     "fps": 30,
     "alpha": true,
@@ -33,7 +31,6 @@
   },
   {
     "name": "coinfunnel",
-    "start": 163.0,
     "frames": 90,
     "fps": 30,
     "alpha": true,
@@ -49,7 +46,6 @@
   },
   {
     "name": "curtaincall",
-    "start": 187.0,
     "frames": 90,
     "fps": 30,
     "alpha": true,

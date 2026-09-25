@@ -1,3 +1,10 @@
+// ============================================================================ BOOT
+// Wrapped in one function scope so its helper names (J, NS, CX, render, ...) can never collide with a
+// chapter's top-level names (tools/check-globals.cjs lints the rest). Exports: window.render, window.READY,
+// window.DURATION. Stage FX run on FILM time and read the timeline (timeline.js); scenes get their own
+// authored clock (t - s.shift, see scene() in core.js).
+(() => {
+const TL = TIMELINE, CUR = TL.curtain;
 // ============================================================================ RENDER
 const capKo = document.querySelector("#cap .ko"), capEn = document.querySelector("#cap .en"), capBox = document.querySelector("#cap .box");
 let capKey = "";
@@ -9,7 +16,7 @@ function showCap(en, ko, a, z, t) {
   $("cap").style.opacity = o;
   capBox.style.transform = `translateY(${(18 * (1 - out(pIn)) + 10 * pOut).toFixed(1)}px) scale(${(0.86 + 0.14 * back(pIn)).toFixed(3)}) rotate(${(wobble(t, a, 1.2, 12, 5)).toFixed(2)}deg)`;
 }
-function render(t) {
+function renderScenes(t) {
   let cap = null, cite = "";
   SC.forEach(s => {
     const o = t < s.a || t > s.b ? 0 : s.a === 0 ? 1 - seg(t, s.b - FADE, s.b) : s.b === DURATION ? seg(t, s.a, s.a + FADE)
@@ -17,17 +24,18 @@ function render(t) {
     s.root.style.opacity = o; s.root.style.display = o > 0 ? "block" : "none";
     if (o > 0) {
       s.root.style.transform = `scale(${1 + 0.012 * (1 - o)})`;
-      s.update(t);
-      s.caps.forEach(c => { if (t >= c[0]) cap = [c, s]; });
-      s.cite.forEach(c => { if (t >= c[0]) cite = c[1]; });
+      const lt = t - s.shift;   // the scene's authored clock
+      s.update(lt);
+      s.caps.forEach(c => { if (lt >= c[0]) cap = [c, s]; });
+      s.cite.forEach(c => { if (lt >= c[0]) cite = c[1]; });
     }
   });
   if (window.CAPTIONS && window.CAPTIONS.length) {
     const c = window.CAPTIONS.find(c => t >= c.start && t < c.end);
     if (c) showCap(c.en, c.ko, c.start, c.end, t); else $("cap").style.opacity = 0;
   } else if (cap) {
-    const [c, s] = cap, next = s.caps[s.caps.indexOf(c) + 1], end = next ? next[0] : s.b;
-    showCap(c[2], c[1], c[0], end, t);
+    const [c, s] = cap, next = s.caps[s.caps.indexOf(c) + 1], end = next ? next[0] + s.shift : s.b;
+    showCap(c[2], c[1], c[0] + s.shift, end, t);
   } else $("cap").style.opacity = 0;
   const ct = cite ? "출처 · " + cite : "";
   if ($("cite").textContent !== ct) $("cite").textContent = ct;
@@ -37,9 +45,9 @@ function render(t) {
 // Everything here is a pure function of t. Cost notes: no full-frame SVG filters or blend modes
 // (they cost ~250 ms/frame); the hand-drawn "boil" comes from 3 pre-jittered variants of the
 // decor swapped at 8 fps, per-element CSS rotate/translate jitter, and jittered curtain geometry.
-const BOUNDS = [10, 40, 72, 106, 134, 160, 184];
-const SIGNS = [["누구를 위한 페이지?", "Who is it for?"], ["전체 흐름 잡기", "Shaping the flow"], ["캐릭터 일관성", "One consistent character"],
-  ["몰입감 만들기", "Building immersion"], ["전문성 × 유머", "Expertise × humor"], ["결국, 매출로", "Turning it into sales"], ["커튼콜", "Curtain call"]];
+const BOUNDS = TL.bounds;                                               // film s of every chapter change
+const SIGNS = TL.boundChapters.map(c => [c.label || "", ...(c.sign || ["", ""])]);   // [kicker, ko, en] per boundary
+const CHEER = TL.anchors.extrasCheer, CHEER_A = TL.at(CHEER.ch, CHEER.at), CHEER_Z = TL.at(CHEER.ch, CHEER.until);
 const J = (i, j, k, a) => (hash(i, j, k) - .5) * 2 * a;   // jitter
 
 // Static decor is rasterized ONCE into canvases (3 hand-drawn "boil" variants each, swapped at 8 fps).
@@ -102,8 +110,8 @@ let curtKey = "";
 const backOut = x => back(clamp(x));
 function curtainC(t) {   // 0 open .. 1 closed (overshoots both ways)
   let c = t < 1.3 ? 1 - backOut(seg(t, 0.15, 1.3)) : 0, bi = -1;
-  BOUNDS.forEach((B, i) => { const k = t < B ? backOut(seg(t, B - 0.75, B - 0.2)) : 1 - backOut(seg(t, B + 0.5, B + 1.25)); if (Math.abs(k) > Math.abs(c)) { c = k; bi = i; } });
-  const e = backOut(seg(t, DURATION - 1.3, DURATION - 0.4)); if (e > c) c = e;
+  BOUNDS.forEach((B, i) => { const k = t < B ? backOut(seg(t, B - CUR.closeLead, B - CUR.closedAt)) : 1 - backOut(seg(t, B + CUR.openAt, B + CUR.openLag)); if (Math.abs(k) > Math.abs(c)) { c = k; bi = i; } });
+  const e = backOut(seg(t, DURATION - CUR.endClose, DURATION - CUR.endClosed)); if (e > c) c = e;
   return { c, bi };
 }
 function innerX(y, c, t, side, lag) {
@@ -199,7 +207,7 @@ function dust(t, sx, sy, cam) {
 const BOIL_SEL = ".card,.win,.chap,.bubble,.chip,.reftag,.btn,.boil";
 function boilScene(s, t) {
   if (!s.boil) s.boil = [...s.root.querySelectorAll(BOIL_SEL)];
-  s.boil.forEach((e, i) => jiggle(e, t, e.classList.contains("win") || e.classList.contains("card") ? .35 : 1, i + s.a));
+  s.boil.forEach((e, i) => jiggle(e, t - s.shift, e.classList.contains("win") || e.classList.contains("card") ? .35 : 1, i + s.a0));   // authored clock + seed
 }
 function mainNoa() {
   let best = null, ba = 0;
@@ -239,12 +247,12 @@ function stageFx(t) {
     const ang = wobble(t, B - 0.12, 7, 7.5, 2.6) + (1 - clamp(d)) * -4 + up * 3;
     sg.style.display = "block";
     sg.style.transform = `translateY(${(-760 * (1 - d) - 800 * up).toFixed(1)}px) rotate(${ang.toFixed(2)}deg)`;
-    if (sg.dataset.bi !== String(bi)) { sg.dataset.bi = bi; sg.querySelector(".k").textContent = bi === 6 ? "FIN" : `CHAPTER 0${bi + 1}`;
-      sg.querySelector(".t").textContent = SIGNS[bi][0]; sg.querySelector(".e").textContent = SIGNS[bi][1]; }
+    if (sg.dataset.bi !== String(bi)) { sg.dataset.bi = bi; sg.querySelector(".k").textContent = SIGNS[bi][0];
+      sg.querySelector(".t").textContent = SIGNS[bi][1]; sg.querySelector(".e").textContent = SIGNS[bi][2]; }
   } else sg.style.display = "none";
   // extras: anticipate, hop and cheer when the curtain opens
   EXTRAS.forEach((n, i) => {
-    const cheer = BOUNDS.some(B => t > B + .45 && t < B + 2.2) || (t > .3 && t < 2.6) || (t > 163 && t < 176);
+    const cheer = BOUNDS.some(B => t > B + .45 && t < B + 2.2) || (t > .3 && t < 2.6) || (t > CHEER_A && t < CHEER_Z);
     const hp = cheer ? ((t * 1.8 + i * .27) % 1) : 0;
     poseNoa(n, t + i * .7, { x: n.x, y: 836, s: 1, look: n.look, hop: hp, wave: cheer, arms: cheer && i % 2 ? "up" : undefined });
     jiggle(n, t, .6, 90 + i);
@@ -253,14 +261,13 @@ function stageFx(t) {
 }
 // ============================================================================ 3D INSERTS
 // Blender PNG/JPG sequences (assets/3d/<shot>/NNNN.*, see tools/blender/finalize.py) played by seq.js.
-// Manifest is inlined: fetch() of a local manifest.json is blocked under file:// (how the renderers load the page).
-// Keep frames/fps/ext in sync with assets/3d/manifest.json.
-const SHOTS3D = [
-  { name: "flythrough", start: 0.0, frames: 72, fps: 30, alpha: false, ext: "jpg", x: 0, y: 0, w: 1920, h: 1080 },
-  { name: "photobooth", start: 86.5, frames: 90, fps: 30, alpha: true, ext: "png", x: 1120, y: 170, w: 740, h: 740, src_w: 1080 },
-  { name: "coinfunnel", start: 163.0, frames: 90, fps: 30, alpha: true, ext: "png", x: 590, y: 140, w: 740, h: 740, src_w: 1080 },
-  { name: "curtaincall", start: 187.0, frames: 90, fps: 30, alpha: true, ext: "png", x: 0, y: 0, w: 1920, h: 1080, src_w: 1920 },
-];
+// Frames/fps/ext/size come from assets/3d/manifest.js (written by tools/blender/finalize.py; a script, because
+// fetch() of a local JSON file is blocked under file://). Start times come from TIMELINE.shots3d ({ch, at}).
+const SHOTS3D = TL.shots3d.map(({ name, ch, at }) => {
+  const m = (window.SHOTS3D_MANIFEST || []).find(e => e.name === name);
+  if (!m) throw new Error(`3D shot ${name}: missing from assets/3d/manifest.js (run tools/blender/finalize.py --manifest-only)`);
+  return Object.assign({}, m, { start: TL.at(ch, at), shift: TL.byId[ch].shift });   // shift: its chapter's clock
+});
 window.__pending = window.__pending || [];
 // RGBA inserts live inside #scenes so they share its scale(.92) about (960,300) and the #cam push/shake.
 // Placement below is given in final SCREEN px (judged against snaps) and converted to #scenes coords.
@@ -287,13 +294,14 @@ const INSERTS = [
   }
   const p = SEQ.attach(wrap, e, { x: f.x - b.x, y: 0, w: f.w, h: f.h, fadeIn: o.fadeIn, fadeOut: o.fadeOut, z: 1 });
   p.el.style.filter = INK3D;
-  return Object.assign(o, { wrap, p });
+  return Object.assign(o, { wrap, p, shift: e.shift });
 });
 // opener fly-through: full frame ABOVE the whole stage (curtains z40-43, cite z45), under the captions (z50)
 const FLY = (() => {
   const wrap = el("div", "position:absolute;inset:0;z-index:46;display:none;pointer-events:none;transform-origin:960px 470px", null, $("stage"));
-  const p = SEQ.attach(wrap, SHOTS3D[0], { x: 0, y: 0, w: 1920, h: 1080, z: 1 });
-  return { wrap, p, end: SHOTS3D[0].start + p.duration };
+  const e = SHOTS3D.find(s => s.name === "flythrough");
+  const p = SEQ.attach(wrap, e, { x: 0, y: 0, w: 1920, h: 1080, z: 1 });
+  return { wrap, p, end: e.start + p.duration };
 })();
 const ALL3D = [FLY, ...INSERTS];
 function warm3d(t) {   // fetch a shot's frames ~1.5 s before its window; drop the refs once it's over
@@ -321,19 +329,19 @@ function fx3d(t) {
     const lt = t - o.p.start, end = o.p.duration;
     const din = back(seg(lt, 0, .38)), dout = ease(seg(lt, end - .3, end));
     o.wrap.style.transform = `translateY(${(-o.drop * (1 - din) + 18 * dout).toFixed(1)}px) scale(${(1 - .04 * dout).toFixed(4)})`;
-    jiggle(o.wrap, t, o.boil, 300 + i);   // 8 fps hand-drawn boil (rotate/translate props, separate from transform)
+    jiggle(o.wrap, t - o.shift, o.boil, 300 + i);   // 8 fps hand-drawn boil on the chapter's authored clock (rotate/translate props)
   });
 }
 // READY also decodes the first frame of every shot, and waits for whatever render(0) queued.
-window.READY = Promise.all([...DECOR_READY, ...ALL3D.map(({ p }) => p.decodeFirst()),
+window.READY = Promise.all([...DECOR_READY, ...REF_READY, ...ALL3D.map(({ p }) => p.decodeFirst()),
   ...[["700 40px GaeguKo", "가나다"], ["400 40px GaeguKo", "가"], ["700 40px GaeguLat", "Aa"], ["400 40px GaeguLat", "A"]].map(([f, x]) => document.fonts.load(f, x))])
   .then(() => document.fonts.ready).then(() => Promise.all(window.__pending.splice(0)));
-const baseRender = render;
 // returns a Promise: the renderers' page.evaluate() awaits it, so every 3D frame is decoded before capture
-window.render = t => { baseRender(t); stageFx(t); fx3d(t); return Promise.all(window.__pending.splice(0)); };
+window.render = t => { renderScenes(t); stageFx(t); fx3d(t); return Promise.all(window.__pending.splice(0)); };
 window.DURATION = DURATION;
 if (!location.search.includes("render")) {
   const t0 = performance.now();
   const loop = now => { window.render(((now - t0) / 1000) % DURATION); requestAnimationFrame(loop); };
   requestAnimationFrame(loop);
 } else window.render(0);
+})();
