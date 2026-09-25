@@ -1,5 +1,6 @@
 // Dance Lab — page controller.
-import { analyzePose, groupSync, AXES, BONES, J, frameAt, matchWithTiming } from "./analyze.mjs";
+import { analyzePose, groupSync, comparePoses, bodyScale, AXES, BONES, J, frameAt, matchWithTiming } from "./analyze.mjs";
+import { analyzeChoreo } from "./choreo.mjs";
 import { buildPracticePlan, trendPlan, fmtTime } from "./drills.mjs";
 import { BUNDLED, rankTrends, youtubeSearch } from "./trends.mjs";
 import { detectBeatsFromMedia } from "./beat.mjs";
@@ -320,6 +321,8 @@ function renderAll() {
   $("timeline-card").classList.toggle("hidden", !has);
   if (!has) $("coach-out").innerHTML = "";
   renderMembers();
+  if ($("pane-sheet").classList.contains("on")) renderCountSheet();
+  else { $("cs").innerHTML = ""; $("cs-empty").classList.remove("hidden"); }
   wirePlan();
   document.querySelectorAll("#bd [data-trend]").forEach((b) => (b.onclick = () => setTarget(S.target === b.dataset.trend ? "" : b.dataset.trend)));
   drawTimeline();
@@ -449,6 +452,67 @@ function trendFitHTML(a) {
     <div class="gaps"><b>${S.target ? "To hit your target" : "To lean into the closest trend"} (${esc(tf.trend.name)}):</b> ${gaps}</div></div>`;
 }
 
+// ── count sheet (choreography structure) ────────────────────────────────────
+function memberChoreo(m) {
+  if (!m || !m.analysis || !m.analysis.ok) return null;
+  if (m.choreo === undefined) m.choreo = analyzeChoreo(m.frames, { beats: S.beats, bpm: m.analysis.raw.bpm, accents: m.analysis.accents });
+  return m.choreo;
+}
+const PHRASE_COLORS = ["#79D86C", "#F472B6", "#7FB5FF", "#FBBF24", "#A78BFA", "#FB923C", "#2DD4BF", "#F87171"];
+const phraseColor = (label) => (label === "?" ? "var(--surface-3)" : PHRASE_COLORS[(label.charCodeAt(0) - 65) % PHRASE_COLORS.length]);
+function miniFigure(p, { hit, mirror }) {
+  if (!p) return '<svg viewBox="0 0 60 76" class="fig"></svg>';
+  const xs = [], ys = [];
+  for (let j = 0; j < 13; j++) { xs.push(p[2 * j]); ys.push(p[2 * j + 1]); }
+  const x0 = Math.min(...xs), x1 = Math.max(...xs), y0 = Math.min(...ys), y1 = Math.max(...ys);
+  const sc = Math.min(48 / Math.max(1e-3, x1 - x0), 58 / Math.max(1e-3, y1 - y0));
+  const cx = (x0 + x1) / 2, cy = (y0 + y1) / 2;
+  const X = (x) => (30 + (mirror ? -1 : 1) * (x - cx) * sc).toFixed(1), Y = (y) => (40 + (y - cy) * sc).toFixed(1);
+  const col = hit ? "var(--pink)" : "var(--accent)";
+  let g = BONES.map(([a, b]) => `<line x1="${X(p[2 * J[a]])}" y1="${Y(p[2 * J[a] + 1])}" x2="${X(p[2 * J[b]])}" y2="${Y(p[2 * J[b] + 1])}"/>`).join("");
+  const nx = X(p[2 * J.nose]), ny = Y(p[2 * J.nose + 1]);
+  const smx = X((p[2 * J.ls] + p[2 * J.rs]) / 2), smy = Y((p[2 * J.ls + 1] + p[2 * J.rs + 1]) / 2);
+  g += `<line x1="${smx}" y1="${smy}" x2="${nx}" y2="${ny}"/><circle cx="${nx}" cy="${ny}" r="4.5" fill="none"/>`;
+  return `<svg viewBox="0 0 60 76" class="fig" stroke="${col}" stroke-width="2.6" stroke-linecap="round">${g}</svg>`;
+}
+function renderCountSheet() {
+  const box = $("cs"), m = selMember();
+  const c = S.analysis ? memberChoreo(m) : null;
+  $("cs-empty").classList.toggle("hidden", !!c);
+  $("cs-empty").textContent = S.analysis && !c ? "Not enough beat-aligned motion to build a count sheet for this member (needs ≥ 8 beats with tracking)." : "Analyze a video to get an automatic 8-count sheet: the key pose on every count, and which phrases repeat.";
+  if (!c) { box.innerHTML = ""; return; }
+  const seq = c.phrases.map((p) => `<button class="pblk" style="--pc:${phraseColor(p.label)}" data-loop="${p.start},${p.end}" title="${fmtTime(p.start)}–${fmtTime(p.end)}${p.mirrored ? " · mirrored" : ""}${p.sim ? " · match " + p.sim : ""}">${p.label}${p.mirrored ? "′" : ""}</button>`).join("");
+  const learn = c.learnOrder.map((l) => `<b style="color:${phraseColor(l.label)}">${l.label}</b> ×${l.repeats} <span class="num" style="color:var(--text-4)">→ ${l.coverage}%</span>`).join(" · ");
+  const cards = c.learnOrder.map((l) => {
+    const cl = c.clusters.find((x) => x.label === l.label);
+    const first = c.phrases[cl.occurrences[0]];
+    const occ = cl.times.map((o) => `<button class="btn sm" data-loop="${o.start},${o.end}">${fmtTime(o.start)}${o.mirrored ? " ′" : ""}</button>`).join("");
+    const cells = first.counts.map((k) => `<button class="cnt${k.hit ? " hit" : ""}" data-seek="${k.t}" title="${esc(k.desc.join(" · "))}">
+        <div class="n">${k.n}${k.andHit ? '<span class="and">&</span>' : ""}</div>
+        ${miniFigure(k.p, { hit: k.hit, mirror: S.mirror })}
+        <div class="d">${k.desc.map(esc).join("<br>")}</div>
+        ${k.hit ? '<div class="bdg">HIT</div>' : ""}${k.travel ? `<div class="tv">${esc(k.travel)}</div>` : ""}
+      </button>`).join("");
+    return `<div class="phrase" style="--pc:${phraseColor(l.label)}">
+      <div class="ph-hd"><span class="ph-l">${l.label}</span><b>Phrase ${l.label}</b><span class="stag">×${cl.occurrences.length}</span>${cl.precision != null ? `<span class="stag ok" title="How identically the dancer repeats this phrase">precision ${cl.precision}</span>` : ""}
+        <span class="ph-occ">${occ}</span>
+        <button class="btn sm primary" data-drill="${first.start},${first.end}">Loop at 0.5x</button></div>
+      ${first.common && first.common.length ? `<div class="footnote" style="margin:0 0 6px">Throughout: ${first.common.map(esc).join(" · ")}</div>` : ""}
+      <div class="cells">${cells}</div></div>`;
+  }).join("");
+  box.innerHTML = `
+    <div class="cs-sum">
+      <div class="k">Structure · ${c.phrases.length} × 8-count · ${c.bpm} BPM (${c.gridSource === "audio" ? "audio beat grid" : "motion-fitted grid"})</div>
+      <div class="pseq">${seq}</div>
+      <div class="learn">Learn in this order: ${learn}</div>
+    </div>
+    <div class="footnote" style="margin:8px 0 12px">Key pose on every count, sides are the dancer's own (${S.mirror ? "figures shown mirrored to match ⇋ Mirror" : "figures as seen on screen"}). ′ = the same phrase done to the other side. Click a count to jump there; click a phrase block to loop it.</div>
+    ${cards}`;
+  box.querySelectorAll("[data-loop]").forEach((el) => (el.onclick = () => { const [a, b] = el.dataset.loop.split(",").map(Number); setLoop(a, b); }));
+  box.querySelectorAll("[data-drill]").forEach((el) => (el.onclick = () => { const [a, b] = el.dataset.drill.split(",").map(Number); setRate(0.5); setLoop(a, b); }));
+  box.querySelectorAll("[data-seek]").forEach((el) => (el.onclick = () => { if (S.player) { S.player.pause(); S.player.currentTime = +el.dataset.seek; } }));
+}
+
 // ── rendering: members ──────────────────────────────────────────────────────
 function syncLabel(x) {
   return x >= 80 ? "칼군무 — razor-sharp unison" : x >= 68 ? "Tight unison" : x >= 55 ? "Loose unison / some solo parts" : "Mostly different parts per member";
@@ -555,7 +619,7 @@ function setRate(r) {
   document.querySelectorAll("#rate button").forEach((b) => b.classList.toggle("on", +b.dataset.r === r));
 }
 document.querySelectorAll("#rate button").forEach((b) => (b.onclick = () => setRate(+b.dataset.r)));
-$("mirror").onclick = () => { S.mirror = !S.mirror; $("mirror").classList.toggle("on", S.mirror); $("flip").classList.toggle("mirrored", S.mirror); };
+$("mirror").onclick = () => { S.mirror = !S.mirror; $("mirror").classList.toggle("on", S.mirror); $("flip").classList.toggle("mirrored", S.mirror); if ($("pane-sheet").classList.contains("on")) renderCountSheet(); };
 $("skel").onclick = () => { S.skeleton = !S.skeleton; $("skel").classList.toggle("on", S.skeleton); };
 $("play").onclick = () => { if (!S.player) return; S.player.paused ? S.player.play() : S.player.pause(); };
 function setLoop(a, b) {
@@ -803,10 +867,67 @@ function metronome(t) {
 document.querySelectorAll(".tab").forEach((t) => (t.onclick = () => {
   document.querySelectorAll(".tab").forEach((x) => x.classList.toggle("on", x === t));
   document.querySelectorAll(".pane").forEach((p) => p.classList.toggle("on", p.id === "pane-" + t.dataset.tab));
+  if (t.dataset.tab === "sheet") { $("cs-empty").textContent = "Building the count sheet…"; setTimeout(renderCountSheet, 30); }
 }));
 
 // ── practice mode ───────────────────────────────────────────────────────────
-const P = { stopCam: null, stopLive: null, lm: null, session: null, lastUi: 0, lastUser: null };
+const P = { stopCam: null, stopLive: null, lm: null, session: null, lastUi: 0, lastUser: null, ghost: true, step: null };
+$("ghost").onclick = () => { P.ghost = !P.ghost; $("ghost").classList.toggle("on", P.ghost); };
+
+// Reference pose drawn onto the learner's own body (same hips, same size).
+function drawGhost(ctx, uf, ref, map, mirror) {
+  const hp = (f) => [(f.p[2 * J.lh] + f.p[2 * J.rh]) / 2, (f.p[2 * J.lh + 1] + f.p[2 * J.rh + 1]) / 2];
+  const uc = hp(uf), rc = hp(ref), k = bodyScale(uf) / bodyScale(ref);
+  const g = { p: ref.p.slice() };
+  const other = (n) => (n[0] === "l" ? "r" + n.slice(1) : n[0] === "r" ? "l" + n.slice(1) : n);
+  for (const n of Object.keys(J)) {
+    const src = mirror ? J[other(n)] : J[n];
+    const dx = (ref.p[2 * src] - rc[0]) * k, dy = (ref.p[2 * src + 1] - rc[1]) * k;
+    g.p[2 * J[n]] = uc[0] + (mirror ? -dx : dx); g.p[2 * J[n] + 1] = uc[1] + dy;
+  }
+  drawSkeleton(ctx, g, map, { color: "rgba(121,216,108,0.9)", width: 6, alpha: 0.45 });
+}
+
+// Step mode: freeze on each count's key pose until the learner matches it.
+function stepTimes() {
+  const c = memberChoreo(selMember());
+  let ts = c ? c.phrases.flatMap((p) => p.counts.map((k) => k.t)) : (S.beats.length ? S.beats : []);
+  if (S.loop) ts = ts.filter((t) => t >= S.loop.start - 0.01 && t < S.loop.end);
+  return ts;
+}
+$("step").onclick = () => {
+  if (P.step) { P.step = null; $("step").classList.remove("on"); $("step-info").textContent = ""; return; }
+  const times = stepTimes();
+  if (times.length < 2 || !S.player) { $("step-info").textContent = "Step mode needs a beat grid — analyze a video with a steady beat first."; return; }
+  const now = S.player.currentTime;
+  let i = times.findIndex((t) => t >= now - 0.05); if (i < 0) i = 0;
+  P.step = { times, i, heldSince: 0, until: null };
+  S.player.pause(); S.player.currentTime = times[i];
+  $("step").classList.add("on");
+};
+function stepTick(uf, mirror) {
+  const st = P.step, pl = S.player;
+  if (st.until != null) {
+    if (pl.currentTime >= st.until - 0.02 || pl.paused) { pl.pause(); pl.currentTime = st.until; st.until = null; }
+    return;
+  }
+  const ref = frameAt(S.frames, st.times[st.i]);
+  const sc = ref ? comparePoses(uf, ref, { mirror }).score : 0;
+  const now = performance.now();
+  const need = 70;
+  if (sc >= need) { st.heldSince ||= now; } else st.heldSince = 0;
+  const c = memberChoreo(selMember());
+  const ph = c && c.phrases.find((p) => p.counts.some((k) => Math.abs(k.t - st.times[st.i]) < 0.01));
+  const cnt = ph && ph.counts.find((k) => Math.abs(k.t - st.times[st.i]) < 0.01);
+  $("step-info").innerHTML = `👣 ${ph ? `Phrase <b>${ph.label}</b> · count <b>${cnt.n}</b>` : `Pose ${st.i + 1}/${st.times.length}`} — match <b class="${cls(sc)}">${sc}</b>/${need} ${cnt ? `<span style="color:var(--text-3)">(${esc(cnt.desc.join(" · "))})</span>` : ""}`;
+  if (st.heldSince && now - st.heldSince > 350) {
+    st.heldSince = 0;
+    if (st.i + 1 >= st.times.length) { st.i = 0; pl.currentTime = st.times[0]; $("step-info").innerHTML = "🎉 Section complete — step mode restarted from the top. Turn it off to run it in time."; return; }
+    st.i++;
+    st.until = st.times[st.i];
+    pl.play();
+  }
+}
 const PART_LABEL = { leftArm: "Left arm", rightArm: "Right arm", leftLeg: "Left leg", rightLeg: "Right leg", torso: "Torso" };
 const cls = (s) => (s >= 75 ? "good" : s >= 55 ? "mid" : "bad");
 
@@ -842,8 +963,14 @@ function onUserFrame(uf) {
   const cam = $("cam");
   const aspect = cam.videoWidth / cam.videoHeight || 16 / 9;
   if (!uf) return;
-  drawSkeleton(ctx, uf, fullMap(fitRect(W, H, aspect), aspect), { color: "rgba(244,114,182,0.95)", width: 3, joint: "#fff" });
+  const map = fullMap(fitRect(W, H, aspect), aspect);
+  if (S.player && S.frames.length && P.ghost) {
+    const ref = frameAt(S.frames, P.step ? P.step.times[P.step.i] : S.player.currentTime);
+    if (ref) drawGhost(ctx, uf, ref, map, !S.mirror);
+  }
+  drawSkeleton(ctx, uf, map, { color: "rgba(244,114,182,0.95)", width: 3, joint: "#fff" });
   if (!S.player || !S.frames.length) return;
+  if (P.step) { stepTick(uf, !S.mirror); return; }
   const t = S.player.currentTime;
   // Displayed mirrored → learner copies the same anatomical side → compare un-mirrored.
   const m = matchWithTiming(uf, S.frames, t, { mirror: !S.mirror });
@@ -860,7 +987,7 @@ function onUserFrame(uf) {
     for (const [k, v] of Object.entries(m.parts)) (sess.parts[k] ||= []).push(v);
     if (m.bestScore >= 50) sess.lags.push(m.lagMs);
     sess.frames.push({ ...uf, t: Math.round(t * 1000) / 1000 });
-    sess.byTime.push([t, m.score]);
+    sess.byTime.push([t, m.score, m.bestScore >= 50 ? m.lagMs : null]);
   }
 }
 
@@ -882,9 +1009,18 @@ function endSession() {
   const med = (xs) => { const a = [...xs].sort((x, y) => x - y); return a[Math.floor(a.length / 2)]; };
   const partAvg = Object.entries(s.parts).map(([k, v]) => [k, Math.round(avg(v))]).sort((a, b) => a[1] - b[1]);
   const lag = s.lags.length ? med(s.lags) : null;
-  const secRows = (S.analysis.sections || []).map((sec) => {
-    const xs = s.byTime.filter(([t]) => t >= sec.start && t < sec.end).map(([, v]) => v);
-    return xs.length >= 5 ? `<tr><td>${fmtTime(sec.start)}–${fmtTime(sec.end)} ${sec.killing ? "★" : ""}</td><td>${sec.label}</td><td class="num ${cls(avg(xs))}">${Math.round(avg(xs))}</td></tr>` : "";
+  // Per phrase: match + timing (median lag → rushing / dragging).
+  const ch = memberChoreo(selMember());
+  const spans = ch ? ch.phrases.map((p) => ({ start: p.start, end: p.end, name: `${p.label}${p.mirrored ? "′" : ""}`, kind: `phrase ${p.label}` }))
+    : (S.analysis.sections || []).map((sec) => ({ start: sec.start, end: sec.end, name: sec.killing ? "★" : "", kind: sec.label }));
+  const secRows = spans.map((sp) => {
+    const rows = s.byTime.filter(([t]) => t >= sp.start && t < sp.end);
+    if (rows.length < 5) return "";
+    const sc = avg(rows.map((r) => r[1]));
+    const lags = rows.map((r) => r[2]).filter((x) => x != null);
+    const lg = lags.length >= 3 ? med(lags) : null;
+    const timing = lg == null ? "–" : Math.abs(lg) < 70 ? "on time" : lg > 0 ? `dragging ${lg} ms` : `rushing ${-lg} ms`;
+    return `<tr><td>${fmtTime(sp.start)}–${fmtTime(sp.end)} <b>${esc(sp.name)}</b></td><td>${esc(sp.kind)}</td><td class="num ${cls(sc)}">${Math.round(sc)}</td><td class="num ${lg != null && Math.abs(lg) >= 70 ? "bad" : ""}">${timing}</td></tr>`;
   }).join("");
   const you = analyzePose(s.frames, {});
   const ref = S.analysis.raw;
@@ -913,7 +1049,7 @@ function endSession() {
     </div>
     ${yr ? `<div class="block"><h4>Reference vs you</h4><table class="tbl"><thead><tr><th>Measure</th><th class="num">Reference</th><th class="num">You</th><th class="num">Δ</th></tr></thead><tbody>${cmpRows}</tbody></table>
       <div class="footnote">Your speeds are measured in reference-time, so practising at ${s.rate}x is compared fairly. Within ±15% = green.</div></div>` : ""}
-    ${secRows ? `<div class="block"><h4>By phrase</h4><table class="tbl"><thead><tr><th>Phrase</th><th>Type</th><th class="num">Match</th></tr></thead><tbody>${secRows}</tbody></table></div>` : ""}
+    ${secRows ? `<div class="block"><h4>By phrase</h4><table class="tbl"><thead><tr><th>Phrase</th><th>Type</th><th class="num">Match</th><th class="num">Timing</th></tr></thead><tbody>${secRows}</tbody></table></div>` : ""}
     <div class="footnote">Next: ${Math.round(avg(s.scores)) >= 70 ? (s.rate < 1 ? `you're ready for the next rung of the tempo ladder.` : "you're matching at full speed — record a full run.") : `stay at ${s.rate}x and drill the ${PART_LABEL[worst[0]].toLowerCase()}.`}</div>`;
 }
 
@@ -941,7 +1077,7 @@ $("coach-go").onclick = async () => {
   try {
     const r = await fetch("/api/dance/coach", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({
       lang: $("coach-lang").value,
-      report: { source: { title: S.source && S.source.title }, member: selMember() && selMember().name, trendFit: trendRank(S.analysis).slice(0, 3).map((x) => ({ trend: x.trend.name, fit: x.fit, gaps: x.gaps })), trendTarget: S.target || null, groupSync: S.sync && selMember() ? { overall: S.sync.overall, member: S.sync.perMember[S.sel] } : null, ...S.analysis, plan: S.plan },
+      report: { source: { title: S.source && S.source.title }, member: selMember() && selMember().name, trendFit: trendRank(S.analysis).slice(0, 3).map((x) => ({ trend: x.trend.name, fit: x.fit, gaps: x.gaps })), trendTarget: S.target || null, structure: (() => { const c = memberChoreo(selMember()); return c ? { sequence: c.sequence.join(" "), learnOrder: c.learnOrder, precision: c.clusters.map((x) => ({ phrase: x.label, repeats: x.occurrences.length, precision: x.precision, at: x.times.map((o) => o.start) })) } : null; })(), groupSync: S.sync && selMember() ? { overall: S.sync.overall, member: S.sync.perMember[S.sel] } : null, ...S.analysis, plan: S.plan },
     }) });
     const j = await r.json();
     if (!r.ok) throw new Error(j.error || "coach failed");

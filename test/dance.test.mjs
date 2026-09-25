@@ -217,3 +217,31 @@ test("trend catalog validates and trend fit ranks the right style", async () => 
   const tp = trendPlan(a, rk.find((x) => x.id === "drop-freeze"));
   assert.ok(tp.drills.length >= 2 && tp.gaps.some((g) => g.axis === "sharpness" && g.delta > 0));
 });
+
+test("count sheet: 8-count phrases, repeated and mirrored phrases detected", async () => {
+  const { analyzeChoreo } = await import("../ui/dance/choreo.mjs");
+  const d = generateDance({ style: "sharp", bpm: 120, duration: 32, structure: "ABAaBC" });
+  const a = analyzePose(d.frames, { beats: d.beats, bpm: 120 });
+  const c = analyzeChoreo(d.frames, { beats: d.beats, bpm: 120, accents: a.accents });
+  assert.equal(c.downbeat, 0);
+  assert.deepEqual(c.sequence.slice(0, 6), ["A", "B", "A", "A′", "B", "C"]);
+  assert.equal(c.uniquePhrases, 3);
+  assert.equal(c.learnOrder[0].label, "A");
+  assert.ok(c.clusters.find((x) => x.label === "A").precision >= 90, "synthetic dancer repeats precisely");
+  const cnt = c.phrases[0].counts;
+  assert.equal(cnt.length, 8);
+  assert.ok(cnt.every((x) => x.desc.length >= 1 && x.p));
+  assert.ok(c.phrases[0].common.length >= 1, "shared stance factored out");
+});
+
+test("pose descriptions name the obvious shapes", async () => {
+  const { describePose } = await import("../ui/dance/choreo.mjs");
+  const { J } = await import("../ui/dance/analyze.mjs");
+  const base = generateDance({ duration: 1 }).frames[0];
+  const pose = (fn) => { const f = { ...base, p: base.p.slice() }; fn(f.p); return f; };
+  const set = (p, n, x, y) => { p[2 * J[n]] = x; p[2 * J[n] + 1] = y; };
+  const up = pose((p) => { for (const s of ["l", "r"]) { const sx = p[2 * J[s + "s"]], sy = p[2 * J[s + "s"] + 1]; set(p, s + "e", sx, sy - 0.08); set(p, s + "w", sx, sy - 0.155); } });
+  assert.match(describePose(up).join(" | "), /Both arms (overhead|hand above head)/);
+  const t = pose((p) => { for (const [s, g] of [["l", 1], ["r", -1]]) { const sx = p[2 * J[s + "s"]], sy = p[2 * J[s + "s"] + 1]; set(p, s + "e", sx + g * 0.08, sy); set(p, s + "w", sx + g * 0.155, sy); } });
+  assert.match(describePose(t).join(" | "), /Both arms out to the side/);
+});

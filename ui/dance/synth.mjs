@@ -15,17 +15,28 @@ const SHAPES = [[0.2, 0.3], [1.57, 0], [2.8, 0.1], [0.9, 1.6], [2.2, -1.2], [0.5
 
 // x0: horizontal centre (image-height units), size: body scale, delay: seconds late
 // vs the beat grid (to simulate a member who is behind), path(t) → extra x offset.
-export function generateDance({ style = "sharp", bpm = 120, duration = 32, fps = 15, seed = 7, aspect = 16 / 9, x0 = null, size = 1, delay = 0, path = null } = {}) {
+// structure: optional phrase layout like "ABAaCAB" — each letter is an 8-count
+// phrase; the same letter repeats the same moves, lowercase = mirrored version.
+export function generateDance({ style = "sharp", bpm = 120, duration = 32, fps = 15, seed = 7, aspect = 16 / 9, x0 = null, size = 1, delay = 0, path = null, structure = null } = {}) {
   const rand = rng(seed);
   const beat = 60 / bpm;
   const nBeats = Math.ceil(duration / beat) + 2;
   // One target shape per beat for each arm, and a foot position per 4 beats.
-  const plan = [];
-  for (let b = 0; b < nBeats; b++) {
+  const randomBeat = (b) => {
     const L = SHAPES[Math.floor(rand() * SHAPES.length)];
     const R = rand() < 0.5 ? L : SHAPES[Math.floor(rand() * SHAPES.length)];
-    plan.push({ L, R, step: Math.floor(b / 4) % 2 ? 1 : -1 });
-  }
+    return { L, R, step: Math.floor(b / 4) % 2 ? 1 : -1 };
+  };
+  const plan = [];
+  if (structure) {
+    const phrases = {};
+    for (let b = 0; b < nBeats; b++) {
+      const ch = structure[Math.floor(b / 8) % structure.length], key = ch.toUpperCase();
+      phrases[key] ||= Array.from({ length: 8 }, (_, k) => randomBeat(k));
+      const m = phrases[key][b % 8];
+      plan.push(ch === key ? m : { L: m.R, R: m.L, step: -m.step });
+    }
+  } else for (let b = 0; b < nBeats; b++) plan.push(randomBeat(b));
   const cx0 = x0 ?? aspect / 2, T = 0.18;
   const frames = [];
   for (let i = 0; i / fps < duration; i++) {
@@ -92,7 +103,7 @@ export function generateGroup({ bpm = 124, duration = 40, fps = 15 } = {}) {
     { name: "C", x0: 1.2, seed: 7, style: "sharp", path: swap(-1) },
     { name: "D", x0: 1.45, seed: 11, style: "smooth" },
   ];
-  const members = specs.map((s) => ({ ...s, frames: generateDance({ style: s.style, bpm, duration, fps, seed: s.seed, x0: s.x0, delay: s.delay || 0, size: s.size || 0.85, path: s.path }).frames }));
+  const members = specs.map((s) => ({ ...s, frames: generateDance({ style: s.style, bpm, duration, fps, seed: s.seed, x0: s.x0, delay: s.delay || 0, size: s.size || 0.85, path: s.path, structure: "ABACABDDABAC" }).frames }));
   const beats = [];
   for (let b = 0; (b * 60) / bpm <= duration; b++) beats.push(Math.round(((b * 60) / bpm) * 1000) / 1000);
   // Shuffle detection order each frame, like a pose model would.

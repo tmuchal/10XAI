@@ -20,7 +20,7 @@ Write user-facing responses, instructions, and reports in English.
 | `lib/model/card.cjs` | Task/card model. |
 | `config.example.js` / `config.js` | Config. Copy the example to `config.js`; `config.js` is gitignored. |
 | `.env.example` / `.env` | Optional tokens (Slack, etc.). Never commit `.env`. |
-| `server/dance.cjs` + `ui/dance/` | **Dance Lab** at `/dance` — idol dance-video analysis. Pose estimation runs in the browser (MediaPipe); `ui/dance/analyze.mjs` (metrics/style), `beat.mjs` (audio tempo), `drills.mjs` (practice plan), `tracker.mjs` (multi-member tracking), `fancam.mjs` (per-member virtual camera + export), `synth.mjs` (demo group), `trends.mjs` (K-pop trend catalog + trend fit; refreshed via `agents/dance-trend-agent.md`). Reports land in `workspace/dance/`. Coach prompt: `agents/dance-coach-agent.md`. Tests: `npm test`. |
+| `server/dance.cjs` + `ui/dance/` | **Dance Lab** at `/dance` — idol dance-video analysis. Pose estimation runs in the browser (MediaPipe); `ui/dance/analyze.mjs` (metrics/style), `beat.mjs` (audio tempo), `drills.mjs` (practice plan), `choreo.mjs` (8-count sheet, key-pose descriptions, repeated-phrase detection), `tracker.mjs` (multi-member tracking), `fancam.mjs` (per-member virtual camera + export), `synth.mjs` (demo group), `trends.mjs` (K-pop trend catalog + trend fit; refreshed via `agents/dance-trend-agent.md`). Reports land in `workspace/dance/`. Coach prompt: `agents/dance-coach-agent.md`. Tests: `npm test`. |
 
 ## The verification pipeline
 
