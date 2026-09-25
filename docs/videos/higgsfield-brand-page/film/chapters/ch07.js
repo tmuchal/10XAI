@@ -16,7 +16,7 @@ function c07_bow(n, b) {
 
 scene(184, 192, (R, s) => {
   s.caps = [[184.2, "다음 페이지의 주인공은, 당신의 브랜드", "The next hero is your brand"]];
-  const INK = C07_INK;
+  const INK = C07_INK; R.style.wordBreak = "keep-all";
   // warm spotlight behind the cast
   const spot = c07_abs("left:360px;top:420px;width:1200px;height:520px;border-radius:50%;background:radial-gradient(closest-side,rgba(255,236,170,.95),rgba(255,236,170,0));z-index:0", "", R);
   // hanging title banner
@@ -78,8 +78,10 @@ scene(184, 192, (R, s) => {
     const winkP = seg(t, 185.9, 186.15) * (1 - seg(t, 186.6, 186.8));
     poseNoa(noa, t, { x: 830, y: 622 + 300 * (1 - nIn), s: t > 190 ? Math.max(.01, back2) : Math.max(.01, 1 - gone), talk: t > 186.1 && t < 186.7,
       wave: (t > 185.3 && t < 185.9) || t > 190.4, hop: t > 185.2 && t < 185.9 ? (t - 185.2) / .7 : 0, blink: winkP < .5, op: gone >= 1 && t < 190.05 ? 0 : nIn });
-    if (noa.P.sg) noa.P.sg.setAttribute("transform", `translate(0 ${18 * ease(winkP)})`);
-    if (winkP > .5) { noa.P.e1.setAttribute("d", "M69 99 Q80 88 91 99"); noa.P.e2.setAttribute("d", "M110 99 Q120 106 130 99"); }
+    if (noa.P.sg) noa.P.sg.setAttribute("transform", `translate(0 ${24 * ease(winkP)}) rotate(${-5 * winkP} 100 98)`);
+    if (winkP > .5) { noa.P.eye.style.display = ""; noa.P.e1.setAttribute("d", "M71 90 Q80 84 89 90"); noa.P.e1.setAttribute("fill", "none");
+      noa.P.p1.style.display = ""; noa.P.p1.setAttribute("cx", 80); noa.P.p1.setAttribute("cy", 98); noa.P.p1.setAttribute("r", 7);
+      noa.P.p2.style.display = "none"; noa.P.e2.setAttribute("d", "M110 99 Q120 106 130 99"); noa.P.e2.setAttribute("fill", "none"); }
     const sp = seg(t, 186.2, 186.7);
     spark.style.opacity = sp > 0 && sp < 1 ? Math.sin(sp * Math.PI) : 0; spark.style.transform = `translate(${830 + 190}px, ${720}px) scale(${0.4 + sp}) rotate(${sp * 180}deg)`;
     const pf = t > 186.85 && t < 187.45 ? seg(t, 186.85, 187.45) : t > 190.05 && t < 190.65 ? seg(t, 190.05, 190.65) : -1;

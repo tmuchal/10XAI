@@ -24,7 +24,7 @@ scene(134, 160, (R, s) => {
             [153.5, "둘을 한 화면에: 과정 공개 + 유머 로딩", "Both at once: show the process, with a joke"]];
   s.cite = [[137, "Buell & Norton 2011 · Spiegel Research Center"], [143, "Oracle Happiness Report"], [149, "McGraw & Warren 2010, Benign Violations"]];
   const head = chapter(R, "CHAPTER 05", "전문성과 유머 코드");
-  const INK = C05_INK;
+  const INK = C05_INK; R.style.wordBreak = "keep-all";
   const W = c05_abs("left:0;top:0;width:1920px;height:1000px", "", R);          // shake wrapper
   const SG = c05_abs("left:0;top:0;width:1920px;height:1000px", "", W);         // scale group
 

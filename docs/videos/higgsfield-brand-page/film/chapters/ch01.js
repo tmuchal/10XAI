@@ -1,9 +1,10 @@
 // ---------------------------------------------------------------- 01 · Who it's for (10–40)
-// Beats: 10.4 four cards are dealt from a deck · 13 agency (clapper snaps, cursor books a call)
-// · 18 shop (bottle spins, add-to-cart, bottle flies into the cart) · 23 store (search typed,
-// pin drops, walking route draws) · 28 influencer (link-in-bio, hearts, follower count ticks)
-// Noa hops card to card. · 33 cards scatter, the real page drops in, confetti, Noa blows a
-// party horn, then points at it.
+// Game-show structure: "업종 룰렛" — a prize wheel spins and lands on each business on the beat.
+// Beats: 10.3 wheel drops in, rim bulbs chase, mystery card · 13 lands on 에이전시 (clapper snaps,
+// cursor books a call) · 18 쇼핑몰 (bottle spins, add-to-cart, bottle arcs into the cart) · 23 매장
+// (search typed, pin drops, route draws) · 28 인플루언서 (links pop, hearts, followers tick) — each
+// card whip-pans in with blur while kinetic type stamps the benefit; Noa spins the wheel each time.
+// 32.5 wheel rolls off, the real page drops in, confetti, Noa blows a party horn, then points at it.
 (() => {
 const INK1 = "#2b2320";
 const c01_rnd = i => { const x = Math.sin(i * 127.1 + 311.7) * 43758.5453; return x - Math.floor(x); };
@@ -19,10 +20,10 @@ scene(10, 40, (R, s) => {
             [33, "그리고 이게, 제가 실제로 만든 페이지", "And this is the page I actually built"]];
   const cam = el("div", "position:absolute;inset:0", "", R);
   const head = chapter(cam, "CHAPTER 01", "누구를 위한 페이지인가");
-  const W = 400, H = 540, TOP = 300, cards = [];
+  const W = 400, H = 540, TOP = 190, CX = 1160, CS = 1.2, cards = [];
   const tag = (txt, bg) => `<div style="position:absolute;left:22px;top:18px;padding:4px 14px 6px;border:3px solid ${INK1};border-radius:10px;background:${bg};font-size:24px;transform:rotate(-2deg)">${txt}</div>`;
   const mk = (i, bg, inner) => {
-    const c = el("div", `left:${120 + i * 430}px;top:${TOP}px;width:${W}px;height:${H}px;background:${bg}`, inner, cam); c.className = "card";
+    const c = el("div", `left:${CX - W / 2}px;top:${TOP}px;width:${W}px;height:${H}px;background:${bg};transform-origin:50% 0;word-break:keep-all`, inner, cam); c.className = "card";
     const cur = el("div", "position:absolute;left:0;top:0;z-index:9;opacity:0", C01_CURSOR, c);
     const ring = el("div", `position:absolute;left:0;top:0;width:60px;height:60px;margin:-30px 0 0 -30px;border:4px solid ${INK1};border-radius:50%;z-index:8;opacity:0`, "", c);
     c.cur = cur; c.ring = ring; cards.push(c); return c;
@@ -62,13 +63,13 @@ scene(10, 40, (R, s) => {
     <div class="cartw" style="position:absolute;right:22px;top:14px;width:58px;height:50px">
       <svg viewBox="0 0 58 50" width="58" height="50"><path d="M3 6 H12 L18 34 H48 L54 14 H15" fill="none" stroke="${INK1}" stroke-width="4" stroke-linejoin="round"/><circle cx="22" cy="43" r="5" fill="${INK1}"/><circle cx="44" cy="43" r="5" fill="${INK1}"/></svg>
       <span class="cart" style="position:absolute;right:-12px;top:-10px;width:32px;height:32px;border-radius:50%;background:#c8372d;color:#fff;border:3px solid ${INK1};font-size:22px;display:grid;place-items:center">0</span></div>
-    <svg viewBox="0 0 200 260" style="position:absolute;left:100px;top:74px;width:200px;height:260px;overflow:visible">
+    <svg viewBox="0 0 200 260" style="position:absolute;left:110px;top:66px;width:180px;height:234px;overflow:visible">
       <ellipse class="sh" cx="100" cy="250" rx="60" ry="8" fill="rgba(43,35,32,.2)"/>
       <g class="rot"><rect x="78" y="20" width="44" height="40" rx="6" fill="${INK1}"/><rect x="50" y="56" width="100" height="186" rx="30" fill="#e8894f" stroke="${INK1}" stroke-width="5"/>
       <rect x="62" y="118" width="76" height="70" rx="8" fill="#fffaf0" stroke="${INK1}" stroke-width="3"/><text x="100" y="162" text-anchor="middle" font-size="26" fill="${INK1}" font-family="GaeguLat">NOA</text>
       <rect class="shine" x="64" y="66" width="12" height="160" rx="6" fill="rgba(255,255,255,.5)"/></g></svg>
-    <div style="position:absolute;left:24px;top:338px"><div style="font-size:32px">노아 선셋 오일</div>
-      <div style="font-size:24px;color:#6b5d52;margin-top:2px"><span style="color:#d98c1f">★★★★☆</span> 4.6 · 리뷰 128</div><div style="font-size:30px;margin-top:2px">₩39,000</div></div>
+    <div style="position:absolute;left:24px;right:24px;top:318px;line-height:1.15"><div style="font-size:30px">노아 선셋 오일</div>
+      <div style="font-size:22px;color:#6b5d52"><span style="color:#d98c1f">★★★★☆</span> 4.6 · 리뷰 128</div><div style="font-size:28px">₩39,000</div></div>
     <div class="btn buy" style="position:absolute;left:24px;right:24px;bottom:24px;background:${INK1};color:#fffaf0;font-size:26px">장바구니 담기</div>
     <svg class="fly" viewBox="0 0 40 60" style="position:absolute;left:0;top:0;width:40px;height:60px;opacity:0"><rect x="14" y="2" width="12" height="10" fill="${INK1}"/><rect x="6" y="10" width="28" height="48" rx="9" fill="#e8894f" stroke="${INK1}" stroke-width="3"/></svg>
     <div class="plus" style="position:absolute;right:30px;top:70px;font-size:34px;color:#c8372d;opacity:0">+1</div>`);
@@ -120,38 +121,99 @@ scene(10, 40, (R, s) => {
     <circle class="curl" cx="142" cy="126" r="9" fill="none" stroke="#e0607e" stroke-width="6"/>`;
   noa.P.b.appendChild(horn);
   const tube = horn.querySelector(".tube"), curl = horn.querySelector(".curl");
-  const bub = makeBubble(cam); bub.style.whiteSpace = "normal"; bub.style.width = "330px"; bub.style.textAlign = "center";
+  const bub = makeBubble(cam); bub.style.whiteSpace = "normal"; bub.style.width = "330px"; bub.style.textAlign = "center"; bub.style.wordBreak = "keep-all";
   const bubS = makeBubble(cam);
 
-  const cardX = i => 120 + i * 430;
+  // ---- game-show wheel ----
+  const WC = [430, 480], WR = 250, SEG = [["에이전시", "🎬", "#f7d774"], ["쇼핑몰", "🛒", "#f2a7a0"], ["매장", "🏪", "#9fd3a8"], ["인플루언서", "📱", "#f7b8cb"]];
+  const arcP = (a0, a1, r) => { const p = a => [Math.sin(a * Math.PI / 180) * r, -Math.cos(a * Math.PI / 180) * r]; const [x0, y0] = p(a0), [x1, y1] = p(a1); return `M0 0 L${x0.toFixed(1)} ${y0.toFixed(1)} A${r} ${r} 0 0 1 ${x1.toFixed(1)} ${y1.toFixed(1)} Z`; };
+  const segs = [0, 1, 2, 3].map(i => `<path d="${arcP(i * 90 - 45, i * 90 + 45, WR - 14)}" fill="${SEG[i][2]}" stroke="${INK1}" stroke-width="4"/>
+      <g transform="rotate(${i * 90})"><text x="0" y="${-(WR - 80)}" text-anchor="middle" font-size="52" font-family="GaeguKo">${SEG[i][1]}</text>
+      <text x="0" y="${-(WR - 136)}" text-anchor="middle" font-size="${i === 3 ? 32 : 38}" fill="${INK1}" font-family="GaeguKo">${SEG[i][0]}</text></g>`).join("");
+  const bulbs = Array.from({ length: 16 }, (_, k) => { const a = k / 16 * 2 * Math.PI; return `<circle class="bl" cx="${(Math.sin(a) * (WR - 2)).toFixed(1)}" cy="${(-Math.cos(a) * (WR - 2)).toFixed(1)}" r="9" stroke="${INK1}" stroke-width="3"/>`; }).join("");
+  const wheel = el("div", `left:${WC[0] - 320}px;top:${WC[1] - 300}px;width:640px;height:720px;z-index:5`, `<svg width="640" height="720" viewBox="-320 -300 640 720" overflow="visible">
+      <path d="M-26 0 L-110 390 L110 390 L26 0 Z" fill="#c8372d" stroke="${INK1}" stroke-width="5" stroke-linejoin="round"/>
+      <rect x="-150" y="380" width="300" height="30" rx="10" fill="#8f1f18" stroke="${INK1}" stroke-width="5"/>
+      <circle cx="10" cy="12" r="${WR + 6}" fill="rgba(43,35,32,.2)"/>
+      <circle cx="0" cy="0" r="${WR + 6}" fill="#e8894f" stroke="${INK1}" stroke-width="6"/>
+      <g class="rot">${segs}</g>
+      <g class="bulbs">${bulbs}</g>
+      <circle cx="0" cy="0" r="40" fill="#fffaf0" stroke="${INK1}" stroke-width="5"/><text x="0" y="10" text-anchor="middle" font-size="28" font-family="GaeguKo" fill="#c8372d">GO</text>
+      <g class="ptr"><path d="M-26 ${-WR - 44} L26 ${-WR - 44} L0 ${-WR + 10} Z" fill="#fffaf0" stroke="${INK1}" stroke-width="5" stroke-linejoin="round"/><circle cx="0" cy="${-WR - 40}" r="10" fill="#c8372d" stroke="${INK1}" stroke-width="4"/></g>
+      <g class="rays" opacity="0">${Array.from({ length: 9 }, (_, k) => { const a = (-80 + k * 20) * Math.PI / 180; return `<line x1="${Math.sin(a) * 60}" y1="${-WR - 40 - Math.cos(a) * 60}" x2="${Math.sin(a) * 100}" y2="${-WR - 40 - Math.cos(a) * 100}" stroke="${INK1}" stroke-width="6" stroke-linecap="round"/>`; }).join("")}</g></svg>`, cam); wheel.className = "abs";
+  const wRot = wheel.querySelector(".rot"), wPtr = wheel.querySelector(".ptr"), wRays = wheel.querySelector(".rays"), wBulbs = [...wheel.querySelectorAll(".bl")];
+  const wTitle = el("div", `left:${WC[0] - 200}px;top:130px;width:400px;text-align:center;z-index:7;font-size:48px;color:#c8372d;text-shadow:4px 4px 0 #f7d774;-webkit-text-stroke:1.5px ${INK1};white-space:nowrap`, "업종 룰렛!", cam); wTitle.className = "abs";
+  // mystery card (before the first spin)
+  const mystery = el("div", `left:${CX - W / 2}px;top:${TOP}px;width:${W}px;height:${H}px;transform-origin:50% 0;background:repeating-linear-gradient(45deg,#f7d774 0 26px,#f2c14e 26px 52px);display:grid;place-items:center;text-align:center`,
+    `<div><div style="font-size:180px;line-height:1;color:#fffaf0;-webkit-text-stroke:5px ${INK1}">?</div><div style="font-size:34px;margin-top:10px;padding:6px 18px;background:#fffaf0;border:3px solid ${INK1};border-radius:12px">당신의 업종은?</div></div>`, cam); mystery.className = "card";
+  // kinetic type column
+  const KT = [["포트폴리오가", "곧 쇼릴", "Agency"], ["제품이 화면", "안에서 움직인다", "Online store"], ["검색에서", "방문까지 한 번에", "Offline store"], ["링크 하나가", "나만의 매장", "Creator"]];
+  const kt = KT.map((k, i) => {
+    const d = el("div", `left:1440px;top:300px;width:360px;z-index:9;word-break:keep-all`, "", cam); d.className = "abs";
+    d.chars = [];
+    [k[0], k[1]].forEach((L, li) => { const row = el("div", `white-space:nowrap;font-size:${li ? 44 : 40}px;line-height:1.25;color:${li ? "#c8372d" : INK1};text-shadow:3px 3px 0 #f7d774`, "", d);
+      [...L].forEach(ch => d.chars.push(el("span", "display:inline-block;transform-origin:50% 100%", ch === " " ? "&nbsp;" : ch, row))); });
+    el("div", `display:inline-block;margin-top:10px;padding:2px 12px 4px;border:3px solid ${INK1};border-radius:999px;background:#fffaf0;font-size:22px`, k[2], d);
+    return d; });
+  const puff = document.createElementNS("http://www.w3.org/2000/svg", "ellipse");
+  puff.setAttribute("cx", "140"); puff.setAttribute("cy", "122"); puff.setAttribute("fill", "#f0b27a"); puff.setAttribute("stroke", INK1); puff.setAttribute("stroke-width", "4");
+  noa.P.b.appendChild(puff);
+  const glint = document.createElementNS("http://www.w3.org/2000/svg", "path");
+  glint.setAttribute("d", "M0 -14 L3 -3 L14 0 L3 3 L0 14 L-3 3 L-14 0 L-3 -3Z"); glint.setAttribute("fill", "#fff"); glint.setAttribute("stroke", INK1); glint.setAttribute("stroke-width", "2");
+  noa.P.b.appendChild(glint);
+  const SPIN = [[11.9, 13.0], [16.9, 18.0], [21.9, 23.0], [26.9, 28.0]], BEAT = [13, 18, 23, 28];
+  const wheelAngle = t => {
+    let a = 20 + 8 * Math.sin(t * 1.5) * (t < 11.9 ? 1 : 0), prev = 20;
+    for (let i = 0; i < 4; i++) {
+      const [s0, e0] = SPIN[i], tgt = -(i * 90) - 720 * (i + 1);
+      if (t < s0) return i === 0 ? a : prev + 3 * c01_settle(t - SPIN[i - 1][1], 1.8, 3.5);
+      if (t < e0) { const p = seg(t, s0, e0); return lerp(prev, tgt, 1 - Math.pow(1 - p, 3)); }
+      prev = tgt;
+    }
+    return prev + 3 * c01_settle(t - SPIN[3][1], 1.8, 3.5);
+  };
+
   return t => {
-    head.style.opacity = seg(t, 10.2, 10.6) * (1 - seg(t, 12.5, 12.9));
-    head.style.transform = `rotate(-1.5deg) translateY(${-30 * seg(t, 12.5, 12.9)}px)`;
+    head.style.opacity = seg(t, 10.2, 10.6) * (1 - seg(t, 11.0, 11.3));
+    head.style.transform = `rotate(-1.5deg) translateY(${-40 * seg(t, 11.0, 11.3)}px)`;
     const active = t < 13 ? -1 : t < 33 ? Math.floor((t - 13) / 5) : 4;
-    const gone = t > 32.5;
-    // gentle camera pan toward the active card
-    const panTo = active >= 0 && active < 4 ? (1.5 - active) * 36 : 0;
-    const panPrev = active > 0 && active < 4 ? (1.5 - (active - 1)) * 36 : 0;
-    const pan = active < 0 ? 0 : lerp(active === 0 ? 0 : panPrev, panTo, ease(seg((t - 13) % 5, 0, 0.8)));
-    cards.forEach((c, i) => {
-      // dealt from a deck in the bottom centre
-      const dl = seg(t, 10.4 + i * 0.22, 11.05 + i * 0.22), d = back(dl);
-      const on = active === i;
-      const sinceOn = on ? t - (13 + i * 5) : 99;
-      const lift = on ? back(seg(sinceOn, 0, 0.5)) : active >= 0 && active < 4 && active === i + 1 ? 1 - ease(seg(t - (13 + (i + 1) * 5), 0, 0.4)) : 0;
-      const sc = active >= 0 && active < 4 ? lerp(0.95, 1.1, lift) : 1;
-      const wob = 2.5 * c01_settle(t - 11.05 - i * 0.22, 1.4, 3.5);
-      // exit: scatter away
-      const ex = seg(t, 32.5 + i * 0.07, 33.2 + i * 0.07), exE = ex * ex;
-      const dx = lerp(960 - 200 - cardX(i), 0, d) + pan + (i - 1.5) * 260 * exE;
-      const dy = lerp(420, 0, d) - 24 * lift + 900 * exE;
-      const rot = lerp((i - 1.5) * 18, 0, d) + wob + (i - 1.5) * 30 * exE + (on ? -1.2 : 0);
-      c.style.opacity = dl > 0 ? 1 : 0;
-      c.style.transform = `translate(${dx}px, ${dy}px) rotate(${rot}deg) scale(${sc})`;
-      c.style.filter = active >= 0 && active < 4 && !on ? "saturate(.55) brightness(1.03)" : "none";
-      c.style.boxShadow = on ? `0 0 0 5px #f7d774, 12px 14px 0 rgba(43,35,32,.25)` : "";
-      c.style.zIndex = on ? 3 : 1;
-      c.style.display = gone && ex >= 1 ? "none" : "block";
+    // wheel: drops in, spins on each beat, rolls away at the end
+    const wIn = seg(t, 10.3, 10.9), wOut = seg(t, 32.4, 33.2);
+    const ang = wheelAngle(t);
+    wheel.style.opacity = wIn > 0 && wOut < 1 ? 1 : 0;
+    wheel.style.transform = `translate(${-900 * wOut * wOut}px, ${-700 * (1 - back(wIn))}px) rotate(${-200 * wOut * wOut}deg)`;
+    wheel.style.transformOrigin = `320px 300px`;
+    wRot.setAttribute("transform", `rotate(${ang})`);
+    const spinning = SPIN.some(([a, b]) => t > a && t < b);
+    const fr = ((ang % 22.5) + 22.5) % 22.5 / 22.5;
+    wPtr.setAttribute("transform", `rotate(${spinning ? -18 * fr : 5 * c01_settle(t - (SPIN.find(([a, b]) => t >= b) || [0, 99])[1], 3, 5)} 0 ${-WR - 40})`);
+    const landed = BEAT.find(b => t >= b && t < b + 0.45);
+    wRays.setAttribute("opacity", landed ? 1 - seg(t, landed + 0.2, landed + 0.45) : 0);
+    wRays.setAttribute("transform", `translate(0 ${-WR - 40}) scale(${landed ? 0.8 + 0.4 * seg(t, landed, landed + 0.45) : 1}) translate(0 ${WR + 40})`);
+    wBulbs.forEach((b, k) => b.setAttribute("fill", (Math.floor(t * (spinning ? 14 : 4)) + k) % 3 === 0 ? "#fff6c8" : "#f2c14e"));
+    wTitle.style.opacity = seg(t, 11.2, 11.3) * (1 - wOut);
+    wTitle.style.transform = `scale(${back(seg(t, 11.2, 11.55)) * (1 + 0.06 * Math.sin(t * 5))}) rotate(${-3 + 2 * Math.sin(t * 2)}deg)`;
+    // cards: whip-pan in from the right with blur, out to the left
+    const whip = (node, tin, tout) => {
+      const pi = seg(t, tin, tin + 0.38), po = seg(t, tout, tout + 0.32);
+      if (pi <= 0 || po >= 1) { node.style.opacity = 0; node.style.display = "none"; return; }
+      node.style.display = "block"; node.style.opacity = 1;
+      const xi = 760 * (1 - out(pi)), xo = -820 * po * po, blur = 10 * (1 - pi) + 12 * po;
+      const settle = 2 * c01_settle(t - tin - 0.38, 1.4, 3.5);
+      node.style.transform = `translateX(${xi + xo}px) skewX(${-14 * (1 - pi) + 14 * po}deg) rotate(${-1.5 + settle}deg) scale(${CS})`;
+      node.style.filter = blur > 0.3 ? `blur(${blur.toFixed(1)}px)` : "none";
+    };
+    whip(mystery, 10.8, 12.95);
+    cards.forEach((c, i) => { whip(c, BEAT[i] - 0.05, i < 3 ? BEAT[i + 1] - 0.05 : 32.5); c.style.zIndex = 3; });
+    mystery.style.transform += ` rotate(${3 * Math.sin(t * 2.2)}deg)`;
+    // kinetic type
+    kt.forEach((d, i) => {
+      const a = BEAT[i] + 0.3, z = i < 3 ? BEAT[i + 1] - 0.15 : 32.4;
+      const vis = t > a - 0.05 && t < z + 0.3;
+      d.style.opacity = vis ? 1 - seg(t, z, z + 0.3) : 0;
+      d.style.transform = `translateY(${-40 * seg(t, z, z + 0.3)}px)`;
+      d.chars.forEach((c, j) => { const p = seg(t, a + j * 0.05, a + j * 0.05 + 0.28);
+        c.style.opacity = p > 0 ? 1 : 0; c.style.transform = `scale(${lerp(2.1, 1, back(p))}, ${lerp(0.4, 1, back(p))}) rotate(${(j % 2 ? 4 : -4) * (1 - p)}deg)`; });
     });
 
     // agency: reel rolls, clapper snaps at each "take", cursor books a call
@@ -235,34 +297,38 @@ scene(10, 40, (R, s) => {
     });
 
     // ---- Noa ----
-    let nx, ny, hop = 0, mood = "happy", wave = false, talk = false, look = 0, flip = false, arm = null, sq = 0;
-    const perch = i => ({ x: cardX(i) + 130 + (1.5 - i) * 36, y: TOP - 24 - 154 - 20 });
-    if (t < 13) {
-      // bounces in from the left onto the agency card
-      const p = seg(t, 12.0, 12.9); const P = perch(0);
-      nx = lerp(-150, P.x, ease(p)); ny = lerp(700, P.y, out(p)) - 110 * Math.sin(p * Math.PI); sq = t > 12.9 ? 0.14 * c01_settle(t - 12.9, 2.6, 6) : 0; mood = p > 0.2 && p < 0.8 ? "shock" : "happy";
-    } else if (t < 33) {
-      const i = active, loc = t - 13 - i * 5, P = perch(i), Q = i > 0 ? perch(i - 1) : P;
-      const j = seg(loc, 0.12, 0.62); // hop from the previous card
-      nx = lerp(Q.x, P.x, ease(j)); ny = lerp(Q.y, P.y, j) - (i > 0 ? 150 * Math.sin(j * Math.PI) : 0);
-      sq = i > 0 ? (seg(loc, 0, 0.12) - seg(loc, 0.12, 0.2)) * 0.18 + 0.12 * c01_settle(loc - 0.62, 2.6, 6) : 0.12 * c01_settle(loc, 2.6, 6);
-      look = [0.3, 0.3, 0.6, 0.2][i]; mood = "happy";
-      if (i === 0) { wave = loc > 2.4 && loc < 3.6; }
-      if (i === 1) { if (loc > 3.1 && loc < 3.8) { hop = seg(loc, 3.1, 3.8); } wave = loc > 3.1 && loc < 4.2; }
-      if (i === 2) { mood = loc > 1.5 && loc < 2.0 ? "shock" : "happy"; }
-      if (i === 3) { talk = loc > 1 && loc < 2.2; wave = loc > 2.5; }
-      if (loc > 4.6) { sq = 0.1 * Math.sin(seg(loc, 4.6, 5) * Math.PI); }
+    let nx = 660, ny = 716, hop = 0, mood = "happy", wave = false, talk = false, look = 1, flip = true, arm = null, sq = 0, gl = 0, nrot = 0;
+    if (t < 32.4) {
+      // hops in from the right, then works the wheel: crouch → swipe → watch → celebrate
+      const pin = seg(t, 11.0, 11.6);
+      if (t < 11.6) { nx = lerp(1000, 660, ease(pin)); ny = 716 - 120 * Math.sin(pin * Math.PI); mood = "happy"; }
+      sq = t > 11.6 ? 0.14 * c01_settle(t - 11.6, 2.6, 6) : 0;
+      SPIN.forEach(([s0, e0], i) => {
+        if (t > s0 - 0.35 && t < s0) sq = 0.14 * seg(t, s0 - 0.35, s0 - 0.1);
+        if (t >= s0 && t < s0 + 0.3) { arm = lerp(50, -110, out(seg(t, s0, s0 + 0.2))); sq = -0.08; }
+        if (t >= s0 + 0.3 && t < e0) { mood = t < e0 - 0.3 ? "shock" : "happy"; look = 1; }
+        if (t >= e0 && t < e0 + 0.7) { hop = seg(t, e0, e0 + 0.7); wave = true; }
+      });
+      if (t > 20.45 && t < 22.6) { look = 0.3; talk = t > 21.2 && t < 21.8; }
+      if (t > 24.5 && t < 25.0) mood = "shock";
+      if (t > 29 && t < 31) { wave = true; look = 0.5; }
     } else {
-      // leaps down to the right of the page, blows the horn, then points at the page
-      const p = seg(t, 33.1, 33.8), P = perch(3);
-      nx = lerp(P.x, 1470, ease(p)); ny = lerp(P.y, 714, p) - 200 * Math.sin(p * Math.PI);
-      sq = t > 33.8 ? 0.15 * c01_settle(t - 33.8, 2.5, 5) : 0; look = -1; flip = true;
-      mood = t > 33.3 && t < 33.8 ? "shock" : "happy";
-      if (t > 35.2) { arm = -18 + 6 * Math.sin(t * 5); talk = t > 35.4 && t < 38; }
+      // leaps over to the right of the page, blows the horn, glints at camera, then points at the page
+      const p = seg(t, 32.6, 33.4);
+      nx = lerp(660, 1470, ease(p)); ny = lerp(716, 714, p) - 260 * Math.sin(p * Math.PI); nrot = p > 0 && p < 1 ? -360 * ease(p) : 0;
+      sq = t > 33.4 ? 0.15 * c01_settle(t - 33.4, 2.5, 5) : 0; look = 1; flip = true;
+      mood = t > 32.6 && t < 33.4 ? "shock" : "happy";
+      if (t > 35.0 && t < 35.5) { flip = false; look = 0; gl = seg(t, 35.0, 35.15) * (1 - seg(t, 35.3, 35.5)); }
+      if (t > 35.5) { arm = -18 + 6 * Math.sin(t * 5); talk = t > 35.6 && t < 38; }
     }
-    poseNoa(noa, t, { x: nx, y: ny, s: 1, hop, mood, wave, talk, look, flip, op: seg(t, 12.0, 12.1) });
-    noa.style.transform += ` scale(${1 + sq}, ${1 - sq})`;
-    if (arm !== null) noa.P.ar.setAttribute("transform", `rotate(${arm} 154 118)`);
+    poseNoa(noa, t, { x: nx, y: ny, s: 1, hop, mood, wave, talk, look, flip, op: seg(t, 11.0, 11.05) });
+    noa.style.transform += ` rotate(${nrot}deg) scale(${1 + sq}, ${1 - sq})`;
+    noa.style.transformOrigin = nrot ? "50% 60%" : "50% 100%";
+    if (arm !== null) noa.P.ar.setAttribute("transform", `rotate(${arm} 154 117)`);
+    glint.setAttribute("opacity", gl); glint.setAttribute("transform", `translate(128 98) scale(${0.3 + 1.1 * gl}) rotate(${t * 200})`);
+    // cheek-pouch gag: when the bottle lands in the cart, Noa stuffs his cheeks too
+    const pf = t > 21.3 && t < 22.9 ? (1 + 0.25 * c01_settle(t - 21.3, 2.8, 5)) * (1 - seg(t, 22.6, 22.9)) : 0;
+    puff.setAttribute("rx", 24 * pf); puff.setAttribute("ry", 18 * pf); puff.setAttribute("opacity", pf ? 1 : 0);
     // party horn: out at 34.0–35.0 with two toots
     const hornOn = t > 33.85 && t < 35.1;
     horn.setAttribute("opacity", hornOn ? 1 : 0);
@@ -270,7 +336,7 @@ scene(10, 40, (R, s) => {
     tube.setAttribute("width", 90 * blow); curl.setAttribute("opacity", blow < 0.12 ? 1 : 0);
     toot.style.opacity = blow > 0.5 ? 1 : 0;
     toot.style.transform = `translate(${nx - 150}px, ${ny - 30}px) rotate(-10deg) scale(${0.9 + 0.2 * blow})`;
-    sayBubble(bubS, t, 21.2, 22.6, "담았다!", nx + 40, ny - 70);
+    sayBubble(bubS, t, 21.4, 22.7, "나도 볼에 담았다!", nx - 120, ny - 80);
     sayBubble(bub, t, 35.3, 39.6, "이게 실제로 만든 페이지야 👀", 1420, 470);
   };
 });

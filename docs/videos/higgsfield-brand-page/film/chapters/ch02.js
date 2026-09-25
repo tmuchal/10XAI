@@ -148,7 +148,7 @@ scene(40, 72, (R, s) => {
 
   // ================= page wireframe (right) =================
   const WX = 1060, WY = 170, WW = 720, WH = 690;
-  const wire = el("div", `left:${WX}px;top:${WY}px;width:${WW}px;height:${WH}px;background:#fffaf0;border:4px solid ${INK2};border-radius:18px;overflow:hidden;box-shadow:9px 11px 0 rgba(43,35,32,.22);z-index:8;transform-origin:50% 50%`, `
+  const wire = el("div", `left:${WX}px;top:${WY}px;width:${WW}px;height:${WH}px;word-break:keep-all;background:#fffaf0;border:4px solid ${INK2};border-radius:18px;overflow:hidden;box-shadow:9px 11px 0 rgba(43,35,32,.22);z-index:8;transform-origin:50% 50%`, `
     <div style="height:48px;background:#f6d9a0;border-bottom:4px solid ${INK2};display:flex;align-items:center;gap:9px;padding:0 16px">
       <i style="width:13px;height:13px;border-radius:50%;background:#ff5f57;border:2px solid ${INK2}"></i><i style="width:13px;height:13px;border-radius:50%;background:#febc2e;border:2px solid ${INK2}"></i><i style="width:13px;height:13px;border-radius:50%;background:#28c840;border:2px solid ${INK2}"></i>
       <span style="margin-left:12px;font-size:24px">내 브랜드 페이지 · 설계도</span></div>
@@ -164,7 +164,7 @@ scene(40, 72, (R, s) => {
   const rows = ROWS.map((r, i) => {
     const d = el("div", `position:relative;height:${r[1]}px;margin-bottom:10px;border:3px solid ${INK2};border-radius:12px;background:#f3ead8;display:flex;align-items:center;gap:14px;padding:0 16px;transform-origin:0 50%`,
       `<span class="bd" style="flex:none;display:grid;place-items:center;width:40px;height:40px;border-radius:50%;background:${C02_COL[i]};border:3px solid ${INK2};font-size:24px">${i + 1}</span>
-       <span style="flex:none;width:96px;font-size:22px;letter-spacing:1px;color:#6b5d52">${r[0]}</span><div style="flex:1;min-width:0">${r[2]}</div>`, inner);
+       <span style="flex:none;width:122px;font-size:22px;white-space:nowrap;color:#6b5d52">${r[0]}</span><div style="flex:1;min-width:0">${r[2]}</div>`, inner);
     d.bd = d.querySelector(".bd"); return d;
   });
   const h1 = rows[0].querySelector(".h1"), h2 = rows[0].querySelector(".h2"), strike = rows[0].querySelector(".strike path");
@@ -213,7 +213,7 @@ scene(40, 72, (R, s) => {
     <circle class="curl" cx="142" cy="126" r="9" fill="none" stroke="#e0607e" stroke-width="6"/>`;
   noa.P.b.appendChild(horn);
   const tube = horn.querySelector(".tube"), curl = horn.querySelector(".curl");
-  const bub = makeBubble(cam); bub.style.whiteSpace = "normal"; bub.style.width = "360px"; bub.style.textAlign = "center";
+  const bub = makeBubble(cam); bub.style.whiteSpace = "normal"; bub.style.width = "360px"; bub.style.textAlign = "center"; bub.style.wordBreak = "keep-all";
   const bubC = makeBubble(cam), bubN = makeBubble(cam);
 
   // customer timeline along the road: [arrive time, depart time] per station

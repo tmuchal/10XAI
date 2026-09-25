@@ -11,9 +11,9 @@ from toonlib import *
 N = 72
 FILM = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..', 'film'))
 frames, out_dir = frames_arg(N)
-out_dir = out_dir or os.path.join(FILM, 'assets', '3d', '_png_flythrough')
+out_dir = out_dir or '/tmp/blender-shots/flythrough'   # PNG master; finalize.py converts to JPG
 
-reset((1920, 1080), transparent=False, samples=8, world="#fbeed3")
+reset((1920, 1080), transparent=False, samples=5, world="#fbeed3")
 
 VEL = toon('velvet', "#c8372d", shadow="#8f2320", hi="#e25a48", thresh=0.47, hi_at=0.9, paper=0.09)
 VEL2 = toon('velvet2', "#b52f28", shadow="#7e1c1b", hi="#d44a3c", thresh=0.47, hi_at=0.9, paper=0.09)
@@ -59,7 +59,7 @@ bd = bpy.data.materials.new('sunburst'); bd.use_nodes = True
 nt = bd.node_tree; nt.nodes.clear(); Nn, Ln = nt.nodes, nt.links
 o = Nn.new('ShaderNodeOutputMaterial'); tc = Nn.new('ShaderNodeTexCoord')
 sep = Nn.new('ShaderNodeSeparateXYZ'); Ln.new(tc.outputs['Object'], sep.inputs[0])
-zc = Nn.new('ShaderNodeMath'); zc.operation = 'SUBTRACT'; zc.inputs[1].default_value = 2.4
+zc = Nn.new('ShaderNodeMath'); zc.operation = 'SUBTRACT'; zc.inputs[1].default_value = 2.9
 Ln.new(sep.outputs['Z'], zc.inputs[0])
 at = Nn.new('ShaderNodeMath'); at.operation = 'ARCTAN2'
 Ln.new(zc.outputs[0], at.inputs[0]); Ln.new(sep.outputs['X'], at.inputs[1])
@@ -100,7 +100,7 @@ for i, (cx, cz, s) in enumerate(((-3.6, 4.1, 1.0), (3.4, 4.6, 0.8), (1.2, 5.6, 0
     pts = cloud_pts([(-0.55 * s, 0, 0.42 * s), (0, 0.18 * s, 0.55 * s), (0.6 * s, 0, 0.4 * s), (0.05 * s, -0.12 * s, 0.4 * s)])
     c = cutout('cloud%d' % i, pts, 0.08, cw, None, (cx, 4.2 - 0.3 * i, cz), 0.03)
     polyline('string%d' % i, [(cx, 4.2 - 0.3 * i, cz + 0.4 * s), (cx, 4.2 - 0.3 * i, cz + 2.2), (cx, 4.2 - 0.3 * i, 9)], 0.012)
-sun = cylinder('sun', 0.75, 0.06, (0, 4.6, 5.2), toon('sunm', "#ffd257", hi="#fff1a8", paper=0.05), None, 0.03,
+sun = cylinder('sun', 0.7, 0.06, (0, 4.6, 2.9), toon('sunm', "#ffd257", hi="#fff1a8", paper=0.05), None, 0.03,
                rot=(math.pi / 2, 0, 0), seg=48)
 SUN = sun
 
@@ -119,25 +119,25 @@ cylinder('crest', 0.42, 0.18, (0, PY - 0.3, OPEN_H + 0.45), GOLDM, None, OL, rot
 star_mesh('creststar', 0.28, 0.11, 5, toon('crs', "#fff3c4", paper=0.0), None, (0, PY - 0.42, OPEN_H + 0.45))
 
 # valance with scallops + gold trim
-VAL_TOP, VAL_BOT, SC_W = OPEN_H + 0.05, OPEN_H - 0.75, 1.075
+VAL_TOP, VAL_BOT, SC_W = OPEN_H - 0.02, OPEN_H - 0.8, 1.075
 
 
 def val_fn(u, v):
     x = -OPEN_W + 2 * OPEN_W * u
     zb = VAL_BOT - 0.28 * abs(math.sin(math.pi * x / SC_W + math.pi / 2)) + 0.28
     z = lerp(zb, VAL_TOP, v)
-    return (x, PY + 0.25 + 0.06 * math.sin(x * 9.0) * (1 - v * 0.5), z)
+    return (x, PY - 0.02 + 0.05 * math.sin(x * 9.0) * (1 - v * 0.5), z)
 
 
 grid_obj('valance', 240, 8, val_fn, VEL2, None, thick=0.08, outline=OL)
 trim = [val_fn(i / 240, 0.0) for i in range(241)]
-trim = [(x, y - 0.08, z + 0.02) for x, y, z in trim]
+trim = [(x, y - 0.07, z + 0.03) for x, y, z in trim]
 polyline('valtrim', trim[::3], 0.05, GOLDM)
 for i in range(9):
     x = -OPEN_W + SC_W * (i + 0.5) - 0.0
     if abs(x) > OPEN_W: continue
     zb = val_fn((x + OPEN_W) / (2 * OPEN_W), 0)[2]
-    sphere('tassel%d' % i, 0.09, (x, PY + 0.12, zb - 0.1), (1, 1, 1.3), GOLDM, None, OL * 0.7, 16)
+    sphere('tassel%d' % i, 0.09, (x, PY - 0.1, zb - 0.1), (1, 1, 1.3), GOLDM, None, OL * 0.7, 16)
 
 
 # tied side curtains
@@ -166,12 +166,24 @@ for sx in (-1, 1):
     polyline('tierope%d' % sx, [(sx * (OPEN_W - 0.5), PY + 0.3, 1.55), (sx * (OPEN_W - 0.62), PY + 0.28, 1.2),
                                 (sx * (OPEN_W - 0.6), PY + 0.28, 1.0)], 0.03, GOLDM)
 
+# apron trim + footlights
+box('aprontrim', (18, 0.3, 0.1), (0, -2.3, -0.05), GOLDM, None, OL * 0.7)
+FOOT = []
+for i in range(-6, 7):
+    FOOT.append(sphere('foot%d' % i, 0.13, (i * 0.72, -2.25, 0.02), (1, 0.8, 0.7),
+                       toon('footm', "#ffe27a", hi="#fffbe0", paper=0.02), None, OL * 0.7, 20))
+    cylinder('footb%d' % i, 0.16, 0.08, (i * 0.72, -2.25, -0.02), GOLDM, None, OL * 0.6, seg=24)
+for sx in (-1, 1):
+    polyline('suneye%d' % sx, [(sx * 0.22 - 0.1, 4.52, 3.0), (sx * 0.22, 4.52, 3.1), (sx * 0.22 + 0.1, 4.52, 3.0)], 0.025)
+    sphere('suncheek%d' % sx, 0.1, (sx * 0.38, 4.53, 2.8), (1, 0.3, 0.7), flat('sunblush', "#f7a08a", alpha=0.8), None)
+polyline('sunsmile', [(-0.14, 4.52, 2.72), (0, 4.52, 2.62), (0.14, 4.52, 2.72)], 0.025)
+
 # floor light pool
-pool = cylinder('pool', 1.8, 0.002, (0, 0.7, 0.004), flat('poolm', "#fff4c8", alpha=0.55), None)
+pool = cylinder('pool', 1.8, 0.002, (0, -0.3, 0.004), flat('poolm', "#fff4c8", alpha=0.55), None)
 pool.scale = (1.25, 0.6, 1)
 
 # ---------------------------------------------------------------- house curtain (parts)
-HY, HW, HH = -10.2, 5.2, 9.0
+HY, HW, HH = -11.2, 5.2, 9.0
 
 
 def house_fn(sx, p, sway):
@@ -183,7 +195,7 @@ def house_fn(sx, p, sway):
         xr = xo - sx * HW * u                              # rest (u=1 -> centre seam)
         x = xo + (xr - xo) * c + sx * 0.0 + sway * (1 - v) ** 2 * sx
         A = 0.14 * (1 + 1.6 * pz)
-        ph = u * math.pi * 14
+        ph = u * math.pi * 22
         y = HY + A * (math.sin(ph) + 0.25 * math.sin(2.3 * ph + 1)) + (0.03 if sx > 0 else 0)
         return (x, y, z)
     return fn
@@ -194,20 +206,19 @@ houseR, updR = grid_obj('houseR', 160, 16, house_fn(1, 0, 0), VEL2, None, thick=
 
 # ---------------------------------------------------------------- Noa
 NOA = hamster('noa', glasses=True, ol=0.024)
-cam = camera((0, -11.3, 1.8), (0, 0, 1.5), lens=30)
+cam = camera((0, -12.0, 1.8), (0, 0, 1.5), lens=30)
 
 
 def setup(f):
     t = f / 30.0
     # curtain: tiny inward tug (anticipation) then fast part with overshoot
     tug = -0.05 * math.sin(math.pi * seg(t, 0.12, 0.42))
-    p = tug + back(seg(t, 0.4, 1.35), 1.2)
-    sway = 0.5 * spring(t - 1.35, 1.6, 3.0)
+    p = tug + ease(seg(t, 0.42, 1.5))
+    sway = 0.45 * spring(t - 1.5, 1.6, 3.0)
     updL(house_fn(-1, max(0.0, p), sway)); updR(house_fn(1, max(0.0, p), sway))
     # camera: creep, then rush through the gap, settle with a soft overshoot
-    k = seg(t, 0.25, 2.1)
-    k = back(ease(k) if k < 1 else 1.0, 0.6) if False else ease(k)
-    y = lerp(-11.35, -8.85, k) + 0.08 * spring(t - 2.1, 1.2, 4.0)
+    k = ease(seg(t, 0.3, 2.05))
+    y = lerp(-12.05, -10.0, k) + 0.1 * spring(t - 2.05, 1.2, 4.0)
     z = lerp(1.65, 2.05, k)
     look = (lerp(0.15, 0.0, k), 0.0, lerp(1.55, 1.75, k))
     aim(cam, (lerp(0.25, 0.0, k), y, z), look, roll=lerp(0.06, 0.0, out(seg(t, 0.2, 2.0))))
@@ -227,14 +238,14 @@ def setup(f):
     wave = seg(t, 1.45, 1.7)
     armR = lerp(0.2, 2.55, back(wave)) + (0.35 * math.sin((t - 1.6) * 16) if t > 1.6 else 0)
     armL = lerp(0.1, 0.9, out(seg(t, 1.12, 1.4))) - 0.5 * out(seg(t, 1.6, 1.9))
-    pose(NOA, f, loc=(0, 0.7, zj), turn=turn, squash=sq, armR=armR, armL=armL,
+    pose(NOA, f, loc=(0, -0.3, zj), turn=turn, squash=sq, armR=armR, armL=armL,
          head_tilt=0.12 * math.sin(math.pi * seg(t, 1.5, 2.4)), lean=0.05 * spring(t - 1.48, 2, 4))
     NOA['shadow'].scale = (1 - 0.35 * math.sin(math.pi * air) if 0 < air < 1 else 1, 0.55, 1)
     g = seg(t, 1.62, 2.05)
     gs = math.sin(math.pi * g) * 1.1
     NOA['glint'].scale = (gs, gs, gs)
     NOA['glint'].rotation_euler = (0, g * 1.6, 0)
-    SUN.rotation_euler = (math.pi / 2, 0, t * 0.6)
+    SUN.scale = (1 + 0.04 * math.sin(t * 6),) * 3
 
 
 render_frames(out_dir, frames, setup)

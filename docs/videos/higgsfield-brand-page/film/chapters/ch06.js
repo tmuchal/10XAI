@@ -23,7 +23,7 @@ scene(160, 184, (R, s) => {
             [178, "제 페이지의 마지막 장면도 결국 '행동'", "My page also ends on the action"]];
   s.cite = [[167, "예시 수치 · illustrative numbers"]];
   const head = chapter(R, "CHAPTER 06", "결국, 비즈니스(매출)로");
-  const INK = C06_INK;
+  const INK = C06_INK; R.style.wordBreak = "keep-all";
 
   // ================= funnel machine
   const CX = 540, Y0 = 250, BH = 86, WT = [760, 620, 490, 370, 260, 180], SPY = Y0 + 5 * BH;  // spout top
@@ -77,16 +77,18 @@ scene(160, 184, (R, s) => {
     <g class="pile"></g><path d="M6 14 H114 L100 62 H20 Z" fill="#d9a06a" stroke="${INK}" stroke-width="4" stroke-linejoin="round"/>
     <path d="M14 30 H106 M18 46 H102" stroke="${INK}" stroke-width="3" opacity=".5"/></svg>`, R);
   const pile = basket.querySelector(".pile");
-  const env = c06_abs("left:0;top:0;width:240px;height:150px;z-index:36;transform-origin:50% 50%", `
-    <svg width="240" height="150" style="position:absolute;left:0;top:0;overflow:visible"><rect x="2" y="2" width="236" height="146" rx="10" fill="#f3d9a4" stroke="${INK}" stroke-width="4"/></svg>
-    <div class="cd" style="position:absolute;left:14px;top:12px;width:212px;height:124px;border:3px solid ${INK};border-radius:8px;text-align:center;white-space:nowrap">
-      <div style="font-size:22px;color:#6b5d52;margin-top:6px">노아의 예측</div><div style="font-size:34px;line-height:1.1">₩4,500,000<span class="q" style="color:#c8372d">?</span></div>
-      <div class="ck" style="font-size:26px;color:#2f7a3a;opacity:0">✓ 적중! MATCH</div></div>
-    <svg width="240" height="150" style="position:absolute;left:0;top:0;overflow:visible"><path d="M2 60 L120 110 L238 60 V140 Q238 148 230 148 H10 Q2 148 2 140 Z" fill="#f7e2b6" stroke="${INK}" stroke-width="4" stroke-linejoin="round"/></svg>
-    <div class="fl" style="position:absolute;left:0;top:0;width:240px;height:100px;transform-origin:50% 2px">
-      <svg width="240" height="100" style="overflow:visible"><path d="M2 4 L120 86 L238 4 Z" fill="#efcf8f" stroke="${INK}" stroke-width="4" stroke-linejoin="round"/></svg>
-      <div class="sl" style="position:absolute;left:100px;top:56px;width:40px;height:40px;border-radius:50%;background:#c8372d;border:3px solid ${INK};color:#fff;font-size:26px;text-align:center;line-height:34px">?</div></div>`, R);
-  const eCard = env.querySelector(".cd"), eFlap = env.querySelector(".fl"), eSeal = env.querySelector(".sl"), eQ = env.querySelector(".q"), eChk = env.querySelector(".ck");
+  const env = c06_abs("left:0;top:0;width:280px;height:160px;z-index:36;transform-origin:50% 50%", `
+    <svg width="280" height="160" style="position:absolute;left:0;top:0;overflow:visible;z-index:0"><rect x="2" y="2" width="276" height="156" rx="10" fill="#f3d9a4" stroke="${INK}" stroke-width="4"/></svg>
+    <div class="cd" style="position:absolute;left:14px;top:12px;width:252px;height:130px;border:3px solid ${INK};border-radius:8px;text-align:center;white-space:nowrap;z-index:2">
+      <div style="font-size:22px;color:#6b5d52;margin-top:4px">노아의 예측</div><div style="font-size:36px;line-height:1.1">₩4,500,000<span class="q" style="color:#c8372d">?</span></div>
+      <div class="ck" style="font-size:28px;color:#2f7a3a;opacity:0">✓ 적중!</div></div>
+    <div style="position:absolute;left:0;top:0;width:280px;height:160px;z-index:3">
+      <svg width="280" height="160" style="position:absolute;left:0;top:0;overflow:visible"><path d="M2 64 L140 116 L278 64 V150 Q278 158 270 158 H10 Q2 158 2 150 Z" fill="#f7e2b6" stroke="${INK}" stroke-width="4" stroke-linejoin="round"/></svg>
+      <div class="fr" style="position:absolute;left:0;right:0;top:112px;text-align:center;font-size:30px;white-space:nowrap">₩4,500,000?</div></div>
+    <div class="fl" style="position:absolute;left:0;top:0;width:280px;height:100px;transform-origin:50% 2px;z-index:4">
+      <svg width="280" height="100" style="overflow:visible"><path d="M2 4 L140 90 L278 4 Z" fill="#efcf8f" stroke="${INK}" stroke-width="4" stroke-linejoin="round"/></svg>
+      <div class="sl" style="position:absolute;left:120px;top:60px;width:40px;height:40px;border-radius:50%;background:#c8372d;border:3px solid ${INK};color:#fff;font-size:26px;text-align:center;line-height:34px">?</div></div>`, R);
+  const eFront = env.querySelector(".fr"), eCard = env.querySelector(".cd"), eFlap = env.querySelector(".fl"), eSeal = env.querySelector(".sl"), eQ = env.querySelector(".q"), eChk = env.querySelector(".ck");
   const eLab = c06_abs(`left:0;top:0;padding:4px 14px 6px;${c06_card("#fff3c4", 10)};font-size:26px;white-space:nowrap;z-index:37;transform-origin:0 100%`, "봉인된 예측 · sealed guess", R);
   const burst = Array.from({ length: 18 }, (_, i) => c06_abs(`left:0;top:0;width:16px;height:12px;border:2px solid ${INK};border-radius:3px;background:${["#f2c14e", "#f08aa0", "#7cc3e0", "#9bd48a"][i % 4]};z-index:37;opacity:0`, "", R));
 
@@ -192,20 +194,20 @@ scene(160, 184, (R, s) => {
     // envelope: shown, stuffed into the cheek (161.3), popped out (170), opened, matched (171.85)
     const eShow = back(seg(t, 160.6, 161.0));
     let ex, ey, es;
-    if (t < 170) { ex = lerp(bx + 60, bx - 38, ease(envIn)); ey = lerp(760, 830, ease(envIn)); es = (0.3 + 0.4 * eShow) * (1 - .92 * ease(envIn)); }
-    else { const f = back(seg(t, 170.0, 170.45)); ex = lerp(bx - 38, 880, clamp(f)); ey = lerp(830, 560, clamp(f)) - 120 * Math.sin(clamp(f) * Math.PI); es = 0.1 + 0.9 * f; }
+    if (t < 170) { ex = lerp(bx + 110, bx - 38, ease(envIn)); ey = lerp(740, 830, ease(envIn)); es = (0.4 + 0.5 * eShow) * (1 - .93 * ease(envIn)); }
+    else { const f = back(seg(t, 170.0, 170.45)); ex = lerp(bx - 38, 860, clamp(f)); ey = lerp(830, 600, clamp(f)) - 120 * Math.sin(clamp(f) * Math.PI); es = 0.1 + 0.9 * f; }
     env.style.opacity = t < 160.6 || (t > 161.8 && t < 170) ? 0 : 1 - X1;
     const match = t > 171.85;
-    env.style.transform = `translate(${ex - 120}px, ${ey - 75}px) scale(${es * (1 + .12 * c06_kick(t - 171.85, 5, 16))}) rotate(${t < 170 ? -8 : -4 + 4 * c06_kick(t - 170.45, 4, 12)}deg)`;
+    env.style.transform = `translate(${ex - 140}px, ${ey - 80}px) scale(${es * (1 + .12 * c06_kick(t - 171.85, 5, 16))}) rotate(${t < 170 ? -8 : -4 + 4 * c06_kick(t - 170.45, 4, 12)}deg)`;
     const fo = seg(t, 170.45, 170.75);
-    eFlap.style.transform = `scaleY(${1 - 2 * fo})`; eSeal.style.opacity = fo < .5 ? 1 : 0;
-    eCard.style.transform = `translateY(${-96 * ease(seg(t, 170.75, 171.2))}px)`;
+    eFlap.style.transform = `scaleY(${1 - 2 * fo})`; eSeal.style.opacity = fo < .5 ? 1 : 0; eFlap.style.zIndex = fo < .5 ? 4 : 1; eFront.style.opacity = t > 170.7 ? 0 : 1; eCard.style.opacity = t > 170.55 ? 1 : 0;
+    eCard.style.transform = `translateY(${-118 * ease(seg(t, 170.75, 171.2))}px)`;
     eQ.style.display = match ? "none" : ""; eChk.style.opacity = match ? 1 : 0;
     eCard.style.background = match ? "#d8f0cf" : "#fffaf0";
-    const lb = back(seg(t, 160.75, 161.1)); eLab.style.opacity = clamp(lb * 2) * (1 - seg(t, 161.3, 161.5)); eLab.style.transform = `translate(${bx - 10}px, 640px) rotate(-4deg) scale(${lb})`;
+    const lb = back(seg(t, 160.75, 161.1)); eLab.style.opacity = clamp(lb * 2) * (1 - seg(t, 161.3, 161.5)); eLab.style.transform = `translate(${bx + 20}px, 600px) rotate(-4deg) scale(${lb})`;
     burst.forEach((b, i) => { const tau = t - 171.85, a = i / burst.length * 6.283 + .3 * c06_h(i, 2), d = (120 + 90 * c06_h(i, 3)) * out(seg(tau, 0, .6));
       b.style.opacity = tau > 0 && X1 < 1 ? 1 - seg(tau, .5, .9) : 0;
-      b.style.transform = `translate(${880 + Math.cos(a) * d - 8}px, ${470 + Math.sin(a) * d * .8 + 120 * tau * tau - 8}px) rotate(${tau * 500 + i * 40}deg)`; });
+      b.style.transform = `translate(${860 + Math.cos(a) * d - 8}px, ${480 + Math.sin(a) * d * .8 + 120 * tau * tau - 8}px) rotate(${tau * 500 + i * 40}deg)`; });
     const lp = back(seg(t, 161.2, 161.7)), lx = ease(seg(t, 166.5, 166.95)), lk = ease(seg(t, 162.7, 163.2));
     live.style.opacity = clamp(lp * 2) * (1 - lx); live.style.transformOrigin = "100% 0";
     live.style.transform = `translateY(${-50 * lx - 70 * lk}px) scale(${(0.6 + 0.4 * lp) * (1 - .45 * lk)}) rotate(${1.5 - 1.5 * lx}deg)`;

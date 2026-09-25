@@ -243,7 +243,7 @@ scene(106, 134, (R, s) => {
   const pC = el("div", `position:absolute;left:44px;top:220px;padding:12px 30px;border:4px solid ${c04_INK};border-radius:999px;background:#c8372d;color:#fff;font-size:34px;z-index:34;box-shadow:5px 6px 0 rgba(43,35,32,.25)`, "지금 시작하기 →", pvw);
   const pNoa = makeNoa(130); pvw.appendChild(pNoa);
   const sparks = [0, 1, 2, 3, 4].map(i => { const d = el("div", `position:absolute;left:0;top:0;font-size:40px;color:#f2a24e;z-index:36`, "✦", pvw); return d; });
-  const badge = el("div", `left:1230px;top:650px;z-index:37;padding:6px 20px 8px;border:5px solid #3e8fb8;border-radius:14px;background:rgba(255,250,240,.95);color:#3e8fb8;font-size:32px;white-space:nowrap`, "Claude가 코드로 만든 움직임 <span style='font-size:22px'>ANIMATED IN CODE</span>", BD); badge.className = "abs";
+  const badge = el("div", `left:1230px;top:650px;z-index:37;padding:6px 20px 8px;border:5px solid #3e8fb8;border-radius:14px;background:rgba(255,250,240,.95);color:#3e8fb8;font-size:32px;white-space:nowrap`, "Claude가 코드로 만든 움직임", BD); badge.className = "abs";
   const proud = makeNoa(190); BD.appendChild(proud);
   const pb2 = makeBubble(BD);
 

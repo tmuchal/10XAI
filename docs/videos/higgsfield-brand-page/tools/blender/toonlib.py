@@ -62,6 +62,9 @@ def reset(res=(1920, 1080), transparent=False, samples=8, world=PAPER):
     s.cycles.transmission_bounces = 0
     s.cycles.transparent_max_bounces = 10
     s.cycles.filter_width = 1.2
+    s.cycles.use_light_tree = False
+    s.cycles.caustics_reflective = False
+    s.cycles.caustics_refractive = False
     s.render.resolution_x, s.render.resolution_y = res
     s.render.resolution_percentage = 100
     s.render.film_transparent = transparent
@@ -158,7 +161,7 @@ def toon(name, color, shadow=None, hi=None, patch=None, paper=0.07, thresh=0.42,
     if paper:
         tc2 = N.new('ShaderNodeTexCoord')
         nz = N.new('ShaderNodeTexNoise'); nz.noise_dimensions = '4D'
-        nz.inputs['Scale'].default_value = 3.5; nz.inputs['Detail'].default_value = 3
+        nz.inputs['Scale'].default_value = 3.5; nz.inputs['Detail'].default_value = 1.5
         L.new(tc2.outputs['Object'], nz.inputs['Vector'])
         _NOISE_NODES.append(nz)
         mp = N.new('ShaderNodeMapRange')
@@ -435,8 +438,8 @@ def hamster(name, glasses=True, hat=False, hat_color="#f39bb6", fur=FUR, ol=0.02
         for o in R['eyes_closed']: o.hide_render = True
     # scarf
     sc = toon(name + '_scarf', SCARF)
-    torus(name + '_scarfr', 0.47, 0.12, (0, -0.03, 0.52), (1, 0.92, 0.7), sc, upper, ol)
-    tail = empty(name + '_scarftp', (0.3, -0.42, 0.5), upper)
+    torus(name + '_scarfr', 0.5, 0.12, (0, -0.03, 0.44), (1, 0.95, 0.7), sc, upper, ol)
+    tail = empty(name + '_scarftp', (0.3, -0.45, 0.42), upper)
     box(name + '_scarft', (0.14, 0.06, 0.32), (0, -0.02, -0.15), sc, tail, ol * 0.9, bevel=0.03)
     polyline(name + '_fringe', [(-0.05, -0.06, -0.31), (0.0, -0.06, -0.33), (0.05, -0.06, -0.31)], 0.008, inkm, tail)
     R['scarf_tail'] = tail
@@ -480,6 +483,10 @@ def render_frames(outdir, frames, setup_frame, start=1):
         s.frame_set(1)
         setup_frame(f)
         boil(f)
+        if i == 0:
+            for m in bpy.data.materials:
+                try: m.cycles.emission_sampling = 'NONE'
+                except Exception: pass
         s.render.filepath = os.path.join(outdir, '%04d.png' % (f + start))
         bpy.ops.render.render(write_still=True)
     dt = time.time() - t0

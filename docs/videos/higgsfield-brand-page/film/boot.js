@@ -42,11 +42,22 @@ const SIGNS = [["누구를 위한 페이지?", "Who is it for?"], ["전체 흐�
   ["몰입감 만들기", "Building immersion"], ["전문성 × 유머", "Expertise × humor"], ["결국, 매출로", "Turning it into sales"], ["커튼콜", "Curtain call"]];
 const J = (i, j, k, a) => (hash(i, j, k) - .5) * 2 * a;   // jitter
 
-// shared paint (kept in the always-rendered #fx defs: gradients inside display:none SVGs don't paint)
-$("fx").insertAdjacentHTML("beforeend", `<linearGradient id="flw" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#e7b06c"/><stop offset=".5" stop-color="#eebd7c"/><stop offset="1" stop-color="#dc9c5a"/></linearGradient>
+// Static decor is rasterized ONCE into canvases (3 hand-drawn "boil" variants each, swapped at 8 fps).
+// Frame capture re-rasterizes every SVG/gradient each shot, but a canvas is just a bitmap blit.
+const DECOR_DEFS = `<defs><linearGradient id="flw" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#e7b06c"/><stop offset=".5" stop-color="#eebd7c"/><stop offset="1" stop-color="#dc9c5a"/></linearGradient>
   <radialGradient id="lampglow"><stop offset="0" stop-color="#fff6cc" stop-opacity=".95"/><stop offset="1" stop-color="#fff6cc" stop-opacity="0"/></radialGradient>
   <linearGradient id="fls" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#7a4a22" stop-opacity=".35"/><stop offset="1" stop-color="#7a4a22" stop-opacity="0"/></linearGradient>
-  <linearGradient id="vg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#9c231d"/><stop offset=".55" stop-color="#d23c30"/><stop offset="1" stop-color="#e65a47"/></linearGradient>`);
+  <linearGradient id="vg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#9c231d"/><stop offset=".55" stop-color="#d23c30"/><stop offset="1" stop-color="#e65a47"/></linearGradient></defs>`;
+const DECOR_READY = [];
+function rasterize(host, svgs, w, h) {
+  host.innerHTML = "";
+  svgs.forEach((svg, k) => {
+    const c = el("canvas", `position:absolute;left:0;top:0;display:${k ? "none" : "block"}`, null, host); c.width = w; c.height = h;
+    const img = new Image();
+    DECOR_READY.push(new Promise(res => { img.onload = () => { c.getContext("2d").drawImage(img, 0, 0); res(); }; img.onerror = res; }));
+    img.src = "data:image/svg+xml;charset=utf-8," + encodeURIComponent(svg.replace("<svg ", `<svg xmlns="http://www.w3.org/2000/svg" `).replace(/(<svg[^>]*>)/, "$1" + DECOR_DEFS));
+  });
+}
 // ---- floor: honey-wood planks in perspective + footlights (3 boil variants)
 (function floor() {
   const v = [0, 1, 2].map(k => {
@@ -57,11 +68,11 @@ $("fx").insertAdjacentHTML("beforeend", `<linearGradient id="flw" x1="0" y1="0" 
     let edge = "M0 3"; for (let x = 0; x <= 1920; x += 80) edge += ` L${x} ${(3 + J(x, k, 7, 1.3)).toFixed(1)}`;
     const lamps = Array.from({ length: 12 }, (_, i) => { const x = 110 + i * 155; return `<g transform="translate(${x} 176)"><ellipse cx="0" cy="-6" rx="46" ry="26" fill="url(#lampglow)"/>
       <path d="M-22 8 Q-22 -14 0 -16 Q22 -14 22 8Z" fill="#ffe7a0" stroke="${INK}" stroke-width="3.5"/><path d="M-12 -6 Q-6 -11 2 -11" stroke="#fff" stroke-width="3" fill="none" stroke-linecap="round"/></g>`; }).join("");
-    return `<svg width="1920" height="190" style="display:${k ? "none" : "block"}">
+    return `<svg width="1920" height="190">
       <rect width="1920" height="190" fill="url(#flw)"/>${s}<rect width="1920" height="22" fill="url(#fls)"/>
       <path d="${edge}" stroke="${INK}" stroke-width="5" fill="none"/>${lamps}</svg>`;
   });
-  $("floor").innerHTML = v.join("");
+  rasterize($("floor"), v, 1920, 190);
 })();
 // ---- valance: swagged pelmet with fold shading, gold trim and tassels (3 boil variants)
 (function valance() {
@@ -76,28 +87,18 @@ $("fx").insertAdjacentHTML("beforeend", `<linearGradient id="flw" x1="0" y1="0" 
       ts += `<g transform="translate(${x + 160} ${y1 + 2})"><path d="M0 0 L0 18" stroke="${INK}" stroke-width="3"/><circle cx="0" cy="20" r="7" fill="#f7c948" stroke="${INK}" stroke-width="3"/>
         <path d="M-8 26 L-10 50 L10 50 L8 26Z" fill="#f7c948" stroke="${INK}" stroke-width="3" stroke-linejoin="round"/><path d="M-4 30 L-5 48 M3 30 L4 48" stroke="#c8963a" stroke-width="2"/></g>`;
     }
-    return `<svg width="1920" height="140" overflow="visible" style="display:${k ? "none" : "block"}">
+    return `<svg width="1920" height="140">
       <rect x="-10" y="-10" width="1940" height="44" fill="#b52e26"/>${sw}${tr}${ts}
       <path d="M-10 6 H1930" stroke="#f7c948" stroke-width="5"/><path d="M-10 11 H1930" stroke="${INK}" stroke-width="2" stroke-opacity=".5"/></svg>`;
   });
-  $("valance").innerHTML = v.join("");
+  rasterize($("valance"), v, 1920, 140);
 })();
 
-// ---- curtains: jittered fold bands, hourglass tie-back when open, overshoot + trailing hem
+// ---- curtains: jittered fold bands, hourglass tie-back when open, overshoot + trailing hem (drawn on a canvas)
 const NS = "http://www.w3.org/2000/svg";
-$("curt").innerHTML = `<defs>
-  <linearGradient id="cb" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#8a1c17"/><stop offset=".28" stop-color="#c0322a"/><stop offset=".55" stop-color="#e45a48"/><stop offset=".72" stop-color="#cf3c31"/><stop offset="1" stop-color="#96221b"/></linearGradient>
-  <linearGradient id="cs" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#4a0d0a" stop-opacity=".45"/><stop offset=".22" stop-color="#4a0d0a" stop-opacity="0"/><stop offset=".85" stop-color="#4a0d0a" stop-opacity="0"/><stop offset="1" stop-color="#4a0d0a" stop-opacity=".25"/></linearGradient></defs>
-  <g id="cL"></g><g id="cR"></g>`;
 const NB = 9, NYS = 16, TIE_Y = 540;
-const CP = ["cL", "cR"].map(id => {
-  const g = $(id), mk = (tag, attrs) => { const e = document.createElementNS(NS, tag); for (const k in attrs) e.setAttribute(k, attrs[k]); g.appendChild(e); return e; };
-  const bands = Array.from({ length: NB }, () => mk("path", { fill: "url(#cb)", stroke: "#7a1813", "stroke-width": 2, "stroke-opacity": .55 }));
-  return { g, bands, shade: mk("path", { fill: "url(#cs)" }), hem: mk("path", { fill: "#f7c948", stroke: INK, "stroke-width": 3.5, "stroke-linejoin": "round" }),
-    edge: mk("path", { fill: "none", stroke: INK, "stroke-width": 6, "stroke-linejoin": "round", "stroke-linecap": "round" }),
-    tieI: mk("path", { fill: "none", stroke: INK, "stroke-width": 26, "stroke-linecap": "round" }), tie: mk("path", { fill: "none", stroke: "#f7c948", "stroke-width": 17, "stroke-linecap": "round" }),
-    tas: mk("path", { fill: "#f7c948", stroke: INK, "stroke-width": 3.5, "stroke-linejoin": "round" }) };
-});
+const CX = $("curt").getContext("2d");
+let curtKey = "";
 const backOut = x => back(clamp(x));
 function curtainC(t) {   // 0 open .. 1 closed (overshoots both ways)
   let c = t < 1.3 ? 1 - backOut(seg(t, 0.15, 1.3)) : 0, bi = -1;
@@ -113,32 +114,45 @@ function innerX(y, c, t, side, lag) {
   return lerp(open, closed, c) + sway + lag * Math.pow(Math.max(0, y) / 1080, 1.4);
 }
 function drawCurtains(t, c) {
-  const vel = (c - curtainC(t - .08).c) / .08, k = boilStep(t);
-  const lag = clamp(-vel * 30, -90, 90);
-  const tieOp = clamp(1 - c * 2.5);
-  CP.forEach((P, side) => {
+  const moving = Math.abs(c - curtainC(t - .04).c) > 1e-4;
+  // when the curtains rest, they sway "on twos" (12 fps) and identical frames reuse the bitmap
+  const tq = moving ? t : Math.floor(t * 12) / 12, k = boilStep(tq);
+  const key = moving ? "m" + t : "r" + tq.toFixed(3) + "|" + c.toFixed(4);
+  if (key === curtKey) return; curtKey = key;
+  const vel = (c - curtainC(tq - .08).c) / .08, lag = clamp(-vel * 30, -90, 90), tieOp = clamp(1 - c * 2.5);
+  const X0 = CX; X0.clearRect(0, 0, 1920, 1080); X0.lineJoin = "round"; X0.lineCap = "round";
+  [0, 1].forEach(side => {
     const X = x => side ? 1920 - x : x, outer = -40;
     const ys = Array.from({ length: NYS + 1 }, (_, j) => j / NYS * 1100 - 10);
-    const E = ys.map((y, j) => innerX(y, c, t, side, lag) + J(side, j, k, 1.4));
+    const E = ys.map((y, j) => innerX(y, c, tq, side, lag) + J(side, j, k, 1.4));
     const col = f => ys.map((y, j) => [X(outer + f * (E[j] - outer) + (f > 0 && f < 1 ? J(f * 10 + side, j, k + 3, 1.6) : 0)), y]);
-    const pts = a => a.map(p => p[0].toFixed(1) + " " + p[1].toFixed(1)).join(" L");
+    const poly = a => { X0.beginPath(); a.forEach((p, i) => i ? X0.lineTo(p[0], p[1]) : X0.moveTo(p[0], p[1])); };
     for (let i = 0; i < NB; i++) {
-      const a = col(i / NB), b = col((i + 1) / NB).reverse();
-      P.bands[i].setAttribute("d", "M" + pts(a) + " L" + pts(b) + "Z");
+      const a = col(i / NB), b = col((i + 1) / NB), mid = NYS >> 1;
+      const g = X0.createLinearGradient(a[mid][0], 0, b[mid][0], 0);
+      [[0, "#8a1c17"], [.28, "#c0322a"], [.55, "#e45a48"], [.72, "#cf3c31"], [1, "#96221b"]].forEach(([o, cl]) => g.addColorStop(o, cl));
+      poly(a.concat(b.reverse())); X0.closePath(); X0.fillStyle = g; X0.fill();
+      X0.strokeStyle = "rgba(122,24,19,.55)"; X0.lineWidth = 2; X0.stroke();
     }
     const inner = ys.map((y, j) => [X(E[j]), y]);
-    P.shade.setAttribute("d", `M${X(outer)} -10 L${pts(inner)} L${X(outer)} 1090Z`);
-    P.edge.setAttribute("d", "M" + pts(inner));
-    const eB = E[NYS], hy = 1046;
-    let hem = `M${X(outer)} ${hy}`;
-    for (let s = 0; s <= 8; s++) hem += ` L${X(outer + (eB - outer) * s / 8).toFixed(1)} ${(hy + (s % 2 ? 6 : 0) + J(s, side, k, 1)).toFixed(1)}`;
-    P.hem.setAttribute("d", hem + ` L${X(eB + 2)} 1090 L${X(outer)} 1090Z`);
-    const eT = innerX(TIE_Y, c, t, side, lag), ty = TIE_Y + 4;
-    const tieD = `M${X(outer)} ${ty - 14} Q${X(eT * .5)} ${ty + 12} ${X(eT + 6)} ${ty}`;
-    P.tieI.setAttribute("d", tieD); P.tie.setAttribute("d", tieD);
-    const sw = Math.sin(t * 2.1 + side) * 4 - lag * .15, tx = X(eT + 4);
-    P.tas.setAttribute("d", `M${tx} ${ty} L${tx + sw - 12} ${ty + 70} L${tx + sw + 12} ${ty + 70}Z M${tx - 8} ${ty + 8} a8 8 0 1 0 16 0 a8 8 0 1 0 -16 0`);
-    [P.tieI, P.tie, P.tas].forEach(e => e.setAttribute("opacity", tieOp));
+    const sg = X0.createLinearGradient(0, 0, 0, 1080);
+    sg.addColorStop(0, "rgba(74,13,10,.45)"); sg.addColorStop(.22, "rgba(74,13,10,0)"); sg.addColorStop(.85, "rgba(74,13,10,0)"); sg.addColorStop(1, "rgba(74,13,10,.25)");
+    poly([[X(outer), -10]].concat(inner, [[X(outer), 1090]])); X0.closePath(); X0.fillStyle = sg; X0.fill();
+    const eB = E[NYS], hy = 1046, hem = [[X(outer), hy]];
+    for (let s = 0; s <= 8; s++) hem.push([X(outer + (eB - outer) * s / 8), hy + (s % 2 ? 6 : 0) + J(s, side, k, 1)]);
+    poly(hem.concat([[X(eB + 2), 1090], [X(outer), 1090]])); X0.closePath(); X0.fillStyle = "#f7c948"; X0.fill(); X0.strokeStyle = INK; X0.lineWidth = 3.5; X0.stroke();
+    poly(inner); X0.strokeStyle = INK; X0.lineWidth = 6; X0.stroke();
+    if (tieOp > 0) {
+      X0.globalAlpha = tieOp;
+      const eT = innerX(TIE_Y, c, tq, side, lag), ty = TIE_Y + 4;
+      const tie = () => { X0.beginPath(); X0.moveTo(X(outer), ty - 14); X0.quadraticCurveTo(X(eT * .5), ty + 12, X(eT + 6), ty); };
+      tie(); X0.strokeStyle = INK; X0.lineWidth = 26; X0.stroke(); tie(); X0.strokeStyle = "#f7c948"; X0.lineWidth = 17; X0.stroke();
+      const sw = Math.sin(tq * 2.1 + side) * 4 - lag * .15, tx = X(eT + 4);
+      X0.beginPath(); X0.moveTo(tx, ty); X0.lineTo(tx + sw - 12, ty + 70); X0.lineTo(tx + sw + 12, ty + 70); X0.closePath();
+      X0.moveTo(tx + 8, ty + 8); X0.arc(tx, ty + 8, 8, 0, Math.PI * 2);
+      X0.fillStyle = "#f7c948"; X0.fill(); X0.strokeStyle = INK; X0.lineWidth = 3.5; X0.stroke();
+      X0.globalAlpha = 1;
+    }
   });
 }
 
@@ -205,9 +219,9 @@ function stageFx(t) {
   // camera: fly in through the curtain at the start, gentle push on every chapter change
   const intro = t < 2.2 ? 1 + 0.5 * (1 - backOut(seg(t, 0.1, 1.5))) : 1;
   let push = 0; BOUNDS.forEach(B => { if (t > B - 1 && t < B + 1.8) push = Math.max(push, t < B ? ease(seg(t, B - .8, B - .1)) : 1 - backOut(seg(t, B + .45, B + 1.5))); });
-  const cam = intro + 0.06 * push;
+  const cam = Math.max(1, intro + 0.06 * push);
   const sh = window.SHAKE || [0, 0]; window.SHAKE = [0, 0];
-  $("cam").style.transform = `translate(${sh[0].toFixed(1)}px, ${(sh[1] - 120 * (intro - 1)).toFixed(1)}px) scale(${cam.toFixed(4)})`;
+  $("cam").style.transform = `translate(${sh[0].toFixed(1)}px, ${(sh[1] - 120 * Math.max(0, intro - 1)).toFixed(1)}px) scale(${cam.toFixed(4)})`;
   // spotlight follows the main Noa, softly biased to centre stage
   const r = mainNoa();
   const nx = r ? r.left + r.width / 2 : 960, ny = r ? r.top + r.height / 2 : 470;
@@ -237,7 +251,7 @@ function stageFx(t) {
   });
   confetti(t);
 }
-window.READY = Promise.all([["700 40px GaeguKo", "가나다"], ["400 40px GaeguKo", "가"], ["700 40px GaeguLat", "Aa"], ["400 40px GaeguLat", "A"]].map(([f, x]) => document.fonts.load(f, x))).then(() => document.fonts.ready);
+window.READY = Promise.all([...DECOR_READY, ...[["700 40px GaeguKo", "가나다"], ["400 40px GaeguKo", "가"], ["700 40px GaeguLat", "Aa"], ["400 40px GaeguLat", "A"]].map(([f, x]) => document.fonts.load(f, x))]).then(() => document.fonts.ready);
 const baseRender = render;
 window.render = t => { baseRender(t); stageFx(t); };
 window.DURATION = DURATION;

@@ -54,7 +54,7 @@ function c03_frame(parent, x, y, w, h, pal, label, noaV) {
   return f;
 }
 function c03_stamp(parent, x, y, text, color, rot) {
-  const s = el("div", `left:${x}px;top:${y}px;z-index:36;padding:4px 18px 6px;border:5px solid ${color};border-radius:12px;color:${color};background:rgba(255,250,240,.88);font-size:34px;letter-spacing:1px;white-space:nowrap`, text, parent);
+  const s = el("div", `left:${x}px;top:${y}px;z-index:38;padding:4px 18px 6px;border:5px solid ${color};border-radius:12px;color:${color};background:rgba(255,250,240,.88);font-size:34px;letter-spacing:1px;white-space:nowrap`, text, parent);
   s.className = "abs"; s.rot = rot; return s;
 }
 function c03_slam(s, t, a) {
@@ -174,17 +174,17 @@ scene(72, 106, (R, s) => {
   const clock = el("div", "position:absolute;left:14px;top:5px", `<svg width="54" height="54"><circle cx="27" cy="27" r="22" fill="#fff" stroke="${c03_INK}" stroke-width="4"/><path class="hd" d="M27 27 V11" stroke="${c03_INK}" stroke-width="4" stroke-linecap="round"/><path class="hd2" d="M27 27 H38" stroke="#c8372d" stroke-width="4" stroke-linecap="round"/></svg>`, train);
   const hands = [clock.querySelector(".hd"), clock.querySelector(".hd2")];
   // the Soul ID card (later becomes the Reference Element)
-  const card = c03_box(R, 720, 290, 500, 300, "#fff4d0", "transform-origin:0 0;overflow:visible");
+  const card = c03_box(R, 720, 290, 500, 336, "#fff4d0", "transform-origin:0 0;overflow:visible");
   card.innerHTML = `<div style="position:absolute;left:0;right:0;top:0;height:18px;border-radius:14px 14px 0 0;background:linear-gradient(90deg,#f2a7a0,#f7d774,#bfe3a6,#9fd3f0,#cdbff3);border-bottom:3px solid ${c03_INK}"></div>
     <div class="ph" style="position:absolute;left:24px;top:44px;width:170px;height:200px;border:4px solid ${c03_INK};border-radius:12px;background:#fbe3b0;overflow:hidden"></div>
     <div style="position:absolute;left:220px;top:36px;font-size:28px;letter-spacing:3px;color:#c8372d">SOUL ID</div>
     <div style="position:absolute;left:218px;top:66px;font-size:78px;line-height:1;color:${c03_INK}">NOA</div>
     <div style="position:absolute;left:220px;top:160px;font-size:24px;line-height:1.4;color:#6b5d52">사진 20장+ 학습<br>3~5분 → 이름 저장</div>
-    <div style="position:absolute;left:24px;top:252px;font-size:22px;color:#c8372d;white-space:nowrap">고정: 선글라스 · 스카프 · 주황 털</div>
+    <div style="position:absolute;left:24px;top:290px;font-size:22px;color:#c8372d;white-space:nowrap">고정: 선글라스 · 스카프 · 주황 털</div>
     <div class="rt" style="position:absolute;left:150px;top:-34px;padding:4px 18px;border:4px solid ${c03_INK};border-radius:12px;background:#9fd3f0;font-size:28px;color:${c03_INK};white-space:nowrap;opacity:0">Reference Element</div>`;
   const cNoa = makeNoa(150); card.querySelector(".ph").appendChild(cNoa);
   const cardRt = card.querySelector(".rt");
-  const saved = c03_stamp(card, 300, 222, "저장 완료 ✓", "#2f9e5a", -8);
+  const saved = c03_stamp(card, 10, 206, "저장 완료 ✓", "#2f9e5a", -8);
 
   // ============ D · Reference Element → Kling / Seedance (91–95)
   const MACH = [["Kling 3.0", "#9fd3f0", 600, "park"], ["Seedance 2.0", "#f7b6c8", 1030, "sunset"]].map(([nm, col, x, pal], i) => {
@@ -243,11 +243,11 @@ scene(72, 106, (R, s) => {
     <rect x="10" y="20" width="110" height="112" rx="20" fill="#fff" stroke="${c03_INK}" stroke-width="5"/>
     ${[[38, 48], [92, 48], [65, 76], [38, 104], [92, 104]].map(([x, y]) => `<circle cx="${x}" cy="${y}" r="8" fill="${c03_INK}"/>`).join("")}
     <path d="M120 70 L150 58" stroke="${c03_INK}" stroke-width="6" stroke-linecap="round"/></svg>`, tugP);
-  const diceL = el("div", `position:absolute;left:30px;top:440px;width:230px;text-align:center;font-size:30px;color:${c03_INK};line-height:1.2`, "시드<br><span style='font-size:24px;color:#6b5d52'>약한 신호 · seed</span>", tugP);
+  const diceL = el("div", `position:absolute;left:30px;top:440px;width:230px;text-align:center;font-size:30px;color:${c03_INK};line-height:1.2`, "시드<br><span style='font-size:24px;color:#6b5d52'>약한 신호</span>", tugP);
   const frameC = el("div", `position:absolute;left:376px;top:196px;width:136px;height:170px;border:6px solid ${c03_INK};border-radius:10px;background:#f7d774;transform-origin:50% 100%`, "", tugP);
   const frameIn = el("div", `position:absolute;left:10px;top:10px;right:10px;bottom:10px;border:3px solid ${c03_INK};background:#d8eef7;overflow:hidden`, "", frameC);
   const fNoa = makeNoa(96); frameIn.appendChild(fNoa);
-  const frameL = el("div", `position:absolute;left:350px;top:440px;width:240px;text-align:center;font-size:30px;color:${c03_INK};line-height:1.2`, "레퍼런스<br><span style='font-size:24px;color:#6b5d52'>강한 신호 · reference</span>", tugP);
+  const frameL = el("div", `position:absolute;left:350px;top:440px;width:240px;text-align:center;font-size:30px;color:${c03_INK};line-height:1.2`, "레퍼런스<br><span style='font-size:24px;color:#6b5d52'>강한 신호</span>", tugP);
   const win = el("div", `position:absolute;left:360px;top:96px;padding:4px 20px;border:4px solid ${c03_INK};border-radius:14px;background:#f7d774;font-size:40px;color:#c8372d;z-index:5`, "승리!", tugP);
   const conf = Array.from({ length: 14 }, (_, i) => el("div", `position:absolute;left:0;top:0;width:14px;height:22px;border:2px solid ${c03_INK};border-radius:3px;background:${["#c8372d", "#f7d774", "#9fd3f0", "#bfe3a6"][i % 4]}`, "", tugP));
 
@@ -455,7 +455,7 @@ scene(72, 106, (R, s) => {
     const off = wob + 44 * yank;
     tug.style.transform = `translateX(${off}px)`;
     const fall = ease(seg(t, 98.4, 98.9));
-    dice.style.transform = `translate(${off + 30 * fall}px, ${30 * fall}px) rotate(${-10 - 12 * Math.abs(Math.sin(t * 6)) * (1 - yank) + 90 * fall}deg)`;
+    dice.style.transform = `translate(${off - 10 * fall}px, 0px) rotate(${-10 - 12 * Math.abs(Math.sin(t * 6)) * (1 - yank) - 28 * fall}deg)`;
     frameC.style.transform = `translateX(${off}px) rotate(${8 + 4 * Math.sin(t * 6) * (1 - yank)}deg)`;
     poseNoa(fNoa, t, { x: 5, y: 26, s: 1, mood: yank > .3 ? "happy" : "pout", wave: fall > .5 });
     diceL.style.opacity = frameL.style.opacity = seg(t, 96.9, 97.2);
