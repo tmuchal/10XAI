@@ -228,7 +228,7 @@ Theater.install();
         g += tx(234, y + 61, reply, 17, { a: 'start' }) + tx(234, y + 81, ko, 14, { a: 'start', body: true, f: KR });
       });
       g += Theater.box(104, FY, 92, Object.assign({ mood: 'star', label: 'HYPE' }, Theater.PAL.gold));
-      g += Theater.card(152, 470, 70, 26, '.env ?', { kind: 'gap' }) + Theater.card(36, 496, 64, 24, 'keys ?', { kind: 'gap' });
+      g += Theater.card(360, 554, 70, 26, '.env ?', { kind: 'gap' }) + Theater.card(36, 496, 64, 24, 'keys ?', { kind: 'gap' });
       g += Theater.uchu(232, FY, .46, { m: 'shock', sweat: true, look: 'l' });
       g += Theater.doc(320, FY, .5, { m: 'flat', q: true });
       g += peek(a);
@@ -446,7 +446,7 @@ Theater.install();
       roles.forEach((r, i) => { const x = i < 4 ? 52 + i * 44 : 376 + (i - 4) * 42; g += Theater.agent(r, x, FY, 40, { noLabel: true, mood: i % 2 ? 'star' : 'happy' }); });
       g += Theater.doc(236, FY, .62, { m: 'grin', la: [-44, -72], ra: [44, -72] });
       g += Theater.uchu(308, FY, .56, { m: 'grin', la: [-44, -84], ra: [44, -84] });
-      g += Theater.bubble(356, 424, 136, ['저장 완료!'], [322, 482], { z: 22, f: '#c9362f' });
+      g += Theater.bubble(384, 414, 136, ['저장 완료!'], [336, 476], { z: 22, f: '#c9362f' });
       g += `<rect x="180" y="608" width="180" height="28" rx="14" fill="${a}" stroke="${INK}" stroke-width="3"/>` + tx(270, 628, 'Harness Theater #1', 15, { mono: true, f: '#fff' });
       return g;
     } })
