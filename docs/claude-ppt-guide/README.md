@@ -4,7 +4,7 @@
 
 | 파일 | 설명 |
 |---|---|
-| `claude-ppt-guide.mp4` | 가이드 영상 (1920×1080, 약 2분 55초, 한국어 자막 + 배경음악) — 수채화 무대 + 손그림 캐릭터 스타일 |
+| `claude-ppt-guide.mp4` | 가이드 영상 (1920×1080, 약 2분 58초, 한국어 자막 + 배경음악) — 수채화 무대 + 손그림 캐릭터 스타일 |
 | `sample-company-deck.pptx` | 영상에 나오는 완성본 예시 (9장, **편집 가능한 PowerPoint 기본 차트**) |
 | `src/` | 영상·예시 자료를 다시 만드는 소스 (아래 "다시 만들기" 참고) |
 
@@ -30,7 +30,7 @@
 
 ---
 
-## 영상 구성 (13개 장면)
+## 영상 구성 (15개 장면)
 
 | 시간 | 장면 | 핵심 내용 |
 |---|---|---|
@@ -40,14 +40,15 @@
 | 0:31 | STEP 1 자료 넣기 | 파일째 첨부, Excel ↔ PowerPoint 연결, 청중·목적·분량 명시 |
 | 0:44 | STEP 2 스토리라인 | 목차 먼저 받기, 피라미드 구조, 결론형 제목 |
 | 0:58 | STEP 3 차트 고르기 | 비교=막대, 추이=선, 구성=누적 막대, 증감=워터폴, 우선순위=2×2, 일정=프로세스 |
-| 1:11 | STEP 3 그래프 만들기 | 강조점까지 요청, Claude의 계산 확인 |
-| 1:25 | STEP 3 도표 만들기 | 로드맵·워터폴·매트릭스를 문장으로 요청 |
-| 1:38 | STEP 4 템플릿 적용 | 템플릿 위에서 바로 작성, 브랜드 규칙은 설정 › 지침에 한 번만 |
-| 1:51 | 완성본 | 9장 결과물 미리보기 |
-| 2:08 | 콕 집어 고치기 | PowerPoint 안에서 슬라이드 하나만 골라 수정 (글 7줄 → 3줄 + 차트) |
-| 2:20 | STEP 5 검수 | 체크리스트 5개 + Claude에게 먼저 검토시키기 |
-| 2:33 | 프롬프트 템플릿 | 그대로 복사해 쓰는 프롬프트 |
-| 2:47 | 마무리 | 자료 정리는 Claude에게, 판단과 검수는 나에게 |
+| 1:09 | STEP 3 그래프 만들기 | 강조점까지 요청, Claude의 계산 확인 |
+| 1:23 | STEP 3 도표 만들기 | 로드맵·워터폴·매트릭스를 문장으로 요청 |
+| 1:33 | STEP 4 템플릿 적용 | 템플릿 위에서 바로 작성, 브랜드 규칙은 설정 › 지침에 한 번만 |
+| 1:46 | + 실사 소스 | Higgsfield로 제품 사진 4종 → 슬라이드 삽입, 5초 제품 영상 |
+| 1:58 | 완성본 | 9장 결과물 미리보기 |
+| 2:15 | 콕 집어 고치기 | PowerPoint 안에서 슬라이드 하나만 골라 수정 (글 7줄 → 3줄 + 차트) |
+| 2:27 | STEP 5 검수 | 체크리스트 5개 + Claude에게 먼저 검토시키기 |
+| 2:40 | 프롬프트 템플릿 | 그대로 복사해 쓰는 프롬프트 |
+| 2:50 | 마무리 | 밤새던 작업은 Claude에게, 판단과 검수는 사람에게 |
 
 ---
 
@@ -59,13 +60,14 @@
 | **Excel·Word와 함께 쓰기** (작업 간 연결) | 숫자는 Excel, 내용은 Word에 있을 때 | 각 추가 기능 설정에서 "Let Claude work across files"를 켜면 Excel 숫자를 복사·붙여넣기 없이 PowerPoint 차트로 가져오고, 최신 숫자로 차트를 갱신할 수 있음. 파일은 열려 있어야 함. |
 | **Claude 앱 대화** | 자료를 첨부하고 편집 가능한 .pptx 파일로 받고 싶을 때 | 대화에서 파일을 만들어 내려받는 방식. |
 | **Claude Design** (Anthropic Labs, 연구 프리뷰) | 디자인 완성도가 중요한 덱·원페이저 | 팀 디자인 시스템을 반영하고 PPTX 또는 Canva로 내보내기. |
+| **Higgsfield** (실사 이미지·영상) | 제품 사진, 표지 이미지, 5초 제품 영상처럼 "진짜 같은" 소스가 필요할 때 | 이미지(Soul 2.0 등)·영상(Kling, Seedance 등) 모델을 한곳에서 사용. Claude에 **Higgsfield MCP 커넥터**(`https://mcp.higgsfield.ai`)를 연결하면 Claude 대화 안에서 바로 생성 요청 가능. |
 
 주의할 점 (공식 문서 기준)
 - 최종 결과물은 사람이 검토해야 합니다. 디자인·스토리 판단을 대신하지 않습니다.
 - 외부에서 받은 템플릿·파일에는 숨은 지시(프롬프트 인젝션)가 있을 수 있으니 신뢰할 수 있는 파일만 쓰세요. 위험한 작업은 실행 전에 확인을 요청합니다.
 - 민감·규제 데이터는 회사 정책과 통제 아래에서만 다루세요.
 
-출처: [Use Claude for PowerPoint](https://claude.com/docs/office-agents/powerpoint) · [Work across M365 apps](https://claude.com/docs/office-agents/work-across-apps) · [Introducing Claude Design](https://www.anthropic.com/news/claude-design-anthropic-labs)
+출처: [Higgsfield MCP](https://higgsfield.ai/mcp) · [Higgsfield API](https://docs.higgsfield.ai/docs) · [Use Claude for PowerPoint](https://claude.com/docs/office-agents/powerpoint) · [Work across M365 apps](https://claude.com/docs/office-agents/work-across-apps) · [Introducing Claude Design](https://www.anthropic.com/news/claude-design-anthropic-labs)
 
 ## 예전엔 vs 이제는
 
