@@ -1,0 +1,318 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<title>Q3 Briefing</title>
+<!--
+  30 s "Hammy" Q3 briefing — compositor for Blender renders + motion-graphics overlays.
+  render-v3.cjs calls window.frame(f) per frame (sets the 3D plate + sprite, awaits decode, then lays out overlays).
+  Expects next to this file: r_hero/, r_chart/, r_road/, r_sprite/ (Blender renders), anchors.js (prep.py),
+  node_modules/pretendard.
+-->
+<link rel="stylesheet" href="node_modules/pretendard/dist/web/variable/pretendardvariable.css">
+<script src="anchors.js"></script>
+<style>
+  :root { --bg:#07080D; --panel:rgba(16,18,28,.72); --line:rgba(255,255,255,.09); --text:#F5F7FB; --muted:#98A2B6; --lime:#C6F432; --violet:#7C5CFF; --blue:#3B82F6; --cyan:#22D3EE; --red:#FF5C7A; }
+  * { box-sizing:border-box; }
+  body { margin:0; width:1920px; height:1080px; overflow:hidden; background:var(--bg); color:var(--text);
+         font-family:'Pretendard Variable',Pretendard,sans-serif; letter-spacing:-0.02em; word-break:keep-all; font-feature-settings:'tnum'; }
+  .abs { position:absolute; }
+  #plate { position:absolute; inset:0; width:1920px; height:1080px; object-fit:cover; }
+  #bg2d { position:absolute; inset:0; display:none; overflow:hidden; }
+  #bg2d .orb { position:absolute; border-radius:50%; filter:blur(90px); opacity:.55; }
+  #bg2d .grid { position:absolute; inset:0; background-image:linear-gradient(rgba(255,255,255,.035) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.035) 1px,transparent 1px); background-size:64px 64px; mask-image:radial-gradient(ellipse at 40% 45%,#000 30%,transparent 80%); }
+  .scene { position:absolute; inset:0; display:none; }
+  .panel { position:absolute; background:var(--panel); border:1px solid var(--line); border-radius:24px; backdrop-filter:blur(18px); box-shadow:0 30px 80px rgba(0,0,0,.45); }
+  .kick { font-size:20px; font-weight:700; letter-spacing:.16em; color:var(--lime); text-transform:uppercase; }
+  .muted { color:var(--muted); }
+  .pill { display:inline-flex; align-items:center; gap:8px; padding:8px 16px; border-radius:999px; font-weight:700; font-size:22px; }
+  .grad { background:linear-gradient(90deg,#9B87FF,#22D3EE 60%,#C6F432); -webkit-background-clip:text; background-clip:text; color:transparent; }
+  #sprite { position:absolute; display:none; }
+  #scrim { position:absolute; left:0; right:0; bottom:0; height:330px; background:linear-gradient(transparent, rgba(4,5,9,.88)); }
+  #subs { position:absolute; left:50%; bottom:46px; transform:translateX(-50%); text-align:center; width:1560px; }
+  #subKo { font-size:40px; font-weight:700; line-height:1.3; text-shadow:0 2px 12px rgba(0,0,0,.6); }
+  #subEn { font-size:26px; font-weight:500; color:#B9C2D3; margin-top:8px; letter-spacing:0; text-shadow:0 2px 10px rgba(0,0,0,.6); }
+  #brand { position:absolute; left:64px; top:40px; display:flex; align-items:center; gap:14px; font-size:21px; font-weight:600; color:#C9CFDB; }
+  #brand b { width:34px; height:34px; border-radius:9px; background:var(--lime); color:#0B0C10; display:flex; align-items:center; justify-content:center; font-weight:900; font-size:20px; }
+  #chapters { position:absolute; right:64px; top:38px; display:flex; gap:10px; }
+  #chapters span { padding:8px 16px; border-radius:999px; font-size:18px; font-weight:700; border:1px solid var(--line); background:rgba(12,14,22,.55); color:rgba(255,255,255,.4); backdrop-filter:blur(10px); }
+  #chapters span.on { background:var(--lime); color:#0B0C10; border-color:var(--lime); }
+  #chapters span.done { color:rgba(255,255,255,.75); }
+  #progress { position:absolute; left:0; top:0; height:4px; background:linear-gradient(90deg,var(--violet),var(--cyan),var(--lime)); }
+  #glare { position:absolute; top:-200px; width:260px; height:1500px; background:linear-gradient(90deg,transparent,rgba(255,255,255,.28),rgba(198,244,50,.25),transparent); transform:rotate(18deg); mix-blend-mode:screen; }
+  .lbl { position:absolute; transform:translate(-50%,-100%); text-align:center; white-space:nowrap; }
+  table { border-collapse:collapse; width:100%; }
+  td, th { padding:0 18px; height:52px; text-align:right; font-size:24px; }
+  th { font-size:18px; color:var(--muted); font-weight:600; height:44px; border-bottom:1px solid var(--line); }
+  td:first-child, th:first-child { text-align:left; }
+  .cbar { height:14px; border-radius:7px; background:linear-gradient(90deg,var(--lime),#8FE000); }
+</style>
+</head>
+<body>
+<img id="plate">
+<div id="bg2d"><div class="orb" id="orb1" style="width:900px;height:900px;background:#4B34D6"></div><div class="orb" id="orb2" style="width:800px;height:800px;background:#0E7490"></div><div class="orb" id="orb3" style="width:600px;height:600px;background:#5B7A00;opacity:.35"></div><div class="grid"></div></div>
+
+<!-- A · HERO -->
+<section class="scene" id="A" data-t="0 3.2">
+  <div class="abs" style="left:120px;top:320px">
+    <div class="kick" data-a="0.15 .5 up">Q3 2026 · 30-second briefing</div>
+    <div style="font-size:112px;font-weight:800;line-height:1.04;margin-top:18px;overflow:hidden"><div data-a="0.3 .6 rise">3분기 실적,</div></div>
+    <div style="font-size:112px;font-weight:800;line-height:1.04;overflow:hidden"><div class="grad" data-a="0.5 .6 rise">30초 요약.</div></div>
+    <div class="muted" style="font-size:28px;margin-top:22px;font-weight:500" data-a="0.9 .5 up">매출 · 채널 · 주간 추이 · 4분기 전망</div>
+  </div>
+  <div class="lbl" data-anchor="hero:hammyHead" data-a="1.0 .5 pop" style="margin-top:-10px"><span class="pill" style="background:rgba(12,14,22,.7);border:1px solid rgba(198,244,50,.5);backdrop-filter:blur(10px);font-size:22px"><i style="width:10px;height:10px;border-radius:50%;background:var(--lime);display:inline-block"></i>햄 주임 · Growth Analyst</span></div>
+</section>
+
+<!-- B · PAST (3D chart) -->
+<section class="scene" id="B" data-t="3.2 9.55">
+  <div class="panel" style="left:96px;top:120px;width:560px;padding:32px 36px" data-a="3.35 .5 up">
+    <div class="kick">Past · 과거 7개 분기</div>
+    <div class="muted" style="font-size:24px;margin-top:18px;font-weight:600">3분기 매출</div>
+    <div style="font-size:96px;font-weight:800;line-height:1.05"><span data-count="5.2 1.4 482 0">0</span><span style="font-size:48px;font-weight:700"> 억 원</span></div>
+    <div style="display:flex;gap:10px;margin-top:16px">
+      <span class="pill" style="background:var(--lime);color:#0B0C10" data-a="6.3 .4 pop">▲ 18.1% YoY</span>
+      <span class="pill" style="background:rgba(124,92,255,.22);color:#CFC6FF;border:1px solid rgba(124,92,255,.5)" data-a="3.8 .4 pop">6분기 연속 성장</span>
+    </div>
+  </div>
+  <svg class="abs" style="left:0;top:0" width="1920" height="1080"><path id="trend" fill="none" stroke="#C6F432" stroke-width="4" stroke-dasharray="10 10" stroke-linecap="round" opacity=".9"/></svg>
+  <div id="barLabels"></div>
+  <div class="lbl" id="trendTag" style="transform:translate(-100%,-160%)"><span class="pill" style="background:rgba(12,14,22,.75);border:1px solid var(--lime);color:var(--lime)">25.1Q 대비 +31%</span></div>
+</section>
+
+<!-- C · PRESENT (dashboard) -->
+<section class="scene" id="C" data-t="9.55 16.45">
+  <div class="abs" style="left:96px;top:112px">
+    <div class="kick" data-a="9.6 .4 up">Present · 현재</div>
+    <div style="font-size:52px;font-weight:800;margin-top:10px" data-a="9.7 .5 up">3분기, 월·주 단위로 보면</div>
+    <div class="muted" style="font-size:22px;margin-top:6px" data-a="9.8 .5 up">Monthly &amp; weekly revenue · 단위: 억 원</div>
+  </div>
+  <div class="panel" style="left:96px;top:290px;width:600px;height:320px;padding:24px 28px" data-a="9.8 .5 up">
+    <div style="display:flex;justify-content:space-between;align-items:baseline"><b style="font-size:24px">월별 매출</b><span class="muted" style="font-size:18px">4월 – 9월</span></div>
+    <div id="months"></div>
+  </div>
+  <div class="panel" style="left:716px;top:290px;width:640px;height:320px;padding:24px 28px" data-a="9.95 .5 up">
+    <div style="display:flex;justify-content:space-between;align-items:baseline"><b style="font-size:24px">주별 매출</b><span class="muted" style="font-size:18px">W27 – W39</span></div>
+    <svg class="abs" style="left:0;top:0" width="640" height="320" id="weekly"></svg>
+  </div>
+  <div class="panel" style="left:96px;top:630px;width:1260px;height:236px;padding:14px 18px" data-a="10.1 .5 up">
+    <table>
+      <tr><th>채널</th><th>3Q25</th><th>3Q26</th><th>증감</th><th style="width:470px;text-align:left;padding-left:40px">성장 기여도</th></tr>
+      <tr id="rowOn"><td><b>온라인</b></td><td class="muted">80</td><td><b>149</b></td><td style="color:var(--lime)"><b>+69</b></td><td style="text-align:left;padding-left:40px"><div style="display:flex;align-items:center;gap:14px"><div style="width:360px;height:14px;background:rgba(255,255,255,.06);border-radius:7px"><div class="cbar" id="cbOn" style="width:0"></div></div><b style="color:var(--lime);font-size:26px" id="cvOn">0%</b></div></td></tr>
+      <tr><td>파트너</td><td class="muted">118</td><td>128</td><td>+10</td><td style="text-align:left;padding-left:40px"><div style="display:flex;align-items:center;gap:14px"><div style="width:360px;height:14px;background:rgba(255,255,255,.06);border-radius:7px"><div class="cbar" id="cbPa" style="width:0;background:#6B7AA6"></div></div><span id="cvPa">0%</span></div></td></tr>
+      <tr><td>직접영업</td><td class="muted">210</td><td>205</td><td style="color:var(--red)">−5</td><td style="text-align:left;padding-left:40px"><div style="display:flex;align-items:center;gap:14px"><div style="width:360px;height:14px;background:rgba(255,255,255,.06);border-radius:7px"><div class="cbar" id="cbDi" style="width:0;background:var(--red)"></div></div><span id="cvDi" style="color:var(--red)">0%</span></div></td></tr>
+    </table>
+  </div>
+  <div class="abs" id="onGlow" style="left:100px;top:690px;width:1252px;height:54px;border:2px solid var(--lime);border-radius:12px;box-shadow:0 0 30px rgba(198,244,50,.35)"></div>
+</section>
+
+<!-- D · FUTURE (3D road) -->
+<section class="scene" id="D" data-t="16.45 25.3">
+  <div class="abs" style="left:96px;top:112px">
+    <div class="kick" data-a="16.55 .4 up">Future · 미래</div>
+    <div style="font-size:52px;font-weight:800;margin-top:10px" data-a="16.65 .5 up">4분기 로드맵 &amp; 전망</div>
+    <div class="pill" style="margin-top:16px;background:rgba(12,14,22,.6);border:1px solid var(--line);backdrop-filter:blur(10px);font-size:20px;font-weight:600" data-a="16.9 .4 up">📅 매주 월요일 KPI 리뷰 · weekly cadence</div>
+  </div>
+  <div id="gateLabels"></div>
+  <div class="panel" style="left:1296px;top:120px;width:528px;height:388px;padding:26px 30px" data-a="20.9 .5 up">
+    <div class="kick" style="color:var(--cyan)">Forecast · 4분기 전망</div>
+    <div style="font-size:64px;font-weight:800;margin-top:6px">510<span style="font-size:32px"> 억 원</span> <span class="muted" style="font-size:22px;font-weight:600">(490–530)</span></div>
+    <svg width="468" height="170" style="margin-top:6px" id="fc"></svg>
+    <div class="pill" style="background:var(--lime);color:#0B0C10;margin-top:6px;font-size:21px" data-a="23.2 .4 pop">연간 1,851억 · 목표 대비 102.8%</div>
+  </div>
+</section>
+
+<!-- E · DECISION -->
+<section class="scene" id="E" data-t="25.3 30">
+  <div class="abs" style="left:120px;top:150px;width:1100px">
+    <div class="kick" data-a="25.4 .4 up">Decision · 결정 요청</div>
+    <div style="font-size:104px;font-weight:800;line-height:1.05;margin-top:14px;overflow:hidden"><div data-a="25.5 .55 rise">선급금 12억 원</div></div>
+    <div style="font-size:104px;font-weight:800;line-height:1.05;overflow:hidden"><div class="grad" data-a="25.7 .55 rise">집행 승인</div></div>
+    <div class="muted" style="font-size:27px;margin-top:22px;line-height:1.5;font-weight:500" data-a="26.1 .5 up">원자재 장기계약 전환 — 환율·단가 변동 리스크를 4분기 전에 고정합니다.</div>
+    <div id="approve" class="abs" style="left:0;top:420px;width:380px;height:84px;border-radius:999px;background:var(--lime);color:#0B0C10;font-size:30px;font-weight:800;display:flex;align-items:center;justify-content:center;gap:12px;box-shadow:0 0 50px rgba(198,244,50,.45)" data-a="26.4 .45 pop"><span id="apTxt">승인하기 →</span></div>
+  </div>
+  <div class="abs" style="left:120px;top:700px;display:flex;gap:20px">
+    <div class="panel" style="position:relative;width:300px;padding:20px 24px" data-a="26.6 .45 up"><div style="font-size:44px;font-weight:800">482억</div><div class="muted" style="font-size:20px">3분기 매출 · +18%</div></div>
+    <div class="panel" style="position:relative;width:300px;padding:20px 24px" data-a="26.75 .45 up"><div style="font-size:44px;font-weight:800;color:var(--lime)">93%</div><div class="muted" style="font-size:20px">성장 중 온라인 기여</div></div>
+    <div class="panel" style="position:relative;width:300px;padding:20px 24px" data-a="26.9 .45 up"><div style="font-size:44px;font-weight:800">1,851억</div><div class="muted" style="font-size:20px">FY26 연간 전망 · 102.8%</div></div>
+  </div>
+</section>
+
+<img id="sprite">
+<div id="scrim"></div>
+<div id="subs"><div id="subKo"></div><div id="subEn"></div></div>
+<div id="brand"><b>N</b>누리테크 · 2026 3분기 경영 브리핑</div>
+<div id="chapters"><span>과거 PAST</span><span>현재 PRESENT</span><span>미래 FUTURE</span><span>결정 DECISION</span></div>
+<div id="progress"></div>
+<div id="glare"></div>
+
+<script>
+const FPS = 30, TOTAL = 30;
+const CUTS = [3.2, 9.55, 16.45, 25.3];
+const SUBS = [
+  [0.30, 3.10, "안녕하세요, 햄 주임입니다. 3분기 실적, 30초로 정리할게요.", "Hey, I'm Hammy. Here's Q3, in thirty seconds."],
+  [3.33, 5.03, "6개 분기 연속 성장.", "Six straight quarters of growth."],
+  [5.10, 9.45, "3분기 매출 482억 원, 전년 대비 18% 늘었습니다.", "Q3 hit 48.2 billion won, up 18%."],
+  [9.69, 13.18, "9월은 월 최고, 39주차는 주간 최고 매출을 기록했습니다.", "September was our best month, and week 39 set a record."],
+  [13.25, 16.35, "성장분의 93%는 온라인에서 나왔습니다.", "Online drove 93% of the growth."],
+  [16.60, 20.82, "다음은 10월 온라인 전용 상품 출시, 11월 파트너 재계약.", "Next: an online-only launch in October, partner renewals in November."],
+  [20.90, 25.20, "4분기 전망은 510억 원, 연간 목표를 넘어섭니다.", "Q4 forecast: 51 billion won, beating the annual target."],
+  [25.45, 29.90, "오늘 결정하실 건 하나, 선급금 12억 원 집행 승인입니다.", "So, one decision today: approve the 1.2-billion-won prepayment."],
+];
+// data (억 원)
+const QV = [368, 385, 408, 410, 412, 447, 482], QN = ["25.1Q","25.2Q","25.3Q","25.4Q","26.1Q","26.2Q","26.3Q"];
+const MON = [["4월",145],["5월",148],["6월",154],["7월",152],["8월",158],["9월",172]];
+const WEEK = (() => { const n = [0.1,-0.3,0.35,-0.1,0.2,-0.35,0.3,0.05,-0.2,0.25,-0.05,0.15,0.3]; let v = n.map((e,i) => 34.2 + 0.47*i + e); const s = v.reduce((a,b)=>a+b); return v.map(x => Math.round(x * 482 / s * 10) / 10); })();
+
+const $ = (h) => { const t = document.createElement('template'); t.innerHTML = h.trim(); return t.content; };
+const clamp = x => Math.min(1, Math.max(0, x));
+const eo = x => 1 - Math.pow(1 - clamp(x), 3);
+const eio = x => { x = clamp(x); return x < .5 ? 4*x*x*x : 1 - Math.pow(-2*x+2, 3)/2; };
+const eb = x => { x = clamp(x); const c1 = 1.70158, c3 = c1 + 1; return 1 + c3*Math.pow(x-1,3) + c1*Math.pow(x-1,2); };
+
+// ---------- build generated overlays ----------
+(() => {
+  // B: bar value + quarter labels
+  document.getElementById('barLabels').append($(QV.map((v,i) =>
+    `<div class="lbl" id="bv${i}"><div style="font-size:${i===6?44:30}px;font-weight:800;color:${i===6?'#C6F432':'#fff'};text-shadow:0 4px 20px rgba(0,0,0,.6)">${v}</div></div>
+     <div class="lbl" id="bq${i}" style="transform:translate(-50%,10%)"><div style="font-size:19px;font-weight:600;color:#AEB6C8">${QN[i]}</div></div>`).join('')));
+  // C: monthly bars
+  let m = ''; const mx = 180, H = 160;
+  MON.forEach(([n,v],i) => { const h = v / mx * H, x = 30 + i*92, hi = i === 5;
+    m += `<div class="abs" style="left:${x}px;top:${270-h}px;width:60px;height:${h}px;border-radius:10px 10px 4px 4px;background:${hi?'linear-gradient(#C6F432,#7FB800)':'linear-gradient(#5B6BFF,#2A2F6B)'};transform-origin:bottom;${hi?'box-shadow:0 0 34px rgba(198,244,50,.45)':''}" data-a="${10.0+i*0.08} .55 gy"></div>
+      <div class="abs" style="left:${x-10}px;top:${270-h-32}px;width:80px;text-align:center;font-size:21px;font-weight:700;color:${hi?'#C6F432':'#DCE1EA'}" data-a="${10.3+i*0.08} .4 fade">${v}</div>
+      <div class="abs muted" style="left:${x-10}px;top:280px;width:80px;text-align:center;font-size:18px">${n}</div>`; });
+  m += `<div class="abs" style="left:28px;top:60px" data-a="10.5 .4 pop"><span class="pill" style="background:var(--lime);color:#0B0C10;font-size:18px;padding:6px 12px">9월 172억 · 월 최고</span></div>`;
+  document.getElementById('months').append($(m));
+  // C: weekly area chart
+  const W = 584, x0 = 28, y0 = 280, ymin = 32, ymax = 42, hh = 190;
+  const pts = WEEK.map((v,i) => [x0 + i*(W-x0-8)/12, y0 - (v-ymin)/(ymax-ymin)*hh]);
+  const line = pts.map((p,i) => (i?'L':'M') + p[0].toFixed(1) + ' ' + p[1].toFixed(1)).join(' ');
+  const svg = document.getElementById('weekly');
+  svg.innerHTML = `<defs><linearGradient id="ag" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#22D3EE" stop-opacity=".45"/><stop offset="1" stop-color="#22D3EE" stop-opacity="0"/></linearGradient><clipPath id="wclip"><rect id="wrect" x="0" y="0" width="0" height="320"/></clipPath></defs>
+    ${[34,36,38,40].map(v => `<line x1="${x0}" x2="${W}" y1="${y0-(v-ymin)/(ymax-ymin)*hh}" y2="${y0-(v-ymin)/(ymax-ymin)*hh}" stroke="rgba(255,255,255,.06)"/><text x="${W+6}" y="${y0-(v-ymin)/(ymax-ymin)*hh+6}" fill="#6B7488" font-size="15">${v}</text>`).join('')}
+    <g clip-path="url(#wclip)"><path d="${line} L${pts[12][0]} ${y0} L${x0} ${y0} Z" fill="url(#ag)"/><path d="${line}" fill="none" stroke="#22D3EE" stroke-width="4" stroke-linejoin="round"/></g>
+    ${[0,4,8,12].map(i => `<text x="${pts[i][0]}" y="${y0+28}" fill="#98A2B6" font-size="17" text-anchor="middle">W${27+i}</text>`).join('')}
+    <g id="w39" transform="translate(${pts[12][0]} ${pts[12][1]})"><circle r="22" fill="#C6F432" opacity=".25" id="w39p"/><circle r="8" fill="#C6F432"/></g>`;
+  document.getElementById('weekly').insertAdjacentHTML('afterend', `<div class="abs" style="left:${pts[12][0]-238}px;top:${pts[12][1]-74}px" data-a="12.0 .4 pop"><span class="pill" style="background:var(--lime);color:#0B0C10;font-size:18px;padding:6px 12px">W39 · ${WEEK[12].toFixed(1)}억 주간 최고</span></div>`);
+  // D: milestone labels
+  const MS = [["W41 · 10월 2주","온라인 전용 상품 출시","#22D3EE"],["W46 · 11월 3주","파트너 3사 재계약","#9B87FF"],["W50 · 12월 2주","4분기 성과 리뷰","#3B82F6"],["12.31","FY26 마감 · 연 1,851억","#C6F432"]];
+  document.getElementById('gateLabels').append($(MS.map(([a,b,c],i) =>
+    `<div class="lbl" id="gl${i}"><div style="background:rgba(10,12,20,.78);border:1px solid ${c};border-radius:16px;padding:12px 20px;backdrop-filter:blur(8px);box-shadow:0 0 30px ${c}55;text-align:left">
+      <div style="font-size:18px;font-weight:700;color:${c};letter-spacing:.04em">${a}</div><div style="font-size:26px;font-weight:700">${b}</div></div></div>`).join('')));
+  // D: forecast mini chart
+  const F = [["1Q",412],["2Q",447],["3Q",482],["4Q",510]], fs = 140/560;
+  document.getElementById('fc').innerHTML = F.map(([n,v],i) => { const x = 20 + i*112, h = v*fs, y = 150 - h, last = i === 3;
+    return `<rect x="${x}" y="${y}" width="64" height="${h}" rx="6" fill="${last?'rgba(34,211,238,.12)':'#3B4A8A'}" stroke="${last?'#22D3EE':'none'}" stroke-width="2.5" stroke-dasharray="${last?'7 6':''}" class="fcb" data-i="${i}"/>
+      ${last ? `<line x1="${x+32}" x2="${x+32}" y1="${150-530*fs}" y2="${150-490*fs}" stroke="#22D3EE" stroke-width="3"/><line x1="${x+20}" x2="${x+44}" y1="${150-530*fs}" y2="${150-530*fs}" stroke="#22D3EE" stroke-width="3"/><line x1="${x+20}" x2="${x+44}" y1="${150-490*fs}" y2="${150-490*fs}" stroke="#22D3EE" stroke-width="3"/>` : ''}
+      <text x="${x+32}" y="166" fill="#98A2B6" font-size="16" text-anchor="middle">${n}${last?' (전망)':''}</text>
+      <text x="${x+32}" y="${y-10}" fill="${last?'#22D3EE':'#DCE1EA'}" font-size="18" font-weight="700" text-anchor="middle">${v}</text>`; }).join('');
+})();
+
+// ---------- engine ----------
+const scenes = [...document.querySelectorAll('.scene')].map(s => { const [a,b] = s.dataset.t.split(' ').map(Number); return { s, a, b }; });
+function anim(el, t) {
+  const [t0, d, k] = el.dataset.a.split(' '); const r = (t - +t0) / +d, p = eo(r);
+  let op = p, tf = '';
+  if (k === 'up') tf = `translateY(${(1-p)*30}px)`;
+  else if (k === 'rise') { op = clamp(r*3); tf = `translateY(${(1-eio(r))*110}%)`; }
+  else if (k === 'pop') { op = clamp(r*3); tf = `scale(${r<=0?0.7:0.7+0.3*eb(r)})`; }
+  else if (k === 'gy') { op = r > 0 ? 1 : 0; tf = `scaleY(${eb(r)})`; }
+  el.style.opacity = op; if (tf) el.style.transform = (el.classList.contains('lbl') ? 'translate(-50%,-100%) ' : '') + tf;
+}
+function anchor(shot, name, f) { const a = (window.ANCH && ANCH[shot] && ANCH[shot][name]) || {}; return a[f] || a[String(f)] || null; }
+
+function seek(f) {
+  const t = f / FPS;
+  const cur = scenes.find(s => t >= s.a && t < s.b) || scenes[scenes.length-1];
+  scenes.forEach(s => s.s.style.display = s === cur ? 'block' : 'none');
+  cur.s.querySelectorAll('[data-a]').forEach(el => anim(el, t));
+  cur.s.querySelectorAll('[data-count]').forEach(el => { const [t0,d,to] = el.dataset.count.split(' ').map(Number); el.textContent = Math.round(to * eo((t-t0)/d)).toLocaleString(); });
+  const id = cur.s.id;
+  // cut transitions: blur/scale around cuts + glare sweep
+  let blur = 0, sc = 1;
+  for (const c of CUTS) { const d = t - c; if (d > -0.18 && d < 0) { blur = (d + 0.18) / 0.18 * 10; sc = 1 + (d + 0.18) / 0.18 * 0.04; } if (d >= 0 && d < 0.3) { blur = (1 - d / 0.3) * 10; sc = 1.06 - eo(d / 0.3) * 0.06; } }
+  const g = document.getElementById('glare'); const gc = CUTS.find(c => Math.abs(t - c) < 0.3);
+  g.style.display = gc === undefined ? 'none' : ''; if (gc !== undefined) g.style.left = (-400 + (t - gc + 0.3) / 0.6 * 2800) + 'px';
+  const plate = document.getElementById('plate'), bg2 = document.getElementById('bg2d');
+  const is3d = id === 'A' || id === 'B' || id === 'D';
+  plate.style.display = is3d ? '' : 'none'; bg2.style.display = is3d ? 'none' : '';
+  [plate, bg2, cur.s].forEach(el => { el.style.filter = blur ? `blur(${blur}px)` : ''; el.style.transform = `scale(${sc})`; });
+  // 2D background drift
+  document.getElementById('orb1').style.transform = `translate(${-200 + Math.sin(t*0.4)*80}px, ${-300 + Math.cos(t*0.3)*60}px)`;
+  document.getElementById('orb2').style.transform = `translate(${1250 + Math.cos(t*0.35)*90}px, ${420 + Math.sin(t*0.4)*70}px)`;
+  document.getElementById('orb3').style.transform = `translate(${id==='E'?-60:600}px, ${id==='E'?380:900}px)`;
+
+  // chapters + progress
+  const ch = { A: -1, B: 0, C: 1, D: 2, E: 3 }[id];
+  [...document.querySelectorAll('#chapters span')].forEach((s, i) => s.className = i === ch ? 'on' : i < ch ? 'done' : '');
+  document.getElementById('progress').style.width = (t / TOTAL * 100) + '%';
+
+  // scene-specific
+  if (id === 'A') { const a = anchor('hero', 'hammyHead', f); const el = cur.s.querySelector('[data-anchor]'); if (a) { el.style.left = a[0]*1920 + 'px'; el.style.top = a[1]*1080 + 'px'; } }
+  if (id === 'B') {
+    const tops = [];
+    QV.forEach((v, i) => { const a = anchor('chart', 'bar' + i, f), b = anchor('chart', 'base' + i, f); const on = t > 3.2 + 0.25 + i*0.32 + 0.45;
+      const e = document.getElementById('bv' + i), q = document.getElementById('bq' + i);
+      if (a) { e.style.left = a[0]*1920 + 'px'; e.style.top = a[1]*1080 + 'px'; tops.push([a[0]*1920, a[1]*1080 + 30]); }
+      if (b) { q.style.left = b[0]*1920 + 'px'; q.style.top = b[1]*1080 + 'px'; }
+      e.style.opacity = on ? eo((t - (3.2 + 0.25 + i*0.32 + 0.45)) / 0.3) : 0; q.style.opacity = e.style.opacity; });
+    const tr = document.getElementById('trend'), tt = document.getElementById('trendTag');
+    if (tops.length === 7) { tr.setAttribute('d', tops.map((p, i) => (i ? 'L' : 'M') + p[0] + ' ' + (p[1] - 70)).join(' '));
+      const L = tr.getTotalLength(); const p = eo((t - 6.6) / 1.2); tr.style.strokeDasharray = `${L*p} ${L}`; tr.style.opacity = p > 0 ? .9 : 0;
+      tt.style.left = tops[6][0] + 'px'; tt.style.top = (tops[6][1] - 70) + 'px'; tt.style.opacity = eo((t - 7.6) / 0.4); }
+  }
+  if (id === 'C') {
+    document.getElementById('wrect').setAttribute('width', 640 * eio((t - 10.2) / 1.6));
+    const pl = document.getElementById('w39p'); const k = t > 12 ? (t - 12) % 1.2 / 1.2 : 0; pl.setAttribute('r', 10 + 26 * k); pl.setAttribute('opacity', t > 12 ? .45 * (1 - k) : 0);
+    const cb = (id2, v, t0) => { const p = eo((t - t0) / 0.9); document.getElementById('cb' + id2).style.width = Math.abs(v) / 100 * 360 * p + 'px'; document.getElementById('cv' + id2).textContent = (v < 0 ? '−' : '') + Math.round(Math.abs(v) * p) + '%'; };
+    cb('On', 93, 13.3); cb('Pa', 14, 13.5); cb('Di', -7, 13.6);
+    const og = document.getElementById('onGlow'); og.style.opacity = eo((t - 13.25) / 0.35) * (0.75 + 0.25 * Math.sin(t * 8));
+  }
+  if (id === 'D') {
+    for (let i = 0; i < 4; i++) { const a = anchor('road', 'gate' + i, f), el = document.getElementById('gl' + i);
+      if (!a || a[2] <= 0.5) { el.style.opacity = 0; continue; }
+      const s = Math.max(0.55, Math.min(1.25, 9 / a[2])); const vis = clamp((a[2] - 2.5) / 3) * clamp((60 - a[2]) / 20);
+      el.style.left = a[0]*1920 + 'px'; el.style.top = a[1]*1080 + 'px'; el.style.opacity = vis * eo((t - 16.8 - i*0.1) / 0.4);
+      el.style.transform = `translate(-50%,-100%) scale(${s})`; }
+    [...document.querySelectorAll('#fc .fcb')].forEach(r => { const i = +r.dataset.i; const p = eb((t - 21.1 - i*0.12) / 0.5); r.style.transformOrigin = 'center bottom'; r.style.transformBox = 'fill-box'; r.style.transform = `scaleY(${p})`; });
+  }
+  if (id === 'E') {
+    const ap = document.getElementById('approve'), tx = document.getElementById('apTxt');
+    const press = t >= 29.0; tx.textContent = press ? '✓ 승인 완료' : '승인하기 →';
+    if (t > 28.85 && t < 29.1) ap.style.transform = 'scale(.94)';
+    ap.style.boxShadow = `0 0 ${50 + 30*Math.sin(t*6)}px rgba(198,244,50,${press ? .8 : .45})`;
+  }
+  // sprite (Hammy over 2D scenes and the road)
+  const sp = document.getElementById('sprite');
+  if (id === 'C') Object.assign(sp.style, { display: '', left: '1340px', top: '310px', width: '640px' });
+  else if (id === 'D') Object.assign(sp.style, { display: '', left: '1480px', top: '520px', width: '440px' });
+  else if (id === 'E') Object.assign(sp.style, { display: '', left: '1260px', top: '250px', width: '700px' });
+  else sp.style.display = 'none';
+  if (sp.style.display !== 'none') { const pe = eo((t - cur.a) / 0.4); sp.style.opacity = pe; sp.style.transform = `translateY(${(1-pe)*60}px)`; sp.style.filter = blur ? `blur(${blur}px)` : 'drop-shadow(0 30px 40px rgba(0,0,0,.5))'; }
+
+  // subtitles
+  const c = SUBS.find(([a, b]) => t >= a && t < b);
+  const ko = document.getElementById('subKo'), en = document.getElementById('subEn');
+  if (c) { ko.textContent = c[2]; en.textContent = c[3]; const o = Math.min(clamp((t - c[0]) / 0.15), clamp((c[1] - t) / 0.15)); document.getElementById('subs').style.opacity = o; }
+  else document.getElementById('subs').style.opacity = 0;
+  document.body.style.filter = t > 29.7 ? `brightness(${1 - (t - 29.7) / 0.3 * 0.6})` : '';
+}
+
+async function frame(f) {
+  const t = f / FPS, plate = document.getElementById('plate'), sp = document.getElementById('sprite');
+  const pad = n => String(n).padStart(4, '0');
+  let src = null;
+  if (t < 3.2) src = `r_hero/${pad(Math.min(f, 96))}.png`;
+  else if (t < 9.55) src = `r_chart/${pad(Math.min(Math.max(f, 96), 287))}.png`;
+  else if (t >= 16.45 && t < 25.3) src = `r_road/${pad(Math.min(Math.max(f, 493), 760))}.png`;
+  const jobs = [];
+  if (src && !plate.src.endsWith(src)) { plate.src = src; jobs.push(plate.decode().catch(() => {})); }
+  if (f >= 287) { const s2 = `r_sprite/${pad(Math.min(287 + Math.floor((f - 287) / 2) * 2, 899))}.png`;  // sprite is rendered on twos
+    if (!sp.src.endsWith(s2)) { sp.src = s2; jobs.push(sp.decode().catch(() => {})); } }
+  await Promise.all(jobs);
+  seek(f);
+}
+window.frame = frame; window.TOTAL_FRAMES = TOTAL * FPS;
+</script>
+</body>
+</html>
