@@ -1,0 +1,55 @@
+{
+  "title": "Harness Theater: It said FREE. We measured.",
+  "voices": { "noa": { "voice": "af_heart", "speed": 1.0 }, "uchu": { "voice": "am_puck", "speed": 1.08, "pitch": 1.2 } },
+  "timing": { "lead": 0.7, "gap": 0.32, "tail": 0.8 },
+  "scenes": [
+    { "id": "hook", "chapter": null, "source": null, "cues": [
+      { "spk": "uchu", "en": "It says *FREE*! One prompt, five minutes!", "ko": "*공짜*래! 프롬프트 하나에 5분 컷!", "sfx": [["boing", 0.1]] },
+      { "spk": "noa", "en": "Every viral AI workflow says that.", "ko": "바이럴 AI 꿀팁은 다 그렇게 말하죠.", "sfx": [["whoosh", 0.0]] },
+      { "spk": "noa", "en": "So we stopped believing, and started *measuring*.", "ko": "그래서 믿는 대신, 직접 *재보기*로 했어요.", "sfx": [["stamp", 1.6]] },
+      { "spk": "noa", "en": "I'm Noa. Welcome to *Harness Theater*.", "ko": "저는 노아. *하네스 극장*에 오신 걸 환영해요.", "sfx": [["tada", 0.2]], "hold": 0.6 }
+    ]},
+    { "id": "traps", "chapter": [1, "바이럴 꿀팁의 함정"], "source": "10XAI · live runs on viral posts", "cues": [
+      { "spk": "noa", "en": "Paste a viral post straight into an AI, and three things go wrong.", "ko": "바이럴 글을 AI에 그대로 넣으면, 세 가지가 터져요." },
+      { "spk": "noa", "en": "*Hidden costs.* *Skipped steps.* And actions nobody checked.", "ko": "*숨은 비용*, *빠진 단계*, 아무도 확인 안 한 행동.", "sfx": [["pop", 0.1], ["pop", 1.1], ["pop", 2.2]] },
+      { "spk": "uchu", "en": "Mine deleted a whole folder!", "ko": "내 건 폴더를 통째로 지웠어!", "sfx": [["boing", 0.0]] },
+      { "spk": "noa", "en": "The model isn't dumb. It just has no *structure* around it.", "ko": "모델이 멍청한 게 아니에요. 둘러싼 *구조*가 없을 뿐.", "hold": 0.3 }
+    ]},
+    { "id": "harness", "chapter": [2, "하네스 = 모델 빼고 전부"], "source": "출처 · OpenAI, Harness engineering (2026)", "cues": [
+      { "spk": "noa", "en": "That structure has a name: the *harness*.", "ko": "그 구조의 이름이 바로 *하네스*예요.", "sfx": [["pop", 0.9]] },
+      { "spk": "noa", "en": "Agent equals model plus harness. Everything except the model.", "ko": "에이전트 = 모델 + 하네스. 모델 빼고 전부죠.", "sfx": [["pop", 0.3], ["pop", 1.2], ["tada", 2.2]] },
+      { "spk": "noa", "en": "*Guides* steer before the agent acts. *Sensors* check after.", "ko": "*가이드*는 하기 전에, *센서*는 한 뒤에 확인해요.", "sfx": [["ding", 2.4]] },
+      { "spk": "noa", "en": "OpenAI reports a million lines of code, built this way.", "ko": "OpenAI는 이렇게 코드 백만 줄을 만들었다고 해요.", "hold": 0.4 }
+    ]},
+    { "id": "ontology", "chapter": [3, "온톨로지 = 명사 · 관계 · 동사"], "source": "출처 · Palantir Ontology docs", "cues": [
+      { "spk": "noa", "en": "But a sensor needs something to check. That's the *ontology*.", "ko": "그런데 센서엔 잴 기준이 필요해요. 그게 *온톨로지*.", "sfx": [["pop", 1.8]] },
+      { "spk": "noa", "en": "Nouns, links, verbs. Every card gets typed tags.", "ko": "명사, 관계, 동사. 카드마다 정해진 이름표를 붙여요.", "sfx": [["pop", 0.0], ["pop", 0.6], ["pop", 1.2]] },
+      { "spk": "noa", "en": "*Claim.* *Measured.* *Risk.* *Gate.*", "ko": "*주장*, *측정*, *위험도*, *게이트*.", "sfx": [["pop", 0.05], ["pop", 0.6], ["pop", 1.15], ["pop", 1.7]] },
+      { "spk": "uchu", "en": "So... it's just name tags?", "ko": "그러니까… 그냥 이름표야?" },
+      { "spk": "noa", "en": "Name tags a machine can *check*. That's the trick.", "ko": "기계가 *검사*할 수 있는 이름표. 그게 핵심이에요.", "sfx": [["ding", 1.0]], "hold": 0.3 }
+    ]},
+    { "id": "crew", "chapter": [4, "칸반 보드 = 에이전트 팀"], "source": "출처 · Anthropic, multi-agent research (2025)", "cues": [
+      { "spk": "noa", "en": "Now meet the crew. Paste a post, and the board fills up.", "ko": "이제 크루를 만나봐요. 글을 붙여넣으면 보드가 채워져요.", "sfx": [["whoosh", 1.4]] },
+      { "spk": "noa", "en": "*Decompose* cuts it into cards. *Gap-fill* adds the steps they skipped.", "ko": "*분해* 담당이 카드로 쪼개고, *빈칸* 담당이 빠진 단계를 채워요.", "sfx": [["pop", 0.4], ["pop", 0.8], ["pop", 2.6]] },
+      { "spk": "noa", "en": "*Verify* scores every card, with Claude and Codex cross-checking.", "ko": "*검증* 담당이 점수를 매기고, Claude와 Codex가 교차 확인해요.", "sfx": [["ding", 1.2], ["ding", 2.4]] },
+      { "spk": "noa", "en": "And the *orchestrator* runs them all, like a stage manager.", "ko": "*오케스트레이터*가 무대 감독처럼 전체를 지휘해요.", "sfx": [["tada", 1.0]], "hold": 0.3 }
+    ]},
+    { "id": "gate", "chapter": [5, "게이트와 샌드박스"], "source": "10XAI · RISK_GATE_THRESHOLD = 70", "cues": [
+      { "spk": "noa", "en": "This card wants to run a shell command. Risk: *seventy-two*.", "ko": "이 카드는 셸 명령을 실행하려 해요. 위험도 *72*.", "sfx": [["pump", 1.2], ["pump", 1.9], ["pump", 2.6], ["alarm", 3.3]] },
+      { "spk": "uchu", "en": "Just run it!", "ko": "그냥 돌려!", "sfx": [["boing", 0.0]] },
+      { "spk": "noa", "en": "Over *seventy*, it waits for a human. No exceptions.", "ko": "*70점*을 넘으면 사람이 승인해요. 예외 없이.", "sfx": [["stamp", 1.1]] },
+      { "spk": "noa", "en": "Safe cards run in a *sandbox*, and we write down real numbers.", "ko": "안전한 카드는 *샌드박스*에서 돌리고, 실제 숫자를 적어요.", "sfx": [["tick", 1.0], ["tick", 1.5], ["tick", 2.0], ["coin", 2.6]] },
+      { "spk": "noa", "en": "Claimed: *free*, five minutes. Measured: *forty cents*, twelve minutes.", "ko": "주장은 *공짜*에 5분. 실측은 *40센트*에 12분.", "sfx": [["whoosh", 1.9]] },
+      { "spk": "uchu", "en": "It said *FREE*!", "ko": "*공짜*라며!!", "sfx": [["boing", 0.0]], "hold": 0.4 }
+    ]},
+    { "id": "yours", "chapter": [6, "내 콘텐츠에 하네스 달기"], "source": "10XAI · export → SKILL.md", "cues": [
+      { "spk": "noa", "en": "Verified steps get packed into a *SKILL* file you can reuse.", "ko": "검증된 단계는 다시 쓰는 *SKILL* 파일로 묶여요.", "sfx": [["whoosh", 0.8], ["pop", 1.6]] },
+      { "spk": "noa", "en": "And you can build the same harness for your own content.", "ko": "여러분 콘텐츠에도 똑같은 하네스를 달 수 있어요.", "sfx": [["pop", 0.5], ["pop", 1.0], ["pop", 1.5], ["pop", 2.0], ["pop", 2.5]] },
+      { "spk": "noa", "en": "One rule: a claim without *evidence* never gets published.", "ko": "규칙은 하나. *근거* 없는 주장은 절대 발행하지 않기.", "sfx": [["stamp", 2.2]], "hold": 0.4 }
+    ]},
+    { "id": "curtain", "chapter": null, "source": null, "cues": [
+      { "spk": "noa", "en": "Next time a post says *free*, paste it in. We'll measure it together.", "ko": "다음에 *공짜*라는 글을 보면, 붙여넣어요. 같이 재봐요.", "sfx": [["tada", 0.0]] },
+      { "spk": "uchu", "en": "Pasting it right now!", "ko": "지금 바로 붙여넣는다!", "sfx": [["boing", 0.0]], "hold": 2.2 }
+    ]}
+  ]
+}

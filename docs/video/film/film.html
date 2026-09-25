@@ -1,0 +1,27 @@
+<meta charset="utf-8">
+<title>Harness Theater Film</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Gaegu:wght@400;700&family=Gowun+Dodum&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+  :root{color-scheme:light}
+  html,body{margin:0;background:#fff4dc}
+  #stage svg{display:block;width:100%;height:auto;max-width:1280px;margin:0 auto}
+  .bar{display:flex;gap:10px;align-items:center;justify-content:center;padding:10px 16px;font:14px 'IBM Plex Mono',monospace}
+  .bar input{flex:1;max-width:900px}
+</style>
+<div id="stage"></div>
+<div class="bar"><button id="play" type="button">Play</button><input id="scrub" type="range" min="0" max="1000" value="0" aria-label="Position"><span id="tc">0:00</span></div>
+<script src="kit.js"></script>
+<script src="timeline.js"></script>
+<script src="film.js"></script>
+<script>
+(function(){
+  const st=document.getElementById('stage'),sc=document.getElementById('scrub'),tc=document.getElementById('tc'),pb=document.getElementById('play');
+  let t=0,playing=false,t0=0,raf=0;
+  const fmt=s=>Math.floor(s/60)+':'+String(Math.floor(s%60)).padStart(2,'0');
+  function show(v){t=v;st.innerHTML=FILM.frame(t);sc.value=Math.round(t/FILM.total*1000);tc.textContent=fmt(t)+' / '+fmt(FILM.total);}
+  function tick(now){if(!playing)return;const v=(now-t0)/1000;if(v>=FILM.total){playing=false;pb.textContent='Play';return;}show(v);raf=requestAnimationFrame(tick);}
+  pb.onclick=()=>{playing=!playing;pb.textContent=playing?'Pause':'Play';if(playing){t0=performance.now()-t*1000;raf=requestAnimationFrame(tick);}};
+  sc.oninput=()=>{playing=false;pb.textContent='Play';show(sc.value/1000*FILM.total);};
+  window.showAt=show;show(0);
+})();
+</script>
