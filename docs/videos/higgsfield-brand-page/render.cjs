@@ -1,5 +1,5 @@
 // Renders explainer.html to MP4, frame by frame (deterministic, no screen capture).
-// Usage: node render.cjs [fps] [out.mp4]   (needs playwright + ffmpeg on PATH or FFMPEG env)
+// Usage: node render.cjs [fps] [out.mp4] [page.html]   (needs playwright + ffmpeg on PATH or FFMPEG env)
 const { chromium } = require("playwright");
 const { spawn } = require("child_process");
 const path = require("path");
@@ -11,7 +11,7 @@ const FFMPEG = process.env.FFMPEG || "ffmpeg";
 (async () => {
   const browser = await chromium.launch();
   const page = await browser.newPage({ viewport: { width: 1920, height: 1080 } });
-  await page.goto("file://" + path.join(__dirname, "explainer.html") + "?render");
+  await page.goto("file://" + path.join(__dirname, process.argv[4] || "explainer.html") + "?render");
   const duration = await page.evaluate(() => window.DURATION);
   const total = Math.round(duration * FPS);
 
