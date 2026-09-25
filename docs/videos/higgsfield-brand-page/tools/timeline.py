@@ -20,9 +20,11 @@ def load(path=PATH):
     if not m:
         raise ValueError(f"{path}: no /*JSON*/{{...}}/*END*/ block")
     T = json.loads(m.group(1))
-    s = 0
+    s = n = 0
     for i, c in enumerate(T["chapters"]):
         c["index"] = i; c["start"] = s; s += c["dur"]; c["end"] = s; c["shift"] = c["start"] - c["authoredAt"]
+        if c.get("label") == "auto":
+            n += 1; c["label"] = "CHAPTER %02d" % n
     T["total"] = s
     T["byId"] = {c["id"]: c for c in T["chapters"]}
     T["bounds"] = [c["start"] for c in T["chapters"][1:]]
