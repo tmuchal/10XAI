@@ -16,10 +16,10 @@ reset((1920, 1080), transparent=True, samples=6)
 
 CAST = []
 HATS = ["#f39bb6", "#f7a8c8", "#f39bb6", "#f7a8c8"]
-xs = [-3.1, -1.6, 1.6, 3.1]
+xs = [-3.8, -1.95, 1.95, 3.8]
 for i, x in enumerate(xs):
     R = hamster('ex%d' % i, glasses=False, hat=True, hat_color=HATS[i], ol=0.022)
-    CAST.append(dict(R=R, x=x, y=0.35 + 0.12 * abs(x) / 3.1, delay=0.06 + 0.05 * abs(x), noa=False, i=i + 1))
+    CAST.append(dict(R=R, x=x, y=0.35 + 0.15 * abs(x) / 3.8, delay=0.06 + 0.05 * abs(x), noa=False, i=i + 1))
 NOA = hamster('noa', glasses=True, ol=0.024)
 CAST.append(dict(R=NOA, x=0.0, y=-0.1, delay=0.0, noa=True, i=0))
 WINKSTAR = star_mesh('winkstar', 0.14, 0.035, 4, flat('ws', "#fff3b0"), NOA['head'], (0.34, -0.55, 0.3))
@@ -40,7 +40,7 @@ for i in range(170):
     CONF.append(dict(o=o, x=(hsh(i, 1) - 0.5) * 12, y=-1.0 + hsh(i, 2) * 3.0, t0=-1.6 + hsh(i, 3) * 3.6,
                      v=1.9 + hsh(i, 4) * 1.2, ph=hsh(i, 5) * 6.28, w=3 + hsh(i, 6) * 5, sway=0.2 + hsh(i, 7) * 0.35))
 
-cam = camera((0, -9.5, 2.2), (0, 0, 1.15), lens=36)
+cam = camera((0, -10.6, 2.3), (0, 0, 1.2), lens=36)
 
 
 def actor(c, t, f):
@@ -58,11 +58,11 @@ def actor(c, t, f):
         sq = lerp(1.12, 1.0, k); armL = armR = lerp(2.5, 0.6, ease(k)); bow = lerp(0, 0.2, k)
     elif tt < 1.35:                                   # the bow (with a small hold wobble)
         k = seg(tt, 0.75, 0.98)
-        bow = lerp(0.2, 0.85, back(k, 1.4)) + 0.03 * math.sin((tt - 0.98) * 12) * (tt > 0.98)
+        bow = lerp(0.2, 0.72, back(k, 1.4)) + 0.03 * math.sin((tt - 0.98) * 12) * (tt > 0.98)
         armL = armR = lerp(0.6, 0.15, k); sq = 1 - 0.06 * k
     elif tt < 1.75:                                   # spring back up
         k = seg(tt, 1.35, 1.6)
-        bow = lerp(0.85, 0.0, back(k, 2.2)) if k < 1 else -0.12 * spring(tt - 1.6, 2.5, 6) * 3
+        bow = lerp(0.72, 0.0, back(k, 2.2)) if k < 1 else -0.12 * spring(tt - 1.6, 2.5, 6) * 3
         sq = lerp(0.94, 1.08, out(k)) - (0.08 * seg(tt, 1.6, 1.75))
         armL = armR = 0.3
     else:
@@ -81,14 +81,16 @@ def actor(c, t, f):
             tilt = lerp(0.0, 0.16, out(seg(tt, 2.05, 2.3)))
     pose(R, f, loc=(c['x'], c['y'], zj), squash=sq, armL=armL, armR=armR, bow=bow, head_tilt=tilt,
          turn=-c['x'] * 0.05)
+    if c['noa']:
+        R['root'].scale = tuple(v * 1.12 for v in R['root'].scale)
     if R.get('shadow'):
         s = 1 - 0.35 * clamp(zj / 0.35)
         R['shadow'].scale = (s, 0.55 * s, 1)
     if c['noa']:
         # tip the shades down the nose, reveal a wink
         g = back(seg(tt, 1.95, 2.2), 2.0) - 0.0
-        R['glasses'].location = (0, -0.05 * g, -0.13 * g)
-        R['glasses'].rotation_euler = (0.25 * g, 0, 0)
+        R['glasses'].location = (0, -0.07 * g, -0.085 * g)
+        R['glasses'].rotation_euler = (0.16 * g, 0, 0)
         show = g > 0.45
         eo = R['eyes_open']; ec = R['eyes_closed']
         eo[0].hide_render = eo[1].hide_render = not show     # left eye open (+ highlight)

@@ -163,7 +163,7 @@ def setup(f):
     else:
         e = out(k)
         cp = cam.location
-        target = Vector((0, 0, 1.05)).lerp(Vector(cp), 0.66)
+        target = Vector((0, 0, 1.05)).lerp(Vector(cp), 0.74)
         target.z -= 0.25
         p = Vector((0, 0, 1.05)).lerp(target, e)
         p.z += 1.0 * math.sin(math.pi * min(1, k * 1.1)) * (1 - e * 0.6)

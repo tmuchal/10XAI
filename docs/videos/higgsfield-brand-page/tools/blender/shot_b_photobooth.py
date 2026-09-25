@@ -79,7 +79,7 @@ cylinder('lens', 0.1, 0.06, (0.3, -0.17, 0.0), toon('lensm', "#1f1b1a", hi="#6a8
 cylinder('stool', 0.32, 0.4, (0, 0.15, 0.45), toon('stoolm', "#c98d5a"), rig, OL)
 NOA = hamster('noa', glasses=True, ol=0.024)
 NOA['root'].parent = rig
-NOA_SCALE = 1.2
+NOA_SCALE = 1.35
 NOA['shadow'].hide_render = True
 
 # photo strip: 3 frames; hangs from the slot, grows downward
@@ -106,8 +106,8 @@ STRIP = strip
 STAR = star_mesh('flashstar', 1.7, 0.28, 4, flat('fs', "#ffffff", alpha=0.95), None, (0, -D / 2 - 0.6, H - 0.3))
 STAR2 = star_mesh('flashstar2', 1.1, 0.2, 4, flat('fs2', "#fffbe6", alpha=0.9), None, (0, -D / 2 - 0.62, H - 0.3))
 HALO_M = flat('halo', "#fffdf2", alpha=0.0)
-HALOS = [cylinder('halo%d' % i, r, 0.01, (0, -3.2 - 0.05 * i, 2.2), HALO_M, None, 0, rot=(math.pi / 2, 0, 0), seg=48)
-         for i, r in enumerate((2.3, 1.7, 1.1))]
+HALOS = [cylinder('halo%d' % i, r, 0.01, (0, -3.2 - 0.05 * i, 2.75), HALO_M, None, 0, rot=(math.pi / 2, 0, 0), seg=48)
+         for i, r in enumerate((1.7, 1.2, 0.75))]
 
 cam = camera((2.0, -8.2, 2.3), (0.12, 0, 1.45), lens=46)
 FLASHES = (0.62, 1.22, 1.82)
@@ -138,7 +138,7 @@ def setup(f):
         armR = lerp(1.3, 0.3, out(k)); armL = 0.4; tilt = lerp(0.3, 0.0, out(k)); lean = lerp(0.18, 0, out(k))
         turn = lerp(-0.25, 0.35, out(seg(t, 2.1, 2.6)))   # looks down at the strip
     sq *= 1 - 0.08 * sum(math.exp(-12 * max(0, t - fa)) * (t > fa) for fa in FLASHES)
-    pose(NOA, f, loc=(0, 0.15, 0.62 + zj), turn=turn, squash=sq, armL=armL, armR=armR, head_tilt=tilt, lean=lean)
+    pose(NOA, f, loc=(0, 0.2, 0.58 + zj), turn=turn, squash=sq, armL=armL, armR=armR, head_tilt=tilt, lean=lean)
     NOA['root'].scale = tuple(v * NOA_SCALE for v in NOA['root'].scale)
     # flashes
     fl_amt = 0.0
@@ -149,7 +149,7 @@ def setup(f):
     s = fl_amt
     STAR.scale = (s * 1.2,) * 3; STAR.rotation_euler = (0, t * 2, 0)
     STAR2.scale = (s,) * 3; STAR2.rotation_euler = (0, 0.78 + t * 2, 0)
-    set_alpha(HALO_M, 0.3 * fl_amt)
+    set_alpha(HALO_M, 0.33 * fl_amt)
     for h in HALOS: h.hide_render = fl_amt < 0.02
     STAR.hide_render = STAR2.hide_render = fl_amt < 0.02
     # bulbs chase
