@@ -95,7 +95,7 @@ scene(72, 106, (R, s) => {
     const f = c03_frame(gag, 150 + i * 560, 300, 500, 290, c03_PAL[pal], `AI 생성 컷 ${i + 1}`, v);
     f.st = c03_stamp(gag, 150 + i * 560 + 250, 528, "✗ 다른 얼굴", "#c8372d", -10 + i * 5);
     el("div", `position:absolute;left:236px;top:6px;width:26px;height:26px;border-radius:50%;background:#c8372d;border:3px solid ${c03_INK};z-index:37;box-shadow:2px 3px 0 rgba(43,35,32,.3)`, "", f);
-    el("div", `position:absolute;right:12px;top:10px;z-index:35;padding:0 12px;border:3px solid ${c03_INK};border-radius:8px;background:#fbd9d3;font-size:22px;color:${c03_INK}`, ["털 색 ✗", "안경 ✗", "머리·털 ✗"][i], f);
+    el("div", `position:absolute;right:12px;top:10px;z-index:35;padding:0 12px;border:3px solid ${c03_INK};border-radius:8px;background:#fbd9d3;font-size:28px;color:${c03_INK}`, ["털 색 ✗", "안경 ✗", "머리 ✗"][i], f);
     return f;
   });
   const yarn = el("div", "left:0;top:0;z-index:36;pointer-events:none", `<svg width="1920" height="700" overflow="visible"><path class="y" d="M400 318 Q680 400 960 318 Q1240 400 1520 318 M400 318 Q640 500 960 590 M1520 318 Q1280 500 960 590" fill="none" stroke="#c8372d" stroke-width="5" stroke-linecap="round" stroke-dasharray="2000" stroke-dashoffset="2000"/></svg>`, gag); yarn.className = "abs";
@@ -106,12 +106,12 @@ scene(72, 106, (R, s) => {
   const whoB = makeBubble(gag), meB = [0, 1, 2].map(() => makeBubble(gag));
 
   // ============ step rail (82–99.5)
-  const RAIL = [["1", "캐릭터 시트 4컷", "Character sheet", 82, 86.5], ["2", "Soul ID 학습", "Soul ID · 20+ photos", 86.5, 91],
-                ["3", "Reference Element", "Kling · Seedance", 91, 95], ["4", "의상·헤어 고정", "Lock + negatives", 95, 96.7], ["5", "시드 < 레퍼런스", "Refs beat seeds", 96.7, 99.5]];
+  const RAIL = [["1", "캐릭터 시트", "4컷 · 의상 하나", 82, 86.5], ["2", "Soul ID", "사진 20장+ 학습", 86.5, 91],
+                ["3", "레퍼런스", "Kling · Seedance", 91, 95], ["4", "의상·헤어 고정", "+ 네거티브", 95, 96.7], ["5", "시드 < 레퍼런스", "레퍼런스가 이김", 96.7, 99.5]];
   const rail = RAIL.map((r, i) => {
     const n = c03_box(R, 1430, 228 + i * 122, 360, 104, "#fffaf0", "display:flex;align-items:center;gap:14px;padding:0 16px;transform-origin:0 50%");
     n.innerHTML = `<div class="num" style="flex:none;width:52px;height:52px;border-radius:50%;border:4px solid ${c03_INK};background:#fbe3b0;display:grid;place-items:center;font-size:30px">${r[0]}</div>
-      <div style="line-height:1.1"><div style="font-size:28px;color:${c03_INK}">${r[1]}</div><div style="font-size:22px;color:#6b5d52;margin-top:4px">${r[2]}</div></div>
+      <div style="line-height:1.1"><div style="font-size:33px;color:${c03_INK};white-space:nowrap">${r[1]}</div><div style="font-size:24px;color:#6b5d52;margin-top:2px;white-space:nowrap">${r[2]}</div></div>
       <div class="ck" style="position:absolute;right:12px;top:-14px;font-size:44px;color:#2f9e5a;opacity:0">✓</div>`;
     n.num = n.querySelector(".num"); n.ck = n.querySelector(".ck"); return n;
   });
@@ -191,7 +191,7 @@ scene(72, 106, (R, s) => {
     const m = c03_box(R, x, 236, 360, 580, col, "overflow:visible");
     m.innerHTML = `<div style="position:absolute;left:120px;top:-22px;width:120px;height:26px;border:4px solid ${c03_INK};border-radius:8px;background:#fffaf0"></div>
       <div style="position:absolute;left:24px;top:22px;font-size:40px;color:${c03_INK}">${nm}</div>
-      <div style="position:absolute;left:24px;top:72px;font-size:22px;color:#4b3f3a">영상 생성 모델</div>
+      <div style="position:absolute;left:24px;top:72px;font-size:28px;color:#4b3f3a">영상 생성 모델</div>
       <svg class="gear" style="position:absolute;right:18px;top:26px" width="70" height="70" viewBox="-35 -35 70 70"><g class="g">
         ${Array.from({ length: 8 }, (_, k) => `<rect x="-7" y="-33" width="14" height="14" rx="3" fill="#f7d774" stroke="${c03_INK}" stroke-width="3" transform="rotate(${k * 45})"/>`).join("")}
         <circle r="23" fill="#f7d774" stroke="${c03_INK}" stroke-width="4"/><circle r="8" fill="#fffaf0" stroke="${c03_INK}" stroke-width="3"/></g></svg>
@@ -215,8 +215,8 @@ scene(72, 106, (R, s) => {
   el("div", `position:absolute;left:24px;top:14px;font-size:34px;color:${c03_INK}`, "④ 의상·헤어 고정 <span style='font-size:24px;color:#6b5d52'>+ 네거티브</span>", lockP);
   const shield = el("div", `position:absolute;left:78px;top:118px;width:340px;height:340px;border-radius:50%;border:5px dashed #3e8fb8;background:rgba(159,211,240,.25)`, "", lockP);
   const lNoa = makeNoa(230); lockP.appendChild(lNoa);
-  const tagHat = el("div", `position:absolute;left:14px;top:92px;padding:4px 14px;border:3px solid ${c03_INK};border-radius:10px;background:#fbd9d3;font-size:24px;z-index:36`, "선글라스 고정", lockP);
-  const tagSc = el("div", `position:absolute;left:14px;top:430px;padding:4px 14px;border:3px solid ${c03_INK};border-radius:10px;background:#fbe3b0;font-size:24px;z-index:36`, "스카프 고정", lockP);
+  const tagHat = el("div", `position:absolute;left:14px;top:92px;padding:4px 14px;border:3px solid ${c03_INK};border-radius:10px;background:#fbd9d3;font-size:28px;z-index:36`, "선글라스 고정", lockP);
+  const tagSc = el("div", `position:absolute;left:14px;top:430px;padding:4px 14px;border:3px solid ${c03_INK};border-radius:10px;background:#fbe3b0;font-size:28px;z-index:36`, "스카프 고정", lockP);
   const lock = el("div", "position:absolute;left:300px;top:320px;z-index:37", `<svg width="110" height="140" viewBox="0 0 110 140" overflow="visible">
     <path class="sh" d="M26 64 V38 A29 29 0 0 1 84 38 V64" fill="none" stroke="${c03_INK}" stroke-width="16" stroke-linecap="round"/>
     <path class="sh2" d="M26 64 V38 A29 29 0 0 1 84 38 V64" fill="none" stroke="#c9c1b4" stroke-width="8" stroke-linecap="round"/>
@@ -228,7 +228,7 @@ scene(72, 106, (R, s) => {
     const d = el("div", `position:absolute;left:0;top:0;padding:6px 14px;border:4px solid #c8372d;border-radius:12px;background:#fff;color:#c8372d;font-size:28px;white-space:nowrap;z-index:39`, x, lockP);
     d.at = 96.05 + i * .28; d.y0 = 150 + i * 120; return d;
   });
-  const negL = el("div", `position:absolute;left:24px;bottom:16px;font-size:26px;color:#3e6f8a`, "네거티브 프롬프트 = 변형 차단 방패", lockP);
+  const negL = el("div", `position:absolute;left:24px;bottom:16px;font-size:30px;color:#3e6f8a`, "네거티브 = 변형 차단 방패", lockP);
 
   const tugP = c03_box(R, 800, 236, 600, 590, "#fffaf0", "overflow:hidden");
   el("div", `position:absolute;left:24px;top:14px;font-size:34px;color:${c03_INK}`, "⑤ 시드 &lt; 레퍼런스", tugP);
@@ -269,7 +269,11 @@ scene(72, 106, (R, s) => {
   const endNoa = makeNoa(190); res.appendChild(endNoa);
   const endB = makeBubble(res);
 
+  const c03_plate = R.querySelector(".chap"), c03_W = el("div", "position:absolute;left:0;top:0;width:1920px;height:1080px;transform-origin:960px 470px");
+  [...R.children].forEach(c => { if (c !== c03_plate) c03_W.appendChild(c); }); R.appendChild(c03_W);
   return t => {
+    const c03_m = getComputedStyle($("scenes")).transform.match(/matrix\(([^,]+)/), c03_k = c03_m ? +c03_m[1] : .82;
+    c03_W.style.transform = `scale(${Math.min(1, .85 / c03_k)})`;
     // ---- A: gag
     const gagOut = ease(seg(t, 81.3, 81.95));
     gag.style.display = t < 82 ? "block" : "none";
@@ -313,7 +317,8 @@ scene(72, 106, (R, s) => {
       const act = t >= a && t < b, done = t >= b;
       const hl = act ? out(seg(t, a, a + .3)) : 0;
       n.style.opacity = clamp(pin * 2) * (t < a ? .72 : 1);
-      n.style.transform = `translateX(${420 * (1 - pin) - 18 * hl + 520 * railOut * (1 + i * .15)}px) rotate(${(i % 2 ? .8 : -.8) * (1 - hl)}deg) scale(${1 + .06 * hl})`;
+      const hide = ease(seg(t, 86.3 + i * .04, 86.8 + i * .04)) * (1 - back(seg(t, 89.5 + i * .06, 90.0 + i * .06)));
+      n.style.transform = `translateX(${420 * (1 - pin) - 18 * hl + 520 * railOut * (1 + i * .15) + 560 * hide}px) rotate(${(i % 2 ? .8 : -.8) * (1 - hl)}deg) scale(${1 + .06 * hl})`;
       n.style.background = act ? "#f7d774" : "#fffaf0";
       n.num.style.background = act ? "#c8372d" : done ? "#bfe3a6" : "#fbe3b0";
       n.num.style.color = act ? "#fff" : c03_INK;

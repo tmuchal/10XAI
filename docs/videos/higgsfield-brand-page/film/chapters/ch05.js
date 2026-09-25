@@ -60,24 +60,48 @@ scene(134, 160, (R, s) => {
 
   // ---------- items dropped onto the pans
   const LI = [
-    [`<div style="font-size:30px;line-height:1.1">과정을 보여준다</div><div style="display:flex;gap:6px;margin:6px 0 2px">${["기획", "촬영", "편집", "완성"].map((x, i) => `<span style="font-size:22px;padding:0 8px;border:2px solid ${INK};border-radius:8px;background:${i < 3 ? "#d8ecd3" : "#fff3c4"}">${x}</span>`).join('<span style="font-size:22px">→</span>')}</div><div style="font-size:22px;color:#6b5d52">노동의 착시 · 과정이 보이면 가치 ↑</div>`, "#eef7fb"],
-    [`<div style="display:flex;align-items:baseline;gap:12px"><span style="font-size:26px">후기 5개 →</span><span style="font-size:50px;line-height:1;color:#2f6f94">+270%</span></div><div style="font-size:22px;color:#6b5d52">구매 가능성 · <span style="color:#d98c1f">★4.0–4.7</span> &gt; ★5.0</div>`, "#eef7fb"],
-    [`<div style="font-size:30px;line-height:1.1">숫자와 결과로 증명</div><div style="font-size:22px;color:#6b5d52">제작 기간 · 성과 · 고객 수</div>`, "#eef7fb"],
+    [`<div style="font-size:38px;line-height:1.1">과정 공개</div><div style="display:flex;gap:6px;margin:6px 0 2px">${["기획", "촬영", "편집"].map((x, i) => `<span style="font-size:26px;padding:0 10px;border:2px solid ${INK};border-radius:8px;background:#d8ecd3">${x}</span>`).join('<span style="font-size:26px">→</span>')}</div><div style="font-size:24px;color:#6b5d52">과정이 보이면 가치 ↑</div>`, "#eef7fb"],
+    [`<div style="display:flex;align-items:baseline;gap:12px"><span style="font-size:32px">후기 5개</span><span class="k270" style="font-size:60px;line-height:1;color:#2f6f94">+270%</span></div><div style="font-size:26px;color:#6b5d52"><span style="color:#d98c1f">★4.0–4.7</span> &gt; ★5.0</div>`, "#eef7fb"],
+    [`<div style="font-size:38px;line-height:1.1">숫자로 증명</div><div style="font-size:24px;color:#6b5d52">기간 · 성과 · 고객 수</div>`, "#eef7fb"],
   ];
-  const RI = [["91%", "재밌는 브랜드가<br>더 좋다"], ["72%", "경쟁사 대신<br>웃긴 브랜드 선택"], ["90%", "웃긴 광고를<br>더 잘 기억"]];
+  const RI = [[91, "재미있는<br>브랜드가 좋다"], [72, "경쟁사 대신<br>웃긴 브랜드"], [90, "웃긴 광고를<br>기억한다"]];
   const lItems = LI.map(([h, bg]) => c05_abs(`width:440px;white-space:nowrap;padding:10px 16px 12px;${c05_card(bg, 14)};transform-origin:50% 100%;z-index:4`, h, SG));
   const rItems = RI.map(([n, x]) => {
     const e = c05_abs(`width:440px;white-space:nowrap;padding:8px 18px 10px;${c05_card("#fff", 30)};display:flex;align-items:center;gap:16px;transform-origin:50% 100%;z-index:4`,
-      `<span style="font-size:56px;line-height:1;color:#c0405f">${n}</span><span style="font-size:26px;line-height:1.1">${x}</span>
+      `<span class="num" style="font-size:76px;line-height:1;color:#c0405f;display:inline-block;width:150px;transform-origin:50% 70%">${n}%</span><span style="font-size:30px;line-height:1.1">${x}</span>
        <svg width="34" height="22" style="position:absolute;left:36px;bottom:-21px;overflow:visible"><path d="M0 0 L8 20 L28 0" fill="#fff" stroke="${INK}" stroke-width="3" stroke-linejoin="round"/><path d="M2 -2 H26" stroke="#fff" stroke-width="5"/></svg>`, SG);
     return e;
   });
-  const LAND_L = [137.9, 139.5, 141.1], LAND_R = [143.8, 145.3, 146.8];
+  const LAND_L = [138.3, 139.8, 141.3], LAND_R = [143.8, 145.3, 146.8];
     // impact text: "쿵!" for expertise, laughs for humor
   const bursts = [...LAND_L.map((tt, i) => [tt, "쿵!", "#2f6f94", -1, i]), ...LAND_R.map((tt, i) => [tt, ["ㅋㅋㅋ", "HA!", "ㅎㅎ"][i], "#c0405f", 1, i])]
     .map(b => { const e = c05_abs(`font-size:52px;color:${b[2]};z-index:6;-webkit-text-stroke:1px ${INK}`, b[1], SG); return [e, ...b]; });
   const balance = c05_abs(`left:720px;top:560px;width:480px;white-space:nowrap;text-align:center;padding:8px 0 10px;${c05_card("#fbe3b0", 14)};z-index:5`,
     `<div style="font-size:36px">⚖ 본문 + 양념 = 균형!</div>`, SG);
+
+  // ---------- cooking-show cold open (134.2–137): chef Noa slams the bowl, sprinkles the shaker
+  const CK = c05_abs("left:0;top:0;width:1920px;height:1000px;z-index:9", `
+    <div class="sign" style="position:absolute;left:560px;top:170px;width:800px;text-align:center;padding:10px 0 14px;${c05_card("#fbe3b0", 18)};white-space:nowrap">
+      <div style="font-size:26px;letter-spacing:5px;color:#c8372d">NOA'S COOKING SHOW</div><div style="font-size:52px;line-height:1.1">노아의 브랜드 쿠킹쇼 🍳</div></div>
+    <svg width="1920" height="1000" style="position:absolute;left:0;top:0;overflow:visible">
+      <g class="ctr"><rect x="420" y="720" width="1080" height="46" rx="10" fill="#d9a06a" stroke="${INK}" stroke-width="5"/>
+        <rect x="450" y="766" width="1020" height="110" fill="#e9b97c" stroke="${INK}" stroke-width="5"/>
+        ${[0, 1, 2, 3, 4].map(i => `<rect x="${480 + i * 200}" y="790" width="160" height="66" rx="8" fill="none" stroke="${INK}" stroke-width="3" opacity=".45"/>`).join("")}</g>
+      <g class="bowl"><path d="M-190 -120 H190 Q190 0 0 0 Q-190 0 -190 -120Z" fill="#fffaf0" stroke="${INK}" stroke-width="6" stroke-linejoin="round"/>
+        <ellipse cx="0" cy="-120" rx="190" ry="26" fill="#f4c98a" stroke="${INK}" stroke-width="6"/>
+        <g class="stm" stroke="#9a8f80" stroke-width="5" fill="none" stroke-linecap="round"><path d="M-60 -160 q-14 -22 0 -44 q14 -22 0 -44"/><path d="M0 -168 q-14 -22 0 -44 q14 -22 0 -44"/><path d="M60 -160 q-14 -22 0 -44 q14 -22 0 -44"/></g></g>
+      <g class="shk"><rect x="-44" y="-150" width="88" height="130" rx="18" fill="#f8cdd8" stroke="${INK}" stroke-width="5"/>
+        <path d="M-40 -150 Q0 -196 40 -150Z" fill="#c9c2d6" stroke="${INK}" stroke-width="5"/>${[-18, 0, 18].map(x => `<circle cx="${x}" cy="-168" r="4" fill="${INK}"/>`).join("")}</g>
+    </svg>
+    <div class="bl" style="position:absolute;left:0;top:0;padding:4px 18px 8px;${c05_card("#e3f2f8", 14)};font-size:44px;color:#2f6f94;white-space:nowrap">전문성 = 본문</div>
+    <div class="sl" style="position:absolute;left:0;top:0;padding:4px 18px 8px;${c05_card("#fde6ec", 14)};font-size:44px;color:#c0405f;white-space:nowrap">유머 = 양념</div>
+    <div class="bang" style="position:absolute;left:0;top:0;font-size:64px;color:#c8372d;-webkit-text-stroke:2px ${INK}">쾅!</div>`, R);
+  const cq = x => CK.querySelector(x);
+  const ckSign = cq(".sign"), ckCtr = cq(".ctr"), ckBowl = cq(".bowl"), ckShk = cq(".shk"), ckBL = cq(".bl"), ckSL = cq(".sl"), ckBang = cq(".bang"), ckStm = cq(".stm");
+  const salt = Array.from({ length: 22 }, (_, i) => c05_abs(`left:0;top:0;width:${10 + (i % 3) * 4}px;height:${10 + (i % 3) * 4}px;border-radius:50%;border:2px solid ${INK};background:${["#fff", "#f7d774", "#f08aa0"][i % 3]};z-index:10;opacity:0`, "", R));
+  const chef = makeNoa(230); R.appendChild(chef);
+  if (chef.P.hat) chef.P.hat.innerHTML = `<g stroke="${INK}" stroke-width="4" stroke-linejoin="round"><rect x="70" y="40" width="60" height="22" rx="4" fill="#fff"/>
+    <path d="M70 44 Q52 30 62 14 Q70 0 86 8 Q94 -8 110 2 Q128 -6 136 12 Q150 28 130 44Z" fill="#fff"/></g>`;
 
   // ---------- Noa balancing on the fulcrum
   const nw = c05_abs("left:960px;top:300px;width:0;height:0;z-index:7", "", SG);
@@ -141,33 +165,57 @@ scene(134, 160, (R, s) => {
   const noteB = c05_abs(`left:1160px;top:640px;padding:8px 18px 10px;${c05_card("#fde6ec", 12)};font-size:32px;color:#c0405f;z-index:34`, "커피 = 유머 ↓", R);
 
   const wipe = c05_strips(R, ["#f08aa0", "#f7d774"]);
+  const cookU = t => {
+    const out1 = ease(seg(t, 136.3, 136.8));
+    CK.style.opacity = t < 134.2 ? 0 : 1 - out1; CK.style.display = t > 136.9 ? "none" : "";
+    const sp = back(seg(t, 134.25, 134.65)); ckSign.style.transform = `translateY(${-160 * (1 - sp)}px) rotate(${-2 + 1.5 * c05_kick(t - 134.65, 3, 9)}deg)`;
+    ckCtr.setAttribute("transform", `translate(0 ${260 * (1 - out(seg(t, 134.2, 134.6)))})`);
+    // bowl slams down at 134.95
+    const bp = seg(t, 134.6, 134.95), bt = t - 134.95, bsq = bt > 0 ? .18 * Math.exp(-8 * bt) * Math.cos(22 * bt) : 0;
+    const fly = ease(seg(t, 136.3, 136.8));
+    ckBowl.setAttribute("transform", `translate(${700 - 260 * fly} ${720 - 700 * (1 - bp * bp) + 60 * fly}) scale(${1 + bsq} ${1 - bsq})`);
+    ckStm.setAttribute("opacity", bt > 0 ? .5 + .4 * Math.sin(t * 6) : 0);
+    ckBang.style.opacity = bt > 0 && bt < .5 ? 1 - bt * 2 : 0; ckBang.style.transform = `translate(${480}px, ${520 - 40 * bt}px) scale(${.8 + bt}) rotate(-10deg)`;
+    const blp = back(seg(t, 135.0, 135.35)); ckBL.style.opacity = clamp(blp * 2); ckBL.style.transform = `translate(${560 - 260 * fly}px, ${735 + 60 * fly}px) scale(${blp}) rotate(-3deg)`;
+    // shaker: appears in Noa's paw, shakes over the bowl (135.4–136.2)
+    const sIn = back(seg(t, 135.3, 135.6)), shake = t > 135.6 && t < 136.25 ? Math.sin((t - 135.6) * 38) : 0;
+    ckShk.setAttribute("transform", `translate(${lerp(1180, 820, ease(seg(t, 135.4, 135.65))) + 320 * fly} ${lerp(640, 470, ease(seg(t, 135.4, 135.65))) + 20 * shake}) rotate(${t > 135.6 ? 150 + 18 * shake : 20 * (1 - sIn)}) scale(${sIn})`);
+    salt.forEach((e, i) => { const t0 = 135.62 + (i % 11) * .055, tau = t - t0, x0 = 820 + (c05_kick(i + 1, .1, 7.3)) * 50;
+      e.style.opacity = tau > 0 && tau < .55 ? 1 : 0; e.style.transform = `translate(${x0 + (i % 5 - 2) * 12}px, ${540 + 380 * tau + 260 * tau * tau}px)`; });
+    const slp = back(seg(t, 135.75, 136.1)); ckSL.style.opacity = clamp(slp * 2);
+    ckSL.style.transform = `translate(${980 + 320 * fly}px, ${380 + 60 * fly}px) scale(${slp * (1 + .25 * c05_kick(t - 136.1, 5, 14))}) rotate(4deg)`;
+    const cOp = seg(t, 134.3, 134.6) * (1 - out1);
+    poseNoa(chef, t, { x: 1080, y: 500 + 40 * (1 - cOp), s: 1, talk: t > 134.6 && t < 135.3, look: -1, mood: "happy", hop: t > 136.05 && t < 136.5 ? (t - 136.05) / .45 : 0,
+      arms: t > 135.4 && t < 136.2 ? "up" : undefined, op: cOp });
+  };
   return t => {
+    cookU(t);
     head.style.opacity = 1 - seg(t, 153.2, 153.6);
     wipe(t, 153.05, .8);
     // ================= scale (134.2–149.3)
     const exit = ease(seg(t, 148.9, 149.4));
-    SG.style.opacity = seg(t, 134.2, 134.5) * (1 - exit);
+    SG.style.opacity = seg(t, 136.4, 136.6) * (1 - exit);
     SG.style.transform = `translateY(${80 * exit}px) scale(${1 - 0.08 * exit})`; SG.style.transformOrigin = "960px 600px";
     // post rises, beam drops in
-    const pr = out(seg(t, 134.2, 134.9));
+    const pr = out(seg(t, 136.4, 137.0));
     P.post.setAttribute("transform", `translate(0 872) scale(1 ${Math.max(.001, pr)}) translate(0 -872)`);
-    const bd = seg(t, 134.6, 135.15), beamY = -520 * (1 - bd * bd);
+    const bd = seg(t, 136.75, 137.25), beamY = -520 * (1 - bd * bd);
     // beam angle: sum of damped steps (left items tip left, right items tip right) + landing wobble
-    let th = 7 * c05_kick(t - 135.15);
+    let th = 7 * c05_kick(t - 137.25);
     LAND_L.forEach(tt => th -= 3 * c05_spring(t - tt));
     LAND_R.forEach(tt => th += 3 * c05_spring(t - tt));
     const rad = th * Math.PI / 180, cs = Math.cos(rad), sn = Math.sin(rad);
     P.beam.setAttribute("transform", `translate(0 ${beamY}) rotate(${th} 960 300)`);
     const ends = [[PIV[0] - ARM * cs, PIV[1] - ARM * sn + beamY], [PIV[0] + ARM * cs, PIV[1] + ARM * sn + beamY]];
     // pans sway on each landing (pendulum)
-    const sway = side => { let f = 5 * c05_kick(t - 135.15, 1.8, 5);
+    const sway = side => { let f = 5 * c05_kick(t - 137.25, 1.8, 5);
       (side ? LAND_R : LAND_L).forEach(tt => f += 3 * c05_kick(t - tt, 2.2, 6)); return f * Math.PI / 180; };
     const pans = ends.map(([ex, ey], k) => { const f = sway(k); return [ex + DROP * Math.sin(f), ey + DROP * Math.cos(f)]; });
     [P.sL, P.sR].forEach((sp, k) => { const [ex, ey] = ends[k], [px, py] = pans[k];
       sp.setAttribute("d", `M${px - 226} ${py} L${ex} ${ey} L${px + 226} ${py} M${ex} ${ey} L${px} ${py - 4}`); });
     P.panL.setAttribute("transform", `translate(${pans[0][0]} ${pans[0][1]})`);
     P.panR.setAttribute("transform", `translate(${pans[1][0]} ${pans[1][1]})`);
-    [tagL, tagR].forEach((g, k) => { const [px, py] = pans[k], p = back(seg(t, 135.2 + k * .25, 135.7 + k * .25));
+    [tagL, tagR].forEach((g, k) => { const [px, py] = pans[k], p = back(seg(t, 137.1 + k * .15, 137.5 + k * .15));
       g.style.left = (px - 170) + "px"; g.style.top = (py + 56) + "px"; g.style.opacity = clamp(p * 2);
       g.style.transform = `scale(${0.6 + 0.4 * p}) rotate(${(k ? 2 : -2) + 3 * Math.sin(t * 1.6 + k)}deg)`; });
     // items: fall, land with squash, then ride the pan
@@ -181,7 +229,12 @@ scene(134, 160, (R, s) => {
       e.style.transform = `scale(${1 + sq * .6}, ${1 - sq}) rotate(${(k ? 1 : -1) * (i % 2 ? 1.2 : -1) + (tau < 0 ? 6 * (1 - p) : 0)}deg)`;
     };
     lItems.forEach((e, i) => stackItem(e, i, LAND_L[i], hsL, 0));
-    rItems.forEach((e, i) => stackItem(e, i, LAND_R[i], hsR, 1));
+    rItems.forEach((e, i) => { stackItem(e, i, LAND_R[i], hsR, 1);
+      const nm = e.querySelector(".num"), tau = t - LAND_R[i];     // numbers count up and punch in
+      nm.textContent = Math.round(RI[i][0] * out(seg(tau, 0, .55))) + "%";
+      nm.style.transform = `scale(${1 + .35 * c05_kick(tau - .55, 5, 14) + (tau > 0 && tau < .55 ? .15 : 0)}) rotate(${-6 * c05_kick(tau - .55, 5, 14)}deg)`; });
+    const k270 = lItems[1].querySelector(".k270"); k270.style.display = "inline-block";
+    k270.style.transform = `scale(${1 + .3 * c05_kick(t - LAND_L[1] - .1, 5, 14)})`;
     bursts.forEach(([e, tt, , , side, i]) => {
       const tau = t - tt, [px, py] = pans[side > 0 ? 1 : 0], hs = side > 0 ? hsR : hsL;
       let h = 0; for (let j = 0; j <= i; j++) h += hs[j] + 6;
@@ -193,12 +246,12 @@ scene(134, 160, (R, s) => {
     const bp = back(seg(t, 147.3, 147.8));
     balance.style.opacity = clamp(bp * 2) * (1 - seg(t, 148.6, 148.9)); balance.style.transform = `translateY(${-20 * (1 - bp)}px) scale(${0.7 + 0.3 * bp}) rotate(-1.5deg)`;
     // Noa: drops onto the pivot, then balances with arms out
-    const nd = seg(t, 135.4, 135.85), nY = -560 * (1 - nd * nd), nt = t - 135.85;
+    const nd = seg(t, 137.3, 137.7), nY = -560 * (1 - nd * nd), nt = t - 137.7;
     const nsq = nt > 0 ? 0.2 * Math.exp(-6 * nt) * Math.cos(16 * nt) : 0;
     const tilted = Math.abs(th) > 5.6;
     nw.style.transform = `translate(0px, ${beamY}px) rotate(${th * .8}deg)`;
-    nw.style.opacity = t > 135.4 ? 1 : 0;
-    poseNoa(noa, t, { x: -65, y: -140 + nY, s: 1, mood: tilted ? "shock" : "happy", talk: t > 136.3 && t < 137.2, look: -th / 8, hop: t > 147 && t < 148.4 ? (t - 147) / .7 % 1 : 0 });
+    nw.style.opacity = t > 137.3 ? 1 : 0;
+    poseNoa(noa, t, { x: -65, y: -140 + nY, s: 1, mood: tilted ? "shock" : "happy", talk: t > 137.8 && t < 138.2, look: -th / 8, hop: t > 147 && t < 148.4 ? (t - 147) / .7 % 1 : 0 });
     noa.P.b.setAttribute("transform", `translate(100 200) scale(${1 + nsq} ${1 - nsq}) rotate(${-th * .6} 0 0) translate(-100 -200)`);
     if (!tilted) {
       const cheer = t > 147 && t < 148.6, flap = 16 * Math.sin(t * 5.2) * (0.4 + Math.min(1, Math.abs(th) / 6));

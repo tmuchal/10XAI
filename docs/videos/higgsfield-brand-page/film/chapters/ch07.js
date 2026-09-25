@@ -18,30 +18,31 @@ scene(184, 192, (R, s) => {
   s.caps = [[184.2, "다음 페이지의 주인공은, 당신의 브랜드", "The next hero is your brand"]];
   const INK = C07_INK; R.style.wordBreak = "keep-all";
   // warm spotlight behind the cast
-  const spot = c07_abs("left:360px;top:420px;width:1200px;height:520px;border-radius:50%;background:radial-gradient(closest-side,rgba(255,236,170,.95),rgba(255,236,170,0));z-index:0", "", R);
+  const spot = c07_abs("left:160px;top:380px;width:1600px;height:600px;border-radius:50%;background:radial-gradient(closest-side,rgba(255,236,170,.95),rgba(255,236,170,0));z-index:0", "", R);
   // hanging title banner
-  const ban = c07_abs("left:410px;top:0;width:1100px;height:300px;transform-origin:550px -60px;z-index:5", `
-    <svg width="1100" height="80" style="position:absolute;left:0;top:-60px;overflow:visible"><path d="M120 0 L200 80 M980 0 L900 80" stroke="${INK}" stroke-width="4"/></svg>
-    <div style="position:absolute;left:40px;top:40px;width:1020px;padding:16px 0 20px;text-align:center;${c07_card("#fbe3b0", 20)};white-space:nowrap">
-      <div style="font-size:26px;letter-spacing:6px;color:#c8372d">CLAUDE × HIGGSFIELD · CURTAIN CALL</div>
-      <div style="font-size:68px;line-height:1.1;margin-top:4px">사람을 붙잡는 브랜드 페이지</div>
-      <div style="font-size:34px;color:#6b5d52">Brand pages that hold people</div></div>`, R);
+  const ban = c07_abs("left:260px;top:0;width:1400px;height:300px;transform-origin:700px -60px;z-index:5", `
+    <svg width="1400" height="80" style="position:absolute;left:0;top:-60px;overflow:visible"><path d="M160 0 L240 80 M1240 0 L1160 80" stroke="${INK}" stroke-width="4"/></svg>
+    <div style="position:absolute;left:40px;top:36px;width:1320px;padding:12px 0 16px;text-align:center;${c07_card("#fbe3b0", 20)};white-space:nowrap">
+      <div style="font-size:28px;letter-spacing:6px;color:#c8372d">CLAUDE × HIGGSFIELD · CURTAIN CALL</div>
+      <div style="font-size:90px;line-height:1.05;margin-top:2px">사람을 붙잡는 브랜드 페이지</div>
+      <div style="font-size:38px;color:#6b5d52">Brand pages that hold people</div></div>`, R);
   // recap chips
   const CH = [["업종 무관", "#fbe0c0"], ["고객이 주인공", "#f8d3df"], ["Soul ID 일관성", "#e3f2f8"], ["3초 · 스크롤 · 영상", "#fff3c4"], ["전문성 + 유머", "#d8ecd3"], ["버튼 → 매출", "#fde6ec"]];
-  const chipRow = c07_abs("left:120px;top:318px;width:1680px;display:flex;justify-content:center;gap:14px;z-index:6", "", R);
-  const chips = CH.map(([c, bg], i) => el("div", `padding:6px 18px 8px;font-size:30px;white-space:nowrap;${c07_card(bg, 999)};box-shadow:4px 5px 0 rgba(43,35,32,.22)`, c, chipRow));
+  const chipRow = c07_abs("left:100px;top:272px;width:1720px;display:flex;justify-content:center;gap:14px;z-index:6", "", R);
+  const chips = CH.map(([c, bg], i) => el("div", `padding:4px 18px 6px;font-size:34px;white-space:nowrap;${c07_card(bg, 999)};box-shadow:4px 5px 0 rgba(43,35,32,.22)`, c, chipRow));
   // URL marquee with light bulbs
-  const NB = 26;
-  const mq = c07_abs(`left:510px;top:386px;width:900px;height:110px;${c07_card("#c8372d", 22)};z-index:6`, `
-    <div style="position:absolute;left:18px;top:14px;right:18px;bottom:14px;border-radius:14px;background:#fffaf0;border:3px solid ${INK};display:flex;align-items:center;justify-content:center;font-size:54px;white-space:nowrap">
+  const MW = 1160, MH = 128, bl = [];
+  for (let x = 40; x <= MW - 40; x += 72) { bl.push([x, 8]); bl.push([x, MH - 8]); }
+  for (let y = 40; y <= MH - 40; y += 48) { bl.push([8, y]); bl.push([MW - 8, y]); }
+  const mq = c07_abs(`left:${960 - MW / 2}px;top:350px;width:${MW}px;height:${MH}px;${c07_card("#c8372d", 22)};z-index:6`, `
+    <div style="position:absolute;left:20px;top:18px;right:20px;bottom:18px;border-radius:14px;background:#fffaf0;border:3px solid ${INK};display:flex;align-items:center;justify-content:center;font-size:70px;white-space:nowrap">
       <span>noainostory</span><span style="color:#d4623a">.higgsfield.app</span></div>
-    ${Array.from({ length: NB }, (_, i) => { const k = i < 11 ? [40 + i * 82, 7] : i < 13 ? [893, 30 + (i - 11) * 50] : i < 24 ? [860 - (i - 13) * 82, 103] : [7, 80 - (i - 24) * 50];
-      return `<div class="bulb" style="position:absolute;left:${k[0] - 6}px;top:${k[1] - 6}px;width:12px;height:12px;border-radius:50%;border:2px solid ${INK}"></div>`; }).join("")}`, R);
+    ${bl.map(k => `<div class="bulb" style="position:absolute;left:${k[0] - 7}px;top:${k[1] - 7}px;width:14px;height:14px;border-radius:50%;border:2px solid ${INK}"></div>`).join("")}`, R);
   const bulbs = [...mq.querySelectorAll(".bulb")];
   // cast: Noa in the middle, extras either side
-  const noa = makeNoa(260); R.appendChild(noa);
-  const EX = [[380, -1, 170], [590, -1, 350], [1170, 1, 1400], [1380, 1, 1580]]
-    .map(([x, from, side]) => { const n = makeNoa(160, { party: true, scarf: null }); R.appendChild(n); return { n, x, from, side }; });
+  const noa = makeNoa(416); R.appendChild(noa);
+  const EX = [[220, -1, 120], [470, -1, 340], [1194, 1, 1330], [1444, 1, 1540]]
+    .map(([x, from, side]) => { const n = makeNoa(256, { party: true, scarf: null }); R.appendChild(n); return { n, x, from, side }; });
   const puff = c07_abs("left:0;top:0;width:0;height:0;z-index:35", Array.from({ length: 8 }, (_, i) => `<div style="position:absolute;left:-26px;top:-26px;width:52px;height:52px;border-radius:50%;background:#fffaf0;border:3px solid ${INK}"></div>`).join(""), R);
   const puffs = [...puff.children];
   const spark = c07_abs("left:0;top:0;width:60px;height:60px;z-index:34", `<svg width="60" height="60" viewBox="-30 -30 60 60"><path d="M0 -28 L7 -7 L28 0 L7 7 L0 28 L-7 7 L-28 0 L-7 -7 Z" fill="#f7d774" stroke="${INK}" stroke-width="3" stroke-linejoin="round"/></svg>`, R);
@@ -76,26 +77,26 @@ scene(184, 192, (R, s) => {
     // Noa: wave, lower the sunglasses + wink, then poof away so the 3D bow owns centre stage (187–190), then pop back
     const gone = seg(t, 186.85, 187.1) * (1 - seg(t, 190.05, 190.3)), back2 = back(seg(t, 190.05, 190.45));
     const winkP = seg(t, 185.9, 186.15) * (1 - seg(t, 186.6, 186.8));
-    poseNoa(noa, t, { x: 830, y: 622 + 300 * (1 - nIn), s: t > 190 ? Math.max(.01, back2) : Math.max(.01, 1 - gone), talk: t > 186.1 && t < 186.7,
+    poseNoa(noa, t, { x: 752, y: 466 + 460 * (1 - nIn), s: t > 190 ? Math.max(.01, back2) : Math.max(.01, 1 - gone), talk: t > 186.1 && t < 186.7,
       wave: (t > 185.3 && t < 185.9) || t > 190.4, hop: t > 185.2 && t < 185.9 ? (t - 185.2) / .7 : 0, blink: winkP < .5, op: gone >= 1 && t < 190.05 ? 0 : nIn });
     if (noa.P.sg) noa.P.sg.setAttribute("transform", `translate(0 ${24 * ease(winkP)}) rotate(${-5 * winkP} 100 98)`);
     if (winkP > .5) { noa.P.eye.style.display = ""; noa.P.e1.setAttribute("d", "M71 90 Q80 84 89 90"); noa.P.e1.setAttribute("fill", "none");
       noa.P.p1.style.display = ""; noa.P.p1.setAttribute("cx", 80); noa.P.p1.setAttribute("cy", 98); noa.P.p1.setAttribute("r", 7);
       noa.P.p2.style.display = "none"; noa.P.e2.setAttribute("d", "M110 99 Q120 106 130 99"); noa.P.e2.setAttribute("fill", "none"); }
     const sp = seg(t, 186.2, 186.7);
-    spark.style.opacity = sp > 0 && sp < 1 ? Math.sin(sp * Math.PI) : 0; spark.style.transform = `translate(${830 + 190}px, ${720}px) scale(${0.4 + sp}) rotate(${sp * 180}deg)`;
+    spark.style.opacity = sp > 0 && sp < 1 ? Math.sin(sp * Math.PI) : 0; spark.style.transform = `translate(${1010}px, ${650}px) scale(${0.6 + 1.2 * sp}) rotate(${sp * 180}deg)`;
     const pf = t > 186.85 && t < 187.45 ? seg(t, 186.85, 187.45) : t > 190.05 && t < 190.65 ? seg(t, 190.05, 190.65) : -1;
-    puffs.forEach((e, i) => { const a = i / 8 * 6.283, d = 30 + 110 * out(clamp(pf));
-      e.style.opacity = pf < 0 ? 0 : 1 - pf; e.style.transform = `translate(${960 + Math.cos(a) * d}px, ${780 + Math.sin(a) * d * .6}px) scale(${1 - .6 * clamp(pf)})`; });
+    puffs.forEach((e, i) => { const a = i / 8 * 6.283, d = 60 + 200 * out(clamp(pf));
+      e.style.opacity = pf < 0 ? 0 : 1 - pf; e.style.transform = `translate(${960 + Math.cos(a) * d}px, ${690 + Math.sin(a) * d * .6}px) scale(${1.8 - 1.2 * clamp(pf)})`; });
     EX.forEach(({ n, x, from, side }, i) => {
       const a = 184.7 + i * .15, w = ease(seg(t, a, a + 1.1)), walking = t > a && t < a + 1.1;
       const st = ease(seg(t, 186.9 + i * .05, 187.4 + i * .05));
       const xx = lerp(lerp(x + from * 700, x, w), side, st);
       const bw = Math.max(bowAt(188.0 + (i < 2 ? (1 - i) : i - 2) * .09 + .05, .45), bowAt(189.55 + .06 * i, .5));
-      poseNoa(n, t + i * .3, { x: xx, y: 722, s: 1, look: -from * .5, flip: from > 0 && walking, hop: walking ? ((t - a) * 3.2) % 1 : (t > 186.9 && t < 187.5 ? (t - 186.9) / .6 : 0), wave: t > 190.2 && i % 2 === 0, op: seg(t, a, a + .2) });
+      poseNoa(n, t + i * .3, { x: xx, y: 626, s: 1, look: -from * .5, flip: from > 0 && walking, hop: walking ? ((t - a) * 3.2) % 1 : (t > 186.9 && t < 187.5 ? (t - 186.9) / .6 : 0), wave: t > 190.2 && i % 2 === 0, op: seg(t, a, a + .2) });
       c07_bow(n, bw);
     });
-    sayBubble(bub, t, 185.95, 186.85, "고마워요! 😎", 1070, 600);
+    sayBubble(bub, t, 185.95, 186.85, "고마워요! 😎", 1130, 470);
     // roses land at the cast's feet
     roses.forEach((r, i) => {
       const a = 188.3 + i * .22, p = seg(t, a, a + .7), tx = [300, 1500, 1680][i], sx = [700, 1200, 1300][i];
