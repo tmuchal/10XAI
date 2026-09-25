@@ -499,3 +499,18 @@ scene(72, 106, (R, s) => {
     sayBubble(endB, t, 101.5, 105.6, "이제 어디서든 나야 ^_^", 1040, 600);
   };
 });
+
+// ---- Uchu (co-host): can't handle the three "wrong" Noas; later compares himself — still himself ----
+(() => {
+  let u, ub;
+  uchuHook((t, s) => {
+    if (!u) { u = makeUchu(150); s.root.appendChild(u); ub = makeBubble(s.root); }
+    const inP = seg(t, 77.2, 77.6), outP = ease(seg(t, 81.3, 81.95));
+    const x = 1400 + 420 * outP, y = lerp(1060, 700, back(inP)) + 40 * outP;
+    let mood = "shock", look = -1, hop = 0, arms;
+    if (t > 78.6 && t < 79.55) { mood = "happy"; arms = "point"; look = -.6; }     // "wait, that one's nerdy…"
+    const recoil = seg(t, 79.6, 80.1); if (recoil > 0 && recoil < 1) hop = recoil;  // stamps slam → jumps
+    poseUchu(u, t, { x, y, mood, look, hop, arms, flip: arms === "point", op: inP > 0 && outP < 1 ? 1 : 0 });
+    sayBubble(ub, t, 80.1, 81.3, "셋 다 누구야?!", 1420, 600);
+  });
+})();

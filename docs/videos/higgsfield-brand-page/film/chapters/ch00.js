@@ -232,3 +232,22 @@ scene(0, 10, (R, s) => {
   };
 });
 })();
+
+// ---- Uchu (co-host): bursts up from below on the DING with his O-face; name tag pops ----
+(() => {
+  let u, ub;
+  uchuHook((t, s) => {
+    if (!u) { u = makeUchu(190); s.root.appendChild(u); ub = makeBubble(s.root); }
+    const rise = seg(t, 2.95, 3.35), gone = t < 2.95;
+    // spring up from below the stage, overshoot, land with squash
+    const y = lerp(1120, 648, back(rise)) + (t > 3.35 ? 10 * Math.exp(-6 * (t - 3.35)) * Math.sin(20 * (t - 3.35)) : 0);
+    let mood = "shock", hop = 0, talk = false, wave = false, look = .5, arms;
+    if (t > 3.9 && t < 4.3) mood = "happy";
+    if (t > 4.3 && t < 4.95) { mood = "shock"; look = 1; }                 // Noa's backflip
+    if (t >= 4.95 && t < 7.8) { mood = "happy"; look = .6; wave = t > 5.3 && t < 6.2; hop = t > 5.25 && t < 5.75 ? (t - 5.25) / .5 : 0; }
+    if (t >= 6.3 && t < 7.8) { arms = "point"; look = .2; talk = t > 6.5 && t < 7.1; }
+    if (t >= 7.8) { mood = t > 7.9 && t < 9.1 ? "shock" : "happy"; look = 1; }  // the ₩4,500,000 envelope
+    poseUchu(u, t, { x: 205, y, s: 1, mood, hop, talk, wave, look, arms, tag: seg(t, 3.15, 3.7) * (1 - seg(t, 5.9, 6.2)), op: gone ? 0 : 1 });
+    sayBubble(ub, t, 8.0, 9.2, "450만?!", 360, 560);
+  });
+})();

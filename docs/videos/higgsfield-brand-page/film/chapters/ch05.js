@@ -317,3 +317,41 @@ scene(134, 160, (R, s) => {
       n.style.opacity = clamp(p * 2); n.style.transform = `scale(${0.5 + 0.5 * p}) rotate(${n === noteA ? -3 : 3}deg)`; });
   };
 });
+
+// ---- Uchu (co-host): taste-tests the "humor" seasoning (O-face), later nearly jokes about the customer ----
+(() => {
+  let u, ub, spoon;
+  uchuHook((t, s) => {
+    if (!u) {
+      u = makeUchu(160); s.root.appendChild(u); ub = makeBubble(s.root);
+      spoon = el("div", "position:absolute;left:0;top:0;z-index:32;width:70px;height:24px;transform-origin:8px 12px", `<svg width="70" height="24" viewBox="0 0 70 24" overflow="visible">
+        <path d="M6 12 H42" stroke="${INK}" stroke-width="8" stroke-linecap="round"/><path d="M6 12 H42" stroke="#f7d774" stroke-width="4" stroke-linecap="round"/>
+        <ellipse cx="54" cy="12" rx="14" ry="9" fill="#f7d774" stroke="${INK}" stroke-width="3.5"/><ellipse cx="54" cy="11" rx="8" ry="4" fill="#fff" opacity=".7"/></svg>`, s.root);
+    }
+    if (t < 140) {
+      // cooking show (134.5–136.9): waits with a spoon, tastes at 136.15, O-face, hops out before the scale drops
+      const inP = seg(t, 134.5, 134.9), outP = seg(t, 136.6, 137.05);
+      const lean = ease(seg(t, 135.95, 136.15)) * (1 - seg(t, 136.35, 136.5));
+      const x = lerp(-60, 250, out(inP)) + 70 * lean - 380 * ease(outP), y = 652 + 360 * (1 - back(inP)) - 140 * Math.sin(outP * Math.PI);
+      const tasted = t > 136.3;
+      poseUchu(u, t, { x, y, mood: tasted || outP > 0 ? "shock" : "happy", look: 1, talk: t > 134.9 && t < 135.4, hop: t < 135.9 && t > 135.0 ? ((t - 135) * 2) % 1 * .25 : 0, arms: tasted ? "up" : undefined, op: inP > 0 && outP < 1 ? 1 : 0 });
+      // the spoon: in his right mitten, dipped toward the bowl, then flung up on the O
+      const sx = x + 118, sy = y + 150;
+      spoon.style.opacity = inP > 0 && outP < 1 ? 1 : 0;
+      spoon.style.transform = `translate(${sx}px, ${sy}px) rotate(${(-40 + 55 * lean - (tasted ? 70 + 10 * Math.sin(t * 30) : 0))}deg)`;
+      sayBubble(ub, t, 136.3, 136.95, "매콤달콤?!", 330, 540);
+    } else {
+      spoon.style.opacity = 0;
+      // rule stamp (149.7–153.3): starts a customer joke, the ✗ lands, the SAFE stamp slams → pout, then agrees
+      const inP = seg(t, 149.6, 150.0), outP = seg(t, 153.0, 153.4);
+      let mood = "happy", talk = false, hop = 0, look = .6, arms;
+      if (t < 150.35) { talk = t > 149.9; arms = "hips"; }
+      else if (t < 151.65) { mood = "shock"; }
+      else if (t < 152.3) { mood = "pout"; }
+      else { mood = "happy"; hop = seg(t, 152.35, 152.9); }
+      poseUchu(u, t, { x: 280, y: lerp(1040, 686, back(inP)) + 320 * ease(outP), s: 150 / 160, mood, talk, hop, look, arms, op: inP > 0 && outP < 1 ? 1 : 0 });
+      if (t < 151) sayBubble(ub, t, 149.9, 150.5, "근데 그 손님 말이야~", 250, 540);
+      else sayBubble(ub, t, 152.4, 153.2, "넵… 상황만!", 250, 540);
+    }
+  });
+})();

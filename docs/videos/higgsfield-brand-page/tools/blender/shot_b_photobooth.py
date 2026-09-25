@@ -76,10 +76,10 @@ cylinder('lens', 0.1, 0.06, (0.3, -0.17, 0.0), toon('lensm', "#1f1b1a", hi="#6a8
          rot=(math.pi / 2, 0, 0), seg=24)
 
 # stool + Noa
-cylinder('stool', 0.32, 0.4, (0, 0.15, 0.45), toon('stoolm', "#c98d5a"), rig, OL)
+cylinder('stool', 0.32, 0.56, (0, 0.2, 0.52), toon('stoolm', "#c98d5a"), rig, OL)
 NOA = hamster('noa', glasses=True, ol=0.024)
 NOA['root'].parent = rig
-NOA_SCALE = 1.35
+NOA_SCALE = 1.1
 NOA['shadow'].hide_render = True
 
 # photo strip: 3 frames; hangs from the slot, grows downward
@@ -106,8 +106,8 @@ STRIP = strip
 STAR = star_mesh('flashstar', 1.7, 0.28, 4, flat('fs', "#ffffff", alpha=0.95), None, (0, -D / 2 - 0.6, H - 0.3))
 STAR2 = star_mesh('flashstar2', 1.1, 0.2, 4, flat('fs2', "#fffbe6", alpha=0.9), None, (0, -D / 2 - 0.62, H - 0.3))
 HALO_M = flat('halo', "#fffdf2", alpha=0.0)
-HALOS = [cylinder('halo%d' % i, r, 0.01, (0, -3.2 - 0.05 * i, 2.75), HALO_M, None, 0, rot=(math.pi / 2, 0, 0), seg=48)
-         for i, r in enumerate((1.7, 1.2, 0.75))]
+HALOS = [cylinder('halo%d' % i, r, 0.01, (0.25, -1.6 - 0.05 * i, 2.8), HALO_M, None, 0, rot=(math.pi / 2, 0, 0), seg=48)
+         for i, r in enumerate((1.45, 1.0, 0.6))]
 
 cam = camera((2.0, -8.2, 2.3), (0.12, 0, 1.45), lens=46)
 FLASHES = (0.62, 1.22, 1.82)
@@ -128,7 +128,7 @@ def setup(f):
     elif t < 1.22:
         k = seg(t, 0.8, 1.1)
         armR = lerp(2.6, 2.9, k); armL = lerp(0.25, 2.9, back(k)); tilt = lerp(-0.15, 0.0, k)
-        hop = seg(t, 0.95, 1.22); zj = 0.35 * math.sin(math.pi * hop); sq = 1 + 0.12 * math.sin(math.pi * hop)
+        hop = seg(t, 0.95, 1.22); zj = 0.16 * math.sin(math.pi * hop); sq = 1 + 0.12 * math.sin(math.pi * hop)
     elif t < 1.82:
         k = seg(t, 1.35, 1.65)
         armR = lerp(2.9, 1.3, out(k)); armL = lerp(2.9, 0.4, out(k)); tilt = lerp(0.0, 0.3, back(k))
@@ -138,7 +138,7 @@ def setup(f):
         armR = lerp(1.3, 0.3, out(k)); armL = 0.4; tilt = lerp(0.3, 0.0, out(k)); lean = lerp(0.18, 0, out(k))
         turn = lerp(-0.25, 0.35, out(seg(t, 2.1, 2.6)))   # looks down at the strip
     sq *= 1 - 0.08 * sum(math.exp(-12 * max(0, t - fa)) * (t > fa) for fa in FLASHES)
-    pose(NOA, f, loc=(0, 0.2, 0.58 + zj), turn=turn, squash=sq, armL=armL, armR=armR, head_tilt=tilt, lean=lean)
+    pose(NOA, f, loc=(0, 0.2, 0.78 + zj), turn=turn, squash=sq, armL=armL, armR=armR, head_tilt=tilt, lean=lean)
     NOA['root'].scale = tuple(v * NOA_SCALE for v in NOA['root'].scale)
     # flashes
     fl_amt = 0.0

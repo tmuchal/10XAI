@@ -484,3 +484,27 @@ scene(40, 72, (R, s) => {
   };
 });
 })();
+
+// ---- Uchu (co-host): cheers the crowned customer (the real hero), later cheers up demoted Noa ----
+(() => {
+  let u, ub;
+  uchuHook((t, s) => {
+    if (!u) { u = makeUchu(150); s.root.appendChild(u); ub = makeBubble(s.root); }
+    // A · 42.8–46.1: pops in at the far left, fan-cheers the customer with the crown
+    const aIn = seg(t, 42.8, 43.2), aOut = seg(t, 45.7, 46.2);
+    // B · 67.3–72: slides in beside Noa, "Chin up, Noa!" (lip-syncs the narration), pats his back
+    const bIn = seg(t, 67.3, 67.8);
+    if (t < 50) {
+      const x = lerp(60, 230, out(aIn)) - 300 * ease(aOut), y = 700 - 150 * Math.sin(aOut * Math.PI) + 300 * (1 - out(aIn));
+      const cheer = t > 43.2 && t < 45.7;
+      poseUchu(u, t, { x, y, mood: t < 43.5 ? "shock" : "happy", hop: cheer ? (t * 1.9) % 1 * .7 : 0, arms: cheer ? "up" : undefined, look: 1, op: aIn > 0 && aOut < 1 ? 1 : 0 });
+      sayBubble(ub, t, 43.55, 45.5, "손님 최고! 👑", 200, 520);
+    } else {
+      const x = lerp(250, 520, out(bIn)), y = 700 - 90 * Math.sin(bIn * Math.PI);
+      const pat = t > 69.0 && t < 70.6;
+      poseUchu(u, t, { x, y, mood: t < 67.8 ? "shock" : "happy", look: 1, talk: t > 67.7 && t < 68.9, arms: pat ? "point" : undefined, hop: t > 70.8 && t < 71.4 ? seg(t, 70.8, 71.4) : 0, op: bIn > 0 ? 1 : 0 });
+      if (pat) u.P.ar.setAttribute("transform", `translate(138 160) rotate(${(-95 + 18 * Math.abs(Math.sin(t * 9))).toFixed(1)})`);
+      sayBubble(ub, t, 67.7, 70.4, "힘내, 노아! 🙌", 760, 560);
+    }
+  });
+})();

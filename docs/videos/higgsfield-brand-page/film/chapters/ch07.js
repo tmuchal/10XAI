@@ -112,3 +112,21 @@ scene(184, 192, (R, s) => {
     });
   };
 });
+
+// ---- Uchu (co-host): front row, stage right (x≥1380, clear of the 3D insert at 596–1330 during
+//      186.85–190.05); gasps at the marquee, bows twice with the cast, name tag floats up during the 3D bow ----
+(() => {
+  let u;
+  uchuHook((t, s) => {
+    if (!u) { u = makeUchu(172); s.root.appendChild(u); }
+    const inP = seg(t, 184.9, 185.8), land = inP >= 1;
+    const x = lerp(1900, 1420, out(inP)), y = 702 - (land ? 0 : Math.abs(Math.sin(inP * Math.PI * 3)) * 70);
+    const bowAt = (tt, d) => { const a = seg(t, tt, tt + .35), z = seg(t, tt + .35 + d, tt + .75 + d); return ease(a) * (1 - ease(z)); };
+    const bow = Math.max(bowAt(188.2, .45), bowAt(189.7, .5));
+    let mood = "happy", wave = false, hop = 0, look = -.6, arms;
+    if (t > 186.25 && t < 186.95) mood = "shock";                 // the URL marquee lights up
+    if (t > 187.0 && t < 188.1) { wave = true; look = 0; }
+    if (t > 190.25) { wave = true; hop = ((t - 190.25) * 1.6) % 1 * .6; look = 0; }
+    poseUchu(u, t, { x, y, mood, wave, hop, look, arms, bow, flip: !land, tag: seg(t, 187.15, 187.7), op: inP > 0 ? 1 : 0 });
+  });
+})();

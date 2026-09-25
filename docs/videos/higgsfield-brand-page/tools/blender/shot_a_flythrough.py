@@ -190,7 +190,7 @@ def house_fn(sx, p, sway):
     def fn(u, v):
         z = -1.5 + v * HH
         pz = clamp(p * 1.18 - 0.18 * (1 - v))            # bottom lags the top
-        c = lerp(1.0, 0.09, out(pz))
+        c = lerp(1.0, 0.09, pz)
         xo = sx * (HW + 0.05)
         xr = xo - sx * HW * u                              # rest (u=1 -> centre seam)
         x = xo + (xr - xo) * c + sx * 0.0 + sway * (1 - v) ** 2 * sx
@@ -204,6 +204,20 @@ def house_fn(sx, p, sway):
 houseL, updL = grid_obj('houseL', 160, 16, house_fn(-1, 0, 0), VEL, None, thick=0.05, outline=OL * 0.7)
 houseR, updR = grid_obj('houseR', 160, 16, house_fn(1, 0, 0), VEL2, None, thick=0.05, outline=OL * 0.7)
 
+# ---------------------------------------------------------------- audience (backs of heads)
+AUD = [toon('aud%d' % i, c, paper=0.06) for i, c in enumerate(("#c47a45", "#b86f3e", "#cf8750"))]
+HATM = toon('audhat', "#f39bb6", paper=0.04)
+for row, (ay, az, n) in enumerate(((-4.4, -0.95, 9), (-5.6, -1.4, 10))):
+    for i in range(n):
+        x = (i - (n - 1) / 2) * 1.05 + (0.5 if row else 0) + (hsh(i, row) - 0.5) * 0.2
+        z = az + (hsh(i, row, 2) - 0.5) * 0.15
+        hd = sphere('aud', 0.42, (x, ay, z), (1.05, 0.9, 0.95), AUD[(i + row) % 3], None, OL * 0.8, 24)
+        for sx in (-1, 1):
+            sphere('audear', 0.13, (x + sx * 0.27, ay, z + 0.36), (1, 0.5, 1), AUD[(i + row) % 3], None, OL * 0.7, 16)
+        if hsh(i, row, 5) > 0.6:
+            cylinder('audhat', 0.13, 0.32, (x + 0.06, ay, z + 0.5), HATM, None, OL * 0.7, seg=20, r2=0.0,
+                     rot=(0, 0.25, 0))
+
 # ---------------------------------------------------------------- Noa
 NOA = hamster('noa', glasses=True, ol=0.024)
 cam = camera((0, -13.6, 1.8), (0, 0, 1.5), lens=30)
@@ -213,7 +227,8 @@ def setup(f):
     t = f / 30.0
     # curtain: tiny inward tug (anticipation) then fast part with overshoot
     tug = -0.05 * math.sin(math.pi * seg(t, 0.12, 0.42))
-    p = tug + ease(seg(t, 0.35, 1.45))
+    q = seg(t, 0.28, 1.45)
+    p = tug + q * q * (3 - 2 * q)
     sway = 0.45 * spring(t - 1.5, 1.6, 3.0)
     updL(house_fn(-1, max(0.0, p), sway)); updR(house_fn(1, max(0.0, p), sway))
     # camera: creep, then rush through the gap, settle with a soft overshoot

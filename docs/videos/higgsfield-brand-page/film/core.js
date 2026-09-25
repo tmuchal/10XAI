@@ -28,6 +28,10 @@
 //   countStamp(node, t, a, to, {from, dur, fmt, prefix, suffix})  kinetic counter + stamp-in
 //   makeBurst(parent, n=24, seed=1) -> svg with .fire(t, a, x, y, power=1)  deterministic sparkle burst
 //   shakeCam(t, a, amp=10, dur=.45)  soft camera shake of the whole stage
+//   makeUchu(size, variant) / poseUchu(n, t, {x,y,s,wave,talk,look,mood,flip,hop,op,blink,arms,tag,bow})
+//                                  Uchu = red-hooded, green-faced co-host (see the Uchu section below);
+//                                  same pose API as Noa, default mood "shock" (big O mouth), tag: name-tag pop 0..1
+//   uchuHook(fn(t, s))             append a per-frame hook to the chapter's last-registered scene
 // Scenes/elements with class "boil" also get the hand-drawn wobble automatically
 // (as do .card .win .chap .bubble .chip .reftag .btn inside a scene).
 // ============================================================================
@@ -395,3 +399,178 @@ function scene(a, b, build) {
   return s;
 }
 function chapter(root, k, t) { const c = el("div", "", `<div class="k">${k}</div><div class="t">${t}</div>`, root); c.className = "chap"; return c; }
+
+// ---------------------------------------------------------------- Uchu (the excitable co-host)
+// Uchu is a little guy in a glossy RED one-piece hooded suit: round red ear-pods on the hood,
+// two short antennae with red ball tips, and a flat GREEN painted face (watercolor stripes on
+// cheeks/forehead). Signature expression: the big "O" shocked mouth with a pink tongue.
+// Noa is the cool guide; Uchu is the reactor who gasps, cheers and points at the numbers.
+//   makeUchu(size=180, variant) -> div.uchu  (width = size, height = size*1.2; feet at y + size*1.2)
+//     variant: { suit: "#hex", face: "#hex", tag: false (omit the name tag) }
+//   poseUchu(n, t, { x, y, s, wave, talk, look, mood: 'happy'|'shock'|'pout', flip, hop, op,
+//                    blink, arms: 'up'|'down'|'hips'|'point', tag: 0..1 (name-tag pop progress), bow: 0..1 })
+//     mood defaults to "shock" (the signature O-face). Squash/stretch + hop phases match poseNoa.
+//     Antennae/ear-pods lag body motion (secondary spring), eyes blink, mouth: grin / talk / O.
+// Globals added: UCHU, makeUchu, poseUchu (class "uchu", so the stage spotlight keeps following Noa).
+const UCHU = { suit: "#e0322b", dark: "#a8201b", face: "#4caf50", stripe: "#a5d6a7" };
+function makeUchu(size = 180, v = {}) {
+  const c = Object.assign({}, UCHU, v);
+  const e = el("div", `position:absolute;left:0;top:0;z-index:31;width:${size}px;height:${size * 1.2}px`); e.className = "uchu";
+  const id = "u" + uid++;
+  const S = `stroke="${INK}" stroke-linejoin="round" stroke-linecap="round"`;
+  const arm = (cls, sx) => `<g class="${cls}"><path d="M0 -4 Q${sx * 4} 20 0 34" stroke="${INK}" stroke-width="27" stroke-linecap="round" fill="none"/>
+      <path d="M0 -4 Q${sx * 4} 20 0 34" stroke="${c.suit}" stroke-width="19" stroke-linecap="round" fill="none"/>
+      <circle cx="0" cy="40" r="13" fill="${c.suit}" ${S} stroke-width="4"/><path d="M${-sx * 8} 34 Q${-sx * 15} 40 ${-sx * 9} 46" stroke="${INK}" stroke-width="3" fill="none" stroke-linecap="round"/>
+      <circle cx="${-sx * 4}" cy="35" r="3.5" fill="#fff" opacity=".55"/></g>`;
+  const ant = (cls, x, tx) => `<g class="${cls}"><path d="M${x} 36 Q${x + (tx - x) * .2} 14 ${tx} 2" stroke="${INK}" stroke-width="9" fill="none" stroke-linecap="round"/>
+      <path d="M${x} 36 Q${x + (tx - x) * .2} 14 ${tx} 2" stroke="${c.suit}" stroke-width="4" fill="none" stroke-linecap="round"/>
+      <circle cx="${tx}" cy="-4" r="10" fill="${c.suit}" ${S} stroke-width="4"/><circle cx="${tx - 3}" cy="-7.5" r="3.2" fill="#fff" opacity=".8"/></g>`;
+  const pod = (cls, x) => `<g class="${cls}"><circle cx="${x}" cy="104" r="22" fill="${c.suit}" ${S} stroke-width="4.5"/>
+      <circle cx="${x}" cy="104" r="22" fill="url(#${id}g)"/><ellipse cx="${x - 6}" cy="96" rx="6" ry="4" fill="#fff" opacity=".65" transform="rotate(-30 ${x - 6} 96)"/></g>`;
+  e.innerHTML = `<svg viewBox="0 0 200 240" width="100%" height="100%" overflow="visible" style="overflow:visible">
+    <defs><radialGradient id="${id}g" cx=".35" cy=".28" r=".85"><stop offset="0" stop-color="#fff" stop-opacity=".5"/><stop offset=".35" stop-color="#fff" stop-opacity="0"/><stop offset="1" stop-color="#5a0d0a" stop-opacity=".28"/></radialGradient>
+      <clipPath id="${id}c"><ellipse cx="100" cy="102" rx="45" ry="53"/></clipPath></defs>
+    <ellipse class="sh" cx="100" cy="234" rx="58" ry="8" fill="rgba(120,40,30,.22)"/>
+    <g class="b">
+      <g transform="translate(6 6)" opacity=".16" fill="${INK}"><ellipse cx="100" cy="98" rx="70" ry="72"/><path d="M56 150 C44 180 48 222 66 230 H134 C152 222 156 180 144 150Z"/></g>
+      <g class="lgs">${[80, 120].map((x, i) => `<g class="lg"><rect x="${x - 13}" y="206" width="26" height="24" rx="8" fill="${c.suit}" ${S} stroke-width="4"/>
+        <ellipse cx="${x + (i ? 4 : -4)}" cy="230" rx="18" ry="8" fill="${c.dark}" ${S} stroke-width="4"/></g>`).join("")}</g>
+      <path d="M56 150 C44 180 48 222 66 226 H134 C152 222 156 180 144 150Z" fill="${c.suit}" ${S} stroke-width="5"/>
+      <path d="M56 150 C44 180 48 222 66 226 H134 C152 222 156 180 144 150Z" fill="url(#${id}g)"/>
+      <path d="M100 168 V222" stroke="${INK}" stroke-width="2.5" stroke-dasharray="4 4" opacity=".45"/>
+      <path d="M64 172 Q62 196 70 214" stroke="#fff" stroke-width="5" opacity=".4" fill="none" stroke-linecap="round"/>
+      <g class="al" transform="translate(62 160)">${arm("", 1)}</g>
+      <g class="ar" transform="translate(138 160)">${arm("", -1)}</g>
+      <g class="hd">
+        ${ant("anl", 84, 70)}${ant("anr", 116, 130)}
+        ${pod("pdl", 30)}${pod("pdr", 170)}
+        <ellipse cx="100" cy="98" rx="70" ry="72" fill="${c.suit}" ${S} stroke-width="5.5"/>
+        <ellipse cx="100" cy="98" rx="70" ry="72" fill="url(#${id}g)"/>
+        <path d="M52 58 Q70 34 98 30" stroke="#fff" stroke-width="7" opacity=".55" fill="none" stroke-linecap="round"/>
+        <path d="M46 72 Q47 67 49 64" stroke="#fff" stroke-width="5" opacity=".45" fill="none" stroke-linecap="round"/>
+        <g class="face">
+          <ellipse cx="100" cy="102" rx="49" ry="57" fill="${c.dark}" opacity=".35"/>
+          <ellipse cx="100" cy="102" rx="45" ry="53" fill="${c.face}"/>
+          <g clip-path="url(#${id}c)">
+            <ellipse cx="86" cy="80" rx="30" ry="20" fill="#7cc97f" opacity=".45"/><ellipse cx="124" cy="138" rx="30" ry="18" fill="#2f8a3a" opacity=".3"/>
+            <path d="M80 57 Q94 52 106 58" stroke="${c.stripe}" stroke-width="9" opacity=".85" fill="none" stroke-linecap="round"/>
+            <path d="M73 110 Q71 122 75 136" stroke="${c.stripe}" stroke-width="10" opacity=".85" fill="none" stroke-linecap="round"/>
+            <path d="M127 110 Q130 120 126 134" stroke="${c.stripe}" stroke-width="9" opacity=".8" fill="none" stroke-linecap="round"/>
+            <path d="M58 94 Q62 128 82 150" stroke="#2f8a3a" stroke-width="3" opacity=".35" fill="none"/>
+            <ellipse cx="72" cy="124" rx="9" ry="5" fill="#ff8aa2" opacity=".35"/><ellipse cx="128" cy="124" rx="9" ry="5" fill="#ff8aa2" opacity=".35"/>
+          </g>
+          <ellipse cx="100" cy="102" rx="45" ry="53" fill="none" stroke="${INK}" stroke-width="4.5"/>
+          <g class="eyes">
+            <g class="ey1"><ellipse class="w1" cx="82" cy="92" rx="10" ry="12" fill="#fff" ${S} stroke-width="3.5"/><circle class="p1" cx="82" cy="93" r="5" fill="${INK}"/><circle class="h1" cx="84" cy="90" r="1.8" fill="#fff"/></g>
+            <g class="ey2"><ellipse class="w2" cx="118" cy="92" rx="10" ry="12" fill="#fff" ${S} stroke-width="3.5"/><circle class="p2" cx="118" cy="93" r="5" fill="${INK}"/><circle class="h2" cx="120" cy="90" r="1.8" fill="#fff"/></g>
+            <path class="lid1" d="" stroke="${INK}" stroke-width="4" fill="${c.face}" stroke-linecap="round"/><path class="lid2" d="" stroke="${INK}" stroke-width="4" fill="${c.face}" stroke-linecap="round"/>
+          </g>
+          <g class="brows" stroke="${INK}" stroke-width="4.5" fill="none" stroke-linecap="round"><path class="br1" d=""/><path class="br2" d=""/></g>
+          <circle cx="96" cy="107" r="2.2" fill="${INK}" opacity=".7"/><circle cx="104" cy="107" r="2.2" fill="${INK}" opacity=".7"/>
+          <g class="mo">
+            <path class="lip" d="" fill="#d97a86" stroke="${INK}" stroke-width="3.5" stroke-linejoin="round"/>
+            <path class="m" d="" fill="#6a1f22"/>
+            <g class="tg"><ellipse cx="100" cy="140" rx="9" ry="6" fill="#f48fb1" stroke="${INK}" stroke-width="2"/><path d="M100 136 V141" stroke="${INK}" stroke-width="1.5" opacity=".5"/></g>
+            <path class="ml" d="" fill="none" stroke="${INK}" stroke-width="3.5" stroke-linecap="round"/>
+          </g>
+        </g>
+      </g>
+    </g></svg>`;
+  if (c.tag !== false) {
+    e.tag = el("div", `position:absolute;left:50%;top:${-size * .52}px;width:${size * 1.1}px;height:${size * .5}px;margin-left:${-size * .55}px;transform-origin:50% 100%;opacity:0`,
+      `<svg viewBox="0 0 220 100" width="100%" height="100%" overflow="visible">
+        <text x="110" y="74" text-anchor="middle" font-family="GaeguLat, sans-serif" font-weight="700" font-size="84" fill="#e0322b" stroke="#e0322b" stroke-width="9" stroke-dasharray="1.2 3.2" stroke-linecap="round" stroke-linejoin="round">uchu</text>
+        <text x="110" y="74" text-anchor="middle" font-family="GaeguLat, sans-serif" font-weight="700" font-size="84" fill="#e0322b" stroke="#ff6b5e" stroke-width="2" stroke-dasharray="2 3">uchu</text>
+        <text x="113" y="77" text-anchor="middle" font-family="GaeguLat, sans-serif" font-weight="700" font-size="84" fill="none" stroke="${INK}" stroke-width="1.5" opacity=".35">uchu</text></svg>`, e);
+  }
+  const q = x => e.querySelector(x);
+  e.P = { b: q(".b"), hd: q(".hd"), al: q(".al"), ar: q(".ar"), anl: q(".anl"), anr: q(".anr"), pdl: q(".pdl"), pdr: q(".pdr"),
+    face: q(".face"), eyes: q(".eyes"), ey1: q(".ey1"), ey2: q(".ey2"), p1: q(".p1"), p2: q(".p2"), w1: q(".w1"), w2: q(".w2"), h1: q(".h1"), h2: q(".h2"),
+    lid1: q(".lid1"), lid2: q(".lid2"), br1: q(".br1"), br2: q(".br2"), lip: q(".lip"), m: q(".m"), tg: q(".tg"), ml: q(".ml"), sh: q(".sh"), legs: [...e.querySelectorAll(".lg")] };
+  e.seed = (uid++ % 5) * 0.61 + .3; e.size = size;
+  return e;
+}
+function poseUchu(n, t, o) {
+  const { x = 0, y = 0, s = 1, wave = 0, talk = false, look = 0, mood = "shock", flip = false, hop = 0, op = 1, blink: canBlink = true, arms, tag = 0, bow = 0 } = o;
+  const T = t + n.seed, P = n.P;
+  let lift = 0, sx = 1, sy = 1, air = 0, vel = 0;
+  if (hop > 0 && hop < 1) {
+    if (hop < .18) { const k = Math.sin(hop / .18 * Math.PI / 2); sy = 1 - .18 * k; sx = 1 + .14 * k; }
+    else if (hop < .86) { const u = (hop - .18) / .68, sp = Math.abs(1 - 2 * u); lift = 4 * u * (1 - u) * 80; vel = 1 - 2 * u; sy = 1 + .16 * sp; sx = 1 - .09 * sp; air = 1; }
+    else { const k = Math.sin((hop - .86) / .14 * Math.PI); sy = 1 - .17 * k; sx = 1 + .14 * k; }
+  }
+  const shock = mood === "shock", pout = mood === "pout";
+  const breathe = 1 + (shock ? .02 : .03) * Math.sin(T * (shock ? 7 : 4.4));
+  sy *= breathe; sx *= 2 - breathe;
+  if (shock) { sy *= 1.06; sx *= .96; }
+  const bob = hop > 0 ? 0 : Math.sin(T * 3.3) * 2.5;
+  const jit = shock ? Math.sin(t * 47) * 1.4 : 0;
+  n.style.transform = `translate(${x + jit}px, ${y + bob - lift}px) scale(${flip ? -s : s}, ${s})`;
+  n.style.transformOrigin = "50% 100%";
+  n.style.opacity = op;
+  if (n.tag) { const p = clamp(tag), pp = back(clamp(p * 1.4));
+    n.tag.style.opacity = clamp(p * 4); n.tag.style.transform = `translateY(${(-8 * Math.sin(t * 2.6) - 30 * (1 - pp)).toFixed(1)}px) scale(${(flip ? -1 : 1) * (.3 + .7 * pp)}, ${.3 + .7 * pp}) rotate(${(-4 + 3 * Math.sin(t * 1.9)).toFixed(2)}deg)`; }
+  if (op <= 0) return;
+  const lean = look * 3 + (talk ? Math.sin(T * 5) * 2.4 : 0) + (pout ? -3 : 0);
+  P.b.setAttribute("transform", `translate(100 232) rotate(${lean.toFixed(2)}) scale(${sx.toFixed(3)} ${sy.toFixed(3)}) translate(-100 -232)`);
+  const unit = (n.size || 180) / 200 * Math.max(.05, s);
+  const shK = 1 - Math.min(.5, lift / 150);
+  P.sh.setAttribute("transform", `translate(0 ${(lift / unit).toFixed(1)}) translate(100 234) scale(${shK.toFixed(3)}) translate(-100 -234)`);
+  P.sh.setAttribute("opacity", (1 - lift / 220).toFixed(2));
+  // head: bows / nods on talk, overshoots the squash (secondary)
+  const nod = talk ? Math.sin(T * 9) * 1.6 : 0, hdy = bow * 22 + (sy < 1 ? (1 - sy) * 30 : 0) + nod;
+  P.hd.setAttribute("transform", `translate(0 ${hdy.toFixed(1)}) rotate(${(look * 4 + (shock ? Math.sin(t * 31) * 1.2 : 0)).toFixed(2)} 100 160)`);
+  // antennae: spring lag against vertical velocity + idle sway; stiff & vibrating on shock
+  const lag = air ? vel * 16 : (1 - sy) * 60, sway = Math.sin(T * 3.1) * 5 + wobble(t, Math.floor(T / 2.3) * 2.3 - n.seed, 5, 11, 3);
+  const aSh = shock ? Math.sin(t * 38) * 4 : 0;
+  P.anl.setAttribute("transform", `rotate(${(-sway - lag - look * 6 + aSh - (shock ? 6 : 0)).toFixed(1)} 84 36)`);
+  P.anr.setAttribute("transform", `rotate(${(sway * .8 + lag - look * 6 - aSh + (shock ? 6 : 0)).toFixed(1)} 116 36)`);
+  // ear pods bounce with the squash (they lag one beat)
+  const pb = (1 - sy) * -28 + (air ? vel * -5 : 0) + Math.sin(T * 6.2) * .8;
+  P.pdl.setAttribute("transform", `translate(${(-Math.max(0, sx - 1) * 30).toFixed(1)} ${pb.toFixed(1)})`);
+  P.pdr.setAttribute("transform", `translate(${(Math.max(0, sx - 1) * 30).toFixed(1)} ${pb.toFixed(1)})`);
+  P.face.setAttribute("transform", `translate(${(look * 7).toFixed(1)} ${air ? -2 : 0})`);
+  // eyes
+  const bc = T % 3.3, blink = canBlink && !shock && (bc < .11 || (Math.floor(T / 3.3) % 3 === 2 && bc > .22 && bc < .31));
+  const es = shock ? 1.28 : 1, pr = shock ? 3.6 : 5;
+  [[P.w1, P.p1, P.h1, 82], [P.w2, P.p2, P.h2, 118]].forEach(([w, p, h, cx], i) => {
+    w.setAttribute("rx", 10 * es); w.setAttribute("ry", (blink ? 1.5 : 12) * es); w.setAttribute("cy", shock ? 88 : 92);
+    const j = shock ? Math.sin(t * 35 + i) * 1.1 : 0;
+    p.setAttribute("r", pr); p.setAttribute("cx", cx + look * 3 + j); p.setAttribute("cy", shock ? 89 : 93 + (pout ? 2 : 0));
+    h.setAttribute("cx", cx + look * 3 + 2 + j); h.setAttribute("cy", shock ? 86 : 90);
+    p.style.display = h.style.display = blink ? "none" : "";
+  });
+  P.lid1.setAttribute("d", pout ? "M71 88 Q82 80 93 86 L93 92 Q82 88 71 92Z" : "");
+  P.lid2.setAttribute("d", pout ? "M107 86 Q118 80 129 88 L129 92 Q118 88 107 92Z" : "");
+  const by = shock ? 64 : 76, tw = shock ? Math.sin(t * 20) * 1 : Math.sin(T * 2) * 1.2;
+  P.br1.setAttribute("d", pout ? `M70 ${by} L92 ${by + 6}` : shock ? `M70 ${by + 4 + tw} Q81 ${by - 6 + tw} 92 ${by + tw}` : `M71 ${by + 2 + tw} Q82 ${by - 5 + tw} 93 ${by + 1 + tw}`);
+  P.br2.setAttribute("d", pout ? `M108 ${by + 6} L130 ${by}` : shock ? `M108 ${by + tw} Q119 ${by - 6 + tw} 130 ${by + 4 + tw}` : `M107 ${by + 1 + tw} Q118 ${by - 5 + tw} 129 ${by + 2 + tw}`);
+  // mouth: O (shock) / talk / grin / pout
+  const ph = Math.floor(t * 9) % 4, open = talk && ph !== 3;
+  let lip = "", m = "", ml = "", tg = false;
+  if (shock) { const k = 1 + .06 * Math.sin(t * 13); const ry = 16 * k, rx = 12.5 / Math.sqrt(k);
+    lip = `M${100 - rx - 4} 131 a${rx + 4} ${ry + 4} 0 1 0 ${2 * rx + 8} 0 a${rx + 4} ${ry + 4} 0 1 0 ${-2 * rx - 8} 0Z`; m = `M${100 - rx} 131 a${rx} ${ry} 0 1 0 ${2 * rx} 0 a${rx} ${ry} 0 1 0 ${-2 * rx} 0Z`; tg = true; }
+  else if (open || air) { const h = air ? 18 : ph === 1 ? 10 : 16; lip = `M82 124 Q100 ${124 + h * 1.6} 118 124 Q100 128 82 124Z`; m = `M85 125.5 Q100 ${124 + h * 1.35} 115 125.5 Q100 128.5 85 125.5Z`; tg = h > 12; }
+  else if (pout) ml = "M88 134 Q92 129 96 133 Q100 137 104 132 Q108 128 112 133";
+  else ml = "M82 124 Q100 142 118 124";
+  P.lip.setAttribute("d", lip); P.m.setAttribute("d", m); P.ml.setAttribute("d", ml);
+  P.tg.style.display = tg ? "" : "none";
+  P.tg.setAttribute("transform", shock ? `translate(0 ${(1 + 1.5 * Math.sin(t * 13)).toFixed(1)})` : `translate(0 -3)`);
+  // arms (pivot at shoulders; +deg swings the left arm outward)
+  let rl = 18 + Math.sin(T * 3) * 6, rr = -18 - Math.sin(T * 3) * 6;
+  if (talk) rl += Math.sin(T * 5.5) * 20 + 20;
+  if (wave) rr = -140 + Math.sin(t * 12) * 24;
+  if (air) { rl = 120; rr = wave ? rr : -120; }
+  if (hop > 0 && hop < .18) { rl = 5; rr = -5; }
+  if (shock || arms === "up") { rl = 150 + Math.sin(t * 30) * 8; rr = -150 - Math.sin(t * 30) * 8; }
+  if (pout || arms === "down") { rl = 4; rr = -4; }
+  if (arms === "hips") { rl = 40; rr = -40; }
+  if (arms === "point") rr = -100 + Math.sin(t * 6) * 4;
+  if (bow) { rl = lerp(rl, -10, bow); rr = lerp(rr, 10, bow); }
+  P.al.setAttribute("transform", `translate(62 ${160 + hdy * .3}) rotate(${rl.toFixed(1)})`);
+  P.ar.setAttribute("transform", `translate(138 ${160 + hdy * .3}) rotate(${rr.toFixed(1)})`);
+  const stepAmp = air ? 0 : hop > 0 ? 3 : 1.5;
+  P.legs.forEach((l, i) => l.setAttribute("transform", air ? `translate(0 4)` : `translate(0 ${(-Math.max(0, Math.sin(t * 9 + i * 2.6)) * stepAmp).toFixed(1)})`));
+}
+// small helper for chapters: the chapter's scene (last one registered) gets an extra per-frame hook
+function uchuHook(fn) { const s = SC[SC.length - 1], f = s.update; s.update = t => { f(t); fn(t, s); }; return s; }

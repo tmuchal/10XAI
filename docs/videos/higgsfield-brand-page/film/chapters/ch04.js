@@ -444,3 +444,57 @@ scene(106, 134, (R, s) => {
     }
   };
 });
+
+// ---- Uchu (co-host): rides the 1-second rocket in, jaw-drops at 53%, gets swept off by the paper wipe,
+//      then returns to O-face at the 85% ring and cheers the shopping crowd ----
+(() => {
+  let u, ub, rk;
+  uchuHook((t, s) => {
+    if (!u) {
+      rk = el("div", "position:absolute;left:0;top:0;z-index:30;width:300px;height:140px", `<svg width="300" height="140" viewBox="-60 0 180 84" overflow="visible">
+        <g class="fl"><path d="M14 42 L-40 28 L-22 42 L-40 56Z" fill="#f2a24e" stroke="${INK}" stroke-width="3" stroke-linejoin="round"/><path d="M14 42 L-12 35 L-4 42 L-12 49Z" fill="#fff3c4"/></g>
+        <path d="M30 26 L12 12 L20 34Z M30 58 L12 72 L20 50Z" fill="#c8372d" stroke="${INK}" stroke-width="3" stroke-linejoin="round"/>
+        <path d="M14 28 H74 Q106 30 112 42 Q106 54 74 56 H14Z" fill="#fff" stroke="${INK}" stroke-width="4" stroke-linejoin="round"/>
+        <path d="M22 34 H70" stroke="#9fd3f0" stroke-width="4" stroke-linecap="round" opacity=".8"/>
+        <circle cx="78" cy="42" r="8" fill="#9fd3f0" stroke="${INK}" stroke-width="3"/><text x="44" y="51" font-size="13" font-weight="700" fill="#c8372d" text-anchor="middle">1s</text></svg>`, s.root);
+      u = makeUchu(150); s.root.appendChild(u); ub = makeBubble(s.root);
+    }
+    const fl = rk.querySelector(".fl");
+    // A · rocket ride: 106.3 → parks at x≈230 by 107.3 (lane 1 "1.0s ✓")
+    const rp = seg(t, 106.3, 107.3), park = t >= 107.3;
+    const rx = lerp(-420, 170, out(rp)), ry = 782 + (park ? 0 : 6 * Math.sin(t * 40)) + (park ? 5 * Math.exp(-5 * (t - 107.3)) * Math.sin(18 * (t - 107.3)) : 0);
+    const rOut = ease(seg(t, 109.5, 110.0));
+    rk.style.opacity = rp > 0 && rOut < 1 ? 1 : 0;
+    rk.style.transform = `translate(${rx - 700 * rOut}px, ${ry}px) rotate(${park ? -2 * rOut : -3}deg)`;
+    fl.setAttribute("transform", `translate(14 42) scale(${(park ? (1 - seg(t, 107.3, 107.6)) : 1) * (1 + .3 * Math.sin(t * 50))} 1) translate(-14 -42)`);
+    // wipe band (112.15–112.8) sweeps him away
+    const bp = seg(t, 112.15, 112.8), bandX = lerp(-120, 2040, ease(bp)) + 60;
+    if (t < 118) {
+      const off = seg(t, 107.45, 107.9);                        // hops off the rocket onto the floor
+      let x = rx + 100, y = ry - 128;
+      if (t > 107.45) { x = lerp(rx + 100, 245, off); y = lerp(ry - 128, 700, off) - 90 * Math.sin(off * Math.PI); }
+      const swept = bandX > x + 20 && bp > 0;
+      if (swept) x = bandX - 20;
+      let mood = rp < 1 ? "happy" : "happy", hop = off > 0 && off < 1 ? .2 + off * .8 : 0, look = 1, arms, wave = false;
+      if (rp < 1) { arms = "up"; }
+      if (t > 108.3 && t < 109.5) { wave = true; }
+      if (t > 110.9) { mood = "shock"; look = .8; }                          // 53% jaw-drop
+      if (swept) { mood = "shock"; hop = 0; }
+      poseUchu(u, t, { x, y, mood, hop, look, arms, wave, op: rp > 0 && x < 1800 ? 1 : 0 });
+      if (t > 110.9) { const jd = seg(t, 111.55, 111.8) * (1 - seg(t, 112.2, 112.4));       // jaw drops extra-long on the splat
+        u.P.m.setAttribute("transform", `translate(100 131) scale(1 ${(1 + .45 * jd).toFixed(2)}) translate(-100 -131)`); u.P.lip.setAttribute("transform", u.P.m.getAttribute("transform")); u.P.tg.setAttribute("transform", `translate(0 ${(1 + 9 * jd).toFixed(1)})`); }
+      else { u.P.m.removeAttribute("transform"); u.P.lip.removeAttribute("transform"); }
+      if (t < 109.6) sayBubble(ub, t, 107.6, 109.4, "1초 컷! 🚀", 330, 560);
+      else sayBubble(ub, t, 111.6, 112.3, "53%?!", 330, 560);
+    } else {
+      // C · 85% ring (120.8–124.9): pops up at the right edge
+      u.P.m.removeAttribute("transform"); u.P.lip.removeAttribute("transform");
+      const cin = seg(t, 120.8, 121.2), cOut = seg(t, 124.6, 125.0);
+      let mood = "happy", hop = 0, arms, look = -1;
+      if (t > 121.5 && t < 122.9) { mood = "shock"; }
+      if (t > 123.0 && t < 124.3) { hop = ((t - 123) * 1.8) % 1; arms = "up"; }
+      poseUchu(u, t, { x: 1615, y: lerp(1080, 712, back(cin)) + 300 * ease(cOut), s: 140 / 150, mood, hop, arms, look, op: cin > 0 && cOut < 1 ? 1 : 0 });
+      sayBubble(ub, t, 121.7, 122.9, "85%!!", 1440, 580);
+    }
+  });
+})();

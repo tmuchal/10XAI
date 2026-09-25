@@ -289,3 +289,37 @@ scene(160, 184, (R, s) => {
     wipeA(t, 172.55, .8); wipeB(t, 177.45, .8);
   };
 });
+
+// ---- Uchu (co-host): tries to catch coins (they all go to Noa), gets bonked by one,
+//      then gasps when the envelope's ₩4,500,000 is confirmed ----
+(() => {
+  let u, ub, coin;
+  uchuHook((t, s) => {
+    if (!u) {
+      u = makeUchu(160); s.root.appendChild(u); ub = makeBubble(s.root);
+      coin = el("div", "position:absolute;left:0;top:0;z-index:33;width:44px;height:44px", `<svg width="44" height="44" viewBox="0 0 40 40"><circle cx="20" cy="20" r="17" fill="#f7c843" stroke="${INK}" stroke-width="3"/>
+        <circle cx="20" cy="20" r="11" fill="none" stroke="#c98a1a" stroke-width="2"/><text x="20" y="27" text-anchor="middle" font-size="19" font-family="GaeguLat" fill="#8a5a12">₩</text></svg>`, s.root);
+    }
+    const inP = seg(t, 162.7, 163.15), X1 = ease(seg(t, 172.7, 173.25));
+    const x = 905 + 12 * Math.sin(t * 2.2) * (t < 165.8 ? 1 : 0), y = lerp(1060, 668, back(inP));
+    let mood = "happy", hop = 0, arms = "up", look = -1, talk = false;
+    if (t < 165.8) hop = ((t - 163.1) * 1.7) % 1 * .55;                 // jumping for coins, catching nothing
+    else if (t < 166.55) { mood = "pout"; arms = "down"; }
+    // one coin ricochets off Noa's head: bonk (166.55) → O-face → he catches it (167.0) → happy
+    const cf = seg(t, 166.0, 166.55), bonk = t > 166.55 && t < 167.0;
+    if (bonk) { mood = "shock"; arms = undefined; }
+    if (t >= 167.0 && t < 170.3) { mood = "happy"; arms = undefined; hop = t < 167.6 ? seg(t, 167.0, 167.6) : 0; look = -.4; }
+    if (t >= 170.3 && t < 171.85) { mood = "happy"; look = -.8; arms = "hips"; }
+    if (t >= 171.85) { mood = "shock"; look = -.2; }                    // ₩4,500,000 matches the envelope!
+    poseUchu(u, t, { x: x + 700 * X1, y: y - 120 * Math.sin(X1 * Math.PI), mood, hop, arms, look, talk, op: inP > 0 && X1 < 1 ? 1 : 0 });
+    // coin path: Noa's head (≈780,720) → arc → Uchu's head, bounce up, into his mitten
+    let cx, cy, cop = 1, cr = t * 600;
+    if (t < 166.0) cop = 0;
+    else if (t < 166.55) { cx = lerp(780, x + 70, cf); cy = lerp(720, y + 20, cf) - 160 * Math.sin(cf * Math.PI); }
+    else if (t < 167.0) { const b = seg(t, 166.55, 167.0); cx = x + 70 + 40 * b; cy = y + 20 - 110 * Math.sin(b * Math.PI) + 60 * b; }
+    else { cx = x + 125; cy = y + 110 + 3 * Math.sin(t * 5); cr = 0; }
+    coin.style.opacity = cop * (1 - X1) * (t < 170.3 ? 1 : 0);
+    if (cop) coin.style.transform = `translate(${cx}px, ${cy}px) rotate(${cr}deg) scale(${t > 167 ? 1 : Math.abs(Math.cos(t * 9)) * .7 + .3}, 1)`;
+    sayBubble(ub, t, 166.6, 167.9, "아얏! …내 거다!", 1010, 560);
+  });
+})();

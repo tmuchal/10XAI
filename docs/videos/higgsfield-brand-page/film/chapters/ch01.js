@@ -355,3 +355,23 @@ scene(10, 40, (R, s) => {
   };
 });
 })();
+
+// ---- Uchu (co-host): the studio audience of the wheel — O-face on every landing, cheers after ----
+(() => {
+  let u;
+  const BEATS = [13, 18, 23, 28];
+  uchuHook((t, s) => {
+    if (!u) { u = makeUchu(165); s.root.appendChild(u); }
+    const inP = seg(t, 12.3, 12.75), outP = seg(t, 32.3, 32.9);
+    let mood = "happy", hop = 0, wave = false, look = -1, arms, talk = false;
+    BEATS.forEach(b => {
+      if (t >= b - 0.9 && t < b) { mood = "happy"; look = -1; arms = "hips"; }       // drumroll: leaning in
+      if (t >= b && t < b + 0.95) { mood = "shock"; }                                  // it LANDS
+      if (t >= b + 0.95 && t < b + 1.6) { hop = seg(t, b + 0.95, b + 1.6); wave = true; }
+    });
+    if (t > 29.6 && t < 31.6) { talk = t > 29.8 && t < 30.6; look = -.6; }
+    const x = lerp(1600, 1545, out(inP)) + 260 * ease(outP);
+    const y = lerp(1100, 696, back(inP)) - 180 * Math.sin(outP * Math.PI);
+    poseUchu(u, t, { x, y, s: 1, mood: outP > 0 ? "shock" : mood, hop: outP > 0 ? 0 : hop, wave, look, arms, talk, op: inP > 0 && outP < 1 ? 1 : 0 });
+  });
+})();
