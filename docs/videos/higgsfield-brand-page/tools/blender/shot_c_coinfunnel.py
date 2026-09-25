@@ -181,7 +181,7 @@ def setup(f):
     g = seg(t, 2.72, 3.0)
     gs = math.sin(math.pi * g) * 1.0
     GLINT.scale = (gs, gs, gs)
-    GLINT.rotation_euler = (math.pi / 2, g * 2.0, 0)
+    GLINT.rotation_euler = (math.pi / 2, 0, g * 2.0)   # spin in the coin-face plane
     GLINT.location = (0.12, -0.12, 0.06)
 
 

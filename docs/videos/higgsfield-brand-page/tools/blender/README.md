@@ -52,11 +52,11 @@ Measured on 4 CPU cores with bpy 4.2.0 and Cycles CPU:
 
 | Shot | Sampling | Time per frame | Time for the shot |
 |---|---|---|---|
-| A (1080p, the heaviest set) | 5 spp | ≈5 s | ≈6 min |
-| B | 6 spp | ≈3.5–4 s | ≈5.5 min |
-| C | 6 spp | ≈1.6 s | ≈2.5 min |
-| D | 6 spp | ≈2.3 s | ≈3.5 min |
+| A (1080p, the heaviest set) | 5 spp | ≈5–6 s | 6–7 min |
+| B | 6 spp | ≈1.5 s | ≈2.3 min |
+| C | 6 spp | ≈1.6 s | ≈2.4 min |
+| D | 6 spp | ≈2.3 s | ≈3.4 min |
 
-The total is about 18 minutes.
+The total is about 15 minutes, plus about 1 minute for `finalize.py`.
 
 EEVEE and Workbench don't work in the headless `bpy` wheel, because there's no GPU or OpenGL context. The render fails silently. Use Cycles.
