@@ -32,6 +32,42 @@ const me = () => G.player;
 const P = () => G.nations[G.player];
 const pct = v => `${Math.round(v * 100)}%`;
 
+// ---------- icons ----------
+const ICONS = {
+  power: '<path d="M4 18h16M5 18l-1-9 5 4 3-7 3 7 5-4-1 9"/>',
+  nation: '<circle cx="12" cy="12" r="8"/><path d="M14.5 9.5c-.5-1-1.5-1.5-2.5-1.5-1.4 0-2.5.8-2.5 2s1 1.6 2.5 2 2.5.9 2.5 2-1.1 2-2.5 2c-1 0-2-.5-2.5-1.5M12 6.5v11"/>',
+  arms: '<path d="M12 3c2 2 3 5 3 8v6H9v-6c0-3 1-6 3-8z"/><path d="M9 14l-3 3v3l3-2M15 14l3 3v3l-3-2M12 17v4"/>',
+  tech: '<path d="M9 3h6M10 3v6l-5 9a2 2 0 002 3h10a2 2 0 002-3l-5-9V3"/><path d="M7.5 15h9"/>',
+  diplo: '<circle cx="12" cy="12" r="8"/><path d="M4 12h16M12 4c3 3 3 13 0 16M12 4c-3 3-3 13 0 16"/>',
+  war: '<path d="M4 19V5M4 19h16"/><path d="M7 15l4-5 3 3 5-7"/>',
+  money: '<rect x="3" y="6" width="18" height="12" rx="2"/><circle cx="12" cy="12" r="3"/>',
+  stab: '<path d="M12 3l7 3v6c0 4-3 7-7 9-4-2-7-5-7-9V6z"/>',
+  crown: '<path d="M4 18h16M5 18l-1-9 5 4 3-7 3 7 5-4-1 9"/>',
+  rep: '<path d="M12 4l2.4 5 5.6.8-4 3.9.9 5.5L12 16.6 7.1 19.2 8 13.7 4 9.8 9.6 9z"/>',
+  clock: '<circle cx="12" cy="12" r="8"/><path d="M12 7v5l3 2"/>',
+  people: '<circle cx="9" cy="8" r="3"/><path d="M3 19c0-3 3-5 6-5s6 2 6 5M16 11a3 3 0 100-6M21 19c0-2.5-2-4.3-4.5-4.8"/>',
+  fuel: '<path d="M6 20V5a2 2 0 012-2h6a2 2 0 012 2v15M4 20h14M16 9h2a2 2 0 012 2v5a1.5 1.5 0 01-3 0v-3"/>',
+  nuke: '<circle cx="12" cy="12" r="2"/><path d="M12 10V4a8 8 0 016.9 4L13.7 11M10.3 11L5.1 8A8 8 0 0112 4M13.7 13l5.2 3a8 8 0 01-13.8 0l5.2-3"/>',
+  wait: '<path d="M5 20V9l7-5 7 5v11"/><path d="M9 20v-6h6v6"/>',
+  deploy: '<path d="M3 17h18M6 17l2-6h8l2 6M9 11V7h6v4"/><circle cx="7" cy="19" r="1.5"/><circle cx="17" cy="19" r="1.5"/>',
+  upgrade: '<path d="M12 19V5M6 11l6-6 6 6"/><path d="M5 21h14"/>',
+  strike: '<path d="M3 13l8-2 5-7 2 1-3 7 6 3-1 2-7-2-6 4-1-1 3-4-6-1z"/>',
+  rebase: '<path d="M4 12a8 8 0 0114-5l2-2v6h-6l2-2a5 5 0 10.6 6"/>',
+  back: '<path d="M15 5l-7 7 7 7"/>',
+  info: '<circle cx="12" cy="12" r="8"/><path d="M12 11v5M12 8h.01"/>',
+  trash: '<path d="M5 7h14M9 7V4h6v3M7 7l1 13h8l1-13"/>',
+  recruit: '<path d="M12 5v14M5 12h14"/>',
+  build: '<path d="M3 21h18M5 21V9l7-5 7 5v12"/><path d="M9 21v-6h6v6"/>',
+  missile: '<path d="M12 3c2 2 3 5 3 8v6H9v-6c0-3 1-6 3-8z"/><path d="M12 17v4"/>',
+  attack: '<path d="M4 20L20 4M14 4h6v6M8 16l-4 4"/>',
+  cancel: '<path d="M6 6l12 12M18 6L6 18"/>',
+  city: '<path d="M3 21h18M5 21V10h5v11M10 21V5h9v16M13 9h3M13 13h3M13 17h3"/>',
+};
+const ic = (k, extra = '') => `<svg class="ic" viewBox="0 0 24 24"${extra}>${ICONS[k] || ICONS.info}</svg>`;
+const DOCK = [['power', '권력'], ['nation', '경제'], ['arms', '병기'], ['tech', '연구'], ['diplo', '외교'], ['war', '전황']];
+const SHEET_TITLES = { sel: '정세 개요', power: '권력', nation: '경제·재정', arms: '병기·전략무기', tech: '연구 개발', diplo: '외교·첩보', war: '전황' };
+const IS_TOUCH = matchMedia('(pointer: coarse)').matches;
+
 // ---------- vision & selection ----------
 function refreshVision() { UI.vis = G.fog ? visionFor(me()) : null; }
 function seen(i) { return !UI.vis || !!UI.vis[i]; }
@@ -59,9 +95,11 @@ function select(sel) {
   UI.sel = sel;
   if (UI.mode !== 'missile') UI.mode = null;
   computeOrders();
+  UI.pending = null;
   UI.dirty = true;
-  if (sel && UI.tab !== 'sel') UI.tab = 'sel';
-  renderPanel(); renderModebar();
+  if (sel && UI.sheet && !UI.sheetPinned && innerWidth < 900) closeSheet();
+  if (UI.sheet === 'sel') renderPanel();
+  renderCtx(); renderModebar();
 }
 
 // ---------- camera ----------
@@ -502,9 +540,10 @@ function showTip(i, sx, sy) {
 }
 
 // ---------- map input ----------
-function onTileClick(i) {
+function onTileClick(i, touch) {
   if (!G || UI.busy || G.over || i < 0) return;
   const su = selUnit();
+  $('#tip').hidden = true;
   if (UI.mode === 'missile') {
     if (UI.mtargets?.has(i)) {
       if (UI.nuclear) return confirmNuke(i);
@@ -525,11 +564,12 @@ function onTileClick(i) {
     else { UI.mode = null; UI.mtargets = null; renderModebar(); UI.dirty = true; }
     return;
   }
+  if (su && su.n === me() && UI.targets.has(i) && touch && UI.pending !== i) { UI.pending = i; UI.hover = i; UI.dirty = true; renderCtx(); vibrate(8); return; }
   if (su && su.n === me() && UI.targets.has(i)) {
     const from = UI.targets.get(i);
     if (from !== su.pos) moveUnit(su, from, UI.reach);
     const r = doAttack(su, i);
-    UI.mode = null;
+    UI.mode = null; UI.pending = null; vibrate(r?.killed || r?.captured ? [20, 40, 30] : 15);
     if (r?.captured) toast(`${W.cities[W.tiles[i].city].name} 점령!`, 'good');
     select(uById.has(su.id) ? { kind: 'unit', id: su.id } : { kind: 'tile', i });
     after(); return;
@@ -541,21 +581,27 @@ function onTileClick(i) {
     if (cur === cands.length - 1 && W.tiles[i].city >= 0) { select({ kind: 'tile', i }); return; }
     select({ kind: 'unit', id: cands[(cur + 1) % cands.length].id }); return;
   }
+  if (UI.sel && W.tiles[i].city < 0) { select(null); return; }
   select({ kind: 'tile', i });
 }
 function after() {
   refreshVision(); computeOrders();
   const o = checkVictory();
-  UI.dirty = true; renderTop(); renderPanel(); renderModebar();
+  UI.dirty = true; renderTop(); renderPanel(); renderCtx(); renderModebar();
   if (o) showGameOver();
 }
+function vibrate(p) { try { navigator.vibrate?.(p); } catch (e) {} }
 function setupInput() {
   const ptrs = new Map();
   let drag = null, pinch = null;
   canvas.addEventListener('pointerdown', e => {
     canvas.setPointerCapture(e.pointerId);
     ptrs.set(e.pointerId, { x: e.offsetX, y: e.offsetY });
-    if (ptrs.size === 1) drag = { x: e.offsetX, y: e.offsetY, cx: UI.cam.x, cy: UI.cam.y, moved: false, btn: e.button };
+    if (ptrs.size === 1) {
+      drag = { x: e.offsetX, y: e.offsetY, cx: UI.cam.x, cy: UI.cam.y, moved: false, btn: e.button, long: false };
+      clearTimeout(UI.lp);
+      if (e.pointerType !== 'mouse') UI.lp = setTimeout(() => { if (drag && !drag.moved) { drag.long = true; const i = screenToTile(drag.x, drag.y); UI.hover = i; UI.dirty = true; showTip(i, drag.x, Math.max(10, drag.y - 120)); vibrate(10); } }, 420);
+    }
     if (ptrs.size === 2) { const [a, b] = [...ptrs.values()]; pinch = { d: Math.hypot(a.x - b.x, a.y - b.y), z: UI.cam.z }; if (drag) drag.moved = true; }
   });
   canvas.addEventListener('pointermove', e => {
@@ -563,7 +609,7 @@ function setupInput() {
     if (pinch && ptrs.size === 2) { const [a, b] = [...ptrs.values()]; zoomAt((a.x + b.x) / 2, (a.y + b.y) / 2, (pinch.z * Math.hypot(a.x - b.x, a.y - b.y) / pinch.d) / UI.cam.z); return; }
     if (drag && ptrs.size === 1) {
       const dx = e.offsetX - drag.x, dy = e.offsetY - drag.y;
-      if (!drag.moved && Math.hypot(dx, dy) > 6) drag.moved = true;
+      if (!drag.moved && Math.hypot(dx, dy) > (e.pointerType === 'mouse' ? 6 : 10)) { drag.moved = true; clearTimeout(UI.lp); }
       if (drag.moved) { UI.cam.x = drag.cx - dx / UI.cam.z; UI.cam.y = drag.cy - dy / UI.cam.z; clampCam(); UI.dirty = true; $('#tip').hidden = true; }
       return;
     }
@@ -574,10 +620,12 @@ function setupInput() {
     ptrs.delete(e.pointerId);
     if (ptrs.size < 2) pinch = null;
     if (ptrs.size === 0) {
-      if (drag && !wasDrag) {
+      clearTimeout(UI.lp);
+      if (drag && drag.long) { setTimeout(() => { $('#tip').hidden = true; }, 2200); }
+      else if (drag && !wasDrag) {
         const i = screenToTile(e.offsetX, e.offsetY);
-        if (drag.btn === 2) { UI.mode = null; select(null); } else onTileClick(i);
-        if (e.pointerType !== 'mouse') { UI.hover = -1; showTip(-1); }
+        if (drag.btn === 2) { UI.mode = null; select(null); } else onTileClick(i, e.pointerType !== 'mouse');
+        if (e.pointerType !== 'mouse' && UI.pending == null) { UI.hover = -1; }
       }
       drag = null;
     }
@@ -589,7 +637,7 @@ function setupInput() {
   window.addEventListener('keydown', e => {
     if (!G || !$('#modal').hidden || ['INPUT', 'SELECT'].includes(e.target.tagName)) return;
     const k = e.key.toLowerCase();
-    if (k === 'escape') { UI.mode = null; UI.mtargets = null; select(null); }
+    if (k === 'escape') { if (UI.sheet) closeSheet(); else { UI.mode = null; UI.mtargets = null; select(null); } }
     else if (k === 'e') endTurn();
     else if (k === 'n') nextUnit();
     else if (k === 'f') { const u = selUnit(); if (u && u.n === me()) act('wait', u.id); }
@@ -598,6 +646,7 @@ function setupInput() {
     else if (k.startsWith('arrow')) { const d = 60 / UI.cam.z; if (k === 'arrowleft') UI.cam.x -= d; if (k === 'arrowright') UI.cam.x += d; if (k === 'arrowup') UI.cam.y -= d; if (k === 'arrowdown') UI.cam.y += d; clampCam(); UI.dirty = true; e.preventDefault(); }
   });
   new ResizeObserver(resize).observe($('#mapwrap'));
+  setupSheetDrag();
 }
 
 // ---------- modes ----------
@@ -663,27 +712,28 @@ function riskColor(v) { return v > 0.15 ? 'var(--danger)' : v > 0.05 ? 'var(--wa
 function renderTop() {
   if (!G) return;
   const N = P(), e = economyPreview(me());
-  $('#nat-chip').style.background = NATIONS[me()].color;
+  const chip = $('#nat-chip');
+  chip.style.background = NATIONS[me()].color; chip.textContent = NATIONS[me()].short.slice(0, 1);
   $('#nat-name').textContent = `${G.leader.title} ${G.leader.name}`;
-  $('#date').textContent = `${NATIONS[me()].short} · ${dateLabel()} · 턴 ${G.turn}/${G.maxTurn}`;
-  const stabCol = N.stab > 55 ? 'var(--ok)' : N.stab > 30 ? 'var(--warn)' : 'var(--danger)';
+  $('#date').textContent = `${dateLabel()} · ${G.turn}/${G.maxTurn}턴`;
   const coup = coupRisk(me()), rev = revoltRisk(me());
+  const pill = (k, icon, label, v, sheet, warn) => `<button class="pillr${warn ? ' warn' : ''}" type="button" data-act="sheet" data-arg="${sheet}" aria-label="${label}">${ic(icon)}<span class="vv"><span class="v">${v}</span><span class="k">${label}</span></span></button>`;
   $('#res').innerHTML = [
-    ['예산 (억$)', `${fmt(N.money)}<span class="d ${e.net >= 0 ? 'pos' : 'neg'}">${sgn(e.net)}</span>`],
-    ['인력 (천명)', `${fmt(N.manpower)}<span class="d pos">+${fmt(e.mp)}</span>`],
-    ['연료', `${fmt(N.fuel)}<span class="d ${e.fuel >= 0 ? 'pos' : 'neg'}">${sgn(e.fuel)}</span>`],
-    ['안정도', `${fmt(N.stab)}<div class="stabbar"><i style="width:${N.stab}%;background:${stabCol}"></i></div>`],
-    ['권력 기반', `${fmt(N.power)}<span class="d" style="color:${riskColor(Math.max(coup, rev))}">쿠데타 ${pct(coup)}</span>`],
-    ['국제 평판', `<span class="${N.rep < -30 ? 'neg' : N.rep > 20 ? 'pos' : ''}">${sgn(N.rep)}</span><span class="d mut">제재 ${(G.sanc[me()] || []).length}국</span>`],
-    ['핵탄두', `${N.nukes}<span class="d mut">${esc(NATIONS[me()].nukeEst.split(' ')[0])}</span>`],
-    ['종말 시계', `<span class="${G.doom < 40 ? 'neg' : ''}">자정 ${G.doom}초 전</span>`],
-  ].map(([k, v]) => `<div class="res-item"><span class="k">${k}</span><span class="v">${v}</span></div>`).join('');
-  $('#btn-end').disabled = UI.busy || !!G.over;
-  document.querySelectorAll('.tab').forEach(b => b.setAttribute('aria-selected', b.dataset.tab === UI.tab));
+    pill('m', 'money', '예산 억$', `${fmt(N.money)}<span class="d ${e.net >= 0 ? 'pos' : 'neg'}">${sgn(e.net)}</span>`, 'nation', N.money < 0),
+    pill('s', 'stab', '안정도', `<span class="${N.stab < 30 ? 'neg' : ''}">${fmt(N.stab)}</span>`, 'power', N.stab < 30),
+    pill('p', 'crown', `쿠데타 ${pct(coup)}`, `${fmt(N.power)}`, 'power', coup > 0.1 || rev > 0.1),
+    pill('r', 'rep', `평판 · 제재 ${(G.sanc[me()] || []).length}`, `<span class="${N.rep < -30 ? 'neg' : N.rep > 20 ? 'pos' : ''}">${sgn(N.rep)}</span>`, 'diplo', false),
+    pill('mp', 'people', '인력 천명', `${fmt(N.manpower)}`, 'nation', false),
+    pill('f', 'fuel', '연료', `${fmt(N.fuel)}<span class="d ${e.fuel >= 0 ? 'pos' : 'neg'}">${sgn(e.fuel)}</span>`, 'nation', N.fuel <= 0),
+    pill('d', 'clock', '종말 시계', `${G.doom}초`, 'war', G.doom < 40),
+  ].join('');
+  const busy = UI.busy || !!G.over;
+  $('#btn-end').disabled = busy;
+  const m0 = G.month - 1 + G.turn; $('#end-sub').textContent = `→ ${G.year + Math.floor(m0 / 12)}년 ${(m0 % 12) + 1}월`;
   const idle = idleUnits().length;
-  $('[data-act="next"]').textContent = idle ? `다음 부대 (${idle})` : '다음 부대';
-  $('[data-tab="tech"]').innerHTML = '연구' + (N.research ? '' : ' <span class="badge">!</span>');
-  $('[data-tab="power"]').innerHTML = '권력' + (coup > 0.1 || rev > 0.1 ? ' <span class="badge">!</span>' : '');
+  const ib = $('#idle-badge'); ib.hidden = !idle; ib.textContent = idle;
+  const badge = { tech: N.research ? '' : '!', power: coup > 0.1 || rev > 0.1 || plotters().length ? '!' : '', diplo: G.pending.length ? G.pending.length : '' };
+  $('#dock').innerHTML = DOCK.map(([k, l]) => `<button class="dk" type="button" data-act="sheet" data-arg="${k}" aria-pressed="${UI.sheet === k}">${ic(k)}<span>${l}</span>${badge[k] ? `<span class="badge">${badge[k]}</span>` : ''}</button>`).join('');
 }
 function renderModebar() {
   const mb = $('#modebar'), su = selUnit();
@@ -696,13 +746,92 @@ function renderModebar() {
   mb.className = UI.nuclear && UI.mode === 'missile' ? 'nuke' : '';
   if (txt) mb.innerHTML = `<span>${esc(txt)}</span><button type="button" data-act="cancel-mode">취소</button>`;
 }
+function openSheet(tab) {
+  if (UI.sheet === tab && !$('#sheet').hidden) return closeSheet();
+  UI.sheet = tab; UI.tab = tab;
+  const sh = $('#sheet'); sh.hidden = false; sh.style.transform = '';
+  document.body.classList.add('sheet-open');
+  renderPanel(); renderTop();
+}
+function closeSheet() {
+  UI.sheet = null;
+  $('#sheet').hidden = true; $('#sheet').classList.remove('full');
+  document.body.classList.remove('sheet-open');
+  renderTop(); renderCtx();
+}
+function setupSheetDrag() {
+  const g = $('#sheet-grab'), sh = $('#sheet');
+  let y0 = null, h0 = 0;
+  g.addEventListener('pointerdown', e => { y0 = e.clientY; h0 = sh.offsetHeight; g.setPointerCapture(e.pointerId); sh.style.transition = 'none'; });
+  g.addEventListener('pointermove', e => { if (y0 == null) return; const dy = e.clientY - y0; sh.style.transform = dy > 0 ? `translateY(${dy}px)` : ''; if (dy < -60) sh.classList.add('full'); });
+  g.addEventListener('pointerup', e => { if (y0 == null) return; const dy = e.clientY - y0; y0 = null; sh.style.transition = ''; sh.style.transform = ''; if (dy > 90) { if (sh.classList.contains('full')) sh.classList.remove('full'); else closeSheet(); } });
+}
 function renderPanel() {
-  if (!G) return;
-  const body = $('#tab-body'), top = body.scrollTop;
+  if (!G || !UI.sheet) return;
+  UI.tab = UI.sheet;
+  $('#sheet-title').textContent = UI.tab === 'sel' && UI.sel ? (selUnit() ? '부대 상세' : '지역 상세') : SHEET_TITLES[UI.tab];
+  const body = $('#sheet-body'), top = body.scrollTop;
   body.innerHTML = ({ sel: panelSel, power: panelPower, nation: panelNation, arms: panelArms, tech: panelTech, diplo: panelDiplo, war: panelWar })[UI.tab]();
   body.scrollTop = (UI.keepScroll || UI.tab === 'war') && UI.lastTab === UI.tab ? top : 0;
   UI.keepScroll = false; UI.lastTab = UI.tab;
   renderTop();
+}
+function actBtn(icon, label, act, arg, o = {}) {
+  return `<button class="act${o.cls ? ' ' + o.cls : ''}" type="button" data-act="${act}"${arg != null ? ` data-arg="${esc(arg)}"` : ''}${o.disabled ? ' disabled' : ''}>${ic(icon)}<span>${label}</span>${o.sub ? `<small>${o.sub}</small>` : ''}</button>`;
+}
+function renderCtx() {
+  const box = $('#ctx');
+  if (!G || UI.busy || !UI.sel || G.flags.demo) { box.hidden = true; return; }
+  const su = selUnit();
+  let html = '';
+  if (su) {
+    const C = CLASSES[su.t], d = dsg(su), mine = su.n === me();
+    const head = `<div class="ch">${svgUnit(su.t, NATIONS[su.n].color)}<div class="t"><b>${esc(d.name)}</b><small>${esc(C.name)} · ${esc(NATIONS[su.n].short)}${vet(su) ? ' · ' + '★'.repeat(vet(su)) : ''}</small></div><button class="x" type="button" data-act="deselect" aria-label="선택 해제">${ic('cancel')}</button></div>
+      ${hpBar(su.hp)}
+      <div class="chips"><span class="chipk">체력 <b>${su.hp}</b></span><span class="chipk">공 <b>${fmt(unitStr(su, 'atk'), 1)}</b></span><span class="chipk">방 <b>${fmt(unitStr(su, 'def'), 1)}</b></span>${C.dom === 'air' ? `<span class="chipk">반경 <b>${fmt(unitKm(su))}km</b></span>` : `<span class="chipk">이동 <b>${fmt(su.mv, 1)}/${mvMax(su)}</b></span>`}${!supplied(su) ? '<span class="chipk neg">보급 두절</span>' : ''}${su.fort > 0 && C.dom === 'land' ? '<span class="chipk">참호</span>' : ''}</div>`;
+    if (UI.pending != null && UI.targets.has(UI.pending)) {
+      const from = UI.targets.get(UI.pending);
+      const saved = su.pos; su.pos = from; const pv = preview(su, UI.pending); su.pos = saved;
+      const name = pv.tg.unit ? `[${nName(pv.tg.unit.n)}] ${dsg(pv.tg.unit).name}` : `${W.cities[pv.tg.city].name} 시가지`;
+      html = head + `<div class="sub">공격 목표: <b>${esc(name)}</b>${from !== su.pos ? ' · 이동 후 공격' : ''}${pv.capture ? ' · <span class="pos">점령 가능</span>' : ''}</div>
+        <div class="preview"><div><div class="k">적 예상 피해</div><div class="v pos">-${Math.round(pv.dealt)}${pv.kill ? ' 격파' : ''}</div></div><div><div class="k">아군 예상 피해</div><div class="v ${pv.taken >= su.hp ? 'neg' : ''}">-${Math.round(pv.taken)}</div></div></div>
+        <div class="acts">${actBtn('attack', '공격 개시', 'confirm-attack', null, { cls: 'primary' })}${actBtn('cancel', '취소', 'cancel-attack')}</div>`;
+    } else {
+      const a = [];
+      if (mine) {
+        if (C.dom === 'air') { a.push(actBtn('strike', '출격', 'air-strike', su.id, { cls: 'primary', disabled: su.acted || su.hp <= 15 })); a.push(actBtn('rebase', '재배치', 'air-rebase', su.id, { disabled: su.acted })); }
+        else a.push(actBtn('wait', '대기·참호', 'wait', su.id, { disabled: su.mv <= 0 }));
+        a.push(actBtn('deploy', '전략 전개', 'deploy', su.id, { disabled: su.acted || su.moved || !!su.carrier }));
+        const mc = modernizeCheck(su);
+        if (mc.ok) a.push(actBtn('upgrade', '개량', 'modernize', su.id, { sub: `${mc.cost}억$` }));
+        if (C.slbm || d.slbm) a.push(actBtn('missile', 'SLBM', 'sheet', 'arms'));
+        if (W.tiles[su.pos].city >= 0 && G.cities[W.tiles[su.pos].city].owner === me()) a.push(actBtn('city', '도시', 'sel-city', W.tiles[su.pos].city));
+      }
+      a.push(actBtn('info', '상세', 'sheet', 'sel'));
+      const hint = mine ? (C.dom === 'air' ? '출격을 누른 뒤 붉은 표적을 탭하세요' : su.mv > 0 ? '노란 칸을 탭해 이동, 붉은 표적을 탭해 공격' : '이번 턴 행동 완료') : '적 부대 — 길게 누르면 정보';
+      html = head + `<div class="sub">${hint}</div><div class="acts">${a.join('')}</div>`;
+    }
+  } else {
+    const i = UI.sel.i, t = W.tiles[i], o = tileOwner(i);
+    if (t.city >= 0) {
+      const cy = W.cities[t.city], c = G.cities[t.city], own = c.owner === me();
+      const q = G.queue.filter(x => x.ci === t.city && x.n === me()).length;
+      const air = airAt(i).filter(u => u.n === me() && !u.carrier);
+      const a = [];
+      if (own) { a.push(actBtn('recruit', '부대 편성', 'sheet', 'sel', { cls: 'primary', sub: `${c.rec}/${cityRecruitCap(t.city)}` })); a.push(actBtn('build', '건설', 'sheet', 'sel')); }
+      for (const u of air.slice(0, 4)) a.push(actBtn('strike', esc(dsg(u).name.split(' ')[0]), 'sel-unit', u.id, { sub: u.acted ? '출격 완료' : `체력 ${u.hp}` }));
+      a.push(actBtn('info', '상세', 'sheet', 'sel'));
+      html = `<div class="ch"><span class="chip" style="width:30px;height:30px;border-radius:9px;background:${NATIONS[c.owner].color}"></span><div class="t"><b>${esc(cy.name)}</b><small>${esc(NATIONS[c.owner].name)}${cy.nat !== c.owner ? ' 점령지' : ''}${G.nations[c.owner].capital === t.city ? ' · 수도' : ''}${cy.port ? ' · 항구' : ''}</small></div><button class="x" type="button" data-act="deselect" aria-label="선택 해제">${ic('cancel')}</button></div>
+        ${hpBar(c.hp)}
+        <div class="chips"><span class="chipk">방어 <b>${c.hp}</b></span><span class="chipk">인구 <b>${c.pop}</b></span><span class="chipk">산업 <b>${c.ind}</b></span><span class="chipk">요새 <b>${c.fort}</b></span>${q ? `<span class="chipk">건조 중 <b>${q}</b></span>` : ''}${cy.port && blockaded(t.city) ? '<span class="chipk neg">봉쇄</span>' : ''}</div>
+        <div class="acts">${a.join('')}</div>`;
+    } else {
+      html = `<div class="ch"><div class="t"><b>${t.land ? TERRAIN_KIND[t.terrain].name : '해양'}</b><small>${Math.abs(t.lat).toFixed(1)}°${t.lat >= 0 ? 'N' : 'S'} ${Math.abs(t.lon).toFixed(1)}°${t.lon >= 0 ? 'E' : 'W'}${o ? ' · ' + esc(NATIONS[o].name) : ''}</small></div><button class="x" type="button" data-act="deselect" aria-label="선택 해제">${ic('cancel')}</button></div>
+        ${t.land ? `<div class="chips"><span class="chipk">이동 <b>${TERRAIN_KIND[t.terrain].cost}</b></span><span class="chipk">방어 <b>×${TERRAIN_KIND[t.terrain].def}</b></span><span class="chipk">${supplyMap(me())[i] ? '보급선 내' : '보급선 밖'}</span></div>` : ''}`;
+    }
+  }
+  box.innerHTML = html;
+  box.hidden = false;
 }
 function panelSel() {
   const su = selUnit();
@@ -718,7 +847,7 @@ function panelSel() {
     <div class="row"><span>지배 도시 (보호국 포함)</span><span class="num">${controlled(me())} / ${W.cities.length}</span></div>
     <div class="row"><span>강대국 수도 장악</span><span class="num">${majorCapitalsHeld(me())} / ${MAJOR_IDS.length - 1}</span></div>
   </div>
-  <div class="btnrow">${btn('다음 부대', 'next')}${btn('수도 보기', 'home')}${btn('세계 지도', 'world')}${btn('규칙', 'help')}</div></div>
+  <div class="btnrow">${btn('다음 부대', 'next')}${btn('수도 보기', 'home')}${btn('세계 지도', 'world')}${btn('규칙', 'help')}${btn('메뉴', 'menu')}</div></div>
   ${inTransit.length ? `<div class="sec"><h3>이동 중인 원정 부대</h3><div class="rows">${inTransit.map(t => `<div class="row"><span>${esc(dsg(t.u).name)}</span><span class="sub">→ ${esc(W.cities[t.to].name)} · ${Math.max(0, t.eta - G.turn)}턴</span></div>`).join('')}</div></div>` : ''}
   <div class="sec"><h3>조작</h3><p class="sub">부대를 선택하면 이동 가능 칸이 노란색, 공격 가능 표적이 붉은 점선으로 표시됩니다. 도시를 선택해 부대 편성·건설을, 부대 카드의 "전략 전개"로 대륙 간 이동을 합니다. 축소하면 세계 정세도가, 확대하면 전술 지도가 나옵니다.</p></div>`;
 }
@@ -1001,7 +1130,7 @@ function nextUnit() {
   centerOn(u.pos, Math.max(UI.cam.z, 0.9));
 }
 function confirmBox(title, text, okLabel, fn, danger) {
-  openModal(`<h2>${esc(title)}</h2><p>${esc(text)}</p><div class="btnrow"><button class="btn ${danger ? 'danger' : 'primary'}" type="button" id="cf-ok">${esc(okLabel)}</button><button class="btn" type="button" id="cf-no">취소</button></div>`);
+  openModal(`<h2>${esc(title)}</h2><p>${esc(text)}</p><div class="choices"><button class="btn ${danger ? 'danger' : 'primary'}" type="button" id="cf-ok">${esc(okLabel)}</button><button class="btn" type="button" id="cf-no">취소</button></div>`);
   $('#cf-ok').onclick = () => { closeModal(); fn(); };
   $('#cf-no').onclick = closeModal;
 }
@@ -1010,20 +1139,28 @@ function act(a, arg) {
   const n = arg;
   switch (a) {
     case 'next': return nextUnit();
+    case 'sheet': return openSheet(arg);
+    case 'close-sheet': return closeSheet();
+    case 'sheet-size': $('#sheet').classList.toggle('full'); return;
+    case 'deselect': UI.mode = null; UI.mtargets = null; return select(null);
+    case 'sel-city': { const cy = W.cities[+arg]; select({ kind: 'tile', i: cy.tile }); return; }
+    case 'cancel-attack': UI.pending = null; UI.hover = -1; UI.dirty = true; return renderCtx();
+    case 'confirm-attack': { const i = UI.pending; UI.pending = null; return onTileClick(i, false); }
     case 'zoom-in': return zoomAt(canvas.clientWidth / 2, canvas.clientHeight / 2, 1.3);
     case 'zoom-out': return zoomAt(canvas.clientWidth / 2, canvas.clientHeight / 2, 1 / 1.3);
     case 'home': { const c = capitalOf(me()) || citiesOf(me())[0]; if (c) centerOn(c.tile, Math.max(UI.cam.z, 0.9)); return; }
     case 'world': { const c = capitalOf(me()) || W.cities[0]; centerOn(c.tile, canvas.clientWidth / WORLD_W * 1.05); return; }
     case 'help': return showHelp();
-    case 'arms-tab': UI.tab = 'arms'; return renderPanel();
+    case 'arms-tab': return openSheet('arms');
     case 'cancel-mode': UI.mode = null; UI.mtargets = null; UI.nuclear = false; computeOrders(); renderModebar(); UI.dirty = true; return;
-    case 'sel-unit': { const u = uById.get(+arg); if (u) select({ kind: 'unit', id: u.id }); return; }
-    case 'wait': { const u = uById.get(+arg); if (u) { u.mv = 0; u.skip = true; } select(null); return after(); }
+    case 'sel-unit': { const u = uById.get(+arg); if (u) { select({ kind: 'unit', id: u.id }); if (innerWidth < 900) closeSheet(); } return; }
+    case 'wait': { const u = uById.get(+arg); if (u) { u.mv = 0; u.skip = true; } select(null); after(); if (idleUnits().length) nextUnit(); return; }
     case 'disband': { const u = uById.get(+arg); if (!u) return; return confirmBox('부대 해산', `${dsg(u).name}을(를) 해산합니다. 인력 ${Math.round(CLASSES[u.t].mp / 2)}을 회수합니다.`, '해산', () => { P().manpower += Math.round(CLASSES[u.t].mp / 2); if (u.t === 'cv') for (const x of G.units.slice()) if (x.carrier === u.id) removeUnit(x); removeUnit(u); select(null); after(); }, true); }
-    case 'air-strike': { const u = uById.get(+arg); if (!u) return; UI.sel = { kind: 'unit', id: u.id }; UI.mode = 'air'; computeOrders(); if (!UI.targets.size) toast('작전반경 내 표적이 없습니다'); renderModebar(); renderPanel(); UI.dirty = true; return; }
-    case 'air-rebase': { const u = uById.get(+arg); if (!u) return; UI.sel = { kind: 'unit', id: u.id }; UI.mode = 'rebase'; UI.mtargets = new Set(rebaseTargets(u)); if (!UI.mtargets.size) toast('재배치 가능한 기지가 없습니다 — 전략 전개를 이용하세요'); renderModebar(); renderPanel(); UI.dirty = true; return; }
+    case 'air-strike': { const u = uById.get(+arg); if (!u) return; if (innerWidth < 900) closeSheet(); UI.sel = { kind: 'unit', id: u.id }; UI.mode = 'air'; computeOrders(); if (!UI.targets.size) toast('작전반경 내 표적이 없습니다'); renderModebar(); renderPanel(); UI.dirty = true; return; }
+    case 'air-rebase': { const u = uById.get(+arg); if (!u) return; if (innerWidth < 900) closeSheet(); UI.sel = { kind: 'unit', id: u.id }; UI.mode = 'rebase'; UI.mtargets = new Set(rebaseTargets(u)); if (!UI.mtargets.size) toast('재배치 가능한 기지가 없습니다 — 전략 전개를 이용하세요'); renderModebar(); renderPanel(); UI.dirty = true; return; }
     case 'deploy': {
       const u = uById.get(+arg); if (!u) return;
+      if (innerWidth < 900) closeSheet();
       UI.sel = { kind: 'unit', id: u.id }; UI.mode = 'deploy'; UI.reach = null; UI.targets = new Map();
       UI.mtargets = new Set(W.cities.filter(c => deployPlan(u, c.id).ok).map(c => c.tile));
       if (!UI.mtargets.size) toast('전개 가능한 도시가 없습니다 (예산·항구·교전 여부 확인)');
@@ -1031,8 +1168,8 @@ function act(a, arg) {
     }
     case 'recruit': { const [ci, t] = arg.split(':'); const u = recruit(me(), +ci, t); if (u) toast(u.queued ? `${W.cities[+ci].name}: ${DESIGNS[u.d].name} 건조 착수 (${BUILD_TURNS[t]}개월)` : `${W.cities[+ci].name}: ${dsg(u).name} 편성`, 'good'); UI.keepScroll = true; return after(); }
     case 'build': { const [ci, b] = arg.split(':'); if (build(me(), +ci, b)) toast(`${W.cities[+ci].name}: ${BUILDINGS[b].name} 완료`, 'good'); UI.keepScroll = true; return after(); }
-    case 'fire': return setMissileMode(arg, false);
-    case 'fire-nuke': return setMissileMode(arg, true);
+    case 'fire': if (innerWidth < 900) closeSheet(); return setMissileMode(arg, false);
+    case 'fire-nuke': if (innerWidth < 900) closeSheet(); return setMissileMode(arg, true);
     case 'buy-missile': buyMissile(me(), arg); UI.keepScroll = true; return after();
     case 'make-nuke': produceNuke(me()); UI.keepScroll = true; return after();
     case 'research': P().research = arg; UI.keepScroll = true; return after();
@@ -1058,7 +1195,7 @@ function act(a, arg) {
     case 'bribe-min': bribeMinister(arg); UI.keepScroll = true; return after();
     case 'bribe-fac': if (bribeFaction(arg)) toast('비밀 자금 전달 완료', 'good'); UI.keepScroll = true; return after();
     case 'menu': return showMenu();
-    case 'new': closeModal(); return showStart();
+    case 'new': closeModal(); return showStart(1);
   }
 }
 document.addEventListener('click', e => {
@@ -1107,25 +1244,36 @@ function showOps(target) {
 
 // ---------- turn flow ----------
 const wait = ms => new Promise(r => setTimeout(r, ms));
-function overlay(text) { $('#overlay').hidden = !text; if (text) $('#overlay-text').textContent = text; }
+function overlay(text, prog, who) {
+  const sp = $('#splash');
+  sp.hidden = !text;
+  if (!text) return;
+  $('#splash-sub').textContent = text;
+  const m0 = G ? G.month - 1 + G.turn : 0;
+  $('#splash-date').textContent = G ? `${G.year + Math.floor(m0 / 12)}년 ${(m0 % 12) + 1}월` : '';
+  if (prog != null) $('#splash-bar').style.width = `${Math.round(prog * 100)}%`;
+  $('#splash-who').textContent = who || '';
+}
 async function runAI(n) {
   startPhase(n);
   const before = UI.fx.length + UI.anim.size;
   aiTurn(n);
-  if (UI.fx.length + UI.anim.size > before) { refreshVision(); UI.dirty = true; overlay(`${NATIONS[n].short} 작전 수행 중…`); await wait(450); }
+  if (UI.fx.length + UI.anim.size > before) { refreshVision(); UI.dirty = true; $('#splash-who').textContent = `${NATIONS[n].short} 작전 수행 중`; await wait(450); }
 }
 async function endTurn() {
   if (!G || UI.busy || G.over) return;
-  UI.busy = true; UI.mode = null; UI.sel = null; UI.reach = null; UI.targets = new Map(); UI.mtargets = null;
-  renderModebar(); renderTop(); renderPanel();
+  UI.busy = true; UI.mode = null; UI.sel = null; UI.reach = null; UI.targets = new Map(); UI.mtargets = null; UI.pending = null;
+  if (innerWidth < 900) closeSheet();
+  renderModebar(); renderTop(); renderPanel(); renderCtx();
   const before = snapshotForReport();
-  overlay('세계 각국이 행동 중…');
+  const totalAI = NATION_IDS.filter(n => n !== me() && G.nations[n].alive && !G.nations[n].capitulated).length;
+  overlay('세계 각국이 행동 중', 0);
   await wait(20);
   let k = 0;
   for (const n of NATION_IDS) {
     if (n === me() || !G.nations[n].alive || G.nations[n].capitulated) continue;
     await runAI(n);
-    if (++k % 12 === 0) { overlay(`세계 각국이 행동 중… (${k}/${NATION_IDS.length - 1})`); await wait(0); }
+    if (++k % 8 === 0) { overlay('세계 각국이 행동 중', k / totalAI); await wait(0); }
     if (checkVictory()) break;
   }
   if (!G.over) {
@@ -1186,7 +1334,7 @@ async function showReport() {
 }
 function modalChoice(html, choices) {
   return new Promise(res => {
-    openModal(html + `<div class="btnrow">${choices.map((c, k) => `<button class="btn ${c.cls || (k ? '' : 'primary')}" type="button" data-choice="${k}">${esc(c.label)}</button>`).join('')}</div>`);
+    openModal(html + `<div class="choices">${choices.map((c, k) => `<button class="btn ${c.cls || (k ? '' : 'primary')}" type="button" data-choice="${k}">${esc(c.label)}</button>`).join('')}</div>`);
     $('#modal-card').querySelectorAll('[data-choice]').forEach(b => b.onclick = () => { closeModal(); res(+b.dataset.choice); });
   });
 }
@@ -1287,17 +1435,17 @@ function showGameOver() {
 }
 function showMenu() {
   let hasSave = false; try { hasSave = !!localStorage.getItem(SAVE_KEY); } catch (e) {}
-  openModal(`<h2>메뉴</h2><div class="btnrow">
+  openModal(`<h2>메뉴</h2><div class="choices">
     ${G ? '<button class="btn" type="button" id="m-save">저장</button>' : ''}
     <button class="btn" type="button" id="m-load" ${hasSave ? '' : 'disabled'}>불러오기</button>
     <button class="btn" type="button" id="m-new">새 게임</button><button class="btn" type="button" id="m-help">규칙</button>
     ${G ? `<button class="btn" type="button" id="m-fog">전장의 안개: ${G.fog ? '켜짐' : '꺼짐'}</button><button class="btn" type="button" id="m-brief">월간 보고 팝업: ${G.flags.brief !== false ? '켜짐' : '꺼짐'}</button>` : ''}
     <button class="btn" type="button" id="m-close">닫기</button></div>
-    <p class="sub">매 턴 종료 시 이 브라우저에 자동 저장됩니다. 단축키: E 턴 종료 · N 다음 부대 · F 대기 · Esc 선택 해제 · 방향키 · +/- 확대.</p>`);
+    <p class="sub">매 턴 자동 저장됩니다. 키보드: E 턴 종료 · N 다음 부대 · F 대기 · Esc 닫기 · 방향키 · +/−.</p>`);
   const on = (id, fn) => { const b = $(id); if (b) b.onclick = fn; };
   on('#m-save', () => { saveGame(true); closeModal(); });
   on('#m-load', () => { if (loadSaved()) { closeModal(); toast('저장된 게임을 불러왔습니다'); } });
-  on('#m-new', () => showStart());
+  on('#m-new', () => showStart(1));
   on('#m-help', () => showHelp());
   on('#m-fog', () => { G.fog = !G.fog; refreshVision(); after(); closeModal(); });
   on('#m-brief', () => { G.flags.brief = G.flags.brief === false; closeModal(); });
@@ -1316,51 +1464,82 @@ function showHelp() {
     <p><b>국제 질서</b> — 평판이 낮거나 침공을 하면 서방 제재·유엔 결의(상임이사국 거부권 가능)가 뒤따릅니다. 너무 강해지면 강대국들이 연합해 맞섭니다. 첩보 작전으로 사보타주·기술 탈취·암살·정권 전복을, 최후통첩으로 약소국을 보호국으로 삼을 수 있습니다.</p>
     <p><b>승리</b> — 한반도 통일(남·북), 세계 도시 35% 지배(세계 패권), 모든 강대국 수도 장악(세계 정복), 적국 항복 후 종전, 또는 기간 종료 시 점수 1위. 승리 후에도 계속 통치할 수 있습니다. 쿠데타·혁명·선거 패배·항복·핵겨울은 패배입니다.</p>
   </div><div class="btnrow"><button class="btn primary" type="button" id="h-close">닫기</button></div>`, true);
-  $('#h-close').onclick = () => { closeModal(); if (!G || G.flags.demo) showStart(); };
+  $('#h-close').onclick = () => { closeModal(); if (!G || G.flags.demo) showStart(1); };
 }
-function showStart() {
+function showStart(step = UI.startStep || 1) {
   const s = UI.setup;
+  UI.startStep = step;
   let hasSave = false; try { hasSave = !!localStorage.getItem(SAVE_KEY); } catch (e) {}
   const N = NATIONS[s.nat];
-  openModal(`<div class="title-block"><span class="eyebrow">세계 전략 시뮬레이션 · 1칸 1° · 1턴 1개월</span><h1>한반도 대전략</h1><p>전쟁이 실제로 일어났다고 가정하고, 한 나라의 절대 권력자가 되어 세계를 상대로 싸우는 턴제 전략 게임입니다. 칙령과 숙청으로 권력을 다지고, 실존 무기 체계와 핵으로 세계를 흔드세요.</p></div>
-    <div class="sec"><h3>시나리오</h3><div class="pick-grid">${SCENARIOS.map(sc => `<button class="pick" type="button" data-scen="${sc.id}" aria-pressed="${s.scen === sc.id}"><b>${esc(sc.name)}</b><span>${esc(sc.blurb)}</span><span class="meta">${sc.year}년 ${sc.month}월</span></button>`).join('')}</div></div>
-    <div class="sec"><h3>지배할 국가</h3><div class="nat-grid">${MAJOR_IDS.map(n => `<button class="natpick" type="button" data-nat="${n}" aria-pressed="${s.nat === n}"><span class="chip" style="background:${NATIONS[n].color}"></span>${esc(NATIONS[n].short)}</button>`).join('')}</div>
-      <div class="nat-detail"><b>${esc(N.name)}</b> <span class="sub">${REGIME_NAMES[N.gov]} · 경제력 ×${N.econ} · 핵 ${esc(N.nukeEst)}</span><p>${esc(N.brief)}</p><div class="traits">${(N.traits || []).map(t => `<span class="trait" title="${esc(TRAITS[t].desc)}">${esc(TRAITS[t].name)}</span>`).join('')}</div></div></div>
-    <div class="sec"><h3>지도자</h3><div class="opts">
-      <label>칭호 <select id="leader-title">${[N.leader, ...LEADER_TITLES.filter(t => t !== N.leader)].map(t => `<option${(s.title || N.leader) === t ? ' selected' : ''}>${esc(t)}</option>`).join('')}</select></label>
-      <label>이름 <input id="leader-name" type="text" maxlength="12" placeholder="지도자" value="${esc(s.name)}"></label></div></div>
-    <div class="sec"><div class="opts">
-      <span>난이도 <span class="seg">${[['easy', '쉬움'], ['normal', '보통'], ['hard', '어려움']].map(([k, l]) => `<button type="button" data-diff="${k}" aria-pressed="${s.diff === k}">${l}</button>`).join('')}</span></span>
-      <span>전장의 안개 <span class="seg">${[[true, '켜기'], [false, '끄기']].map(([k, l]) => `<button type="button" data-fog="${k}" aria-pressed="${s.fog === k}">${l}</button>`).join('')}</span></span>
-      <span>기간 <span class="seg">${[[60, '5년'], [120, '10년'], [240, '20년']].map(([k, l]) => `<button type="button" data-turns="${k}" aria-pressed="${s.turns === k}">${l}</button>`).join('')}</span></span>
-    </div></div>
-    <div class="btnrow"><button class="btn primary big" type="button" id="st-go">권좌에 오르기</button>${hasSave ? '<button class="btn big" type="button" id="st-load">이어하기</button>' : ''}<button class="btn big" type="button" id="st-help">규칙</button></div>`, true);
+  const dots = `<div class="stepper">${step > 1 ? `<button class="iconbtn" type="button" id="st-back" aria-label="이전">${ic('back')}</button>` : ''}<div class="dots">${[1, 2, 3].map(k => `<i class="${k <= step ? 'on' : ''}"></i>`).join('')}</div><span class="sub num">${step}/3</span></div>`;
+  let body = '';
+  if (step === 1) {
+    body = `<div class="title-block"><span class="eyebrow">세계 전략 시뮬레이션</span><h1>한반도 대전략</h1><p>한 나라의 절대 권력자가 되어 세계를 상대로 싸우는 턴제 전략 게임. 권력을 다지고, 실존 무기와 핵으로 세계를 흔드세요.</p></div>
+      ${hasSave ? '<button class="btn primary big" type="button" id="st-load">이어하기</button>' : ''}
+      <h3>시나리오 선택</h3>
+      <div class="scen-list">${SCENARIOS.map(sc => `<button class="scen" type="button" data-scen="${sc.id}"><span class="meta">${sc.year}년 ${sc.month}월</span><b>${esc(sc.name)}</b><span>${esc(sc.blurb)}</span></button>`).join('')}</div>
+      <button class="btn" type="button" id="st-help">규칙 보기</button>`;
+  } else if (step === 2) {
+    body = `<div class="title-block"><span class="eyebrow">${esc(SCENARIOS.find(x => x.id === s.scen).name)}</span><h2>지배할 국가</h2></div>
+      <div class="nat-grid">${MAJOR_IDS.map(n => `<button class="natpick" type="button" data-nat="${n}" aria-pressed="${s.nat === n}"><span class="chip" style="background:${NATIONS[n].color}"></span><b>${esc(NATIONS[n].short)}</b><small>${REGIME_NAMES[NATIONS[n].gov]}</small></button>`).join('')}</div>
+      <div class="nat-detail"><b>${esc(N.name)}</b><span class="sub">${REGIME_NAMES[N.gov]} · 경제력 ×${N.econ} · 핵 ${esc(N.nukeEst)}</span><p>${esc(N.brief)}</p><div class="traits">${(N.traits || []).map(t => `<span class="trait">${esc(TRAITS[t].name)} · ${esc(TRAITS[t].desc)}</span>`).join('')}</div></div>
+      <button class="btn primary big" type="button" id="st-next">${esc(N.short)}(으)로 결정</button>`;
+  } else {
+    const titles = [N.leader, ...LEADER_TITLES.filter(t => t !== N.leader)];
+    body = `<div class="title-block"><span class="eyebrow">${esc(N.name)}</span><h2>지도자 즉위</h2></div>
+      <label class="field"><span>이름</span><input id="leader-name" type="text" maxlength="12" placeholder="지도자" value="${esc(s.name)}" autocomplete="off"></label>
+      <div class="field"><span>칭호</span><div class="titles">${titles.map(t => `<button type="button" data-title="${esc(t)}" aria-pressed="${(s.title || N.leader) === t}">${esc(t)}</button>`).join('')}</div></div>
+      <div class="field"><span>난이도</span><span class="seg">${[['easy', '쉬움'], ['normal', '보통'], ['hard', '어려움']].map(([k, l]) => `<button type="button" data-diff="${k}" aria-pressed="${s.diff === k}">${l}</button>`).join('')}</span></div>
+      <div class="field"><span>전장의 안개</span><span class="seg">${[[true, '켜기'], [false, '끄기']].map(([k, l]) => `<button type="button" data-fog="${k}" aria-pressed="${s.fog === k}">${l}</button>`).join('')}</span></div>
+      <div class="field"><span>통치 기간</span><span class="seg">${[[60, '5년'], [120, '10년'], [240, '20년']].map(([k, l]) => `<button type="button" data-turns="${k}" aria-pressed="${s.turns === k}">${l}</button>`).join('')}</span></div>
+      <button class="btn primary big" type="button" id="st-go">권좌에 오르기</button>`;
+  }
+  openModal(dots + body, true);
+  $('#modal-card').classList.add('screen');
   const card = $('#modal-card');
-  const keep = () => { s.name = $('#leader-name').value; s.title = $('#leader-title').value; };
+  const keep = () => { const inp = $('#leader-name'); if (inp) s.name = inp.value; };
   card.onclick = e => {
     const b = e.target.closest('button'); if (!b) return;
     keep();
-    if (b.dataset.scen) s.scen = b.dataset.scen;
-    else if (b.dataset.nat) { s.nat = b.dataset.nat; s.title = ''; }
+    if (b.id === 'st-back') return showStart(step - 1);
+    if (b.id === 'st-next') return showStart(3);
+    if (b.id === 'st-go') { e.stopPropagation(); return startGame(); }
+    if (b.id === 'st-help') return showHelp();
+    if (b.id === 'st-load') { if (loadSaved()) closeModal(); return; }
+    if (b.dataset.scen) { s.scen = b.dataset.scen; return showStart(2); }
+    if (b.dataset.nat) { s.nat = b.dataset.nat; s.title = ''; }
+    else if (b.dataset.title) s.title = b.dataset.title;
     else if (b.dataset.diff) s.diff = b.dataset.diff;
     else if (b.dataset.fog) s.fog = b.dataset.fog === 'true';
     else if (b.dataset.turns) s.turns = +b.dataset.turns;
     else return;
-    const y = card.scrollTop; showStart(); $('#modal-card').scrollTop = y;
+    const y = card.scrollTop; showStart(step); $('#modal-card').scrollTop = y;
   };
-  $('#st-go').onclick = e => { e.stopPropagation(); keep(); startGame(); };
-  $('#st-help').onclick = e => { e.stopPropagation(); keep(); showHelp(); };
-  const l = $('#st-load'); if (l) l.onclick = e => { e.stopPropagation(); if (loadSaved()) closeModal(); };
+}
+function showCoach() {
+  let seen = false; try { seen = !!localStorage.getItem('kws-coach'); } catch (e) {}
+  if (seen) return;
+  try { localStorage.setItem('kws-coach', '1'); } catch (e) {}
+  openModal(`<div class="title-block"><span class="eyebrow">작전 교범 · 30초</span><h2>이렇게 플레이합니다</h2></div>
+    <div class="coach"><ol>
+      <li><b>부대를 탭</b>하면 이동 가능한 칸이 노랗게, 공격 가능한 적이 붉은 점선으로 표시됩니다.</li>
+      <li><b>노란 칸을 탭</b>하면 이동, <b>붉은 표적을 탭</b>하면 예상 피해가 뜨고 <b>공격 개시</b>로 확정합니다.</li>
+      <li><b>도시를 탭</b>해 부대를 편성하고, 아래 메뉴에서 권력·경제·병기·연구·외교를 다룹니다.</li>
+      <li>화면을 <b>길게 누르면</b> 지형·부대 정보, <b>두 손가락</b>으로 확대·축소합니다.</li>
+      <li>명령을 마치면 오른쪽 아래 <b>턴 종료</b>. 1턴은 1개월입니다.</li>
+    </ol></div><div class="choices"><button class="btn primary" type="button" id="coach-ok">시작하기</button></div>`);
+  $('#coach-ok').onclick = closeModal;
 }
 async function startGame() {
   const s = UI.setup;
   closeModal();
   overlay('세계를 준비하는 중…'); await wait(20);
   newGame(s.scen, s.nat, { diff: s.diff, fog: s.fog, maxTurn: s.turns, leaderName: s.name.trim() || '지도자', leaderTitle: s.title || NATIONS[s.nat].leader });
-  UI.sel = null; UI.mode = null; UI.fx = []; UI.anim.clear(); UI.tab = 'sel'; UI.lowDirty = true;
+  UI.sel = null; UI.mode = null; UI.fx = []; UI.anim.clear(); UI.tab = 'sel'; UI.lowDirty = true; UI.startStep = 1;
+  closeSheet();
   refreshVision();
   const cap = capitalOf(me());
-  centerOn(cap.tile, 0.9);
+  centerOn(cap.tile, IS_TOUCH ? 1.05 : 0.9);
   startPhase(me());
   overlay('');
   after();
@@ -1373,6 +1552,7 @@ async function startGame() {
   }
   G.flags.firstStrike = null;
   saveGame(false);
+  showCoach();
 }
 
 // ---------- persistence ----------
@@ -1389,7 +1569,8 @@ function restore(obj) {
   loadGame(obj);
   UI.sel = null; UI.mode = null; UI.busy = false; UI.fx = []; UI.anim.clear(); UI.lowDirty = true;
   refreshVision();
-  const cap = capitalOf(me()); if (cap) centerOn(cap.tile, 0.9);
+  const cap = capitalOf(me()); if (cap) centerOn(cap.tile, IS_TOUCH ? 1.05 : 0.9);
+  closeSheet();
   after();
 }
 

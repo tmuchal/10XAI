@@ -38,6 +38,14 @@ python3 -m http.server -d games/korea-war-sim   # then open http://localhost:800
 - **Scenarios**: 독재자의 길 (sandbox), 2027 한반도 위기, 제3차 세계대전 and 세계를 적으로 (everyone against you).
 - **Victory**: unify Korea (as South or North Korea), control 35% of the world's cities, take every great power's capital, win your wars, or have the top score when the turn limit is reached. After a victory you can keep ruling.
 
+- **Mobile-game UI**:
+  - The map fills the screen, with resource pills on top and a six-tab dock at the bottom (권력 · 경제 · 병기 · 연구 · 외교 · 전황).
+  - Tapping a unit or city opens a context card with large action buttons. Tapping an enemy first shows an attack preview (odds, expected losses) and needs a confirm tap.
+  - Menus open as a draggable bottom sheet on phones and as a right-hand drawer on desktop.
+  - Floating buttons handle next idle unit and end turn.
+  - Long-press shows a tile tooltip.
+  - A three-step start flow (scenario, nation, leader) is followed by a one-time tutorial.
+
 The game autosaves to `localStorage` every turn.
 
 ## Code
