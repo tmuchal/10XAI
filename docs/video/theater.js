@@ -2,7 +2,7 @@
  *
  * Every scene is plain SVG markup built from these helpers, in a bright
  * watercolor-theater style: sunburst backdrop, red curtains, wooden stage,
- * boxy ^ ^ characters, and a scientist host (Dr. Harness).
+ * boxy ^ ^ agent characters, and the host Dr. Harness: a hamster scientist in sunglasses.
  *
  *   Theater.install()                     // once per page: fonts' fallbacks + <defs>
  *   Theater.scene({ w, h, st, draw, en, ko, subY, hook })  → "<svg …>…</svg>"
@@ -162,21 +162,33 @@
     const opts = Object.assign({ c: a.c, crown: a.crown, mag: a.prop === 'mag' ? 'r' : undefined, extra: a.prop === 'mag' ? '' : p, label: o.noLabel ? undefined : a.name }, o);
     return box(x, fy, s, opts);
   }
+  /* Dr. Harness: a chubby golden hamster scientist in black sunglasses and a lab coat.
+     Options: m ('smile'|'o'|'grin'|'flat'), la/ra (paw positions), q, bang, flip, eyes (sunglasses pushed up). */
   function doc(x, fy, sc, o) {
     o = o || {}; sc = sc || 1;
-    const la = o.la || [-34, -50], ra = o.ra || [34, -50];
-    let g = `<rect x="-17" y="-42" width="13" height="40" fill="#3f63a8" stroke="${INK}" stroke-width="2.5"/><rect x="4" y="-42" width="13" height="40" fill="#3f63a8" stroke="${INK}" stroke-width="2.5"/><ellipse cx="-13" cy="-3" rx="12" ry="5.5" fill="${INK}"/><ellipse cx="12" cy="-3" rx="12" ry="5.5" fill="${INK}"/>`;
-    g += `<path d="M-24,-98 L24,-98 L33,-36 L-33,-36 Z" fill="#ffffff" stroke="${INK}" stroke-width="3" stroke-linejoin="round"/><path d="M-5,-98 L0,-84 L5,-98 Z" fill="#39b3b0" stroke="${INK}" stroke-width="2"/><path d="M-12,-98 L0,-76 L12,-98" fill="none" stroke="${INK}" stroke-width="2"/><rect x="9" y="-70" width="13" height="10" fill="none" stroke="${INK}" stroke-width="2"/><line x1="13" y1="-75" x2="13" y2="-66" stroke="#39b3b0" stroke-width="3"/>`;
-    for (const [sx, a] of [[-22, la], [22, ra]]) g += `<path d="M${sx},-92 L${a[0]},${a[1]}" stroke="${INK}" stroke-width="12" stroke-linecap="round"/><path d="M${sx},-92 L${a[0]},${a[1]}" stroke="#ffffff" stroke-width="7" stroke-linecap="round"/><circle cx="${a[0]}" cy="${a[1]}" r="5.5" fill="#f3cda4" stroke="${INK}" stroke-width="2"/>`;
-    g += `<polygon points="-24,-120 -30,-142 -17,-137 -13,-158 -3,-141 5,-160 10,-141 22,-153 20,-135 28,-128 22,-118" fill="#2b1c16" stroke="${INK}" stroke-width="2" stroke-linejoin="round"/><circle cx="0" cy="-118" r="21" fill="#f6d2ad" stroke="${INK}" stroke-width="3"/><path d="M-20,-124 Q-9,-135 0,-128 Q9,-137 20,-124 L19,-136 L-19,-136 Z" fill="#2b1c16"/>`;
-    g += `<circle cx="-8" cy="-116" r="7.5" fill="#fff" fill-opacity=".55" stroke="${INK}" stroke-width="2.5"/><circle cx="8" cy="-116" r="7.5" fill="#fff" fill-opacity=".55" stroke="${INK}" stroke-width="2.5"/><circle cx="-7" cy="-115.5" r="2.2" fill="${INK}"/><circle cx="9" cy="-115.5" r="2.2" fill="${INK}"/><ellipse cx="-15" cy="-106" rx="4" ry="2.4" fill="#f07f86" opacity=".5"/><ellipse cx="15" cy="-106" rx="4" ry="2.4" fill="#f07f86" opacity=".5"/>`;
+    const la = o.la || [-34, -46], ra = o.ra || [34, -46], FUR = '#f0a64a', FUR2 = '#d9832e', CREAM = '#fff1d6', PINK = '#f7a1a8';
+    let g = `<ellipse cx="-13" cy="-4" rx="12" ry="6" fill="${PINK}" stroke="${INK}" stroke-width="2.5"/><ellipse cx="13" cy="-4" rx="12" ry="6" fill="${PINK}" stroke="${INK}" stroke-width="2.5"/>`;
+    g += `<path d="M-31,-10 Q-44,-52 -27,-86 L27,-86 Q44,-52 31,-10 Q0,-2 -31,-10 Z" fill="#ffffff" stroke="${INK}" stroke-width="3" stroke-linejoin="round"/>`;
+    g += `<path d="M-12,-86 Q0,-60 12,-86 Z" fill="${CREAM}" stroke="${INK}" stroke-width="2"/><path d="M-14,-86 L0,-58 L14,-86" fill="none" stroke="${INK}" stroke-width="2"/><path d="M-4,-62 L0,-52 L4,-62 Z" fill="#39b3b0" stroke="${INK}" stroke-width="1.8"/><rect x="11" y="-58" width="13" height="10" rx="2" fill="none" stroke="${INK}" stroke-width="2"/><line x1="15" y1="-63" x2="15" y2="-54" stroke="#39b3b0" stroke-width="3"/><circle cx="0" cy="-40" r="2.4" fill="${INK}"/><circle cx="0" cy="-28" r="2.4" fill="${INK}"/>`;
+    for (const [sx, a] of [[-24, la], [24, ra]]) g += `<path d="M${sx},-78 L${a[0]},${a[1]}" stroke="${INK}" stroke-width="13" stroke-linecap="round"/><path d="M${sx},-78 L${a[0]},${a[1]}" stroke="#ffffff" stroke-width="8" stroke-linecap="round"/><circle cx="${a[0]}" cy="${a[1]}" r="6.5" fill="${PINK}" stroke="${INK}" stroke-width="2"/>`;
+    g += `<circle cx="-25" cy="-137" r="11" fill="${FUR}" stroke="${INK}" stroke-width="2.5"/><circle cx="-25" cy="-137" r="5.5" fill="${PINK}"/><circle cx="25" cy="-137" r="11" fill="${FUR}" stroke="${INK}" stroke-width="2.5"/><circle cx="25" cy="-137" r="5.5" fill="${PINK}"/>`;
+    g += `<ellipse cx="0" cy="-110" rx="35" ry="31" fill="${FUR}" stroke="${INK}" stroke-width="3"/><ellipse cx="0" cy="-131" rx="15" ry="7" fill="${FUR2}" opacity=".8"/><path d="M-3,-141 q4,-8 9,-3" fill="none" stroke="${INK}" stroke-width="2.2" stroke-linecap="round"/>`;
+    g += `<ellipse cx="-23" cy="-100" rx="14" ry="12" fill="${CREAM}" stroke="${INK}" stroke-width="2"/><ellipse cx="23" cy="-100" rx="14" ry="12" fill="${CREAM}" stroke="${INK}" stroke-width="2"/><ellipse cx="0" cy="-99" rx="14" ry="11" fill="${CREAM}"/><ellipse cx="-24" cy="-97" rx="6" ry="3.5" fill="#f07f86" opacity=".6"/><ellipse cx="24" cy="-97" rx="6" ry="3.5" fill="#f07f86" opacity=".6"/>`;
+    g += `<path d="M-30,-101 l-14,-3 M-30,-97 l-15,2 M30,-101 l14,-3 M30,-97 l15,2" stroke="${INK}" stroke-width="1.5" stroke-linecap="round"/>`;
+    g += `<ellipse cx="0" cy="-106" rx="4.5" ry="3.2" fill="#e8747c" stroke="${INK}" stroke-width="1.5"/>`;
     const m = o.m || 'smile';
-    if (m === 'o') g += `<ellipse cx="0" cy="-103" rx="3.2" ry="4" fill="${INK}"/>`;
-    else if (m === 'flat') g += `<path d="M-5,-103 L5,-103" stroke="${INK}" stroke-width="2.5" stroke-linecap="round"/>`;
-    else if (m === 'grin') g += `<path d="M-8,-106 Q0,-96 8,-106 Z" fill="#fffaf0" stroke="${INK}" stroke-width="2.2" stroke-linejoin="round"/>`;
-    else g += `<path d="M-6,-106 Q0,-100 6,-106" fill="none" stroke="${INK}" stroke-width="2.5" stroke-linecap="round"/>`;
-    if (o.q) g += `<text x="30" y="-150" font-size="38" fill="#3b7fd0" font-family="${FONT}" font-weight="700" transform="rotate(14 30 -150)">?</text><text x="44" y="-172" font-size="22" fill="#3b7fd0" font-family="${FONT}" font-weight="700">?</text>`;
-    if (o.bang) g += `<text x="30" y="-150" font-size="40" fill="#e5533f" font-family="${FONT}" font-weight="700" transform="rotate(10 30 -150)">!</text>`;
+    if (m === 'o') g += `<ellipse cx="0" cy="-95" rx="4" ry="5" fill="#8a2f2a" stroke="${INK}" stroke-width="1.8"/><rect x="-3" y="-100" width="6" height="4" fill="#fff" stroke="${INK}" stroke-width="1"/>`;
+    else if (m === 'grin') g += `<path d="M-9,-100 Q0,-86 9,-100 Z" fill="#8a2f2a" stroke="${INK}" stroke-width="2" stroke-linejoin="round"/><rect x="-3.5" y="-100" width="7" height="5" fill="#fff" stroke="${INK}" stroke-width="1"/>`;
+    else if (m === 'flat') g += `<path d="M-5,-99 L5,-99" stroke="${INK}" stroke-width="2.2" stroke-linecap="round"/>`;
+    else g += `<path d="M-6,-101 q3,4 6,0 q3,4 6,0" fill="none" stroke="${INK}" stroke-width="2" stroke-linecap="round"/>`;
+    if (o.eyes) {
+      g += `<circle cx="-12" cy="-116" r="5.5" fill="${INK}"/><circle cx="12" cy="-116" r="5.5" fill="${INK}"/><circle cx="-10.5" cy="-118" r="1.8" fill="#fff"/><circle cx="13.5" cy="-118" r="1.8" fill="#fff"/>`;
+      g += `<g transform="translate(0,-17) rotate(-6)"><rect x="-26" y="-126" width="22" height="13" rx="5" fill="#15151c" stroke="${INK}" stroke-width="2"/><rect x="4" y="-126" width="22" height="13" rx="5" fill="#15151c" stroke="${INK}" stroke-width="2"/><path d="M-4,-121 L4,-121" stroke="${INK}" stroke-width="2.5"/></g>`;
+    } else {
+      g += `<path d="M-35,-119 L-26,-120 M26,-120 L35,-119" stroke="${INK}" stroke-width="2.5" stroke-linecap="round"/><rect x="-27" y="-126" width="23" height="15" rx="6" fill="#15151c" stroke="${INK}" stroke-width="2.2"/><rect x="4" y="-126" width="23" height="15" rx="6" fill="#15151c" stroke="${INK}" stroke-width="2.2"/><path d="M-4,-120 Q0,-123 4,-120" fill="none" stroke="${INK}" stroke-width="2.5"/><path d="M-23,-122 l7,0 M8,-122 l7,0" stroke="#9fb4ff" stroke-width="2.2" stroke-linecap="round" opacity=".9"/>`;
+    }
+    if (o.q) g += `<text x="34" y="-150" font-size="38" fill="#3b7fd0" font-family="${FONT}" font-weight="700" transform="rotate(14 34 -150)">?</text><text x="48" y="-172" font-size="22" fill="#3b7fd0" font-family="${FONT}" font-weight="700">?</text>`;
+    if (o.bang) g += `<text x="34" y="-150" font-size="40" fill="#e5533f" font-family="${FONT}" font-weight="700" transform="rotate(10 34 -150)">!</text>`;
     return G(`<g transform="translate(${x},${fy}) scale(${o.flip ? -sc : sc},${sc})">${g}</g>`);
   }
   const hand = (x, fy, sc, a, flip) => [x + a[0] * sc * (flip ? -1 : 1), fy + a[1] * sc];

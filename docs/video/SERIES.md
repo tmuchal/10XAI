@@ -10,7 +10,7 @@ Hook line for the whole series: **"It said FREE. We measured."**
 
 ## Language and subtitles
 
-- **Voice-over is in English.** Dr. Harness is the narrator: warm, quick, a little deadpan. Keep Fireship-style density: one joke or punchline roughly every 20 seconds.
+- **Voice-over is in English.** Dr. Harness, the hamster, is the narrator: warm, quick, a little deadpan. Keep Fireship-style density: one joke or punchline roughly every 20 seconds.
 - **Every line has a combined subtitle** drawn with `Theater.sub2(en, ko)`: the English line in ink on top, the Korean line in vermilion below at about 85% of the English size, on a white paper strip. Keep English to 42 characters or fewer per subtitle, and write natural Korean, not literal translation.
 - Box characters speak in "boop" gibberish. Their meaning goes in the subtitles.
 
@@ -25,7 +25,7 @@ Hook line for the whole series: **"It said FREE. We measured."**
 
 | Character | Call | Role |
 |---|---|---|
-| Dr. Harness | `doc(x, floorY, scale, {m, ra, la, q, bang})` | Host and narrator. Lab coat, spiky hair, round glasses. |
+| Dr. Harness | `doc(x, floorY, scale, {m, ra, la, q, bang, eyes})` | Host and narrator: a chubby golden hamster scientist in black sunglasses and a lab coat. `eyes:true` pushes the sunglasses up for reveal beats. |
 | Orchestrator | `agent('orchestrator', …)` | Crowned rose box with a baton. Fans work out to the others. (`verify-orchestrator`, `exec-orchestrator`) |
 | Decompose | `agent('decompose', …)` | Blue, scissors. Cuts the post into ordered cards. |
 | Gap-fill | `agent('gapfill', …)` | Amber, pencil. Adds the gray, dashed cards for steps the author skipped. |
@@ -34,9 +34,15 @@ Hook line for the whole series: **"It said FREE. We measured."**
 | Exec runner | `agent('runner', …)` | Green, stopwatch. Runs safe cards in the sandbox and measures them. |
 | Repair | `agent('repair', …)` | Pink, wrench. Runs the fix loop on failures. |
 | Deploy | `agent('deploy', …)` | Purple, package. Exports SKILL.md / JSON / CLI to the library. |
-| Hype Box | `box(x, fy, s, Object.assign({mood:'cool'}, Theater.PAL.gold))` | The viral post. Gold, sunglasses. |
+| Hype Box | `box(x, fy, s, Object.assign({mood:'star'}, Theater.PAL.gold))` | The viral post. Gold, star-struck eyes. Sunglasses belong to the hamster only. |
 
 Moods: `happy`, `worried`, `dizzy`, `alert`, `sleep`, `cool`, `sheepish`, `star`. Options: `hat`, `crown`, `tag`, `label`, `carry` (holds a card overhead), `harness`, `mag`, `rot`, `arms:'down'`.
+
+## Production: Blender 3D motion graphics
+
+- The final Reel and long-form video are made as **3D motion graphics in Blender**: a toon-shaded stage with Line Art ink outlines, a rigged hamster host, 3D Kanban columns with cards flying on physics arcs, depth of field, parallax and particles.
+- The SVG frames in these pages are the 2D storyboard and animatic. `blender/harness_theater.py` builds the 3D set and renders hero stills into `renders/`.
+- Hamster gags: a hamster wheel powers the 10XAI machine (the harness), cheek pouches stuffed with cards, sunglasses pushed up at reveals, and sunflower seeds as the cost coin.
 
 ## Home set: the multi-agent Kanban board
 
