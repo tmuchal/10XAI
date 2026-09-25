@@ -1,6 +1,7 @@
 """Post-process the rendered shots and write film/assets/3d/manifest.json.
-  * flythrough: PNG master (/tmp/blender-shots/flythrough) -> high-quality JPG (opaque).
-  * RGBA shots: re-save PNGs with optimize=True (lossless) in place.
+  * Masters are PNG sequences in /tmp/blender-shots/<name>/ (written by the shot scripts).
+  * flythrough (opaque) -> JPG q90;  RGBA shots -> 256-colour palette PNG with alpha
+    (~10x smaller than the truecolour master, visually identical for this flat toon look).
 Run with the venv python (needs Pillow):  /tmp/bpyenv/bin/python tools/blender/finalize.py
 """
 import json, os
@@ -27,17 +28,20 @@ def main():
     for s in SHOTS:
         d = os.path.join(OUT, s['name'])
         os.makedirs(d, exist_ok=True)
-        if s['name'] == 'flythrough':
-            src = '/tmp/blender-shots/flythrough'
-            if os.path.isdir(src):
-                for f in sorted(os.listdir(src)):
-                    if f.endswith('.png'):
-                        Image.open(os.path.join(src, f)).convert('RGB').save(
-                            os.path.join(d, f[:-4] + '.jpg'), quality=90, subsampling=0, optimize=True)
-        else:
-            for f in sorted(os.listdir(d)):
-                if f.endswith('.png'):
-                    p = os.path.join(d, f); im = Image.open(p); im.load(); im.save(p, optimize=True)
+        src = os.path.join('/tmp/blender-shots', s['name'])
+        if os.path.isdir(src):
+            for f in os.listdir(d):
+                os.remove(os.path.join(d, f))
+            for f in sorted(os.listdir(src)):
+                if not f.endswith('.png'):
+                    continue
+                im = Image.open(os.path.join(src, f))
+                dst = os.path.join(d, f[:-4] + '.' + s['ext'])
+                if s['ext'] == 'jpg':
+                    im.convert('RGB').save(dst, quality=90, subsampling=0, optimize=True)
+                else:
+                    q = im.convert('RGBA').quantize(256, method=Image.Quantize.FASTOCTREE, dither=Image.Dither.NONE)
+                    q.save(dst, optimize=True)
         files = sorted(f for f in os.listdir(d) if f.endswith('.' + s['ext']))
         if not files:
             print('missing', s['name']); continue

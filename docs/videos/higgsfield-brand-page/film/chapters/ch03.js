@@ -90,10 +90,10 @@ scene(72, 106, (R, s) => {
   const gag = el("div", "left:0;top:0;width:1920px;height:1080px;transform-origin:960px 560px", "", R); gag.className = "abs";
   const GAG = [["beach", { body: "#9fd3f0" }], ["park", { glasses: true, scarf: "#6fb3d9", beret: "#3f8f7a" }], ["lilac", { spiky: true, body: "#f7c6d4", scarf: null }]];
   const board = c03_box(gag, 120, 262, 1680, 372, "#e8c48f", "background-image:radial-gradient(rgba(120,70,30,.18) 2px,transparent 2.5px);background-size:22px 22px");
-  const wanted = el("div", `left:790px;top:214px;z-index:37;padding:4px 22px 6px;border:4px solid ${c03_INK};border-radius:10px;background:#fffaf0;font-size:30px;color:#c8372d;white-space:nowrap`, "WANTED · 진짜 노아는?", gag); wanted.className = "abs";
+  const wanted = el("div", `left:760px;top:574px;z-index:37;padding:4px 22px 6px;border:4px solid ${c03_INK};border-radius:10px;background:#fffaf0;font-size:30px;color:#c8372d;white-space:nowrap`, "WANTED · 진짜 노아는?", gag); wanted.className = "abs";
   const shots = GAG.map(([pal, v], i) => {
     const f = c03_frame(gag, 150 + i * 560, 300, 500, 290, c03_PAL[pal], `AI 생성 컷 ${i + 1}`, v);
-    f.st = c03_stamp(gag, 150 + i * 560 + 250, 528, "✗ 다른 얼굴", "#c8372d", -10 + i * 5);
+    f.st = c03_stamp(gag, 150 + i * 560 + 200, 430, "✗ 다른 얼굴", "#c8372d", -10 + i * 5);
     el("div", `position:absolute;left:236px;top:6px;width:26px;height:26px;border-radius:50%;background:#c8372d;border:3px solid ${c03_INK};z-index:37;box-shadow:2px 3px 0 rgba(43,35,32,.3)`, "", f);
     el("div", `position:absolute;right:12px;top:10px;z-index:35;padding:0 12px;border:3px solid ${c03_INK};border-radius:8px;background:#fbd9d3;font-size:28px;color:${c03_INK}`, ["털 색 ✗", "안경 ✗", "머리 ✗"][i], f);
     return f;
@@ -268,6 +268,7 @@ scene(72, 106, (R, s) => {
   const bXp = bX.querySelector(".x");
   const endNoa = makeNoa(190); res.appendChild(endNoa);
   const endB = makeBubble(res);
+  const c03_burst = makeBurst(res, 26, 3);
 
   const c03_plate = R.querySelector(".chap"), c03_W = el("div", "position:absolute;left:0;top:0;width:1920px;height:1080px;transform-origin:960px 470px");
   [...R.children].forEach(c => { if (c !== c03_plate) c03_W.appendChild(c); }); R.appendChild(c03_W);
@@ -290,7 +291,7 @@ scene(72, 106, (R, s) => {
       poseNoa(f.n, t, { x: 165, y: 92, look: [1, 0, -1][i], talk: t > nameAt && t < nameAt + .6, hop: said > 0 && said < 1 ? said : 0, mood: t > 80.4 ? "pout" : "happy" });
       c03_slam(f.st, t, 80.35 + i * .2);
       f.st.style.opacity = +f.st.style.opacity * (1 - gagOut);
-      sayBubble(meB[i], t, nameAt, 80.3, ["나야. (파랑)", "나야. (범생)", "나야. (삐죽)"][i], 150 + i * 560 + 150, 212);
+      sayBubble(meB[i], t, nameAt, 80.3, ["파란 노아!", "범생이 노아!", "삐죽머리 노아!"][i], 150 + i * 560 + 150, 212);
     });
     [80.35, 80.55, 80.75].forEach(a => shakeCam(t, a, 6, .25));
     const rp = back(seg(t, 74.4, 75.0));
@@ -411,7 +412,7 @@ scene(72, 106, (R, s) => {
       const shake = t > arrive && t < outAt ? Math.sin(t * 70) * 4 : 0;
       const squash = seg(t, arrive, arrive + .2), sq = Math.sin(squash * Math.PI) * .05;
       m.style.opacity = clamp(mIn * 2) * (1 - mOut);
-      m.style.transform = `translate(${shake}px, ${420 * (1 - mIn) + 300 * mOut * (1 + i * .3)}px) scale(${1 + sq}, ${1 - sq})`;
+      m.style.transform = `translate(${shake}px, ${240 * (1 - mIn) + 300 * mOut * (1 + i * .3)}px) scale(${1 + sq}, ${1 - sq})`;
       m.style.transformOrigin = "50% 100%";
       m.gear.setAttribute("transform", `rotate(${t > arrive ? (t - arrive) * 400 : 0})`);
       m.lts.forEach((l, j) => l.style.background = t > arrive && (Math.floor(t * 8) + j) % 3 === 0 ? ["#c8372d", "#f7d774", "#2f9e5a"][j] : t > outAt ? "#bfe3a6" : "#fffaf0");
@@ -434,7 +435,7 @@ scene(72, 106, (R, s) => {
     const Ev = t > 94.8 && t < 99.6;
     lockP.style.display = tugP.style.display = Ev ? "block" : "none";
     lockP.style.opacity = clamp(eIn * 2) * (1 - eOut);
-    lockP.style.transform = `translateY(${360 * (1 - eIn) - 500 * eOut}px) rotate(${-1 + 3 * eOut}deg)`;
+    lockP.style.transform = `translate(${-900 * eOut * eOut}px, ${360 * (1 - eIn)}px) rotate(${-1 - 6 * eOut}deg)`;
     poseNoa(lNoa, t, { x: 133, y: 150, s: 1, look: t > 96 && t < 97 ? 1 : 0, mood: t > 95.8 && t < 96.05 ? "shock" : "happy" });
     [tagHat, tagSc].forEach((g, i) => { const p = back(seg(t, 95.2 + i * .15, 95.55 + i * .15)); g.style.opacity = clamp(p * 2); g.style.transform = `scale(${p}) rotate(-3deg)`; });
     const drop = seg(t, 95.3, 95.75), snap = seg(t, 95.78, 95.9);
@@ -459,7 +460,7 @@ scene(72, 106, (R, s) => {
     // ---- E: tug of war
     const uIn = back(seg(t, 96.5, 97.0));
     tugP.style.opacity = clamp(uIn * 2) * (1 - eOut);
-    tugP.style.transform = `translateY(${360 * (1 - uIn) - 500 * eOut}px) rotate(${1 - 3 * eOut}deg)`;
+    tugP.style.transform = `translate(${900 * eOut * eOut}px, ${360 * (1 - uIn)}px) rotate(${1 + 6 * eOut}deg)`;
     const yank = back(seg(t, 97.9, 98.5)), wob = t > 97.0 && t < 97.95 ? 16 * Math.sin((t - 97) * 11) : 0;
     const off = wob + 44 * yank;
     tug.style.transform = `translateX(${off}px)`;
@@ -480,12 +481,14 @@ scene(72, 106, (R, s) => {
     // ---- F: result
     const Fv = t > 99.3;
     res.style.display = Fv ? "block" : "none";
-    res.style.transform = `scale(${1 + .03 * ease(seg(t, 99.6, 106))})`;
+    res.style.transform = `scale(${1.08 + .03 * ease(seg(t, 99.6, 106))})`;
     oks.forEach((f, i) => {
-      const p = back(seg(t, 99.55 + i * .3, 100.2 + i * .3));
+      const p = back(seg(t, 99.35 + i * .3, 100.0 + i * .3));
       f.style.opacity = clamp(p * 2);
       f.style.transform = `translateY(${-360 * (1 - p)}px) rotate(${[-2, 1.5, -1.5][i] * p}deg)`;
       f.sc.update(t + i * 5, .6, [620, 180, 560][i]);
+      const c03_fin = seg(t, 103.7 + i * .08, 104.3 + i * .08);
+      if (c03_fin > 0 && c03_fin < 1) f.style.transform += ` translateY(${-18 * Math.sin(c03_fin * Math.PI)}px)`;
       if (i === 0) poseNoa(f.n, t, { x: 70, y: 110, s: .62, look: 1, wave: t > 101 });
       else if (i === 1) poseNoa(f.n, t, { x: 150, y: 150, s: 1.6, look: .3, talk: t > 101.5 && t < 104 });
       else {
@@ -499,8 +502,9 @@ scene(72, 106, (R, s) => {
     bNoas.forEach((n, i) => poseNoa(n, t, { x: 100 + i * 108, y: 22, s: 1, mood: t > 102.7 ? "shock" : "happy" }));
     bXp.setAttribute("stroke-dashoffset", 320 * (1 - ease(seg(t, 102.5, 102.9))));
     const en = back(seg(t, 100.8, 101.3));
-    poseNoa(endNoa, t, { x: 865, y: 620 + 260 * (1 - en), s: .95, wave: t > 101.4, talk: t > 101.5 && t < 103.5, hop: seg(t, 103.6, 104.1) > 0 && t < 104.1 ? seg(t, 103.6, 104.1) : 0, op: clamp(en * 3) });
-    sayBubble(endB, t, 101.5, 105.6, "이제 어디서든 나야 ^_^", 1040, 600);
+    poseNoa(endNoa, t, { x: 865, y: 640 + 260 * (1 - en), s: 1.25, wave: t > 101.4, talk: t > 101.5 && t < 103.5, hop: seg(t, 103.6, 104.1) > 0 && t < 104.1 ? seg(t, 103.6, 104.1) : 0, op: clamp(en * 3) });
+    sayBubble(endB, t, 101.5, 105.6, "이제 어디서든 나야 ^_^", 1100, 590);
+    c03_burst.fire(t, 103.75, 960, 600, 1.3);
   };
 });
 

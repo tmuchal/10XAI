@@ -426,7 +426,7 @@ scene(40, 72, (R, s) => {
       if (t > 51.9) { cjump = 60 * Math.abs(Math.sin(seg(t, 51.9, 52.9) * Math.PI * 2)); cmood = "big"; }
     }
     const cOp = seg(t, 42.1, 42.2) * (1 - toStats);
-    c02_posePerson(cust, t, { x: cx, y: cy, s: 1, walk: cwalk, moving: cm, flip: cflip, jump: cjump, mood: cmood, reach: creach, crown: t < 42.9 ? 0 : back(seg(t, 42.9, 43.3)), op: cOp });
+    c02_posePerson(cust, t, { x: cx, y: cy, s: t < 46 ? 1 + 0.35 * back(seg(t, 42.9, 43.35)) * (1 - ease(seg(t, 45.6, 46.2))) : 1, walk: cwalk, moving: cm, flip: cflip, jump: cjump, mood: cmood, reach: creach, crown: t < 42.9 ? 0 : back(seg(t, 42.9, 43.3)), op: cOp });
     sayBubble(bubC, t, 47.25, 47.9, "헉, 막혔다!", cx + 10, cy - 240);
 
     // ---------------- Noa ----------------
@@ -512,7 +512,7 @@ scene(40, 72, (R, s) => {
     mapProp.style.opacity = mp > 0 && t < 49.5 ? 1 : 0;
     { const hx = t < 48.6 ? lerp(nx + 10, cx - 10, mp) : cx + 20, hy = t < 48.6 ? lerp(ny + 90, cy - 80, mp) - 50 * Math.sin(mp * Math.PI) : cy - 80 - cjump;
       mapProp.style.transform = `translate(${hx}px, ${hy}px) rotate(${-10 + 20 * Math.sin(t * 5)}deg)`; }
-    sayBubble(bub, t, 43.3, 45.1, "주인공은 내가 아니라… 손님이래 😤", 690, 470);
+    sayBubble(bub, t, 43.3, 45.1, "주인공은 내가 아니라… 손님이래 😤", 620, 470);
     sayBubble(bubN, t, 47.9, 48.9, "지도 받아!", nx + 110, ny - 70);
     if (t > 64.5 && t < 67.4) sayBubble(bubN, t, 64.6, 67.4, "괜찮아… 길잡이도 멋져… 😢", 990, 560);
     if (t > 69.5) sayBubble(bubN, t, 69.6, 71.6, "명대사는 내 몫! 😎", 990, 560);

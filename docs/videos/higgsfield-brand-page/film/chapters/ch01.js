@@ -118,6 +118,8 @@ scene(10, 40, (R, s) => {
   const tada = el("div", `left:170px;top:104px;z-index:12;padding:8px 22px 10px;background:#c8372d;color:#fffaf0;border:4px solid ${INK1};border-radius:14px;font-size:36px;box-shadow:6px 7px 0 rgba(43,35,32,.25);white-space:nowrap;transform-origin:0 50%`, "짠! 제가 만든 페이지", cam); tada.className = "abs";
   const COLS = ["#f7d774", "#e0607e", "#3e8fb8", "#9fd3a8", "#e8894f"];
   const conf = Array.from({ length: 44 }, (_, i) => { const d = el("div", `left:0;top:0;width:${12 + c01_rnd(i) * 10}px;height:${8 + c01_rnd(i + 50) * 10}px;background:${COLS[i % 5]};border:2px solid ${INK1};border-radius:2px;z-index:15;opacity:0`, "", cam); d.className = "abs"; return d; });
+  // "증거?" kinetic stamp bridges the wheel exit and the page drop (33.0–33.7)
+  const c01_proof = el("div", `left:0;right:0;top:330px;text-align:center;z-index:14;font-size:150px;line-height:1;color:#c8372d;-webkit-text-stroke:4px ${INK1};text-shadow:7px 7px 0 #f7d774;opacity:0;white-space:nowrap`, "증거?", cam); c01_proof.className = "abs";
   // Noa's guide intro (35.9–39.3): nameplate, an "eye contact" reticle he keeps dodging, 0% stamp
   const c01_plate = el("div", `left:1250px;top:300px;z-index:17;padding:10px 26px 12px;background:#fff3cf;border:4px solid ${INK1};border-radius:14px;box-shadow:6px 7px 0 rgba(43,35,32,.25);white-space:nowrap;opacity:0;transform-origin:0 100%`,
     `<div style="font-size:24px;letter-spacing:4px;color:#c8372d">YOUR GUIDE</div><div style="font-size:48px;line-height:1.05">가이드 · 노아</div>`, cam); c01_plate.className = "abs";
@@ -301,6 +303,10 @@ scene(10, 40, (R, s) => {
       h.style.transform = `translate(${120 + 110 * c01_rnd(i) + 22 * Math.sin(p * 9 + i)}px, ${260 - 230 * p}px) scale(${0.7 + 0.6 * p})`;
     });
 
+    const pfP = seg(t, 32.85, 33.1), pfO = seg(t, 33.45, 33.75);
+    c01_proof.style.opacity = pfP > 0 ? 1 - pfO : 0;
+    c01_proof.style.transform = `translateY(${-260 * pfO * pfO}px) scale(${lerp(2.2, 1, back(pfP)) * (1 + 0.04 * Math.sin(t * 30) * (1 - pfO))}) rotate(${-6 + 4 * pfO}deg)`;
+    shakeCam(t, 33.1, 7, 0.3);
     // ---- reference reveal ----
     const rIn = seg(t, 33.1, 33.9);
     const rY = t < 33.9 ? lerp(-900, 0, rIn * rIn) : -26 * Math.abs(c01_settle(t - 33.9, 1.6, 4)) * 1;

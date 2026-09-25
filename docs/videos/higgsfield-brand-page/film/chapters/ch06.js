@@ -53,7 +53,7 @@ scene(160, 184, (R, s) => {
   const vis = Array.from({ length: N }, (_, i) => {
     const e = c06_abs("left:0;top:0;width:30px;height:30px;opacity:0", `<svg width="30" height="30" viewBox="0 0 30 30"><circle cx="15" cy="15" r="12" fill="${VC[i % 6]}" stroke="${INK}" stroke-width="3"/>
       <circle cx="11" cy="14" r="2" fill="${INK}"/><circle cx="19" cy="14" r="2" fill="${INK}"/></svg>`, dotsL);
-    const t0 = 160.9 + i * .16, boost = t0 > 169.2;
+    const t0 = 162.0 + i * .16, boost = t0 > 171.2;          // the stream starts when the button is pressed
     const keep = boost ? [.92, .9, .86, .84] : [.84, .8, .74, .7];
     let d = 5; for (let k = 0; k < 4; k++) if (c06_h(i, k) > keep[k]) { d = k; break; }
     return { e, t0, d, u: (c06_h(i, 7) * 2 - 1) * .85, side: c06_h(i, 9) > .5 ? 1 : -1 };
@@ -90,6 +90,18 @@ scene(160, 184, (R, s) => {
       <div class="sl" style="position:absolute;left:120px;top:60px;width:40px;height:40px;border-radius:50%;background:#c8372d;border:3px solid ${INK};color:#fff;font-size:26px;text-align:center;line-height:34px">?</div></div>`, R);
   const eFront = env.querySelector(".fr"), eCard = env.querySelector(".cd"), eFlap = env.querySelector(".fl"), eSeal = env.querySelector(".sl"), eQ = env.querySelector(".q"), eChk = env.querySelector(".ck");
   const eLab = c06_abs(`left:0;top:0;padding:4px 14px 6px;${c06_card("#fff3c4", 10)};font-size:26px;white-space:nowrap;z-index:37;transform-origin:0 100%`, "봉인된 예측 · sealed guess", R);
+  // "Remember that button I promised?" (161.0): the button itself, pressed at 161.95 → the funnel starts
+  const c06_btn = c06_abs(`left:1180px;top:300px;width:520px;height:0;z-index:38`, `
+    <div class="tg" style="position:absolute;left:250px;top:-34px;padding:4px 16px 6px;${c06_card("#fff3c4", 10)};font-size:32px;white-space:nowrap;transform:rotate(5deg)">약속한 그 버튼!</div>
+    <div class="bb" style="position:absolute;left:0;top:34px;width:520px;height:120px;border-radius:60px;background:#d4623a;border:4px solid ${INK};box-shadow:0 10px 0 ${INK};color:#fff;font-size:52px;display:flex;align-items:center;justify-content:center;white-space:nowrap">▶ 상담 예약하기</div>
+    <div class="rr" style="position:absolute;left:200px;top:34px;width:120px;height:120px;border-radius:50%;border:6px solid #f2c14e;opacity:0"></div>`, R);
+  const c06_bb = c06_btn.querySelector(".bb"), c06_tg = c06_btn.querySelector(".tg"), c06_rr = c06_btn.querySelector(".rr");
+  const c06_b1 = makeBurst(R, 24, 11), c06_b2 = makeBurst(R, 28, 12);
+  // "Noa's cheeks? Already full." (181.0–183.0): the finale gag
+  const c06_q = c06_abs(`left:0;top:0;font-size:120px;color:#c8372d;z-index:39;-webkit-text-stroke:3px ${INK};opacity:0`, "?", R);
+  const c06_full = c06_abs(`left:1130px;top:300px;padding:8px 26px 12px;border:6px solid #c8372d;border-radius:16px;background:#fffaf0;color:#c8372d;font-size:64px;white-space:nowrap;z-index:40;opacity:0;box-shadow:6px 7px 0 rgba(43,35,32,.22)`, "볼주머니 만석!", R);
+  const c06_fsub = el("div", "font-size:30px;color:#6b5d52;text-align:center;margin-top:-4px", "FULL · 더는 못 넣어요", c06_full);
+  const c06_pc = [0, 1, 2, 3].map(() => c06_abs("left:0;top:0;width:52px;height:52px;z-index:37;opacity:0", `<svg width="52" height="52" viewBox="0 0 40 40"><circle cx="20" cy="20" r="17" fill="#f7c843" stroke="${INK}" stroke-width="3"/><circle cx="20" cy="20" r="11" fill="none" stroke="#c98a1a" stroke-width="2"/><text x="20" y="27" text-anchor="middle" font-size="19" font-family="GaeguLat" fill="#8a5a12">₩</text></svg>`, R));
   const burst = Array.from({ length: 18 }, (_, i) => c06_abs(`left:0;top:0;width:16px;height:12px;border:2px solid ${INK};border-radius:3px;background:${["#f2c14e", "#f08aa0", "#7cc3e0", "#9bd48a"][i % 4]};z-index:37;opacity:0`, "", R));
 
   // ================= formula
@@ -131,15 +143,9 @@ scene(160, 184, (R, s) => {
   const PRESS = [174.0, 174.9, 175.8, 176.7];
 
   // ================= reference page reveal
-  const stars = [[150, 180], [1470, 150], [140, 700], [1480, 820], [760, 110], [300, 860]].map(([x, y], i) => c06_abs(`left:${x}px;top:${y}px;width:70px;height:70px;z-index:6`,
+  const stars = [[330, 200], [1470, 170], [300, 640], [1500, 600], [760, 150], [1160, 760]].map(([x, y], i) => c06_abs(`left:${x}px;top:${y}px;width:70px;height:70px;z-index:6`,
     `<svg width="70" height="70" viewBox="-35 -35 70 70"><path d="M0 -32 L9 -9 L32 0 L9 9 L0 32 L-9 9 L-32 0 L-9 -9 Z" fill="${["#f2c14e", "#f08aa0", "#7cc3e0"][i % 3]}" stroke="${INK}" stroke-width="3" stroke-linejoin="round"/></svg>`, R));
-  const ref = refWindow(R, 200, 140, 1240, 690);
-  const hl = c06_abs("left:0;top:0;width:1920px;height:1000px;z-index:8;pointer-events:none", `<svg width="1920" height="1000" overflow="visible">
-    <path class="ring" d="M1100 690 C1104 636 1260 628 1400 650 C1460 662 1440 740 1330 752 C1200 766 1090 750 1098 700 C1102 676 1140 662 1170 658" fill="none" stroke="#c8372d" stroke-width="7" stroke-linecap="round"/></svg>`, R);
-  const ring = hl.querySelector(".ring");
-  const tada = c06_abs(`left:1060px;top:96px;padding:6px 22px 10px;${c06_card("#f7d774", 14)};font-size:52px;z-index:9;white-space:nowrap`, "짜잔! TA-DA!", R);
-  const act = c06_abs(`left:1460px;top:770px;padding:6px 16px 8px;${c06_card("#fde6ec", 12)};font-size:32px;color:#c8372d;z-index:9;white-space:nowrap`, "← 행동 · ACTION", R);
-  const noa = makeNoa(190); R.appendChild(noa); const bub = makeBubble(R);
+  const noa = makeNoa(190); R.appendChild(noa);
   const wipeA = c06_strips(R, ["#f7d774", "#f08aa0"]), wipeB = c06_strips(R, ["#7cc3e0", "#f7d774"]);
 
   return t => {

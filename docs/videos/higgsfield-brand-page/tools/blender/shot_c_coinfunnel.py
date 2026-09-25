@@ -10,7 +10,7 @@ from toonlib import *
 N = 90
 FILM = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..', 'film'))
 frames, out_dir = frames_arg(N)
-out_dir = out_dir or os.path.join(FILM, 'assets', '3d', 'coinfunnel')
+out_dir = out_dir or '/tmp/blender-shots/coinfunnel'   # PNG master; finalize.py converts to WebP
 
 reset((1080, 1080), transparent=True, samples=6)
 OL = 0.03
