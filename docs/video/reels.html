@@ -147,7 +147,7 @@
           <li>Face shape keys: smile, grin, O-mouth, flat, cheeks_full (pouch stuffing), blink.</li>
           <li>Sunglasses on their own bone, with a "glasses_up" pose for reveals (R11). Deadpan face (flat mouth, one slow blink) for R01, R04, R06 and R11. Hand poses: sign grip (R01), strap yank (R08a), stamp raised (R09), mic drop and paw press on glass (R12).</li>
           <li>Ear flicks and whiskers on a jiggle modifier.</li>
-          <li>Uchu: red hooded suit with ear pods, antenna stalks on a jiggle chain (the fuzzy "uchu" lettering as a hair/curve object), and face shape keys for shock (big O), grin, smile and squint, plus a sweat-drop particle. Uchu reacts in R01, R11 and R12.</li>
+          <li>Uchu: red hooded suit with ear pods, antenna stalks on a jiggle chain (the fuzzy "uchu" lettering as a hair/curve object), and face shape keys for shock (big O), grin, smile and squint, plus a sweat-drop particle. Uchu appears in R01 (shock), R03 (dragged back), R04 (cheering believer), R11 (doubtful squint) and R12 (grinning at the next post), always on the right of frame so the loop cut R12 → R01 is seamless.</li>
           <li>Agent boxes: one shared box rig with a mood face swap and prop sockets.</li>
         </ul>
       </div>
@@ -314,7 +314,7 @@
     { id: 'R01', beat: 0, dur: 1,
       en: 'It said *FREE*.', ko: '*공짜*라며?!',
       cam: 'Snap zoom on the two faces', k: 'push',
-      action: 'Payoff first. In front of the Kanban board, Uchu gapes with a huge shocked O at the word FREE, while a dead-still Dr. Harness holds up the answer: FREE, struck out in red, over $0.40. The risky card already sits in the Gate column.',
+      action: 'Payoff first. In front of the Kanban board, a dead-still Dr. Harness (left) holds up the answer on a stick: FREE, struck out in red, over $0.40. On the right, Uchu gapes with a huge shocked O at the word FREE. The risky card already sits in the Gate column.',
       onscreen: 'Hook: FREE? Sign: FREE (struck out) / $0.40 (placeholder). Board card badge: 72. Uchu: "!"',
       sfx: 'The R12 mic thud lands here as the loop point, then the beat drops.',
       anim: 'Uchu\'s O mouth pops open on frame 2 with an antenna wobble (the pattern interrupt). The hamster holds the deadpan for 16 frames, then one slow blink. The strike-through draws on in 4 frames.',
@@ -322,36 +322,41 @@
       st: { floorY: 640, bg: rays('#ff5a4a', .22, 270, 520) },
       hook: () => hook(['FREE?'], { y: 196, z: 84 }),
       draw() {
+
         let g = kb(60, 250, 420, 190, [[{ t: 'viral post', k: 'amber' }], [{ t: 'step' }], [{ t: 'API key', k: 'risk', b: '72' }], [{ t: 'step', k: 'ok' }]], { hl: 2 });
-        const hp = Th.hand(390, FY, 1.1, [-70, -130]);
-        g += Th.doc(390, FY, 1.1, { m: 'flat', la: [-70, -130] });
-        g += Th.sign(292, 446, 150, ['FREE', '$0.40'], { z: 40, z2: 44, f2: '#e5533f', fill: '#fffdf5', stick: hp });
-        g += G(`<line x1="240" y1="483" x2="344" y2="477" stroke="#e5533f" stroke-width="6" stroke-linecap="round"/>`);
-        g += Th.uchu(140, FY, 1, { m: 'shock', bang: true, la: [-46, -70], ra: [46, -70] });
+        const hp = Th.hand(150, FY, 1.1, [70, -130]);
+        g += Th.doc(150, FY, 1.1, { m: 'flat', ra: [70, -130] });
+        g += Th.sign(290, 446, 150, ['FREE', '$0.40'], { z: 40, z2: 44, f2: '#e5533f', fill: '#fffdf5', stick: hp });
+        g += G(`<line x1="238" y1="483" x2="342" y2="477" stroke="#e5533f" stroke-width="6" stroke-linecap="round"/>`);
+        g += Th.uchu(410, FY, 1, { m: 'shock', bang: true, flip: true, la: [-46, -70], ra: [46, -70] });
         g += sparkles([[430, 250, 12, '#ffd23f'], [110, 250, 9, '#fff']]);
         return g;
       } },
     { id: 'R02', beat: 0, dur: 1,
       en: 'We measured.', ko: '직접 재봤햄',
       cam: 'Whip-pan along the squad', k: 'pan',
-      action: 'The agent squad sprints across the front of the board carrying cards: Decompose, Verify with the red 72 card, the Exec runner with a green card, Deploy. A stopwatch sweeps above them.',
-      onscreen: 'Carried cards: cut · 72 · ok. Stopwatch mid-sweep.',
+      action: 'The agent squad sprints left to right across the front of the board, leaning forward and bouncing, carrying cards: Decompose, Verify with the red 72 card, the Exec runner with a green card, Deploy. A big stopwatch starts in the middle.',
+      onscreen: 'Carried cards: cut · 72 · ok. Big stopwatch with 0:00… Floor arrow pointing right.',
       sfx: 'Four fast woodblock footsteps and a stopwatch click.',
       anim: 'Agents run on 2s with speed lines, staggered by 2 frames so the line ripples.',
       blender: 'Camera: whip-pan left to right at 28 mm, motion blur on. Layers: running agents (front) · 3D board (mid) · spotlight and backdrop (back). Motion: dust puffs at each footfall, cards bobbing on spring bones.',
       st: { floorY: 640, spots: [270] },
       draw() {
-        let g = kb(60, 130, 420, 260, [[{ t: 'post', k: 'amber' }], [{ t: 'step' }, { t: 'step' }], [{ t: 'API key', k: 'risk', b: '72' }], [{ t: 'step', k: 'ok' }, { t: 'step', k: 'ok' }]]);
-        g += scaleAt(Th.stopwatch(400, 450), 400, 450, 1.5);
-        [['decompose', 110, { carry: 'cut' }], ['verify', 215, { carry: '72', carryKind: 'risk' }], ['runner', 320, { carry: 'ok', carryKind: 'ok' }], ['deploy', 425, {}]].forEach(([r, x, o]) => {
-          g += Th.motion(x - 45, 610, 3, 30, -1) + Th.agent(r, x, FY, 62, Object.assign({ noLabel: true, mood: 'happy' }, o));
+
+        let g = kb(60, 130, 420, 250, [[{ t: 'post', k: 'amber' }], [{ t: 'step' }, { t: 'step' }], [{ t: 'API key', k: 'risk', b: '72' }], [{ t: 'step', k: 'ok' }, { t: 'step', k: 'ok' }]]);
+        g += scaleAt(Th.stopwatch(270, 460), 270, 460, 1.8) + pill(270, 530, '0:00…', '#fffdf5');
+        g += Th.arrow(150, 582, 430, 582, { c: '#2fbf8a', w: 5 });
+        [['decompose', 110, { carry: 'cut' }], ['verify', 215, { carry: '72', carryKind: 'risk' }], ['runner', 320, { carry: 'ok', carryKind: 'ok' }], ['deploy', 425, {}]].forEach(([r, x, o], i) => {
+          const fy = FY - (i % 2) * 16;
+          g += Th.motion(x - 40, 598 - (i % 2) * 16, 3, 55, -1) + Th.agent(r, x, fy, 62, Object.assign({ noLabel: true, mood: 'happy', rot: -12 }, o));
+          g += G(`<ellipse cx="${x - 30}" cy="${FY + 4}" rx="14" ry="5" fill="#c98543" opacity=".7"/>`);
         });
         return g;
       } },
     { id: 'R03', beat: 0, dur: 1,
       en: 'Rewind.', ko: '처음부터 까봄',
       cam: 'Rewind, crash zoom out', k: 'pull',
-      action: 'Dr. Harness clicks a remote. Tracking bands roll, the cards fly backwards out of the columns on reverse arcs, and the Hype Box moonwalks out of frame.',
+      action: 'Dr. Harness clicks a remote. Tracking bands roll, the cards fly backwards out of the columns on reverse arcs, and Uchu gets dragged backwards out of frame on the right.',
       onscreen: 'Big ◀◀ glyph.',
       sfx: 'Record scratch into a tape-rewind whirr.',
       anim: 'Play R02 backwards under the bands, then hold on the glyph for 4 frames.',
@@ -365,70 +370,72 @@
         g += Th.doc(150, FY, .95, { m: 'grin', ra: [46, -80] });
         const hp = Th.hand(150, FY, .95, [46, -80]);
         g += G(`<rect x="${n(hp[0] - 6)}" y="${n(hp[1] - 30)}" width="16" height="36" rx="4" fill="#2c2e47" stroke="${INK}" stroke-width="2.5"/><circle cx="${n(hp[0] + 2)}" cy="${n(hp[1] - 20)}" r="3.5" fill="#e5533f"/>`);
-        g += hype(385, FY, 78, { mood: 'dizzy' }) + Th.motion(440, 600, 3, 40, 1);
+        g += Th.uchu(390, FY, .8, { m: 'squint' }) + Th.motion(440, 600, 3, 40, 1);
         return g;
       } },
     { id: 'R04', beat: 1, dur: 2.5,
       en: '*Free*. 5 min. 1 prompt. Sure.', ko: '*공짜*에 5분 컷이래',
       cam: 'Push in on the phone', k: 'push',
-      action: 'The viral post on a phone: "Build an AI agent. FREE. 5 MIN. 1 PROMPT." The star-eyed Hype Box chatters. Below the phone, Dr. Harness stares at it, completely unimpressed, on the word "Sure."',
-      onscreen: 'Post: FREE · 5 MIN · 1 PROMPT, "trust me bro". Likes 48.2K (illustrative). Stickers: FREE!, 1 PROMPT.',
-      sfx: 'Notification ping, crowd "ooh", Hype Box "boop boop!", a flat sip sound on "Sure."',
-      anim: 'Stickers slap on with a 3-frame squash. The hamster turns its head to camera on "Sure." (deadpan).',
-      blender: 'Camera: 50 mm dolly-in on the phone, ending by flying through the screen into R05. Layers: stickers (front, faster parallax) · phone, Hype Box and hamster (mid) · stage (back, bokeh). Motion: heart particles drifting up, kinetic "FREE" on the screen.',
+      action: 'The viral post on a phone: "Build an AI agent. FREE. 5 MIN. 1 PROMPT." Uchu, the believer, throws both mittens up and cheers "공짜!!". Next to him, Dr. Harness stares at the post, completely unimpressed, on the word "Sure."',
+      onscreen: 'Post: FREE · 5 MIN · 1 PROMPT, "trust me bro". Likes 48.2K (illustrative). Stickers: FREE!, 1 PROMPT. Uchu bubble: 공짜!!',
+      sfx: 'Notification ping, Uchu squeals "공짜!!", a flat sip sound on "Sure."',
+      anim: 'Stickers slap on with a 3-frame squash. Uchu bounces twice with antenna wobble. The hamster turns its head to camera on "Sure." (deadpan).',
+      blender: 'Camera: 50 mm dolly-in on the phone, ending by flying through the screen into R05. Layers: stickers (front, faster parallax) · phone, Uchu and hamster (mid) · stage (back, bokeh). Motion: heart particles drifting up, kinetic "FREE" on the screen.',
       st: { floorY: 640 },
       draw() {
+
         const inner = `<circle cx="28" cy="32" r="16" fill="#f2c14e" stroke="${INK}" stroke-width="2.5"/>` + T(52, 30, '@hype.ai', 17, { a: 'start', font: MONO, w: 500 }) + T(52, 48, 'trust me bro', 12, { a: 'start', font: MONO, w: 400, f: '#8d6f5a' })
           + T(109, 96, 'Build an AI agent', 22) + T(109, 160, 'FREE', 62, { f: '#e5533f', stroke: INK, sw: 4 })
           + T(109, 206, '5 MIN · 1 PROMPT', 23) + `<rect x="14" y="222" width="190" height="62" rx="8" fill="#ffe7bf" stroke="${INK}" stroke-width="2"/>` + Th.star(56, 253, 16, '#ffd23f') + Th.star(109, 253, 16, '#f062a8') + Th.star(162, 253, 16, '#2fbf8a')
           + T(20, 310, '♥ 48.2K   ↻ 9.1K', 16, { a: 'start', font: MONO, w: 500, f: '#c2361f' });
-        let g = Th.phone(96, 200, 230, 340, inner);
-        g += hype(395, FY, 92, { arms: 'up' });
-        g += Th.bubble(392, 452, 124, ['boop boop!'], [394, 520], { z: 22 });
-        g += Th.burst(366, 250, 56, 'FREE!', { fill: '#f062a8', f: '#fff', z: 26, r: 10 });
-        g += Th.sign(398, 336, 118, ['1 PROMPT'], { z: 22, fill: '#ffd23f', r: 7 });
-        g += Th.doc(200, FY, .62, { m: 'flat' });
-        g += T(262, 590, 'sure.', 26, { f: '#6b4a36', r: -6 });
+        let g = Th.phone(96, 176, 230, 340, inner);
+        g += Th.burst(366, 226, 56, 'FREE!', { fill: '#f062a8', f: '#fff', z: 26, r: 10 });
+        g += Th.sign(398, 312, 118, ['1 PROMPT'], { z: 22, fill: '#ffd23f', r: 7 });
+        g += Th.uchu(400, FY, .85, { m: 'grin', la: [-40, -110], ra: [40, -110] });
+        g += Th.bubble(400, 410, 110, ['공짜!!'], [400, 480], { z: 26 });
+        g += Th.doc(200, FY, .75, { m: 'flat' });
+        g += T(282, 578, 'sure.', 26, { f: '#6b4a36', r: -8 });
         return g;
       } },
     { id: 'R05', beat: 1, dur: 3,
       en: 'Paste it in. The *agents* split it.', ko: '붙여넣자 *에이전트* 팀 출동',
-      cam: 'Board wide, slow orbit', k: 'static',
-      action: 'The post slaps into the Decomposed column. The crowned Orchestrator waves its baton, and Decompose, Gap-fill and Verify fling their work cards up into the board: cut and fill into Decomposed, check into Verifying.',
-      onscreen: 'Board: post in Decomposed, cut + check cards landing. Burst: PASTE! Burst: x3! Label: POST /api/ingest.',
+      cam: 'Low angle past the Orchestrator',
+      action: 'Low angle: the crowned Orchestrator looms huge in the left foreground, cropped by the frame, baton up. Behind it, Decompose, Gap-fill and Verify fling their work cards up into the board: cut and fill into Decomposed, check into Verifying. The pasted post already sits in column 1.',
+      onscreen: 'Board: post in Decomposed, cut + check cards landing. Burst: PASTE! (in the empty lower half of column 1). Burst: x3!',
       sfx: 'Paper SLAP, a baton "tink", then three whooshes in a chord.',
       anim: 'Cards fly up along the three dashed arcs in 6 frames and land in their columns with a 2-frame squash.',
-      blender: 'Camera: continues out of the phone screen, then a locked 35 mm wide with a slow 3-degree orbit so the columns parallax. Layers: agents (front) · 3D board (mid, sharp) · backdrop. Motion: three cards on simultaneous physics arcs with ribbon trails.',
-      st: { floorY: 640, spots: [240] },
+      blender: 'Camera: 24 mm low angle from behind the Orchestrator\'s shoulder, slow crane up. No curtains in frame. Layers: Orchestrator (front, cropped, soft) · three agents (mid) · 3D board (back, sharp). Motion: three cards on simultaneous physics arcs with ribbon trails.',
+      st: { floorY: 600, spots: [300] },
+      noCurtains: true,
       draw() {
-        let g = kb(60, 128, 420, 230, [[{ t: 'post', k: 'amber' }, { t: 'cut' }], [{ t: 'check' }], [], []], { hl: 0 });
-        g += Th.burst(172, 180, 38, 'PASTE!', { fill: '#ffd23f', z: 15, r: -10 });
-        g += T(270, 384, 'POST /api/ingest', 17, { font: MONO, w: 500, f: '#6b3f22' });
-        g += Th.arrow(120, 560, 110, 368, { c: '#4f8ef7' }) + Th.arrow(220, 560, 130, 368, { c: '#f7a928' }) + Th.arrow(320, 560, 210, 368, { c: '#e5533f' });
-        g += Th.agent('decompose', 120, FY, 66, { carry: 'cut', mood: 'happy' });
-        g += Th.agent('gapfill', 220, FY, 66, { carry: 'fill', mood: 'happy' });
-        g += Th.agent('verify', 320, FY, 66, { carry: 'check', mood: 'alert' });
-        g += Th.agent('orchestrator', 412, FY, 76, { mood: 'star' });
-        g += Th.burst(420, 470, 34, 'x3!', { fill: '#f062a8', f: '#fff', z: 20 });
+
+        let g = kb(60, 128, 420, 200, [[{ t: 'post', k: 'amber' }, { t: 'cut' }], [{ t: 'check' }], [], []], { hl: 0 });
+        g += Th.burst(118, 290, 32, 'PASTE!', { fill: '#ffd23f', z: 13, r: -10 });
+        g += Th.arrow(250, 520, 130, 338, { c: '#4f8ef7' }) + Th.arrow(340, 520, 150, 338, { c: '#f7a928' }) + Th.arrow(430, 520, 225, 338, { c: '#e5533f' });
+        g += Th.agent('decompose', 250, 590, 56, { carry: 'cut', mood: 'happy', noLabel: true });
+        g += Th.agent('gapfill', 340, 590, 56, { carry: 'fill', mood: 'happy', noLabel: true });
+        g += Th.agent('verify', 430, 590, 56, { carry: 'check', mood: 'alert', noLabel: true });
+        g += Th.agent('orchestrator', 95, 780, 210, { mood: 'star' });
+        g += Th.burst(240, 420, 36, 'x3!', { fill: '#f062a8', f: '#fff', z: 20 });
         return g;
       } },
     { id: 'R06', beat: 2, dur: 2.5,
       en: 'Cut into cards. Fill the gaps.', ko: '카드로 쪼개고 빠진 단계 채움',
-      cam: 'Push down the Decomposed column', k: 'push',
-      action: 'The Decomposed column fills up: three numbered cards from the post, plus two gray, dashed cards that Gap-fill pencils in for the steps the author skipped. Dr. Harness squints at the gap cards.',
-      onscreen: 'Column cards: 1 clone, + node 20, 2 API key, + .env, 3 deploy. Sign: +2 skipped steps.',
-      sfx: 'Scissor snips on the beat, pencil scribble, a "hmm".',
+      cam: 'Close-up on the Decomposed column',
+      action: 'Close-up: the Decomposed column fills the frame. Three numbered cards come from the post, and Gap-fill, huge in the left foreground and cropped by the frame edge, pencils in two gray, dashed cards for the steps the author skipped.',
+      onscreen: 'Column: Decomposed. Cards: 1 clone repo, + node 20, 2 API key, + .env file, 3 deploy. Sign: +2 skipped.',
+      sfx: 'Scissor snips on the beat, pencil scribble.',
       anim: 'Cards drop into the column on 2s. Gray cards slide in sideways and push the others down.',
-      blender: 'Camera: 50 mm push-in along the Decomposed column. Layers: agents and hamster (front) · column (mid, sharp) · other columns (back, soft). Motion: snip particles, gray cards drawn on with Grease Pencil dashes.',
-      st: { floorY: 640 },
+      blender: 'Camera: 85 mm close-up tracking down the Decomposed column. No curtains in frame. Layers: Gap-fill (front, cropped, soft) · column (mid, sharp) · rest of the board (back, blurred). Motion: gray cards drawn on with Grease Pencil dashes, pencil shavings as particles.',
+      st: { floorY: 620 },
+      noCurtains: true,
       draw() {
-        let g = kb(60, 130, 420, 380, [[{ t: '1 clone' }, { t: '+ node 20', k: 'gap', b: 'gap' }, { t: '2 API key' }, { t: '+ .env', k: 'gap', b: 'gap' }, { t: '3 deploy' }], [], [], []], { hl: 0, cardH: 34 });
-        g += Th.sign(318, 250, 220, ['+2 skipped', 'steps'], { z: 30, fill: '#f1efe9', r: -4 });
-        g += Th.arrow(246, 560, 180, 330, { c: '#b07a10' });
-        g += Th.agent('decompose', 120, FY, 70, { mood: 'happy' });
-        g += Th.agent('gapfill', 250, FY, 70, { mood: 'happy' });
-        g += Th.doc(395, FY, .8, { m: 'flat', la: [-50, -90] });
-        g += Th.confetti(10, 7, [90, 520, 300, 560]);
+
+        let g = G(`<rect x="196" y="126" width="290" height="470" rx="14" fill="#4f8ef7" fill-opacity=".22" stroke="#4f8ef7" stroke-width="4"/><rect x="196" y="126" width="290" height="52" rx="14" fill="#4f8ef7"/>` + T(341, 162, 'Decomposed', 30, { f: '#fff' }));
+        [['1  clone repo', 'orig'], ['+  node 20', 'gap', 'gap'], ['2  API key', 'orig'], ['+  .env file', 'gap', 'gap'], ['3  deploy', 'orig']].forEach(([t, k, b], i) => { g += Th.card(212, 196 + i * 76, 258, 56, t, { kind: k, badge: b, z: 24 }); });
+        g += Th.sign(110, 204, 150, ['+2', 'skipped'], { z: 34, fill: '#f1efe9', r: -6 });
+        g += Th.agent('gapfill', 70, 740, 190, { mood: 'happy' });
+        g += Th.arrow(170, 540, 205, 296, { c: '#b07a10', w: 5 }) + Th.arrow(170, 560, 205, 448, { c: '#b07a10', w: 5 });
         return g;
       } },
     { id: 'R07', beat: 3, dur: 3,
@@ -442,9 +449,8 @@
       st: { floorY: 640 },
       hook: () => hook(['ONTOLOGY'], { y: 170, z: 58, f: '#c9a5ff' }),
       draw() {
-        let g = `<g opacity=".5">${kb(60, 200, 420, 330, [[{ t: 'step' }], [{ t: '' }], [{ t: 'key', k: 'risk' }], [{ t: 'ok', k: 'ok' }]])}</g>`;
+        let g = `<g opacity=".25">${kb(60, 200, 420, 330, [[{ t: 'step' }], [{ t: '' }], [{ t: 'key', k: 'risk' }], [{ t: 'ok', k: 'ok' }]])}</g>`;
         g += G(`<rect x="160" y="252" width="80" height="28" rx="5" fill="none" stroke="${INK}" stroke-width="2" stroke-dasharray="5 4"/>`);
-        g += Th.motion(150, 312, 3, 30, -1);
         [[175, 382], [365, 382], [175, 470], [365, 470]].forEach(([x, y]) => { g += `<line x1="${x}" y1="306" x2="${x}" y2="${y + 4}" stroke="${INK}" stroke-width="2.5"/>`; });
         g += Th.card(110, 240, 320, 64, 'Deploy the agent', { kind: 'orig', z: 28 });
         g += pill(372, 238, 'kind: step', '#d9d0ff');
@@ -452,32 +458,35 @@
         g += nameTag(365, 380, 'measured', '?', '#2fbf8a', 3);
         g += nameTag(175, 468, 'risk', '72', '#e5533f', 3);
         g += nameTag(365, 468, 'gate', 'hold', '#a86af2', -3);
-        g += Th.agent('router', 270, FY, 66, { mood: 'happy' });
+        g += Th.agent('router', 270, FY, 80, { mood: 'happy' });
         return g;
       } },
     { id: 'R08a', beat: 3, dur: 2,
       en: '*Harness* = seatbelts for agents.', ko: '*하네스* = AI 안전벨트',
       cam: 'Wide, locked off', k: 'static',
-      action: 'Three agents stand in front of the board wearing belts. Dr. Harness, perched on the board edge, yanks one strap that clicks all three buckles shut.',
-      onscreen: 'Hook: HARNESS. Burst: CLICK! One strap joining three belt buckles.',
+      action: 'Three agents stand in front of the board, each with a diagonal seatbelt and a gold buckle. Dr. Harness sits on the board\'s top edge and yanks the strap; the middle buckle clicks shut.',
+      onscreen: 'Hook: HARNESS. Pill: HARNESS ①. Burst: CLICK! on the middle buckle. Three seatbelts with gold buckles.',
       sfx: 'Three seatbelt clicks on the beat.',
-      anim: 'The strap snaps taut in 3 frames; each agent jolts 6 px on its click.',
-      blender: 'Camera: locked 35 mm wide with a tiny push on each click. Layers: agents and strap (front) · hamster on the board edge (mid) · 3D board (back). Motion: the strap as a soft-body rope, buckle glints as particles.',
+      anim: 'Each belt snaps taut in 3 frames and its agent jolts 6 px on the click, left to right.',
+      blender: 'Camera: locked 35 mm wide with a tiny push on each click. Layers: belted agents (front) · hamster on the board\'s top edge (mid) · 3D board (back). Motion: belts as cloth straps that snap taut, buckle glints as particles.',
       st: { floorY: 640 },
       hook: () => hook(['HARNESS'], { y: 164, z: 56, f: '#7fdcb5' }),
       draw() {
+
         let g = kb(60, 210, 420, 200, [[{ t: 'post', k: 'amber' }], [{ t: 'step' }], [{ t: 'key', k: 'risk' }], [{ t: 'ok', k: 'ok' }]]);
-        g += Th.doc(270, 470, .55, { m: 'grin', ra: [40, -60] });
-        g += Th.agent('decompose', 140, FY, 70, { harness: true, mood: 'happy' });
-        g += Th.agent('verify', 270, FY, 70, { harness: true, mood: 'alert' });
-        g += Th.agent('runner', 400, FY, 70, { harness: true, mood: 'happy' });
-        g += G(`<path d="M105,648 Q270,676 435,648" fill="none" stroke="#6b3f22" stroke-width="7" stroke-linecap="round"/><path d="M292,437 Q296,540 290,650" fill="none" stroke="#6b3f22" stroke-width="5" stroke-linecap="round"/>`);
-        g += Th.burst(130, 480, 42, 'CLICK!', { fill: '#ffd23f', z: 18, r: -8 });
+        g += Th.doc(440, 212, .5, { m: 'grin', la: [-40, -70] });
+        g += Th.arrow(420, 225, 290, 600, { c: '#6b3f22' });
+        [['decompose', 140, 'happy'], ['verify', 270, 'alert'], ['runner', 400, 'happy']].forEach(([r, x, m]) => {
+          g += Th.agent(r, x, FY, 70, { mood: m });
+          g += G(`<path d="M${x - 30},613 L${x + 30},655" stroke="#6b3f22" stroke-width="9" stroke-linecap="round"/><rect x="${x - 8}" y="628" width="16" height="12" rx="3" fill="#ffd23f" stroke="${INK}" stroke-width="2.5"/>`);
+        });
+        g += Th.burst(270, 572, 34, 'CLICK!', { fill: '#ffd23f', z: 16, r: -8 });
+        g += pill(400, 432, 'HARNESS ①', '#d9f4ee');
         return g;
       } },
     { id: 'R08b', beat: 3, dur: 2,
       en: 'Rules steer. *Tests* catch. DING!', ko: '규칙이 끌고 *테스트*가 잡음',
-      cam: 'Split: rules left, tests right', k: 'pan',
+      cam: 'Split screen: rules left, tests right',
       action: 'Left: Dr. Harness points at a RULES scroll that feeds an arrow up into the board. Right: a red "bug" card runs into the TESTS fence and bounces off with a DING.',
       onscreen: 'Pill: HARNESS ②. Scroll: RULES, 1 card at a time. Sign: TESTS. DING!',
       sfx: 'A bright bell DING and a cartoon boing.',
@@ -485,37 +494,40 @@
       blender: 'Camera: slow pan left to right at 35 mm. Layers: fence and scroll (front) · hamster (mid) · 3D board (back). Motion: the bug card on a rigid-body bounce, DING as Grease Pencil marks.',
       st: { floorY: 640 },
       draw() {
-        let g = kb(90, 150, 360, 230, [[{ t: 'post', k: 'amber' }], [{ t: 'step' }, { t: 'step' }], [], [{ t: 'ok', k: 'ok' }]], { hl: 1 });
+
+        let g = G(`<rect x="0" y="120" width="270" height="520" fill="#fff0c8" opacity=".75"/><rect x="270" y="120" width="270" height="520" fill="#d9f4ee" opacity=".75"/><line x1="270" y1="120" x2="270" y2="640" stroke="${INK}" stroke-width="5"/>`);
+        g += kb(90, 150, 360, 200, [[{ t: 'post', k: 'amber' }], [{ t: 'step' }, { t: 'step' }], [], [{ t: 'ok', k: 'ok' }]], { hl: 1 });
         g += pill(390, 128, 'HARNESS ②', '#d9f4ee');
-        g += scrollProp(90, 420, 130, 84, [['RULES', 24], ['1 card', 18], ['at a time', 18]]);
-        g += Th.arrow(155, 415, 170, 382, { c: '#b07a10' });
-        g += Th.doc(150, FY, .75, { m: 'grin', ra: [36, -110] });
-        g += Th.sign(375, 440, 110, ['TESTS'], { z: 22, fill: '#d9f4ee' });
+        g += scrollProp(90, 412, 140, 96, [['RULES', 24], ['1 card', 18], ['at a time', 18]]);
+        g += Th.arrow(160, 408, 175, 358, { c: '#b07a10', w: 6 });
+        g += Th.doc(170, FY, .75, { m: 'grin', ra: [36, -110] });
+        g += Th.sign(375, 400, 110, ['TESTS'], { z: 22, fill: '#fffdf5' });
         g += Th.fence(305, 450, FY);
         g += G(`<g transform="rotate(-18 370 560)">${Th.card(320, 540, 100, 34, 'bug', { kind: 'risk', small: true })}</g>`) + Th.motion(430, 540, 3, 30, 1);
-        g += T(390, 612, 'DING!', 34, { f: '#e5533f', stroke: '#fff', sw: 5, r: -8 });
+        g += T(400, 520, 'DING!', 34, { f: '#e5533f', stroke: '#fff', sw: 5, r: -8 });
         return g;
       } },
     { id: 'R09', beat: 4, dur: 3,
       en: 'Over *70*? It waits for a human.', ko: '*70점* 넘으면 사람 도장 필수',
       cam: 'Board flip to the Gate column', k: 'static',
-      action: 'The RISK meter on the left is redlined past 70. The red "API key" card is pinned against the closed barrier, and its box is stuck behind it. Dr. Harness raises the rubber stamp and waits, deadpan.',
-      onscreen: 'Hook: GATE. Pill: HARNESS ③. Meter: 72 (placeholder), dashed 70. Card badge: RISK 72. Stamp: HUMAN ONLY. Rubber stamp: OK?',
+      action: 'The RISK meter on the left is redlined past 70. The red "API key" card is pinned against the closed barrier, and its box is stuck behind it. Dr. Harness holds the rubber stamp overhead and waits, deadpan, face in full view.',
+      onscreen: 'Hook: GATE. Pill: HARNESS ③. Meter: 72 (placeholder), dashed 70. Board card badge: 72. Stamp: HUMAN ONLY. Rubber stamp: OK?',
       sfx: 'Meter alarm "bweep", clunk on the barrier, a held drumroll.',
       anim: 'The card slams into the barrier on frame 4 and sticks. The stamp hovers with a 2-frame wobble.',
       blender: 'Camera: the 3D board flips from Verifying to the Gate column (card-flip transition), then a locked 35 mm wide. Layers: barrier and card (front) · meter, box and hamster (mid) · board (back). Motion: meter liquid wobble, HUMAN ONLY as a Grease Pencil stamp.',
       st: { floorY: 640 },
       hook: () => hook(['GATE'], { y: 164, z: 58, f: '#ff6b57' }),
       draw() {
+
         let g = kb(60, 200, 420, 140, [[], [{ t: 'step' }], [{ t: 'API key', k: 'risk', b: '72' }], [{ t: 'step', k: 'ok' }]], { hl: 2, cardH: 26 });
         g += pill(400, 360, 'HARNESS ③', '#d9f4ee');
         g += Th.meter(120, 420, 72, { H: 120 });
-        g += stampMark(316, 424, 'HUMAN ONLY', -10);
+        g += stampMark(250, 420, 'HUMAN ONLY', -10);
         g += Th.box(330, FY, 80, Object.assign({}, Th.PAL.red, { mood: 'worried', arms: 'down' }));
         g += Th.gate(200, FY, false, 230);
-        g += G(`<g transform="rotate(-6 320 510)">${Th.card(232, 488, 170, 46, 'API key', { kind: 'risk', badge: 'RISK 72', z: 20, small: true })}</g>`);
-        g += Th.doc(420, FY, .9, { m: 'flat', la: [-30, -130] });
-        const hp = Th.hand(420, FY, .9, [-30, -130]);
+        g += G(`<g transform="rotate(-6 290 510)">${Th.card(212, 488, 150, 46, 'API key', { kind: 'risk', z: 20, small: true })}</g>`);
+        g += Th.doc(420, FY, .9, { m: 'flat', la: [-20, -190] });
+        const hp = Th.hand(420, FY, .9, [-20, -190]);
         g += rubber(hp[0], hp[1], 'OK?');
         return g;
       } },
@@ -536,14 +548,14 @@
         g += scaleAt(Th.coin(140, 420), 140, 420, 1.8) + pill(140, 490, '$0.1…', '#fffdf5');
         g += scaleAt(Th.stopwatch(400, 420), 400, 420, 1.8) + pill(400, 490, '0:07…', '#fffdf5');
         g += Th.sandbox(270, FY, 400);
-        g += Th.agent('runner', 230, 652, 72, { carry: 'step 3', carryKind: 'ok', mood: 'happy' }) + Th.motion(180, 590, 3, 48, -1);
         g += G(`<rect x="95" y="585" width="350" height="10" rx="5" fill="#dff3ff" fill-opacity=".7" stroke="${INK}" stroke-width="2.5"/>`);
+        g += Th.agent('runner', 230, 652, 64, { carry: 'step 3', carryKind: 'ok', mood: 'happy' }) + Th.motion(180, 590, 3, 48, -1);
         return g;
       } },
     { id: 'R11', beat: 5, dur: 3,
       en: 'Claimed: *free*. Measured: *$0.40*.', ko: '*공짜*라며? 실측 *$0.40*',
       cam: 'Push to the chalkboard', k: 'push',
-      action: 'The reveal. Dr. Harness blinks once, deadpan, then pushes the sunglasses up and points at the chalkboard: free → $0.40, 5 min → 12 min, 1 prompt → 8 cards. Uchu is shocked again, sweating.',
+      action: 'The reveal. Dr. Harness blinks once, deadpan, then pushes the sunglasses up and points at the chalkboard: free → $0.40, 5 min → 12 min, 1 prompt → 8 cards. Uchu squints at the board, doubtful and sweating ("wait… really?"), then snaps into shock on the last beat.',
       onscreen: 'Hook: WE MEASURED. Board: CLAIMED / MEASURED. free → $0.40, 5 min → 12 min, 1 prompt → 8 cards (all placeholders).',
       sfx: 'Kazoo sting on the glasses push-up, chalk squeaks on each number.',
       anim: '4-frame deadpan blink with the glasses on, then the glasses slide up in 4 frames (eyes:true). Strike-throughs draw on over the claims, then the numbers write on.',
@@ -558,12 +570,12 @@
           const y = 306 + i * 50;
           g += T(180, y, a, 30, { f: '#fdfdf5' }) + `<line x1="${n(180 - Th.textW(a, 30) / 2 - 6)}" y1="${y - 10}" x2="${n(180 + Th.textW(a, 30) / 2 + 6)}" y2="${y - 8}" stroke="#ff7a66" stroke-width="4" stroke-linecap="round"/>` + T(362, y, b, 30, { f: '#7fffc4' });
         });
-        g += Th.uchu(150, FY, .8, { m: 'shock', bang: true, sweat: true });
+        g += Th.uchu(150, FY, .8, { m: 'squint', sweat: true });
         g += Th.doc(398, FY, .98, { m: 'flat', eyes: true, la: [-52, -104] });
         return g;
       } },
     { id: 'R12', beat: 6, dur: 3,
-      en: 'Ship *SKILL.md*. Next *free* post?', ko: '다음 *공짜* 글, 재볼까?',
+      en: 'Ship SKILL.md. Next *free* post?', ko: '다음 *공짜* 글, 재볼까?',
       cam: 'Board flip, then the host at the lens', k: 'push',
       action: 'The board has flipped to Verified, with SKILL.md in the last column next to the gift-wrapped package. Dr. Harness drops the mic and presses a paw on the screen glass. Uchu has already spotted the next FREE!! post and starts grinning. Cut straight back to R01, where Uchu gasps.',
       onscreen: 'Hook: NEXT POST? Board: Verified column with SKILL.md. Package: SKILL.md. Uchu holds a FREE!! card. One paw print on the glass.',
@@ -571,7 +583,7 @@
       anim: 'The mic falls in 6 frames and bounces once. The paw print appears on the tap. Hold the last 4 frames so the loop into R01 reads as one move.',
       blender: 'Camera: continues the 3D board flip from R11, then a 24 mm dolly toward the hamster until its paw hits a glass plane at the near clip (fourth-wall gag). Layers: paw print on glass (front) · hamster, Uchu and package (mid) · board (back). Motion: confetti burst, smudge decal, whip-pan into R01.',
       st: { floorY: 640 },
-      hook: () => hook(['NEXT POST?'], { y: 170, z: 58 }) + paw(118, 330, 1.8, -12),
+      hook: () => hook(['NEXT POST?'], { y: 170, z: 58 }) + `<ellipse cx="150" cy="485" rx="46" ry="30" fill="#fff" opacity=".35"/>` + paw(150, 470, 2.2, -12),
       draw() {
         let g = kb(60, 230, 420, 190, [[], [], [{ t: 'API key', k: 'risk', b: 'hold' }], [{ t: 'step 1', k: 'ok' }, { t: 'step 2', k: 'ok' }, { t: 'SKILL.md', k: 'ok' }]], { hl: 3 });
         g += Th.confetti(12, 33, [90, 190, 450, 300]);
@@ -598,9 +610,9 @@
 
   /* ---------- render ---------- */
   const withSZ = (svg) => svg.replace(/<\/svg>$/, SZ + '</svg>');
-  const frames = SHOTS.map((s) => withSZ(Th.scene({ w: W, h: H, st: s.st, draw: s.draw, en: s.en, ko: s.ko, ...SUB, hook: s.hook ? s.hook() : '', label: s.id + '. ' + plain(s.en) + ' ' + s.action })));
+  const frames = SHOTS.map((s) => withSZ(Th.scene({ w: W, h: H, st: s.st, noCurtains: s.noCurtains, draw: s.draw, en: s.en, ko: s.ko, ...SUB, hook: s.hook ? s.hook() : '', label: s.id + '. ' + plain(s.en) + ' ' + s.action })));
   // Clean frames (no safe-zone overlay) for tools/render-reel.cjs, which turns the Reel into an MP4.
-  window.REEL = { shots: SHOTS.map((s) => ({ id: s.id, dur: s.dur, k: s.k, beat: s.beat, en: plain(s.en), ko: s.ko })), frames: SHOTS.map((s) => Th.scene({ w: W, h: H, st: s.st, draw: s.draw, en: s.en, ko: s.ko, ...SUB, hook: s.hook ? s.hook() : '', label: s.id })) };
+  window.REEL = { shots: SHOTS.map((s) => ({ id: s.id, dur: s.dur, k: s.k, beat: s.beat, en: plain(s.en), ko: s.ko })), frames: SHOTS.map((s) => Th.scene({ w: W, h: H, st: s.st, noCurtains: s.noCurtains, draw: s.draw, en: s.en, ko: s.ko, ...SUB, hook: s.hook ? s.hook() : '', label: s.id })) };
   let t = 0; SHOTS.forEach((s) => { s.t0 = t; t += s.dur; });
   const total = t;
   if (Math.abs(total - 30) > 1e-6) console.warn('Reel runtime is ' + total + ' s, expected 30 s.');

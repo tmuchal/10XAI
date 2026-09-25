@@ -2,7 +2,7 @@
 /* Render the 30-second Harness Theater Reel to an MP4 animatic (1080×1920, animated on twos: 12 fps drawn, 24 fps file).
  *
  * Usage (from the repo root):
- *   NODE_PATH=$(npm root -g) node docs/video/tools/render-reel.cjs [--fps 12] [--out-fps 24] [--out docs/video/renders/reel-30s.mp4]
+ *   NODE_PATH=$(npm root -g) node docs/video/tools/render-reel.cjs [--fps 12] [--out-fps 24] [--src reels.html] [--out docs/video/renders/reel-30s.mp4]
  *
  * Needs Playwright (Chromium) and an ffmpeg binary: FFMPEG env var, `ffmpeg` on PATH,
  * or `pip install imageio-ffmpeg`. Loads docs/video/reels.html, reads window.REEL
@@ -22,6 +22,7 @@ const arg = (k, d) => { const i = process.argv.indexOf(k); return i > 0 ? proces
 const FPS = +arg('--fps', 12);          // drawn on twos: film at 12 fps, encode at 24
 const OUT_FPS = +arg('--out-fps', 24);
 const OUT = path.resolve(arg('--out', path.join(SRC, 'renders', 'reel-30s.mp4')));
+const PAGE = path.resolve(arg('--src', path.join(SRC, 'reels.html')));
 const FONTS = 'https://fonts.googleapis.com/css2?family=Gaegu:wght@400;700&family=Gowun+Dodum&family=IBM+Plex+Mono:wght@400;500&display=swap';
 const skeleton = (body) => `<!doctype html><html lang="en"><head><meta charset="utf-8"><title>reel</title></head><body>${body}</body></html>`;
 
@@ -44,7 +45,7 @@ const ease = (t) => t < .5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2;
   const frameDir = path.join(tmp, 'frames');
   fs.mkdirSync(frameDir);
   for (const f of ['theater.js', 'player.js', 'series.css']) fs.copyFileSync(path.join(SRC, f), path.join(tmp, f));
-  fs.writeFileSync(path.join(tmp, 'index.html'), skeleton(fs.readFileSync(path.join(SRC, 'reels.html'), 'utf8')));
+  fs.writeFileSync(path.join(tmp, 'index.html'), skeleton(fs.readFileSync(PAGE, 'utf8')));
   const proxy = process.env.HTTPS_PROXY || process.env.https_proxy;
   const browser = await chromium.launch(proxy ? { proxy: { server: proxy, bypass: 'localhost,127.0.0.1' } } : {});
   try {
