@@ -271,16 +271,19 @@ const INSERTS = [
   // (edges feathered by a mask); drop: px of the drop-in; boil: jiggle amount
   { name: "photobooth", box: [960, 140, 760, 760], fadeIn: .12, fadeOut: .3, drop: 46, boil: 1.1 },
   { name: "coinfunnel", box: [820, 236, 700, 700], fadeIn: .12, fadeOut: .3, drop: 40, boil: 1.1 },
-  // 5-Noa lineup is 1920 wide; keep the centre three (hero in shades) at 2D-Noa size between the 2D groups
-  { name: "curtaincall", box: [435, 415, 1056, 594], crop: [430, 1490], fadeIn: .15, fadeOut: .3, drop: 30, boil: .8 },
+  // the 5-Noa lineup spans the whole 1920 source; shown full-width it collides with the 2D cast at the sides, so keep
+  // the centre three (hero in shades) big (~1.3x the 2D Noas) in the gap between the 2D groups, feet on the floor line
+  { name: "curtaincall", box: [329, 329, 1267, 713], crop: [430, 1490], fadeTop: .3, fadeIn: .15, fadeOut: .3, drop: 30, boil: .8 },
 ].map(o => {
   const e = SHOTS3D.find(s => s.name === o.name), [X, Y, W, H] = o.box, k = W / ((e.src_w || e.w)), c = o.crop || [0, e.src_w || e.w];
   const b = toScene(X + c[0] * k, Y, (c[1] - c[0]) * k, H), f = toScene(X, Y, W, H);
   const wrap = el("div", `position:absolute;left:${b.x.toFixed(1)}px;top:${b.y.toFixed(1)}px;width:${b.w.toFixed(1)}px;height:${b.h.toFixed(1)}px;z-index:20;display:none;pointer-events:none;transform-origin:50% 100%`, null, $("scenes"));
   if (o.crop) {
     wrap.style.overflow = "hidden";
-    const m = "linear-gradient(90deg, transparent, #000 6%, #000 94%, transparent)";
+    const m = "linear-gradient(90deg, transparent, #000 6%, #000 94%, transparent)" +
+      (o.fadeTop ? `, linear-gradient(180deg, transparent ${(o.fadeTop * 60).toFixed(0)}%, #000 ${(o.fadeTop * 100).toFixed(0)}%)` : "");
     wrap.style.webkitMaskImage = wrap.style.maskImage = m;
+    if (o.fadeTop) { wrap.style.maskComposite = "intersect"; wrap.style.webkitMaskComposite = "source-in"; }
   }
   const p = SEQ.attach(wrap, e, { x: f.x - b.x, y: 0, w: f.w, h: f.h, fadeIn: o.fadeIn, fadeOut: o.fadeOut, z: 1 });
   p.el.style.filter = INK3D;
@@ -289,7 +292,7 @@ const INSERTS = [
 // opener fly-through: full frame ABOVE the whole stage (curtains z40-43, cite z45), under the captions (z50)
 const FLY = (() => {
   const wrap = el("div", "position:absolute;inset:0;z-index:46;display:none;pointer-events:none;transform-origin:960px 470px", null, $("stage"));
-  const p = SEQ.attach(wrap, SHOTS3D[0], { x: 0, y: 0, w: 1920, h: 1080, fadeOut: .4, z: 1 });
+  const p = SEQ.attach(wrap, SHOTS3D[0], { x: 0, y: 0, w: 1920, h: 1080, z: 1 });
   return { wrap, p, end: SHOTS3D[0].start + p.duration };
 })();
 const ALL3D = [FLY, ...INSERTS];
@@ -305,7 +308,11 @@ function fx3d(t) {
   FLY.p.update(t);
   const fv = FLY.p.frameAt(t) >= 0;
   FLY.wrap.style.display = fv ? "block" : "none";
-  if (fv) FLY.wrap.style.transform = `scale(${(1 + .16 * ease(seg(t, FLY.end - .45, FLY.end))).toFixed(4)})`;
+  if (fv) {   // eased (not linear) dissolve keeps the double-exposure short; the push-in carries the 3D past camera
+    const h = seg(t, FLY.end - .4, FLY.end);
+    FLY.wrap.style.opacity = (1 - ease(h)).toFixed(3);
+    FLY.wrap.style.transform = `scale(${(1 + .22 * h * h).toFixed(4)})`;
+  }
   INSERTS.forEach((o, i) => {
     o.p.update(t);
     const v = o.p.frameAt(t) >= 0;
