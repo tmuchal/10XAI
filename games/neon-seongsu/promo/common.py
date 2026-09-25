@@ -70,6 +70,7 @@ FONT_URLS = {
     'BlackHanSans-Regular.ttf': 'blackhansans/BlackHanSans-Regular.ttf',
     'IBMPlexSansKR-SemiBold.ttf': 'ibmplexsanskr/IBMPlexSansKR-SemiBold.ttf',
     'IBMPlexSansKR-Regular.ttf': 'ibmplexsanskr/IBMPlexSansKR-Regular.ttf',
+    'IBMPlexSans-Var.ttf': 'ibmplexsans/IBMPlexSans%5Bwdth%2Cwght%5D.ttf',
     'IBMPlexMono-Medium.ttf': 'ibmplexmono/IBMPlexMono-Medium.ttf',
     'IBMPlexMono-SemiBold.ttf': 'ibmplexmono/IBMPlexMono-SemiBold.ttf',
 }

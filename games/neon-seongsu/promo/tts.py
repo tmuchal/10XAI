@@ -104,11 +104,14 @@ def build_timeline(durs):
     add('mograph', 'card_cha', mid + q, s(8) - 0.3)
     add('gameplay', 'switch', s(8) - 0.3, s(9) - 0.25, line=8)
     cuts = [s(9) - 0.25, P(9, 1)[0] - 0.25, P(9, 2)[0] - 0.25, s(10) - 0.25]
-    for k, (scn, co) in enumerate(zip(['drive', 'chase', 'drones'], ['car', 'stars', 'emp'])):
-        add('gameplay', scn, cuts[k], cuts[k + 1], line=9, callout=co)
+    add('gameplay', 'drive', cuts[0], cuts[1], line=9, callout='car')
+    rob_at = cuts[1] + (cuts[2] - cuts[1]) * 0.62
+    add('gameplay', 'chase', cuts[1], rob_at, line=9, callout='stars')
+    add('gameplay', 'rob', rob_at, cuts[2], line=9)
+    add('gameplay', 'drones', cuts[2], cuts[3], line=9, callout='emp')
     m10 = (s(10) + e(10)) / 2 + 0.3
-    add('gameplay', 'race', s(10) - 0.25, m10, line=10)
-    add('gameplay', 'forest', m10, s(11) - 0.25, line=10)
+    add('gameplay', 'forest', s(10) - 0.25, m10, line=10)
+    add('gameplay', 'race', m10, s(11) - 0.25, line=10)
     add('gameplay', 'phone', s(11) - 0.25, s(12) - 0.25, line=11)
     add('gameplay', 'heist', s(12) - 0.25, e(12) + 0.6, line=12)
     add('blender', 'D_logo', e(12) + 0.6, total)
