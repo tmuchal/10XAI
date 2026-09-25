@@ -269,11 +269,11 @@ const INK3D = "drop-shadow(0 0 .9px rgba(43,35,32,.95)) drop-shadow(6px 8px 0 rg
 const INSERTS = [
   // box: screen-space box of the WHOLE source frame [x, y, w, h]; crop: optional source-px column range to keep
   // (edges feathered by a mask); drop: px of the drop-in; boil: jiggle amount
-  { name: "photobooth", box: [960, 140, 760, 760], fadeIn: .12, fadeOut: .3, drop: 46, boil: 1.1 },
+  { name: "photobooth", box: [960, 140, 760, 760], fadeIn: .22, fadeOut: .3, drop: 46, boil: 1.1 },
   { name: "coinfunnel", box: [820, 236, 700, 700], fadeIn: .12, fadeOut: .3, drop: 40, boil: 1.1 },
   // the 5-Noa lineup spans the whole 1920 source; shown full-width it collides with the 2D cast at the sides, so keep
   // the centre three (hero in shades) big (~1.3x the 2D Noas) in the gap between the 2D groups, feet on the floor line
-  { name: "curtaincall", box: [329, 329, 1267, 713], crop: [430, 1490], fadeTop: .3, fadeIn: .15, fadeOut: .3, drop: 30, boil: .8 },
+  { name: "curtaincall", box: [329, 329, 1267, 713], crop: [430, 1490], fadeTop: .3, fadeIn: .3, fadeOut: .3, drop: 30, boil: .8 },
 ].map(o => {
   const e = SHOTS3D.find(s => s.name === o.name), [X, Y, W, H] = o.box, k = W / ((e.src_w || e.w)), c = o.crop || [0, e.src_w || e.w];
   const b = toScene(X + c[0] * k, Y, (c[1] - c[0]) * k, H), f = toScene(X, Y, W, H);
