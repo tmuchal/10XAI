@@ -293,3 +293,75 @@ That gives 89.25 / 11.5 = **about 7.8 on its own**. Fixes 1–6 alone do not rea
 - **Immersion +0.5:** break the left–center–right blocking in at least one chapter. In `S.board`, put Noa *behind* the board at x=640, popping up over its top edge (return `noa: { x: 640, behind: true, … }`; in `frame()`, when `res.noa.behind` is set, draw `noa(o.x, 190, …)` *before* the camera group, so the board, which is inside the camera group, covers Noa's lower body) on "One source of truth". Immersion 7.5 → 8.
 
 With both, the total is 91.75 / 11.5 = **about 8.0**. Apply Fixes 1–6 and these two changes as one batch.
+
+---
+
+# Round 4: film v5 (155.8 s, commit 283ec64)
+
+Reviewed the same way as before:
+- Frames every 2 s: 7 contact sheets.
+- Transitions: 18 frames around every scene boundary at −0.2 / 0 / +0.3 s (15.8–16.3, 46.1–46.6, 67.5–68.0, 87.2–87.7, 112.3–112.8, 143.4–144.0).
+- Full-size stills at 0.5, 80.6, 81.6, 84.3, 85.5, 131, 153 s: the open, the reject beat, Noa's pop-up, the fix-once demo and the finale orbit.
+- The source checked at the lines cited below.
+
+**Verdict:** The pre-drop flats make the chapter changes seamless, and there is no more empty-stage flash. The lighting cues now read at thumbnail size: the board at dusk, the crew under a spotlight, the automation scene warm. Noa popping up behind the board is the first time the film breaks its left–center–right blocking, and it is charming. The FREE!! thread now pays off end to end: cold open → CAUGHT → REJECT / NOPE → "~~IT SAID FREE~~ ✓ evidence" in the reel. The medallion orbit gives the finale a closing image.
+
+It is close, but **not yet 8**, because the fixes introduced a new layer of small but visible defects:
+
+1. **The slam-in hook is hidden by the opening drapes.** `dr = 1 - k(lt, .05, .8)` means the drapes still cover the left third at 0.5 s, and the first post (FREE!!, at 0.3 s) slams in behind the curtain (full frame at 0.5 s).
+2. **Noa's pop-up is washed out.** The board glow `<ellipse … fill="#bcd3ff" opacity=".35">` (film.js:194) is inside the camera group, which is drawn *over* the behind-board Noa (film.js:418). Noa appears pale blue-grey at 85.5 s.
+3. **The live cursors duplicate cards.** The dragged copies (`'script · reel'`, `'post · "$0.40"'`, film.js:~234) are drawn while the seeded originals stay in place. At 84.3 and 85.5 s the board shows two "$0.40" cards side by side and two overlapping "script · reel" cards. That contradicts "one source of truth".
+4. **The FREE!! fall piles up on APPROVE and Uchu.** At 81.6 s the card, the NO EVIDENCE badge and the REJECT stamp land on the APPROVE pill and Uchu's elbow in one illegible stack. The "근거 없음 → 발행 불가" chip sits at the bottom of the *Verifying* column, so it reads as belonging to the wrong column.
+5. **The previous scene's chrome sits on top of the pre-drop flat.** `K.source(...)` and `chapterTag` are drawn after the pre-drop (film.js:420–424), so "출처 · OpenAI…", the Palantir pill and the Anthropic pill float over the incoming flat for 0.35 s (46.1, 67.5, 112.3 s).
+6. **Card-news labels run into the subtitle bar.** Moving the card news to (1010, 452) at ×1.2 puts its "5 min" badge and "Card news" label at y≈585–635, overlapping the top edge of the subtitle bar (131 s). Uchu at 1120 now touches the card's right edge.
+7. **The claim fix swaps too early.** The card text switches to "12 min" at `fix > .5` while the strike line is still drawing, so for ~0.2 s the new value is struck out (131 s).
+
+## Scorecard, v4 → v5
+
+| Axis | v4 | v5 | Reason (v5) |
+|---|---|---|---|
+| Hook | 6.5 | **7** | Three posts slam in before any words, which is right. But the first slam happens behind the opening drapes. |
+| Content depth & accuracy | 8 | **8.5** | Gate contract, reject reason ("근거 없음 → 발행 불가") and evidence tag are all explicit and correct. |
+| Through-line to automation + consistency | 8 | **8.5** | The FREE!! thread closes in the Ch.5 outputs, and the fix-once demo is legible. |
+| Immersion & cinematic feel ×1.5 | 6.5 | **7.5** | Seamless flats, visible lighting cues, one real staging break. Harness, ontology and auto still use the same left–center–right blocking and a static camera. |
+| Fantastical & fun ×1.5 | 7 | **7.5** | NOPE burst, pop-up Noa, medallion orbit. The harness chapter (the seatbelt) is still the least playful. |
+| Professional polish ×1.5 | 7 | **7.5** | Several v4 defects are fixed, but seven new ones (listed above) appear, and 3, 4 and 6 are visible at normal viewing speed. |
+| Character (Noa size, Uchu) | 7.5 | **8** | Noa's size stays consistent, the pop-up and the orbit centerpiece work, and Uchu is the human in the loop throughout. |
+| Style match to reference | 7.5 | **7.5** | Unchanged and faithful. |
+| Subtitles (EN+KR) | 7.5 | **7.5** | Clean. No regressions. |
+| Pacing | 7 | **7.5** | The reject beat now has its own time plus the .8 hold. The transitions no longer stall. |
+
+**Overall weighted score: 7.7 / 10** (v2 5.1 → v3 6.6 → v4 7.2 → v5 7.7)
+(7+8.5+8.5+8+7.5+7.5+7.5 = 54.5; (7.5+7.5+7.5)×1.5 = 33.75; 88.25 / 11.5 = 7.67)
+
+## TOP FIXES (v5 → 8)
+
+Fixes 1–5 are polish and each is a few lines; together they take Polish to 8.5 and Hook to 7.5. That reaches about 7.85, so Fix 6 (two staging beats) is needed to clear 8.
+
+1. **Stop covering the chrome and dimming Noa** (defects 2 and 5):
+   - Board glow: remove the ellipse from `res.s` (film.js:194) and return it as `res.under = '<ellipse …>'`. In `frame()`, draw `if (res.under) s += res.under;` *before* the behind-board Noa (line 418). Because it is now outside the camera, apply the same camera transform: wrap it in `<g transform="translate(640,360) scale(z) translate(-cx,-cy)">`.
+   - Pre-drop order: in `frame()`, compute `const pre = nx && nx.chapter && lt > sc.dur - .35;`. Gate the chapter tag with `&& !pre`. Change the source line to `if (sc.source) s += K.source(sc.source, k(lt, lead, .5) * (1 - k(lt, sc.dur - .35, .12)));`.
+
+2. **Remove the duplicate cards on the live board** (defect 3). In the `seed.forEach` in `S.board`, skip the two originals once the cursors start:
+   ```js
+   seed.forEach(([col, row, t, stripe, t0]) => { if (lt > c[3] && ((col === 1 && row === 1) || (col === 0 && row === 2))) return; s += popAt(...); });
+   ```
+   Also make the cursor loop land and stay: replace `% 1` with `Math.min(1, …)` on the first pass, so each card moves once and parks instead of teleporting back to its start column every ~2.9 s.
+
+3. **Make the reject readable** (defect 4). In the FREE!! block:
+   - Drift the fall left and away from APPROVE and Uchu: `x = lerp(cx(0), cx(2), mv) - 150 * drop` and `y = … + 300 * drop`, with rotation `-35 * drop`. The card now falls through the empty space under the Gate/Verifying columns (x≈560–700).
+   - Fade from `drop > .45`: `opacity = 1 - k(drop, .45, .55)`. Apply the same offset to the `stampMark`.
+   - Move the "근거 없음 → 발행 불가" chip above the Gate column header: `(cx(2) + cw/2, 150)`. That area is free since "One source of truth" moved below the board.
+
+4. **Show the slam** (defect 1). In `frame()`, change `if (i === 0) dr = 1 - k(lt, .05, .8);` → `dr = 1 - k(lt, 0, .35);`. In `S.cold`, change the post slam times from `.3/.6/.9` → `.45/.75/1.05`, and shift the three cold `["stamp", …]` sfx by +0.15 s to match. Keep `timing.lead` at 1.5 for cold.
+
+5. **Automation-scene clearances** (defects 6 and 7):
+   - Card news `y2`/`y`: `452` → `420`. Uchu `1120` → `1135`.
+   - Claim fix: draw the strike across "5 min" over `fix ∈ [0, .6]`, and swap the text only at `fix >= 1`. Use `fix = k(lt, c[4] + 1.2, .6)` and `const txt = fix >= 1 ? '12 min' : '5 min'`, with the strike shown while `fix < 1`. Pop the new card with `pop(k(lt, c[4] + 1.8, .3))`.
+   - Finale orbit: raise the orbit center from `STAND - 170` → `STAND - 200`, so the Harness medallion label clears Noa's party hat.
+
+6. **Two staging beats for Immersion and Fun, 7.5 → 8 each:**
+   - **Harness, "So… a seatbelt for robots?" (c[4]):** Uchu walks from x=300 to the orb (`uchu(lerp(300, 560, ease(k(lt, c[4], .8))), …)`) and pulls the strap across. Draw the diagonal strap with `stroke-dasharray` growing `0 → 230` over `k(lt, c[4] + .6, .4)`, add `burst(700, 260, 30, 'CLICK!')` at `c[4] + 1.0`, and give the orb a squash (`scale(1.08, .92)` for 0.2 s). Add `["stamp", 1.0]` to that cue. Right now the strap simply appears.
+   - **Auto, "Watch all three change":** one deliberate camera push. In `S.auto`, add `if (lt > c[4] + 1.6 && lt < c[5]) cam = [1.06, 900, 330];`, so the camera eases toward the three outputs as they flip to 12 min. `camAt` clamps `cx` to 640 ± (z−1)·600, which is 676 at z=1.06, so the push is mostly a zoom with a slight drift right. That is enough. If more drift is wanted, allow it for this beat only with a `res.camFree` flag that skips the `cx` clamp; `cy` stays clamped. It pulls back to `[1.02, 640, 330]` for the critic panel. Because Noa is in screen space and the camera is clamped, nothing crops.
+
+**Projected score with Fixes 1–6:** Hook 7.5, Immersion 8, Fun 8, Polish 8.5, everything else unchanged. That gives 55 + 36.75 = 91.75 / 11.5 = **about 8.0**.
