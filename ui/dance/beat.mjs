@@ -154,6 +154,35 @@ export function detectBeats(samples, sampleRate) {
   return { bpm: Math.round(tempo.bpm * 10) / 10, beats, confidence: Math.round(tempo.strength * 100) / 100 };
 }
 
+async function decodeMono(src) {
+  const buf = src instanceof Blob ? await src.arrayBuffer() : await (await fetch(src)).arrayBuffer();
+  const Ctx = globalThis.AudioContext || globalThis.webkitAudioContext;
+  const ctx = new Ctx();
+  try {
+    const audio = await ctx.decodeAudioData(buf);
+    const mono = new Float32Array(audio.length);
+    for (let c = 0; c < audio.numberOfChannels; c++) { const ch = audio.getChannelData(c); for (let i = 0; i < audio.length; i++) mono[i] += ch[i] / audio.numberOfChannels; }
+    return { mono, sampleRate: audio.sampleRate };
+  } finally { ctx.close && ctx.close(); }
+}
+
+// Onset envelope resampled to `fps` (for syncing two recordings of the same song).
+export function resampleEnvelope(env, fps, target = 20) {
+  const n = Math.floor((env.length / fps) * target);
+  const out = new Float32Array(n);
+  for (let i = 0; i < n; i++) {
+    const a = Math.floor((i / target) * fps), b = Math.max(a + 1, Math.floor(((i + 1) / target) * fps));
+    let m = 0; for (let k = a; k < b && k < env.length; k++) m = Math.max(m, env[k]);
+    out[i] = m;
+  }
+  return out;
+}
+export async function onsetFromMedia(src, target = 20) {
+  const { mono, sampleRate } = await decodeMono(src);
+  const { env, fps, offset } = onsetEnvelope(mono, sampleRate);
+  return { env: resampleEnvelope(env, fps, target), fps: target, t0: offset };
+}
+
 // Browser helper: decode a video/audio Blob or URL and detect beats.
 export async function detectBeatsFromMedia(src) {
   const buf = src instanceof Blob ? await src.arrayBuffer() : await (await fetch(src)).arrayBuffer();

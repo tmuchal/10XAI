@@ -6,7 +6,8 @@
  * reports under workspace/dance/, and asks the local `claude` CLI for a coach brief.
  *
  *   GET  /dance                     → ui/dance/index.html (+ /dance/*.mjs assets)
- *   GET  /api/dance/status          → { ytdlp, claude }
+ *   GET  /api/dance/status          → { ytdlp, ytdlpSource, canInstallYtdlp, ffmpeg, claude }
+ *   POST /api/dance/tools/ytdlp/install → install the official yt-dlp build (SHA-256 verified) into workspace/dance/bin
  *   GET  /api/dance/meta?url=…      → YouTube oEmbed metadata
  *   POST /api/dance/fetch           → { url, ack:true } → downloads to workspace/dance/videos
  *   GET  /api/dance/video/:id       → range-served local video
@@ -30,7 +31,51 @@ module.exports = function createDanceRoutes({ root, workspace }) {
   const REPORTS = path.join(DATA, "reports");
   const MIME = { ".html": "text/html; charset=utf-8", ".mjs": "text/javascript", ".js": "text/javascript", ".css": "text/css", ".svg": "image/svg+xml", ".json": "application/json" };
   const which = (bin) => { try { execFileSync("which", [bin], { stdio: "ignore", timeout: 4000 }); return true; } catch { return false; } };
-  const tools = { ytdlp: which("yt-dlp"), claude: !process.env.CLAUDECODE && which("claude") };
+  const tools = { claude: !process.env.CLAUDECODE && which("claude"), ffmpeg: which("ffmpeg") };
+  // yt-dlp: a system install, or the official standalone build installed on
+  // request into workspace/dance/bin (SHA-256 checked against the release sums).
+  const BIN = path.join(DATA, "bin");
+  const YTDLP_ASSET = { "linux-x64": "yt-dlp_linux", "linux-arm64": "yt-dlp_linux_aarch64", "darwin-x64": "yt-dlp_macos", "darwin-arm64": "yt-dlp_macos", "win32-x64": "yt-dlp.exe", "win32-arm64": "yt-dlp_arm64.exe" }[process.platform + "-" + process.arch] || null;
+  const localYtdlp = path.join(BIN, process.platform === "win32" ? "yt-dlp.exe" : "yt-dlp");
+  const systemYtdlp = which("yt-dlp");
+  const ytdlpCmd = () => (systemYtdlp ? "yt-dlp" : fs.existsSync(localYtdlp) ? localYtdlp : null);
+  const status = () => ({ ...tools, ytdlp: !!ytdlpCmd(), ytdlpSource: systemYtdlp ? "system" : fs.existsSync(localYtdlp) ? "local" : null, canInstallYtdlp: !!YTDLP_ASSET });
+
+  function getBuffer(url, limit = 80 * 1024 * 1024, hops = 0) {
+    return new Promise((resolve, reject) => {
+      const r = https.get(url, { headers: { "User-Agent": "10XAI-dance" } }, (resp) => {
+        if ([301, 302, 303, 307, 308].includes(resp.statusCode) && resp.headers.location && hops < 6) { resp.resume(); return resolve(getBuffer(new URL(resp.headers.location, url).toString(), limit, hops + 1)); }
+        if (resp.statusCode !== 200) { resp.resume(); return reject(new Error(`GET ${url} → ${resp.statusCode}`)); }
+        const chunks = []; let size = 0;
+        resp.on("data", (c) => { size += c.length; if (size > limit) { resp.destroy(); reject(new Error("download too large")); } else chunks.push(c); });
+        resp.on("end", () => resolve(Buffer.concat(chunks)));
+        resp.on("error", reject);
+      });
+      r.on("error", reject);
+      r.setTimeout(60000, () => r.destroy(new Error("timeout")));
+    });
+  }
+  let installing = null;
+  function installYtdlp() {
+    if (installing) return installing;
+    installing = (async () => {
+      if (!YTDLP_ASSET) throw new Error(`No standalone yt-dlp build for ${process.platform}/${process.arch} — install it with pipx install yt-dlp.`);
+      const base = "https://github.com/yt-dlp/yt-dlp/releases/latest/download/";
+      const sums = (await getBuffer(base + "SHA2-256SUMS", 1e6)).toString("utf-8");
+      const line = sums.split("\n").find((l) => l.trim().endsWith("  " + YTDLP_ASSET));
+      if (!line) throw new Error("Release checksum not found for " + YTDLP_ASSET);
+      const want = line.split(/\s+/)[0].toLowerCase();
+      const bin = await getBuffer(base + YTDLP_ASSET);
+      const got = crypto.createHash("sha256").update(bin).digest("hex");
+      if (got !== want) throw new Error("Checksum mismatch — refusing to install the downloaded yt-dlp.");
+      fs.mkdirSync(BIN, { recursive: true });
+      fs.writeFileSync(localYtdlp + ".tmp", bin, { mode: 0o755 });
+      fs.renameSync(localYtdlp + ".tmp", localYtdlp);
+      const version = execFileSync(localYtdlp, ["--version"], { timeout: 30000 }).toString().trim();
+      return { ok: true, version, sha256: got, asset: YTDLP_ASSET };
+    })().finally(() => { installing = null; });
+    return installing;
+  }
   const fetching = new Map(); // videoId → Promise
 
   const json = (res, code, obj) => { res.writeHead(code, { "Content-Type": "application/json" }); res.end(JSON.stringify(obj)); };
@@ -80,8 +125,12 @@ module.exports = function createDanceRoutes({ root, workspace }) {
     const p = new Promise((resolve, reject) => {
       if (fs.existsSync(out)) return resolve(out);
       // No shell: the id is validated to [A-Za-z0-9_-]{11} and passed as an argv entry.
-      const proc = spawn("yt-dlp", ["-f", "b[ext=mp4][height<=720]/bv*[ext=mp4][height<=720]+ba[ext=m4a]/b[height<=720]/b",
-        "--merge-output-format", "mp4", "--no-playlist", "-o", out, "https://www.youtube.com/watch?v=" + id], { stdio: ["ignore", "ignore", "pipe"] });
+      // Shorts are vertical: sort by resolution (short side ≤ 720) rather than height.
+      // Without ffmpeg only single-file (progressive) formats can be used.
+      const fmt = tools.ffmpeg ? ["-f", "bv*+ba/b", "-S", "res:720,ext:mp4:m4a", "--merge-output-format", "mp4"] : ["-f", "b", "-S", "res:720,ext:mp4"];
+      const cmd = ytdlpCmd();
+      if (!cmd) return reject(new Error("yt-dlp is not installed."));
+      const proc = spawn(cmd, [...fmt, "--no-playlist", "-o", out, "https://www.youtube.com/watch?v=" + id], { stdio: ["ignore", "ignore", "pipe"] });
       let err = "";
       proc.stderr.on("data", (d) => { err = (err + d).slice(-2000); });
       const timer = setTimeout(() => proc.kill("SIGKILL"), 10 * 60 * 1000);
@@ -159,7 +208,12 @@ module.exports = function createDanceRoutes({ root, workspace }) {
         if (!/^[\w.-]+$/.test(rel)) return json(res, 404, { error: "not found" }), true;
         return serveFile(res, path.join(UI_DIR, rel)) || (json(res, 404, { error: "not found" }), true);
       }
-      if (req.method === "GET" && p === "/api/dance/status") return json(res, 200, tools), true;
+      if (req.method === "GET" && p === "/api/dance/status") return json(res, 200, status()), true;
+      if (req.method === "POST" && p === "/api/dance/tools/ytdlp/install") {
+        if (ytdlpCmd()) return json(res, 200, { ok: true, already: true, ...status() }), true;
+        const r = await installYtdlp();
+        return json(res, 200, { ...r, ...status() }), true;
+      }
       if (req.method === "GET" && p === "/api/dance/trends") {
         const mod = await loadTrendsMod();
         try { return json(res, 200, mod.validateTrends(JSON.parse(fs.readFileSync(TRENDS_FILE, "utf-8")))), true; }
@@ -181,7 +235,7 @@ module.exports = function createDanceRoutes({ root, workspace }) {
         const id = youtubeId(body.url);
         if (!id) return json(res, 400, { error: "Not a YouTube URL" }), true;
         if (!body.ack) return json(res, 400, { error: "Confirm personal-study use first." }), true;
-        if (!tools.ytdlp && !fs.existsSync(path.join(VIDEOS, id + ".mp4"))) return json(res, 501, { error: "yt-dlp is not installed on this machine. Install it (pipx install yt-dlp) or upload a video file instead." }), true;
+        if (!ytdlpCmd() && !fs.existsSync(path.join(VIDEOS, id + ".mp4"))) return json(res, 501, { error: "yt-dlp is not installed — use “Install yt-dlp” (official build, checksum-verified) or upload a video file instead.", needInstall: true }), true;
         await download(id);
         return json(res, 200, { id, src: "/api/dance/video/" + id }), true;
       }
@@ -196,7 +250,7 @@ module.exports = function createDanceRoutes({ root, workspace }) {
         const list = fs.readdirSync(REPORTS).filter((f) => f.endsWith(".json")).map((f) => {
           try {
             const r = JSON.parse(fs.readFileSync(path.join(REPORTS, f), "utf-8"));
-            return { id: r.id, title: r.source && r.source.title, createdAt: r.createdAt, archetype: r.analysis && r.analysis.archetype && r.analysis.archetype.primary.name, bpm: r.analysis && r.analysis.raw && r.analysis.raw.bpm };
+            return { id: r.id, title: r.source && r.source.title, ytId: r.source && r.source.ytId, createdAt: r.createdAt, archetype: r.analysis && r.analysis.archetype && r.analysis.archetype.primary.name, bpm: r.analysis && r.analysis.raw && r.analysis.raw.bpm };
           } catch { return null; }
         }).filter(Boolean).sort((a, b) => String(b.createdAt).localeCompare(String(a.createdAt)));
         return json(res, 200, list), true;

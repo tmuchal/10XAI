@@ -32,6 +32,7 @@ Write a practice brief with these sections (Markdown, short paragraphs and bulle
 4. **How to get this feel** — 4–6 body cues a learner can apply today (stance, bounce direction, stops, arms, focus).
 5. **Learning route** — if `structure` is present: the phrase sequence (e.g. "A B A C"), which phrases to learn first (`learnOrder` coverage %), and where the dancer repeats a phrase less precisely (lowest `precision`).
 6. **Trend angle** — using `trendFit` (and `trendTarget` if set): which current K-pop trend this dance is closest to, and the 2–3 concrete changes (from `gaps`) to make it read as that trend.
-7. **7-day plan** — one line per day, using the tempo ladder (0.5x → 0.75x → 1x) and the killing-part timestamps.
+7. **Your cover** — only if `cover` is present: the learner's grade, their strengths and weaknesses vs the idol (quote the numbers), and the top 3 fixes in priority order.
+8. **7-day plan** — one line per day, using the tempo ladder (0.5x → 0.75x → 1x) and the killing-part timestamps.
 
-Stay under 600 words. No medical claims; mention warming up knees before level changes if `levels` ≥ 50.
+Stay under 700 words. No medical claims; mention warming up knees before level changes if `levels` ≥ 50.

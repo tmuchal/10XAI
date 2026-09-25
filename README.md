@@ -144,6 +144,15 @@ Licensed under MIT — free to use, modify, and redistribute.
 
 ## Dance Lab — idol dance analysis (`/dance`)
 
+**The service loop:**
+1. Paste an idol **YouTube Short** (or any dance video link).
+2. Click **Fetch & analyze**. The first time, the official `yt-dlp` build is installed into `workspace/dance/bin` after its SHA-256 is checked against the release checksums. It works without ffmpeg by using a single-file format.
+3. Read the **Report**: what you can learn from this idol, their strengths and weak spots ("don't copy these"), and the learning route.
+4. Add **your cover** (upload it, or ⏺ record it along with the video). It is synced to the idol automatically, by the song's audio or else by motion. You get **your** grade, strengths, weaknesses, the top 3 fixes with drills, idol-vs-you style bars, measured values and match by phrase.
+5. **⬇ Download report** saves it as a standalone HTML page.
+
+A Short you've analyzed before opens instantly from its saved report.
+
 Open `http://localhost:8080/dance` (or **💃 Dance Lab** in the board header). Paste a YouTube dance video or upload a clip; dance-practice / fixed-cam videos work best.
 
 - **Measure.** MediaPipe Pose runs locally in your browser and follows the most central dancer. It records speed, sharp stops, bounce, arm extension, knee bend, travel, level changes and symmetry, all in torso-lengths so the camera distance doesn't matter. The audio track is beat-tracked, so it can also check whether hits land on the beat. Camera cuts and tracking switches split the analysis instead of creating fake speed spikes.

@@ -245,3 +245,30 @@ test("pose descriptions name the obvious shapes", async () => {
   const t = pose((p) => { for (const [s, g] of [["l", 1], ["r", -1]]) { const sx = p[2 * J[s + "s"]], sy = p[2 * J[s + "s"] + 1]; set(p, s + "e", sx + g * 0.08, sy); set(p, s + "w", sx + g * 0.155, sy); } });
   assert.match(describePose(t).join(" | "), /Both arms out to the side/);
 });
+
+test("cover vs idol: sync by motion, find dragging + softer hits; perfect copy scores ~100", async () => {
+  const { compareCover, motionEnvelope, alignEnvelopes } = await import("../ui/dance/compare.mjs");
+  const { frameAt } = await import("../ui/dance/analyze.mjs");
+  const ref = generateDance({ style: "sharp", bpm: 120, duration: 30, structure: "ABAC" });
+  const refA = analyzePose(ref.frames, { beats: ref.beats, bpm: 120 });
+  // The learner: 150 ms late and mushy (half of each pose blended with 180 ms earlier), filmed starting 2 s into the song.
+  const cover = [];
+  for (let t = 2; t < 30; t += 1 / 15) {
+    const a = frameAt(ref.frames, t - 0.15), b = frameAt(ref.frames, t - 0.33);
+    if (!a || !b) continue;
+    cover.push({ t: Math.round((t - 2) * 1000) / 1000, p: a.p.map((x, i) => 0.5 * x + 0.5 * b.p[i]), v: a.v });
+  }
+  const covA = analyzePose(cover, {});
+  const al = alignEnvelopes(motionEnvelope(ref.frames), motionEnvelope(cover));
+  assert.ok(Math.abs(al.shift - 2) < 0.45, `motion sync shift ${al.shift}`);
+  // With the true (audio) sync, the lag must show up as dragging.
+  const r = compareCover({ ref: { frames: ref.frames, analysis: refA }, cover: { frames: cover, analysis: covA }, shift: 2 });
+  assert.ok(r.ok);
+  assert.ok(r.lagMs >= 100, `lag ${r.lagMs}`);
+  assert.ok(r.weaknesses.some((w) => /Dragging/.test(w.title)));
+  assert.ok(r.weaknesses.some((w) => w.axis === "sharpness"), JSON.stringify(r.axes));
+  assert.ok(r.fixes.length >= 1);
+  const same = compareCover({ ref: { frames: ref.frames, analysis: refA }, cover: { frames: ref.frames, analysis: refA }, shift: 0 });
+  assert.ok(same.match >= 95 && same.grade === "S" && !same.weaknesses.length);
+  assert.ok(same.strengths.length >= 3);
+});

@@ -1,9 +1,10 @@
 // Dance Lab — page controller.
 import { analyzePose, groupSync, comparePoses, bodyScale, AXES, BONES, J, frameAt, matchWithTiming } from "./analyze.mjs";
 import { analyzeChoreo } from "./choreo.mjs";
-import { buildPracticePlan, trendPlan, fmtTime } from "./drills.mjs";
+import { compareCover, motionEnvelope, alignEnvelopes } from "./compare.mjs";
+import { buildPracticePlan, trendPlan, fmtTime, DRILL_BY_ID } from "./drills.mjs";
 import { BUNDLED, rankTrends, youtubeSearch } from "./trends.mjs";
-import { detectBeatsFromMedia } from "./beat.mjs";
+import { detectBeatsFromMedia, onsetFromMedia } from "./beat.mjs";
 import { generateGroup } from "./synth.mjs";
 import { buildMembers } from "./tracker.mjs";
 import { cropPath, cropAt, toCrop, drawCrop, recordFancam } from "./fancam.mjs";
@@ -54,10 +55,15 @@ async function loadTools() {
   try {
     S.tools = await (await fetch("/api/dance/status")).json();
   } catch {}
-  chip("chip-yt", S.tools.ytdlp ? "yt-dlp: ready" : "yt-dlp: not installed", S.tools.ytdlp ? "ok" : "warn");
+  chip("chip-yt", S.tools.ytdlp ? `yt-dlp: ready (${S.tools.ytdlpSource})` : S.tools.canInstallYtdlp ? "yt-dlp: installs on first fetch" : "yt-dlp: not installed", S.tools.ytdlp ? "ok" : "warn");
   chip("chip-coach", S.tools.claude ? "AI coach: claude CLI" : "AI coach: offline", S.tools.claude ? "ok" : "warn");
-  $("fetch-note").textContent = S.tools.ytdlp ? "" : "yt-dlp isn't installed on this machine — upload a clip instead.";
+  $("fetch-note").textContent = S.tools.ytdlp ? (S.tools.ffmpeg ? "" : "No ffmpeg: the best single-file format is used (often 360p — fine for pose tracking).")
+    : S.tools.canInstallYtdlp ? "First fetch installs the official yt-dlp build into workspace/dance/bin (SHA-256 checked)." : "yt-dlp isn't available for this platform — upload a clip instead.";
+  $("fetch-go").textContent = S.tools.ytdlp ? "Fetch & analyze" : "Install yt-dlp, fetch & analyze";
+  updateFetchBtn();
 }
+const canFetch = () => S.tools.ytdlp || S.tools.canInstallYtdlp;
+function updateFetchBtn() { $("fetch-go").disabled = !($("ack").checked && canFetch()); }
 
 // ── theme ───────────────────────────────────────────────────────────────────
 function applyTheme(t) { document.body.dataset.theme = t; $("theme-tog").textContent = t === "dark" ? "☾" : "☀"; store.set("dance-theme", t); drawTimeline(); }
@@ -82,11 +88,13 @@ function useVideo(src, meta) {
   $("fetch").classList.remove("on");
   $("play").disabled = false;
   $("analyze").disabled = false;
-  v.onloadedmetadata = () => { S.aspect = v.videoWidth / v.videoHeight || 16 / 9; $("opt-end").placeholder = Math.floor(v.duration) + ""; };
+  v.onloadedmetadata = () => { S.aspect = v.videoWidth / v.videoHeight || 16 / 9; setStageAspect(S.aspect); $("opt-end").placeholder = Math.floor(v.duration) + ""; };
   v.onerror = () => setStatus("This browser can't decode that video. Try an MP4 (H.264) file.", true);
   badge(meta.title || "");
 }
 
+// Shorts are 9:16 — size the stage to the video so it isn't a thin strip.
+function setStageAspect(a) { const st = $("stage"); st.style.setProperty("--stage-ar", String(a)); st.style.setProperty("--stage-arn", String(a)); }
 function badge(text) { const b = $("stage-badge"); b.textContent = text; b.classList.toggle("hidden", !text); }
 
 $("file").onchange = (e) => {
@@ -114,7 +122,13 @@ async function loadUrl() {
   } catch (e) { setStatus(String(e.message || e), true); return; }
   resetAnalysis();
   S.source = { kind: "youtube", title: meta.title || "YouTube video " + meta.id, author: meta.author, url, ytId: meta.id };
-  if (meta.cached) { useVideo(meta.src, S.source); setStatus("Using your locally fetched copy. Press “Analyze dance”."); return; }
+  // Already analyzed this Short? Open the saved report instantly.
+  try {
+    const list = await (await fetch("/api/dance/reports")).json();
+    const hit = list.find((r) => r.ytId === meta.id);
+    if (hit) { setStatus("Already analyzed — opening the saved report."); return openReport(hit.id); }
+  } catch {}
+  if (meta.cached) { useVideo(meta.src, S.source); setStatus("Using your locally fetched copy — analyzing…"); autoAnalyze(); return; }
   // Watch-only embed until the frames are available locally.
   $("vid").classList.add("hidden"); $("vid").removeAttribute("src");
   const yt = $("yt");
@@ -123,25 +137,39 @@ async function loadUrl() {
   $("empty").classList.add("hidden");
   $("fetch").classList.add("on");
   $("fetch-title").innerHTML = `<b>${esc(S.source.title)}</b>${meta.author ? " · " + esc(meta.author) : ""}<br><span style="color:var(--text-3)">Embedded players can't be read frame-by-frame. To analyze, fetch a local copy or upload a clip.</span>`;
-  $("fetch-go").disabled = !($("ack").checked && S.tools.ytdlp);
+  updateFetchBtn();
   $("play").disabled = true; $("analyze").disabled = true;
   S.player = null;
   badge("");
   setStatus("");
 }
-$("ack").onchange = () => { $("fetch-go").disabled = !($("ack").checked && S.tools.ytdlp); };
+$("ack").onchange = updateFetchBtn;
+// One click: (install yt-dlp) → fetch → analyze → report.
 $("fetch-go").onclick = async () => {
   if (!S.source || !S.source.ytId) return;
   $("fetch-go").disabled = true;
-  setStatus("Fetching a local copy with yt-dlp (720p max). This can take a minute…");
   try {
+    if (!S.tools.ytdlp) {
+      setStatus("Installing the official yt-dlp build (checksum-verified)…");
+      const ir = await fetch("/api/dance/tools/ytdlp/install", { method: "POST" });
+      const ij = await ir.json();
+      if (!ir.ok) throw new Error(ij.error || "yt-dlp install failed");
+      await loadTools();
+    }
+    setStatus("Fetching the video with yt-dlp (720p max)…");
     const r = await fetch("/api/dance/fetch", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ url: S.source.url, ack: true }) });
     const j = await r.json();
     if (!r.ok) throw new Error(j.error || "fetch failed");
     useVideo(j.src, S.source);
-    setStatus("Ready. Press “Analyze dance”.");
-  } catch (e) { setStatus(String(e.message || e), true); $("fetch-go").disabled = false; }
+    setStatus("Fetched — analyzing…");
+    autoAnalyze();
+  } catch (e) { setStatus(String(e.message || e), true); updateFetchBtn(); }
 };
+function autoAnalyze() {
+  const v = $("vid");
+  const go = () => { showTab("report"); $("analyze").click(); };
+  if (v.readyState >= 1) go(); else v.addEventListener("loadedmetadata", go, { once: true });
+}
 
 $("demo").onclick = () => {
   resetAnalysis();
@@ -159,6 +187,7 @@ function useSkeletonPlayer(duration) {
   $("fetch").classList.remove("on");
   $("empty").classList.add("hidden");
   S.player = new SkeletonClock(duration);
+  setStageAspect(16 / 9);
   S.player.playbackRate = S.rate;
   $("play").disabled = false;
   $("analyze").disabled = true;
@@ -321,6 +350,7 @@ function renderAll() {
   $("timeline-card").classList.toggle("hidden", !has);
   if (!has) $("coach-out").innerHTML = "";
   renderMembers();
+  renderReport();
   if ($("pane-sheet").classList.contains("on")) renderCountSheet();
   else { $("cs").innerHTML = ""; $("cs-empty").classList.remove("hidden"); }
   wirePlan();
@@ -864,6 +894,7 @@ function metronome(t) {
 }
 
 // ── tabs ────────────────────────────────────────────────────────────────────
+function showTab(name) { const t = document.querySelector(`.tab[data-tab="${name}"]`); if (t) t.click(); }
 document.querySelectorAll(".tab").forEach((t) => (t.onclick = () => {
   document.querySelectorAll(".tab").forEach((x) => x.classList.toggle("on", x === t));
   document.querySelectorAll(".pane").forEach((p) => p.classList.toggle("on", p.id === "pane-" + t.dataset.tab));
@@ -1077,7 +1108,7 @@ $("coach-go").onclick = async () => {
   try {
     const r = await fetch("/api/dance/coach", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({
       lang: $("coach-lang").value,
-      report: { source: { title: S.source && S.source.title }, member: selMember() && selMember().name, trendFit: trendRank(S.analysis).slice(0, 3).map((x) => ({ trend: x.trend.name, fit: x.fit, gaps: x.gaps })), trendTarget: S.target || null, structure: (() => { const c = memberChoreo(selMember()); return c ? { sequence: c.sequence.join(" "), learnOrder: c.learnOrder, precision: c.clusters.map((x) => ({ phrase: x.label, repeats: x.occurrences.length, precision: x.precision, at: x.times.map((o) => o.start) })) } : null; })(), groupSync: S.sync && selMember() ? { overall: S.sync.overall, member: S.sync.perMember[S.sel] } : null, ...S.analysis, plan: S.plan },
+      report: { source: { title: S.source && S.source.title }, member: selMember() && selMember().name, cover: (() => { const cv = selMember() && S.covers[selMember().id]; const x = cv && cv.result; return x && x.ok ? { grade: x.grade, poseMatch: x.match, styleMatch: x.styleMatch, lagMs: x.lagMs, strengths: x.strengths.map((w) => w.title + ": " + w.evidence), weaknesses: x.weaknesses.map((w) => w.title + ": " + w.evidence) } : null; })(), trendFit: trendRank(S.analysis).slice(0, 3).map((x) => ({ trend: x.trend.name, fit: x.fit, gaps: x.gaps })), trendTarget: S.target || null, structure: (() => { const c = memberChoreo(selMember()); return c ? { sequence: c.sequence.join(" "), learnOrder: c.learnOrder, precision: c.clusters.map((x) => ({ phrase: x.label, repeats: x.occurrences.length, precision: x.precision, at: x.times.map((o) => o.start) })) } : null; })(), groupSync: S.sync && selMember() ? { overall: S.sync.overall, member: S.sync.perMember[S.sel] } : null, ...S.analysis, plan: S.plan },
     }) });
     const j = await r.json();
     if (!r.ok) throw new Error(j.error || "coach failed");
@@ -1085,6 +1116,204 @@ $("coach-go").onclick = async () => {
   } catch (e) { $("coach-out").innerHTML = `<p class="bad">${esc(e.message || e)}</p>`; }
   finally { $("coach-go").disabled = false; }
 };
+
+// ── report (the service output) ─────────────────────────────────────────────
+const LEARN = {
+  power: ["Project full energy", "Commit every move at full size and speed"],
+  sharpness: ["Hit & freeze stops", "Move fast, then lock the pose dead still"],
+  flow: ["Seamless transitions", "Finish each move into the next — no dead stops"],
+  groove: ["Bounce & groove", "Keep the knees soft and ride the beat with the body"],
+  extension: ["Finished lines", "Reach through the fingertips on every big shape"],
+  footwork: ["Fast, clean footwork", "Learn the feet first; the arms come after"],
+  levels: ["Level changes", "Drop and rise on the count, landing quietly"],
+  rhythm: ["Musicality", "Land accents exactly on the beat"],
+};
+S.covers = {};
+function renderReport() {
+  const a = S.analysis, m = selMember();
+  $("rp-empty").classList.toggle("hidden", !!a);
+  if (!a) { $("rp").innerHTML = ""; return; }
+  const r = a.raw, name = m ? m.name : "the dancer", multi = S.members.length > 1;
+  const tf = targetFit(a);
+  const ps = S.sync && m ? S.sync.perMember[m.id] : null;
+  const thumb = S.source && S.source.ytId ? `<img src="https://i.ytimg.com/vi/${esc(S.source.ytId)}/hqdefault.jpg" alt="" onerror="this.replaceWith(Object.assign(document.createElement('div'),{className:'ph'}))">` : '<div class="ph"></div>';
+  const kpi = (v, l) => (v == null || v === "" ? "" : `<span class="kpi"><b>${v}</b>${l}</span>`);
+  const sig = (S.plan && S.plan.signature) || [];
+  const learnCards = sig.map((k) => {
+    const [title, how] = LEARN[k] || [k, ""];
+    const st = a.strengths.find((x) => x.axis === k);
+    const dr = S.plan.drills.find((d) => d.axis === k);
+    return `<div class="lc"><b>${esc(title)}</b> <span class="stag ok">${esc(AXIS_SHORT[k] || k)} ${a.axes[k]}</span>
+      <div class="ev">${esc(how)}. ${esc(st ? st.evidence : "")}</div>
+      ${dr ? `<div class="dr">Drill: ${esc(dr.name)} — ${esc(dr.target)}</div>` : ""}</div>`;
+  }).join("");
+  const li = (xs, minus) => xs.length ? xs.map((x) => `<div class="item${minus ? " minus" : ""}"><b>${esc(x.title)}</b><span>${esc(x.evidence)}</span></div>`).join("") : `<div class="item${minus ? " minus" : ""}"><span>Nothing stands out.</span></div>`;
+  const c = m ? m.choreo : null;
+  const route = c ? `<div class="pseq">${c.phrases.map((p) => `<button class="pblk" style="--pc:${phraseColor(p.label)}" data-loop="${p.start},${p.end}">${p.label}${p.mirrored ? "′" : ""}</button>`).join("")}</div>
+      <div class="learn">Learn in this order: ${c.learnOrder.map((l) => `<b style="color:${phraseColor(l.label)}">${l.label}</b> ×${l.repeats} → ${l.coverage}%`).join(" · ")}</div>`
+    : c === null ? '<div class="footnote">No steady beat grid — the learning route needs a clear pulse.</div>' : '<div class="footnote" id="rp-route-wait">Building the learning route…</div>';
+  const cv = m ? S.covers[m.id] : null;
+  $("rp").innerHTML = `
+    <div class="rp-hero">${thumb}<div>
+      <div class="kicker" style="font-size:11px;font-weight:700;color:var(--accent);text-transform:uppercase;letter-spacing:.08em">Dance report${multi ? ` · ${esc(name)}` : ""}</div>
+      <h2>${esc((S.source && S.source.title) || "Dance video")}</h2>
+      <div class="meta">${esc(a.archetype.primary.name)} — ${esc(a.archetype.primary.tagline)}</div>
+      <div class="rp-kpis">${kpi(r.bpm ? Math.round(r.bpm) : null, "BPM")}${kpi(r.hitsPerMin, "hits/min")}${kpi(r.stopTime != null ? Math.round(r.stopTime * 1000) : null, "ms stops")}${kpi(Math.round(r.extension * 100), "% reach")}${tf ? kpi(tf.fit + "%", " " + esc(tf.trend.name)) : ""}${ps && ps.sync != null ? kpi(ps.sync, "/100 group sync") : ""}</div>
+    </div></div>
+    <div class="controls" style="justify-content:flex-end;margin-top:8px"><button class="btn sm" id="rp-dl">⬇ Download report</button></div>
+    <div class="block"><h4>What you can learn from ${esc(name)}</h4><div class="learn-cards">${learnCards}</div>
+      <div class="cues" style="margin-top:10px">${a.cues.slice(0, 3).map((q) => `<div class="cue"><b>${esc(q.title)}</b><span>${esc(q.cue)}</span></div>`).join("")}</div></div>
+    <div class="two"><div><div class="sub">${esc(name)}'s strengths</div><div class="list">${li(a.strengths)}</div></div>
+      <div><div class="sub">Weak spots — don't copy these</div><div class="list">${li(a.tradeoffs, true)}</div></div></div>
+    <div class="block"><h4>Learning route</h4>${route}</div>
+    <div class="block"><h4>Your cover vs ${esc(name)}</h4>
+      <div class="cover-box">
+        <div class="controls" style="margin:0">
+          <button class="btn primary sm" id="cv-upload">⬆ Upload my cover</button>
+          <button class="btn sm" id="cv-record" title="Plays the idol's video (or the looped phrase) and records you with the webcam — perfectly synced">⏺ Record my cover</button>
+          <button class="btn sm" id="cv-demo" title="A synthetic learner: late and with softer hits">✨ Demo cover</button>
+          <span class="footnote" style="margin:0">Film full-body, one person, same song. It's synced automatically (by the music, or by motion).</span>
+        </div>
+        <div id="cv-stage"></div>
+        <div class="status" id="cv-status"></div>
+        <div id="cv-result">${cv ? coverHTML(cv, name) : ""}</div>
+      </div></div>`;
+  $("rp").querySelectorAll("[data-loop]").forEach((el) => (el.onclick = () => { const [x, y] = el.dataset.loop.split(",").map(Number); setLoop(x, y); }));
+  $("rp").querySelectorAll("[data-fix]").forEach((el) => (el.onclick = () => { const [x, y] = el.dataset.fix.split(",").map(Number); setRate(0.5); setLoop(x, y); showTab("practice"); }));
+  $("rp-dl").onclick = downloadReport;
+  $("cv-upload").onclick = () => $("cover-file").click();
+  $("cv-record").onclick = recordCover;
+  $("cv-demo").onclick = demoCover;
+  if (m && m.choreo === undefined) setTimeout(() => { memberChoreo(m); if (S.analysis === a) renderReport(); }, 50);
+}
+
+function coverHTML(cv, name) {
+  const x = cv.result;
+  if (!x.ok) return `<div class="status err">${esc(x.reason)}</div>`;
+  const gcol = x.grade === "S" || x.grade === "A" ? "var(--accent)" : x.grade === "B" ? "var(--amber)" : "var(--red)";
+  const lag = x.lagMs == null ? "–" : Math.abs(x.lagMs) < 70 ? "on time" : x.lagMs > 0 ? `dragging ${x.lagMs} ms` : `rushing ${-x.lagMs} ms`;
+  const li = (xs, minus) => xs.length ? xs.map((w) => `<div class="item${minus ? " minus" : ""}"><b>${esc(w.title)}</b><span>${esc(w.evidence)}</span></div>`).join("") : `<div class="item${minus ? " minus" : ""}"><span>${minus ? "No major gaps found." : "Keep going — strengths appear as your match improves."}</span></div>`;
+  const fixes = x.fixes.map((f, i) => {
+    const d = f.drill && DRILL_BY_ID[f.drill];
+    const loop = f.start != null ? `${f.start},${f.end}` : (S.plan && S.plan.focus[0] ? `${S.plan.focus[0].start},${S.plan.focus[0].end}` : null);
+    return `<div class="drill"><div class="top"><b>${i + 1}. ${esc(f.title)}</b></div><div class="why">${esc(f.evidence)}</div>
+      ${d ? `<ol>${(typeof d.how === "function" ? d.how(S.analysis.raw) : d.how).map((h) => `<li>${esc(h)}</li>`).join("")}</ol><div class="target">🎯 ${esc(d.name)}: ${esc(d.target(S.analysis.raw))}</div>` : ""}
+      ${loop ? `<button class="btn sm" style="margin-top:6px" data-fix="${loop}">Practice this part at 0.5x →</button>` : ""}</div>`;
+  }).join("");
+  const axes = x.axes.map((a) => `<div class="vs"><span>${esc(a.label)}</span><span class="bar" title="${esc(name)} ${a.idol}"><i class="idol" style="width:${a.idol}%"></i></span><span class="bar" title="You ${a.you}"><i style="width:${a.you}%"></i></span><span class="num ${a.delta <= -15 ? "bad" : a.delta >= -8 ? "good" : "mid"}">${a.delta > 0 ? "+" : ""}${a.delta}</span></div>`).join("");
+  const metrics = x.metrics.map((mt) => `<tr><td>${esc(mt.label)}</td><td class="num">${esc(mt.idol)}</td><td class="num">${esc(mt.you)}</td><td class="num">${mt.deltaPct > 0 ? "+" : ""}${mt.deltaPct}%</td></tr>`).join("");
+  const spans = x.spans.map((sp) => `<button class="pblk" style="--pc:${sp.match >= 75 ? "var(--accent)" : sp.match >= 55 ? "var(--amber)" : "var(--red)"};min-width:44px" data-fix="${sp.start},${sp.end}" title="${fmtTime(sp.start)}–${fmtTime(sp.end)}${sp.lagMs != null ? ` · ${sp.lagMs} ms` : ""}">${sp.label || fmtTime(sp.start)} ${sp.match}</button>`).join("");
+  return `<div class="gradebox" style="margin-top:10px">
+      <div class="grade" style="color:${gcol}">${x.grade}</div>
+      <div class="rp-kpis" style="margin:0">${`<span class="kpi"><b>${x.match}</b>/100 pose match</span>`}${x.styleMatch != null ? `<span class="kpi"><b>${x.styleMatch}</b>/100 style match</span>` : ""}<span class="kpi"><b>${esc(lag)}</b></span><span class="kpi">${esc(cv.method)} · ${x.overlapSec}s compared${x.mirror ? " · mirrored" : ""}</span></div></div>
+    ${/motion|demo/.test(cv.method) ? '<div class="footnote">Synced by motion: a constant delay is absorbed by the sync, so timing here is relative — use a cover with the song\'s audio (or ⏺ Record) for absolute timing. The rhythm score still uses the song\'s beat grid.</div>' : ""}
+    <div class="two"><div><div class="sub">Your strengths</div><div class="list">${li(x.strengths)}</div></div>
+      <div><div class="sub">Your weaknesses</div><div class="list">${li(x.weaknesses, true)}</div></div></div>
+    ${fixes ? `<div class="block"><h4>Fix these first</h4><div class="drills">${fixes}</div></div>` : ""}
+    <div class="block"><h4>Style: ${esc(name)} <span style="color:var(--pink)">■</span> vs you <span style="color:var(--accent)">■</span></h4><div style="display:grid;gap:5px">${axes}</div></div>
+    ${metrics ? `<div class="block"><h4>Measured</h4><table class="tbl"><thead><tr><th>Measure</th><th class="num">${esc(name)}</th><th class="num">You</th><th class="num">Δ</th></tr></thead><tbody>${metrics}</tbody></table></div>` : ""}
+    ${spans ? `<div class="block"><h4>Match by phrase</h4><div class="pseq">${spans}</div></div>` : ""}`;
+}
+
+// ── cover pipeline: upload / record / demo → track → sync → compare ─────────
+function coverStatus(msg, err) { const el = $("cv-status"); if (el) { el.textContent = msg || ""; el.classList.toggle("err", !!err); } }
+async function trackCover(src) {
+  const v = $("cover-vid");
+  const stage = $("cv-stage");
+  if (stage) { stage.appendChild(v); v.classList.remove("hidden"); v.style.cssText = "max-height:220px;max-width:100%;border-radius:10px;margin-top:10px;background:#000"; }
+  v.srcObject = null; v.src = src; v.muted = true;
+  await new Promise((res, rej) => { v.onloadedmetadata = res; v.onerror = () => rej(new Error("Can't decode this video — try an MP4.")); });
+  const lm = await getLandmarker();
+  const { extractPoses } = await import("./pose.mjs");
+  if (S.player && !S.player.paused) S.player.pause();
+  const { samples, aspect } = await extractPoses(v, lm, { fps: 15, onSlowGpu: () => getLandmarker("CPU"), onProgress: (fr) => coverStatus(`Tracking you… ${Math.round(fr * 100)}%`) });
+  const ms = buildMembers(samples, { aspect, minCoverage: 0.15 });
+  const me = ms.find((x) => x.main) || ms[0];
+  if (!me) throw new Error("No one was tracked in the cover — film full-body with good light.");
+  return me.frames;
+}
+async function finishCover(frames, { shift, method, coverSrc }) {
+  const m = selMember();
+  let sh = shift, how = method;
+  if (sh == null) {
+    let audio = null;
+    try {
+      const refSrc = S.source && (S.source.file || (S.player instanceof HTMLVideoElement ? S.player.currentSrc : null));
+      if (refSrc && coverSrc) { coverStatus("Syncing by the music…"); const [ea, eb] = await Promise.all([onsetFromMedia(refSrc), onsetFromMedia(coverSrc)]); audio = alignEnvelopes(ea, eb, { maxLagSec: 90 }); }
+    } catch {}
+    if (audio && audio.confidence >= 0.25) { sh = audio.shift; how = `synced by music (${Math.round(audio.confidence * 100)}%)`; }
+    else { const mo = alignEnvelopes(motionEnvelope(S.frames), motionEnvelope(frames), { maxLagSec: 90 }); sh = mo.shift; how = `synced by motion (${Math.round(mo.confidence * 100)}%)`; }
+  }
+  coverStatus("Comparing…");
+  // Same song ⇒ same beat grid: score the cover's rhythm against the idol's beats (shifted into cover time).
+  const beats = S.beats.map((b) => b - sh).filter((b) => b >= 0);
+  const analysis = analyzePose(frames, beats.length >= 8 ? { beats, bpm: S.bpm } : {});
+  const ch = memberChoreo(m);
+  const result = compareCover({ ref: { frames: S.frames, analysis: S.analysis }, cover: { frames, analysis }, shift: sh, phrases: ch ? ch.phrases.map((p) => ({ start: p.start, end: p.end, label: p.label + (p.mirrored ? "′" : "") })) : null });
+  S.covers[m.id] = { result, method: how, at: Date.now() };
+  renderReport();
+  coverStatus(result.ok ? `Done — offset ${sh >= 0 ? "+" : ""}${sh.toFixed(2)} s.` : "", !result.ok);
+}
+$("cover-file").onchange = async (e) => {
+  const f = e.target.files[0]; e.target.value = "";
+  if (!f || !S.analysis) return;
+  try { const url = URL.createObjectURL(f); const frames = await trackCover(url); await finishCover(frames, { coverSrc: f }); }
+  catch (err) { coverStatus(String(err.message || err), true); }
+};
+async function recordCover() {
+  if (!S.player || !S.analysis) return;
+  let stream;
+  try { stream = await navigator.mediaDevices.getUserMedia({ video: { width: { ideal: 1280 }, height: { ideal: 720 } }, audio: false }); }
+  catch (e) { coverStatus("Camera unavailable: " + (e.message || e), true); return; }
+  const v = $("cover-vid"), stage = $("cv-stage");
+  stage.appendChild(v); v.classList.remove("hidden"); v.style.cssText = "max-height:220px;max-width:100%;border-radius:10px;margin-top:10px;transform:scaleX(-1)";
+  v.srcObject = stream; v.muted = true; await v.play();
+  const known = S.frames.filter((f) => f.p);
+  const start = S.loop ? S.loop.start : known[0].t, end = S.loop ? S.loop.end : known[known.length - 1].t;
+  for (const n of [3, 2, 1]) { coverStatus(`Get in position… ${n}`); await new Promise((r) => setTimeout(r, 1000)); }
+  const types = ["video/webm;codecs=vp9", "video/webm;codecs=vp8", "video/webm", "video/mp4"];
+  const rec = new MediaRecorder(stream, { mimeType: types.find((t) => MediaRecorder.isTypeSupported(t)) || "" });
+  const chunks = []; rec.ondataavailable = (e) => e.data.size && chunks.push(e.data);
+  S.player.pause(); S.player.currentTime = start;
+  await S.player.play();
+  rec.start(250);
+  const refStart = S.player.currentTime;
+  const btn = $("cv-record"); btn.textContent = "■ Stop recording";
+  let stopped = false; btn.onclick = () => { stopped = true; };
+  await new Promise((r) => { const tick = () => (stopped || S.player.paused || S.player.currentTime >= end ? r() : (coverStatus(`Recording… ${fmtTime(S.player.currentTime)} / ${fmtTime(end)}`), requestAnimationFrame(tick))); tick(); });
+  S.player.pause();
+  const done = new Promise((r) => (rec.onstop = r)); rec.stop(); await done;
+  stream.getTracks().forEach((t) => t.stop()); v.srcObject = null; v.style.transform = "";
+  try {
+    const blob = new Blob(chunks, { type: rec.mimeType || "video/webm" });
+    const frames = await trackCover(URL.createObjectURL(blob));
+    await finishCover(frames, { shift: refStart, method: "synced by recording" });
+  } catch (err) { coverStatus(String(err.message || err), true); }
+}
+// A synthetic learner for the demo: 150 ms late with softer hits, starting 2 s in.
+function demoCover() {
+  if (!S.analysis) return;
+  const known = S.frames.filter((f) => f.p);
+  const t0 = known[0].t + 2, t1 = known[known.length - 1].t;
+  const frames = [];
+  for (let t = t0; t < t1; t += 1 / 15) {
+    const a = frameAt(S.frames, t - 0.15), b = frameAt(S.frames, t - 0.33);
+    if (a && b) frames.push({ t: Math.round((t - t0) * 1000) / 1000, p: a.p.map((x, i) => 0.5 * x + 0.5 * b.p[i]), v: a.v });
+  }
+  finishCover(frames, { method: "demo" }).catch((e) => coverStatus(String(e.message || e), true));
+}
+
+function downloadReport() {
+  const clone = $("rp").cloneNode(true);
+  clone.querySelectorAll("button:not(.pblk), .cover-box > .controls, video, #cv-stage, #cv-status").forEach((el) => el.remove());
+  const css = [...document.querySelectorAll("style")].map((x) => x.textContent).join("\n");
+  const title = `${(S.source && S.source.title) || "Dance"} — Dance Lab report`;
+  const html = `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${esc(title)}</title><style>${css}</style></head><body data-theme="${document.body.dataset.theme}"><main style="max-width:920px;margin:24px auto;padding:0 16px">${clone.innerHTML}<p class="footnote">Generated by 10XAI Dance Lab · ${new Date().toISOString().slice(0, 10)}</p></main></body></html>`;
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(new Blob([html], { type: "text/html" }));
+  a.download = title.replace(/[^\w가-힣-]+/g, "_").slice(0, 60) + ".html";
+  document.body.appendChild(a); a.click(); a.remove();
+}
 
 // ── boot ────────────────────────────────────────────────────────────────────
 S.target = store.get("dance-target") || "";

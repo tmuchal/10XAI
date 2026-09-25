@@ -78,7 +78,7 @@ a{color:var(--accent)}
 .card h3{font-size:12px;font-weight:700;color:var(--text-2);text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px}
 
 /* stage */
-.stage{position:relative;aspect-ratio:16/9;background:var(--stage);border-radius:12px;overflow:hidden}
+.stage{position:relative;aspect-ratio:var(--stage-ar,16/9);width:min(100%,calc(72vh * var(--stage-arn,1.7778)));margin:0 auto;background:var(--stage);border-radius:12px;overflow:hidden}
 .stage video,.stage canvas,.stage iframe{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;border:0}
 .stage .flip{position:absolute;inset:0}
 .stage .flip.mirrored{transform:scaleX(-1)}
@@ -197,6 +197,27 @@ table.tbl td.num{text-align:right;white-space:nowrap}
 .recent button:hover{border-color:var(--accent)}
 .recent span{color:var(--text-3);font-size:11px;white-space:nowrap}
 .hidden{display:none!important}
+/* report */
+.rp-hero{display:grid;grid-template-columns:120px 1fr;gap:14px;align-items:center;background:var(--surface-2);border:1px solid var(--border);border-radius:14px;padding:12px}
+.rp-hero img,.rp-hero .ph{width:120px;aspect-ratio:9/16;object-fit:cover;border-radius:10px;background:var(--stage);display:block}
+.rp-hero h2{font-size:17px;letter-spacing:-0.02em;margin:2px 0}
+.rp-hero .meta{font-size:11.5px;color:var(--text-3)}
+.rp-kpis{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
+.kpi{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:4px 8px;font-size:11px;color:var(--text-3)}
+.kpi b{font-family:var(--mono);color:var(--text);font-size:13px;margin-right:3px}
+.learn-cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:10px}
+.lc{border:1px solid var(--border);border-top:3px solid var(--accent);border-radius:12px;padding:10px 12px;background:var(--surface)}
+.lc b{font-size:13px}
+.lc .ev{font-size:11.5px;color:var(--text-2);margin:4px 0 6px}
+.lc .dr{font-size:11px;color:var(--pink)}
+.cover-box{border:1px dashed var(--border-2);border-radius:14px;padding:12px;margin-top:6px}
+.grade{font-family:var(--mono);font-size:40px;font-weight:800;line-height:1}
+.gradebox{display:flex;gap:18px;align-items:center;flex-wrap:wrap}
+.vs{display:grid;grid-template-columns:90px 1fr 1fr 44px;gap:6px;align-items:center;font-size:11.5px}
+.vs .bar{display:block;height:7px;background:var(--surface-3);border-radius:4px;overflow:hidden;position:relative}
+.vs .bar i{position:absolute;top:0;bottom:0;left:0;background:var(--accent)}
+.vs .bar i.idol{background:var(--pink)}
+@media (max-width:520px){.rp-hero{grid-template-columns:80px 1fr}.rp-hero img,.rp-hero .ph{width:80px}}
 /* count sheet */
 .cs-sum{background:var(--surface-2);border:1px solid var(--border);border-radius:12px;padding:12px 14px}
 .cs-sum .k{font-size:10.5px;color:var(--text-3);font-weight:700;text-transform:uppercase;letter-spacing:.06em}
@@ -287,10 +308,10 @@ table.mem td.best{color:var(--accent);font-weight:800}
 </header>
 
 <section class="hero">
-  <h1>How do they <em>actually</em> dance it?</h1>
+  <h1>Paste an idol Short. Learn <em>how</em> they dance it — and how <em>you</em> compare.</h1>
   <p class="lead">Paste a YouTube dance video (dance-practice / fixed-cam works best) or upload a clip. Pose estimation runs locally in your browser and measures power, sharpness, groove, lines and rhythm — then turns the numbers into strengths, trade-offs and a practice plan.</p>
   <div class="bar">
-    <input type="url" id="url" placeholder="https://www.youtube.com/watch?v=…  (dance practice video)" autocomplete="off">
+    <input type="url" id="url" placeholder="https://youtube.com/shorts/…  or any YouTube dance video" autocomplete="off">
     <button class="btn primary" id="load-url">Load</button>
     <label class="btn" for="file">⬆ Upload video</label>
     <input type="file" id="file" accept="video/*" class="hidden">
@@ -382,7 +403,8 @@ table.mem td.best{color:var(--accent);font-weight:800}
   <div class="col-r">
     <div class="card">
       <div class="tabs" role="tablist">
-        <button class="tab on" data-tab="breakdown">Breakdown</button>
+        <button class="tab on" data-tab="report">Report</button>
+        <button class="tab" data-tab="breakdown">Breakdown</button>
         <button class="tab" data-tab="members">Members</button>
         <button class="tab" data-tab="sheet">Count sheet</button>
         <button class="tab" data-tab="plan">Practice plan</button>
@@ -390,7 +412,10 @@ table.mem td.best{color:var(--accent);font-weight:800}
         <button class="tab" data-tab="coach">AI coach</button>
       </div>
 
-      <div class="pane on" id="pane-breakdown"><div class="placeholder" id="bd-empty">Run an analysis to see how the dance is built.</div><div id="bd"></div></div>
+      <div class="pane on" id="pane-report"><div class="placeholder" id="rp-empty">Paste an idol YouTube Short (or any dance video) above → <b>Fetch &amp; analyze</b>. The report shows what to learn from the idol, their strengths and weak spots, and — once you add your own cover — <b>your</b> strengths and weaknesses against them.</div><div id="rp"></div>
+        <video id="cover-vid" playsinline muted preload="auto" class="hidden"></video>
+        <input type="file" id="cover-file" accept="video/*" class="hidden"></div>
+      <div class="pane" id="pane-breakdown"><div class="placeholder" id="bd-empty">Run an analysis to see how the dance is built.</div><div id="bd"></div></div>
       <div class="pane" id="pane-members"><div class="placeholder" id="mem-empty">Group videos: every member is tracked separately — compare styles, sync (칼군무) and timing here.</div><div id="mem"></div></div>
       <div class="pane" id="pane-sheet"><div class="placeholder" id="cs-empty">Analyze a video to get an automatic 8-count sheet.</div><div id="cs"></div></div>
       <div class="pane" id="pane-plan"><div class="placeholder" id="plan-empty">The practice plan appears after analysis.</div><div id="plan"></div></div>
