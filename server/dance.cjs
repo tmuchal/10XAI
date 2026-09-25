@@ -14,6 +14,7 @@
  *   GET  /api/dance/reports         → saved analyses (summary)
  *   GET  /api/dance/reports/:id     → one saved analysis
  *   POST /api/dance/reports         → save an analysis
+ *   DELETE /api/dance/reports/:id   → delete an analysis
  *   POST /api/dance/coach           → { report, lang } → Markdown brief
  *   GET  /api/dance/trends          → K-pop trend catalog (researched copy or bundled snapshot)
  *   POST /api/dance/trends/refresh  → re-research trends with the claude CLI (WebSearch)
@@ -259,6 +260,11 @@ module.exports = function createDanceRoutes({ root, workspace }) {
       if (req.method === "GET" && rep) {
         const file = path.join(REPORTS, rep[1] + ".json");
         return serveFile(res, file) || (json(res, 404, { error: "not found" }), true);
+      }
+      if (req.method === "DELETE" && rep) {
+        const file = path.join(REPORTS, rep[1] + ".json");
+        if (fs.existsSync(file)) fs.unlinkSync(file);
+        return json(res, 200, { ok: true }), true;
       }
       if (req.method === "POST" && p === "/api/dance/reports") {
         const body = await readBody(req);

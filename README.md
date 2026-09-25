@@ -144,6 +144,8 @@ Licensed under MIT — free to use, modify, and redistribute.
 
 ## Dance Lab — idol dance analysis (`/dance`)
 
+The app is a bright, two-screen tool. **Home** has the paste box, how it works, your **library** (every analysis saved on this machine, with thumbnails and delete) and the trend board. The **workspace** has the player with a 4-step progress tracker (Video → Track dancers → Beat & structure → Report) and the results tabs: 📋 Report · 📊 Details · 👯 Members · 🎼 Count sheet · 🗓 Practice plan · 🎥 Practice · 💬 AI coach. Uploading a clip starts the analysis immediately, and technical options live under *Analysis settings*. A dark theme is one click away.
+
 **The service loop:**
 1. Paste an idol **YouTube Short** (or any dance video link).
 2. Click **Fetch & analyze**. The first time, the official `yt-dlp` build is installed into `workspace/dance/bin` after its SHA-256 is checked against the release checksums. It works without ffmpeg by using a single-file format.

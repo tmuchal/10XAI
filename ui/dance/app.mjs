@@ -66,9 +66,36 @@ const canFetch = () => S.tools.ytdlp || S.tools.canInstallYtdlp;
 function updateFetchBtn() { $("fetch-go").disabled = !($("ack").checked && canFetch()); }
 
 // ── theme ───────────────────────────────────────────────────────────────────
-function applyTheme(t) { document.body.dataset.theme = t; $("theme-tog").textContent = t === "dark" ? "☾" : "☀"; store.set("dance-theme", t); drawTimeline(); }
+function applyTheme(t) { document.body.dataset.theme = t; $("theme-tog").textContent = t === "dark" ? "☀" : "☾"; store.set("dance-theme", t); drawTimeline(); }
 $("theme-tog").onclick = () => applyTheme(document.body.dataset.theme === "dark" ? "light" : "dark");
-applyTheme(store.get("dance-theme") || "dark");
+applyTheme(store.get("dance-theme") || "light");
+
+// ── app modes: home (paste / library / trends) ↔ workspace (player + results) ─
+function setMode(mode) {
+  document.body.classList.toggle("mode-home", mode === "home");
+  document.body.classList.toggle("mode-work", mode === "work");
+  document.querySelectorAll("[data-nav]").forEach((b) => b.classList.toggle("on", mode === "home" ? b.dataset.nav === "home" : false));
+  if (mode === "home" && S.player && !S.player.paused) S.player.pause();
+  window.scrollTo({ top: 0 });
+}
+function goHome(section) {
+  setMode("home");
+  loadRecent();
+  if (section) setTimeout(() => $(section === "library" ? "sec-library" : "sec-trends").scrollIntoView({ behavior: "smooth" }), 30);
+}
+$("go-home").onclick = () => goHome();
+$("new-analysis").onclick = () => { goHome(); $("url").value = ""; $("url").focus(); };
+document.querySelectorAll("[data-nav]").forEach((b) => (b.onclick = () => goHome(b.dataset.nav === "home" ? null : b.dataset.nav)));
+
+// Stepper: video → track → beat → report
+const STEP_ORDER = ["video", "track", "beat", "report"];
+function setStep(name, done = false) {
+  const k = STEP_ORDER.indexOf(name);
+  document.querySelectorAll("#steps li").forEach((li, i) => {
+    li.classList.toggle("done", i < k || (i === k && done));
+    li.classList.toggle("active", i === k && !done);
+  });
+}
 
 // ── sources ─────────────────────────────────────────────────────────────────
 function resetAnalysis() {
@@ -91,11 +118,14 @@ function useVideo(src, meta) {
   v.onloadedmetadata = () => { S.aspect = v.videoWidth / v.videoHeight || 16 / 9; setStageAspect(S.aspect); $("opt-end").placeholder = Math.floor(v.duration) + ""; };
   v.onerror = () => setStatus("This browser can't decode that video. Try an MP4 (H.264) file.", true);
   badge(meta.title || "");
+  setMode("work"); setStep("track");
+  document.querySelector(".analyze-row").classList.remove("hidden");
+  $("analyze").textContent = "▶ Analyze";
 }
 
 // Shorts are 9:16 — size the stage to the video so it isn't a thin strip.
 function setStageAspect(a) { const st = $("stage"); st.style.setProperty("--stage-ar", String(a)); st.style.setProperty("--stage-arn", String(a)); }
-function badge(text) { const b = $("stage-badge"); b.textContent = text; b.classList.toggle("hidden", !text); }
+function badge(text) { const b = $("stage-badge"); b.textContent = text; b.classList.toggle("hidden", !text); $("ws-title").textContent = text || "Analysis"; }
 
 $("file").onchange = (e) => {
   const f = e.target.files[0];
@@ -104,7 +134,8 @@ $("file").onchange = (e) => {
   const prevYt = S.source && S.source.kind === "youtube" ? S.source : null;
   S.source = { kind: "file", title: prevYt ? prevYt.title : f.name, file: f, url: prevYt ? prevYt.url : null, ytId: prevYt ? prevYt.ytId : null };
   useVideo(URL.createObjectURL(f), S.source);
-  setStatus(`Loaded ${f.name} (${(f.size / 1e6).toFixed(1)} MB). Press “Analyze dance”.`);
+  setStatus(`Loaded ${f.name} (${(f.size / 1e6).toFixed(1)} MB) — analyzing…`);
+  autoAnalyze();
   e.target.value = "";
 };
 
@@ -112,7 +143,7 @@ $("load-url").onclick = loadUrl;
 $("url").onkeydown = (e) => { if (e.key === "Enter") loadUrl(); };
 async function loadUrl() {
   const url = $("url").value.trim();
-  if (!url) return;
+  if (!url) { $("url").focus(); $("url").placeholder = "Paste a YouTube link first — e.g. https://youtube.com/shorts/…"; return; }
   setStatus("Looking up the video…");
   let meta;
   try {
@@ -136,11 +167,12 @@ async function loadUrl() {
   yt.src = `https://www.youtube-nocookie.com/embed/${meta.id}?rel=0`;
   $("empty").classList.add("hidden");
   $("fetch").classList.add("on");
+  setMode("work"); setStep("video");
   $("fetch-title").innerHTML = `<b>${esc(S.source.title)}</b>${meta.author ? " · " + esc(meta.author) : ""}<br><span style="color:var(--text-3)">Embedded players can't be read frame-by-frame. To analyze, fetch a local copy or upload a clip.</span>`;
   updateFetchBtn();
   $("play").disabled = true; $("analyze").disabled = true;
   S.player = null;
-  badge("");
+  badge(S.source.title);
   setStatus("");
 }
 $("ack").onchange = updateFetchBtn;
@@ -188,6 +220,8 @@ function useSkeletonPlayer(duration) {
   $("empty").classList.add("hidden");
   S.player = new SkeletonClock(duration);
   setStageAspect(16 / 9);
+  setMode("work");
+  document.querySelector(".analyze-row").classList.add("hidden"); // nothing to (re)analyze without a video
   S.player.playbackRate = S.rate;
   $("play").disabled = false;
   $("analyze").disabled = true;
@@ -225,6 +259,7 @@ $("analyze").onclick = async () => {
     if (!(end > start + 2)) throw new Error("Pick a range of at least a few seconds.");
     // Beat tracking in parallel (audio decode) — optional, analysis still works without it.
     const beatsP = detectBeatsFromMedia(S.source.file || v.currentSrc).catch(() => null);
+    setStep("track");
     setStatus(`Tracking every member at ${fps} fps… (~${Math.round((end - start) * fps)} frames)`);
     const t0 = performance.now();
     const { extractPoses } = await import("./pose.mjs");
@@ -243,7 +278,8 @@ $("analyze").onclick = async () => {
     S.aspect = aspect;
     const members = buildMembers(samples, { aspect });
     if (!members.length) throw new Error("No dancer was tracked for long enough — try a clearer video or a different range.");
-    setStatus("Detecting beats…");
+    setStep("beat");
+    setStatus("Finding the beat and the song structure…");
     const beat = await beatsP;
     S.beats = beat && beat.beats.length ? beat.beats : [];
     S.bpm = beat && beat.bpm && beat.confidence >= 0.1 ? beat.bpm : null;
@@ -270,6 +306,8 @@ async function finishMembers(members, save) {
   const best = ok.find((m) => m.main) || ok.slice().sort((a, b) => b.coverage - a.coverage)[0];
   selectMember(S.sel && ok.some((m) => m.id === S.sel) ? S.sel : best.id);
   $("prog").style.width = "100%";
+  setStep("report", true);
+  $("analyze").textContent = S.player instanceof HTMLVideoElement ? "↻ Analyze again" : "▶ Analyze";
   const q = best.analysis.quality;
   setStatus(`Done — ${S.members.length} member${S.members.length > 1 ? "s" : ""} tracked` + (S.sync ? `, group sync ${S.sync.overall}/100` : "") + `. ${q.analyzedSec}s analyzed for ${best.name}.` + (S.bpm ? ` Audio tempo ${S.bpm} BPM.` : " No usable audio beat; tempo estimated from motion."));
   if (save) {
@@ -331,13 +369,25 @@ async function openReport(id) {
 }
 
 async function loadRecent() {
+  const box = $("recent");
   try {
     const list = await (await fetch("/api/dance/reports")).json();
-    const box = $("recent");
-    if (!list.length) { box.innerHTML = '<span style="color:var(--text-4)">None yet.</span>'; return; }
-    box.innerHTML = list.slice(0, 12).map((r) => `<button data-id="${esc(r.id)}"><b>${esc(r.title || r.id)}</b><span>${esc(r.archetype || "")}${r.bpm ? " · " + Math.round(r.bpm) + " BPM" : ""} · ${esc((r.createdAt || "").slice(0, 10))}</span></button>`).join("");
-    box.querySelectorAll("button").forEach((b) => (b.onclick = () => openReport(b.dataset.id)));
-  } catch {}
+    if (!list.length) { box.innerHTML = '<div class="empty-lib">No analyses yet — paste a Short above or try the demo.</div>'; return; }
+    box.innerHTML = list.slice(0, 24).map((r) => {
+      const initials = esc((r.title || "?").replace(/[^\w가-힣]/g, "").slice(0, 2).toUpperCase() || "✦");
+      const th = r.ytId ? `<img src="https://i.ytimg.com/vi/${esc(r.ytId)}/hqdefault.jpg" alt="" loading="lazy" onerror="this.parentNode.textContent='▶'">` : "";
+      return `<div class="libcard" data-id="${esc(r.id)}" role="button" tabindex="0">
+        <div class="th">${th || initials}</div>
+        <div class="bd"><div class="t">${esc(r.title || r.id)}</div><div class="m">${esc(r.archetype || "")}${r.bpm ? " · " + Math.round(r.bpm) + " BPM" : ""} · ${esc((r.createdAt || "").slice(0, 10))}</div></div>
+        <button class="del" data-del="${esc(r.id)}" title="Delete this analysis">✕</button></div>`;
+    }).join("");
+    box.querySelectorAll(".libcard").forEach((c) => (c.onclick = (e) => { if (!e.target.closest("[data-del]")) openReport(c.dataset.id); }));
+    box.querySelectorAll("[data-del]").forEach((b) => (b.onclick = async () => {
+      if (!confirm("Delete this analysis from your library?")) return;
+      await fetch("/api/dance/reports/" + b.dataset.del, { method: "DELETE" }).catch(() => {});
+      loadRecent();
+    }));
+  } catch { box.innerHTML = '<div class="empty-lib">Library unavailable.</div>'; }
 }
 
 // ── rendering: breakdown ────────────────────────────────────────────────────
@@ -1009,7 +1059,7 @@ function onUserFrame(uf) {
   if (m && now - P.lastUi > 120) {
     P.lastUi = now;
     $("live-score").innerHTML = `<span class="${cls(m.score)}">${m.score}</span><small>/100</small>`;
-    $("live-parts").innerHTML = Object.entries(m.parts).map(([k, v]) => `<div class="axis"><span class="lbl">${PART_LABEL[k]}</span><span class="track"><i style="width:${v}%;background:var(--${v >= 75 ? "accent" : v >= 55 ? "amber" : "red"})"></i></span><span class="v">${v}</span></div>`).join("");
+    $("live-parts").innerHTML = Object.entries(m.parts).map(([k, v]) => `<div class="axis"><span class="lbl">${PART_LABEL[k]}</span><span class="track"><i style="width:${v}%;background:var(--${v >= 75 ? "green" : v >= 55 ? "amber" : "red"})"></i></span><span class="v">${v}</span></div>`).join("");
     $("live-lag").textContent = m.bestScore < 50 ? "Find the pose — no close match nearby." : Math.abs(m.lagMs) < 90 ? "On time ✓" : m.lagMs > 0 ? `About ${m.lagMs} ms behind — anticipate the next count.` : `About ${-m.lagMs} ms ahead — let the music lead.`;
   }
   const sess = P.session;
@@ -1190,7 +1240,7 @@ function renderReport() {
 function coverHTML(cv, name) {
   const x = cv.result;
   if (!x.ok) return `<div class="status err">${esc(x.reason)}</div>`;
-  const gcol = x.grade === "S" || x.grade === "A" ? "var(--accent)" : x.grade === "B" ? "var(--amber)" : "var(--red)";
+  const gcol = x.grade === "S" || x.grade === "A" ? "var(--green)" : x.grade === "B" ? "var(--amber)" : "var(--red)";
   const lag = x.lagMs == null ? "–" : Math.abs(x.lagMs) < 70 ? "on time" : x.lagMs > 0 ? `dragging ${x.lagMs} ms` : `rushing ${-x.lagMs} ms`;
   const li = (xs, minus) => xs.length ? xs.map((w) => `<div class="item${minus ? " minus" : ""}"><b>${esc(w.title)}</b><span>${esc(w.evidence)}</span></div>`).join("") : `<div class="item${minus ? " minus" : ""}"><span>${minus ? "No major gaps found." : "Keep going — strengths appear as your match improves."}</span></div>`;
   const fixes = x.fixes.map((f, i) => {
@@ -1202,7 +1252,7 @@ function coverHTML(cv, name) {
   }).join("");
   const axes = x.axes.map((a) => `<div class="vs"><span>${esc(a.label)}</span><span class="bar" title="${esc(name)} ${a.idol}"><i class="idol" style="width:${a.idol}%"></i></span><span class="bar" title="You ${a.you}"><i style="width:${a.you}%"></i></span><span class="num ${a.delta <= -15 ? "bad" : a.delta >= -8 ? "good" : "mid"}">${a.delta > 0 ? "+" : ""}${a.delta}</span></div>`).join("");
   const metrics = x.metrics.map((mt) => `<tr><td>${esc(mt.label)}</td><td class="num">${esc(mt.idol)}</td><td class="num">${esc(mt.you)}</td><td class="num">${mt.deltaPct > 0 ? "+" : ""}${mt.deltaPct}%</td></tr>`).join("");
-  const spans = x.spans.map((sp) => `<button class="pblk" style="--pc:${sp.match >= 75 ? "var(--accent)" : sp.match >= 55 ? "var(--amber)" : "var(--red)"};min-width:44px" data-fix="${sp.start},${sp.end}" title="${fmtTime(sp.start)}–${fmtTime(sp.end)}${sp.lagMs != null ? ` · ${sp.lagMs} ms` : ""}">${sp.label || fmtTime(sp.start)} ${sp.match}</button>`).join("");
+  const spans = x.spans.map((sp) => `<button class="pblk" style="--pc:${sp.match >= 75 ? "var(--green)" : sp.match >= 55 ? "var(--amber)" : "var(--red)"};min-width:44px" data-fix="${sp.start},${sp.end}" title="${fmtTime(sp.start)}–${fmtTime(sp.end)}${sp.lagMs != null ? ` · ${sp.lagMs} ms` : ""}">${sp.label || fmtTime(sp.start)} ${sp.match}</button>`).join("");
   return `<div class="gradebox" style="margin-top:10px">
       <div class="grade" style="color:${gcol}">${x.grade}</div>
       <div class="rp-kpis" style="margin:0">${`<span class="kpi"><b>${x.match}</b>/100 pose match</span>`}${x.styleMatch != null ? `<span class="kpi"><b>${x.styleMatch}</b>/100 style match</span>` : ""}<span class="kpi"><b>${esc(lag)}</b></span><span class="kpi">${esc(cv.method)} · ${x.overlapSec}s compared${x.mirror ? " · mirrored" : ""}</span></div></div>
