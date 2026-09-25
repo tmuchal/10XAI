@@ -38,8 +38,8 @@ try:
 except Exception:
     sc.view_settings.view_transform = "Filmic"
 sc.render.image_settings.file_format = "PNG"
-if SHOT == "sprite":
-    sc.render.resolution_x = sc.render.resolution_y = 720
+if SHOT in ("sprite", "uchu"):
+    sc.render.resolution_x = sc.render.resolution_y = 720 if SHOT == "sprite" else 600
     sc.render.film_transparent = True
     sc.render.image_settings.color_mode = "RGBA"
 else:
@@ -203,6 +203,81 @@ def pose_hammy(H, f):
     for sd, pv in H["arms"].items():
         pv.rotation_euler = Euler((math.radians(rot[sd][0]), math.radians(rot[sd][1]), 0))
 
+# ---------------------------------------------------------------- Uchu (red space-suit CFO, green face paint)
+SUIT = mat("suit", "#E0242B", rough=0.32, coat=0.4)
+SUITD = mat("suitD", "#B5161D", rough=0.4, coat=0.3)
+FACE = mat("face", "#4E9B34", rough=0.55, sss=0.15, bump=0.12)
+STRIPE = mat("stripe", "#BFE3A6", rough=0.6)
+SCLERA = mat("sclera", "#F7F4EE", rough=0.2, coat=0.6)
+IRIS = mat("iris", "#6B3F22", rough=0.2)
+LIP = mat("lip", "#D86B6B", rough=0.45, sss=0.2)
+MAW = mat("maw", "#5A0C16", rough=0.7)
+TONGUE = mat("tongue", "#E3867F", rough=0.5, sss=0.3)
+BROWG = mat("browg", "#2C5A1E", rough=0.7)
+
+def curve_tube(name, pts, radius, material, parent):
+    cu = bpy.data.curves.new(name, "CURVE"); cu.dimensions = "3D"; cu.bevel_depth = radius; cu.bevel_resolution = 6
+    sp = cu.splines.new("BEZIER"); sp.bezier_points.add(len(pts) - 1)
+    for bp, co in zip(sp.bezier_points, pts): bp.co = co; bp.handle_left_type = bp.handle_right_type = "AUTO"
+    o = bpy.data.objects.new(name, cu); sc.collection.objects.link(o); o.data.materials.append(material); set_parent(o, parent)
+    return o
+
+def build_uchu(origin=(0, 0, 0), s=1.0):
+    root = empty("Uchu", origin); root.scale = (s, s, s)
+    sphere("usuit", (0, 0, 1.0), (0.95, 0.85, 1.05), SUIT, root)
+    for sx in (-1, 1): sphere(f"uboot{sx}", (0.4 * sx, -0.3, 0.1), (0.3, 0.38, 0.14), SUITD, root)
+    head = empty("uhead", (0, -0.1, 2.0), root)
+    sphere("uhood", (0, 0, 2.4), (1.02, 0.95, 1.08), SUIT, head)
+    sphere("uface", (0, -0.62, 2.32), (0.72, 0.42, 0.9), FACE, head)
+    bpy.ops.mesh.primitive_torus_add(major_radius=0.78, minor_radius=0.085, location=(0, -0.84, 2.32), rotation=(math.radians(90), 0, 0))
+    rim = bpy.context.object; rim.scale = (0.98, 1.22, 1); rim.data.materials.append(SUIT); bpy.ops.object.shade_smooth(); set_parent(rim, head)
+    for sx in (-1, 1):
+        sphere(f"upod{sx}", (1.0 * sx, -0.05, 2.35), (0.26, 0.42, 0.42), SUIT, head)
+        sphere(f"ustripe{sx}", (0.28 * sx, -0.99, 2.18), (0.07, 0.02, 0.2), STRIPE, head)
+        sphere(f"usclera{sx}", (0.25 * sx, -0.95, 2.52), (0.15, 0.08, 0.14), SCLERA, head)
+        sphere(f"uiris{sx}", (0.25 * sx, -1.02, 2.52), (0.07, 0.03, 0.07), IRIS, head)
+        sphere(f"upupil{sx}", (0.25 * sx, -1.045, 2.52), (0.035, 0.015, 0.035), EYE, head)
+        sphere(f"uspec{sx}", (0.25 * sx - 0.03, -1.06, 2.56), (0.015, 0.01, 0.015), SPEC, head)
+        sphere(f"ubrow{sx}", (0.26 * sx, -0.98, 2.74), (0.14, 0.03, 0.03), BROWG, head)
+        ant = empty(f"uant{sx}", (0.32 * sx, -0.1, 3.3), head)
+        curve_tube(f"uantc{sx}", [(0.32 * sx, -0.1, 3.3), (0.55 * sx, -0.1, 3.8), (0.95 * sx, -0.25, 4.1)], 0.06, SUIT, ant)
+        sphere(f"uantb{sx}", (0.95 * sx, -0.25, 4.1), (0.14, 0.14, 0.14), SUIT, ant)
+    sphere("unose", (0, -1.04, 2.3), (0.08, 0.06, 0.07), FACE, head)
+    mouth = empty("umouth", (0, -1.0, 1.98), head)
+    bpy.ops.mesh.primitive_torus_add(major_radius=0.15, minor_radius=0.045, location=(0, -1.0, 1.98), rotation=(math.radians(90), 0, 0))
+    lip = bpy.context.object; lip.scale = (0.95, 1.3, 1); lip.data.materials.append(LIP); bpy.ops.object.shade_smooth(); set_parent(lip, mouth)
+    sphere("umaw", (0, -0.97, 1.98), (0.14, 0.05, 0.18), MAW, mouth)
+    sphere("utongue", (0, -0.99, 1.88), (0.1, 0.04, 0.06), TONGUE, mouth)
+    arms = {}
+    for sx in (-1, 1):
+        pv = empty(f"ushoulder{sx}", (0.72 * sx, -0.3, 1.45), root)
+        sphere(f"uarm{sx}", (0.72 * sx, -0.3, 1.12), (0.17, 0.17, 0.34), SUIT, pv)
+        sphere(f"uhand{sx}", (0.72 * sx, -0.3, 0.8), (0.15, 0.14, 0.15), SUITD, pv)
+        arms[sx] = pv
+    bpy.context.view_layer.update()
+    return dict(root=root, head=head, mouth=mouth, arms=arms,
+                ants=[bpy.data.objects["uant-1"], bpy.data.objects["uant1"]],
+                brows=[bpy.data.objects["ubrow-1"], bpy.data.objects["ubrow1"]],
+                brow_z=[bpy.data.objects["ubrow-1"].location.z, bpy.data.objects["ubrow1"].location.z],
+                sclera=[bpy.data.objects["usclera-1"], bpy.data.objects["usclera1"]])
+
+# Uchu appears in three reaction beats (global seconds); arms fly up on each beat
+UCHU_BEATS = [(6.2, 9.5), (13.2, 16.4), (27.4, 30.0)]
+def pose_uchu(U, f):
+    t = f / FPS
+    beat = next(((a, b) for a, b in UCHU_BEATS if a - 0.3 <= t <= b), None)
+    k = smooth((t - beat[0]) / 0.35) if beat else 0.0
+    # shocked "O" mouth pulses, head trembles, antennae wobble with a spring
+    U["mouth"].scale = (1.0 + 0.1 * math.sin(t * 9), 1.0, 1.0 + 0.25 * k + 0.12 * math.sin(t * 7))
+    U["head"].rotation_euler = Euler((math.radians(-6 * k + 1.5 * math.sin(t * 2)), 0, math.radians(3 * math.sin(t * 23) * k + 4 * math.sin(t * 0.9))))
+    for i, a in enumerate(U["ants"]):
+        a.rotation_euler = Euler((math.radians(10 * math.sin(t * 7 + i)), math.radians((12 + 10 * k) * math.sin(t * 5.5 + i * 1.7)), 0))
+    for b, z in zip(U["brows"], U["brow_z"]): b.location.z = z + 0.08 * k
+    bl = 1.0 if (t % 2.7) > 0.1 or k > 0.5 else 0.15
+    for sc_ in U["sclera"]: sc_.scale.z = 0.14 * bl
+    for sd, pv in U["arms"].items():  # hands up in surprise
+        pv.rotation_euler = Euler((math.radians(-20 - 30 * k), math.radians(-sd * (15 + 120 * k)), 0))
+
 # ---------------------------------------------------------------- lights
 def area(name, loc, target, color, power, size, spec=0.15):
     ld = bpy.data.lights.new(name, "AREA"); ld.color = hexc(color)[:3]; ld.energy = power; ld.size = size; ld.specular_factor = spec
@@ -272,6 +347,12 @@ if SHOT == "sprite":
     rig_lights()
     cam, aim = camera((0, -8.2, 1.75), (0, 0, 1.5), lens=50)
     def per_frame(f): pose_hammy(H, f)
+
+elif SHOT == "uchu":
+    U = build_uchu()
+    rig_lights((0, 0, 2.0))
+    cam, aim = camera((0, -8.4, 2.4), (0, 0, 2.15), lens=50)
+    def per_frame(f): pose_uchu(U, f)
 
 elif SHOT == "hero":
     glossy_floor()

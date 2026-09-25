@@ -138,6 +138,11 @@
 </section>
 
 <img id="sprite">
+<div id="uchuWrap" class="abs" style="display:none">
+  <img id="uchu" style="width:100%;display:block">
+  <div id="uchuTag" class="abs" style="left:50%;bottom:6%;transform:translateX(-50%)"><span class="pill" style="background:rgba(12,14,22,.75);border:1px solid rgba(255,92,122,.6);font-size:18px;white-space:nowrap"><i style="width:9px;height:9px;border-radius:50%;background:#FF5C7A;display:inline-block"></i>우추 · CFO</span></div>
+  <div id="uchuBub" class="abs" style="left:-8%;top:4%;background:var(--lime);color:#0B0C10;font-weight:800;font-size:30px;padding:12px 22px;border-radius:22px 22px 22px 4px;white-space:nowrap;box-shadow:0 10px 30px rgba(0,0,0,.4)"></div>
+</div>
 <div id="scrim"></div>
 <div id="subs"><div id="subKo"></div><div id="subEn"></div></div>
 <div id="brand"><b>N</b>누리테크 · 2026 3분기 경영 브리핑</div>
@@ -290,6 +295,18 @@ function seek(f) {
   else sp.style.display = 'none';
   if (sp.style.display !== 'none') { const pe = eo((t - cur.a) / 0.4); sp.style.opacity = pe; sp.style.transform = `translateY(${(1-pe)*60}px)`; sp.style.filter = blur ? `blur(${blur}px)` : 'drop-shadow(0 30px 40px rgba(0,0,0,.5))'; }
 
+  // Uchu (CFO) reaction beats: [start, end, left, top, width, bubble, bubbleAt, firstFrame]
+  const UB = [[6.2, 9.5, 1470, 540, 470, '우와, +18%?!', 6.5, 180], [13.2, 16.4, 1110, 640, 400, '온라인 93%?!', 13.5, 390], [27.4, 30.1, 1030, 610, 380, '승인!', 29.05, 816]];
+  const uw = document.getElementById('uchuWrap'), ub = UB.find(([a, b]) => t >= a && t < b);
+  if (ub) {
+    const [a, b, x, y, w, txt, bt] = ub, r = (t - a) / 0.55, out = clamp((b - t) / 0.25);
+    Object.assign(uw.style, { display: '', left: x + 'px', top: y + 'px', width: w + 'px' });
+    uw.style.transform = `translateY(${(1 - eb(r)) * 420}px) rotate(${(1 - eo(r)) * 8}deg)`; uw.style.opacity = Math.min(clamp(r * 3), out);
+    uw.style.filter = blur ? `blur(${blur}px)` : 'drop-shadow(0 26px 36px rgba(0,0,0,.5))';
+    const bb = document.getElementById('uchuBub'); bb.textContent = txt; const br = (t - bt) / 0.35;
+    bb.style.opacity = clamp(br * 3); bb.style.transform = `scale(${br <= 0 ? .6 : .6 + .4 * eb(br)})`; bb.style.transformOrigin = '10% 100%';
+  } else uw.style.display = 'none';
+
   // subtitles
   const c = SUBS.find(([a, b]) => t >= a && t < b);
   const ko = document.getElementById('subKo'), en = document.getElementById('subEn');
@@ -309,6 +326,9 @@ async function frame(f) {
   if (src && !plate.src.endsWith(src)) { plate.src = src; jobs.push(plate.decode().catch(() => {})); }
   if (f >= 287) { const s2 = `r_sprite/${pad(Math.min(287 + Math.floor((f - 287) / 2) * 2, 899))}.png`;  // sprite is rendered on twos
     if (!sp.src.endsWith(s2)) { sp.src = s2; jobs.push(sp.decode().catch(() => {})); } }
+  const ubs = [[180, 286], [390, 492], [816, 900]].find(([a, b]) => f >= a && f <= b + 2);
+  if (ubs) { const u = document.getElementById('uchu'), s3 = `r_uchu/${pad(Math.min(ubs[0] + Math.floor((f - ubs[0]) / 2) * 2, ubs[1] - (ubs[1] - ubs[0]) % 2))}.png`;
+    if (!u.src.endsWith(s3)) { u.src = s3; jobs.push(u.decode().catch(() => {})); } }
   await Promise.all(jobs);
   seek(f);
 }
