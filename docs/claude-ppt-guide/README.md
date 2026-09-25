@@ -4,11 +4,23 @@
 
 | 파일 | 설명 |
 |---|---|
-| `claude-ppt-guide.mp4` | 가이드 영상 (1920×1080, 약 2분 40초, 한국어 자막 + 배경음악) |
+| `claude-ppt-guide.mp4` | 가이드 영상 (1920×1080, 약 2분 40초, 한국어 자막 + 배경음악) — 수채화 무대 + 손그림 캐릭터 스타일 |
 | `sample-company-deck.pptx` | 영상에 나오는 완성본 예시 (9장, **편집 가능한 PowerPoint 기본 차트**) |
 | `src/` | 영상·예시 자료를 다시 만드는 소스 (아래 "다시 만들기" 참고) |
 
 > 예시 자료의 회사명과 숫자는 모두 가상의 **예시 데이터**입니다.
+
+---
+
+## 영상 스타일
+
+빨간 커튼이 있는 수채화 무대 위에서 캐릭터들이 이젤 보드를 가리키며 설명하는 동화책 스타일입니다. 오른쪽의 **보고서 완성도** 게이지가 단계마다 0% → 100%로 차오릅니다.
+
+| 캐릭터 | 역할 |
+|---|---|
+| **코디** (주황색 동그란 캐릭터, 머리에 반짝이) | Claude 역할 — 설명하고 도와줌 |
+| **김대리** (안경 쓴 직장인) | PPT를 만들어야 하는 사람 |
+| **부장님** (콧수염, 회색 정장) | 보고를 받는 사람 — 마지막에 "좋아, 승인!" |
 
 ---
 
@@ -119,18 +131,27 @@
 
 ## 다시 만들기
 
-필요 도구: Node.js, `pptxgenjs`, `playwright`(Chromium), Python 3 + `numpy`, `ffmpeg`, LibreOffice(슬라이드 이미지 생성용), 한글 폰트(Noto Sans CJK KR).
+필요 도구: Node.js, Python 3 + `numpy`·`Pillow`, `ffmpeg`, LibreOffice(슬라이드 이미지 생성용). 폰트는 npm의 Jua·Yeon Sung(OFL 라이선스)을 사용합니다.
 
 ```bash
 cd docs/claude-ppt-guide/src
+npm install                                  # pptxgenjs, playwright, 폰트(Jua, Yeon Sung)
 # 1) 예시 PPT 생성 (네이티브 차트)
-node build-deck.cjs ../sample-company-deck.pptx
+npm run deck
 # 2) 슬라이드 이미지(영상에 삽입) — slides/slide-1.png … slide-9.png, 1920px 폭
 soffice --headless --convert-to pdf ../sample-company-deck.pptx   # 이후 PDF를 PNG로 변환
-# 3) 배경음악 (직접 합성, 저작권 문제 없음)
+# 3) 수채화 배경과 배경음악 (둘 다 코드로 직접 생성, 저작권 문제 없음)
+python3 make-backdrop.py backdrop.png
 python3 make-music.py 161 music.wav
 # 4) 영상 렌더링 — video.html을 프레임 단위로 캡처해 ffmpeg로 인코딩
-node render-video.cjs video.html ../claude-ppt-guide.mp4 --music music.wav
+npm run video
 ```
 
-`video.html`의 각 `<section class="scene" data-dur="초">`가 한 장면이며, 자막은 장면 안의 `text/x-cap` 스크립트에 `[시작초, "문장"]` 형식으로 들어 있습니다. 문구나 길이를 바꾸면 위 4단계를 다시 실행하면 됩니다.
+`video.html` 구조:
+
+- `<section class="scene" data-dur="초">` 하나가 한 장면이고, 이젤 보드 안의 내용을 담습니다.
+- `text/x-cap` — 자막 `[시작초, "문장"]`
+- `text/x-act` — 캐릭터 연출: `ev`(`[초, 캐릭터, 동작, 지속]`; 동작은 `happy`/`wow`/`normal`/`hop`/`wave`/`point`/`q`), `bub`(말풍선 `[시작, 끝, 캐릭터, "대사"]`), `meter`(완성도 `[시작%, 끝%, 초, 지속]`), `confetti`(색종이 시작초)
+- `BLOCK` — 장면별 캐릭터 위치(걸어서 이동)
+
+문구·연출을 바꾼 뒤 4단계를 다시 실행하면 됩니다.
