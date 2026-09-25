@@ -462,10 +462,15 @@ elif SHOT == "road":
             project(cam, f"gate{i}", (x, gy, 3.6), f)
 
 os.makedirs(OUT, exist_ok=True)
+def anchors_needed(f):  # label anchors must be recomputed even for frames we skip rendering
+    return SHOT in ("hero", "chart", "road")
 STEP = int(os.environ.get("STEP", "1"))  # 2 = render "on twos" (character sprite)
 for f in range(F0, F1 + 1, STEP):
+    done_already = os.path.exists(os.path.join(OUT, f"{f:04d}.png"))
     sc.frame_set(f)
     per_frame(f)
+    if done_already:
+        continue  # resume: frame already rendered (anchors were still recomputed above)
     sc.render.filepath = os.path.join(OUT, f"{f:04d}.png")
     bpy.ops.render.render(write_still=True)
     if f % 30 == 0: print(f"[{SHOT}] frame {f}", flush=True)

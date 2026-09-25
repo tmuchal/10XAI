@@ -224,7 +224,10 @@ function anim(el, t) {
   else if (k === 'gy') { op = r > 0 ? 1 : 0; tf = `scaleY(${eb(r)})`; }
   el.style.opacity = op; if (tf) el.style.transform = (el.classList.contains('lbl') ? 'translate(-50%,-100%) ' : '') + tf;
 }
-function anchor(shot, name, f) { const a = (window.ANCH && ANCH[shot] && ANCH[shot][name]) || {}; return a[f] || a[String(f)] || null; }
+// 3D plates are rendered on twos from each shot's first frame; snap to the rendered frame
+const SHOT0 = { hero: [0, 96], chart: [96, 287], road: [493, 760] };
+const snap = (shot, f) => { const [a, b] = SHOT0[shot]; const g = a + Math.floor((Math.min(Math.max(f, a), b) - a) / 2) * 2; return g; };
+function anchor(shot, name, f) { const a = (window.ANCH && ANCH[shot] && ANCH[shot][name]) || {}; const g = snap(shot, f); return a[g] || a[String(g)] || null; }
 
 function seek(f) {
   const t = f / FPS;
@@ -319,9 +322,9 @@ async function frame(f) {
   const t = f / FPS, plate = document.getElementById('plate'), sp = document.getElementById('sprite');
   const pad = n => String(n).padStart(4, '0');
   let src = null;
-  if (t < 3.2) src = `r_hero/${pad(Math.min(f, 96))}.png`;
-  else if (t < 9.55) src = `r_chart/${pad(Math.min(Math.max(f, 96), 287))}.png`;
-  else if (t >= 16.45 && t < 25.3) src = `r_road/${pad(Math.min(Math.max(f, 493), 760))}.png`;
+  if (t < 3.2) src = `r_hero/${pad(snap('hero', f))}.png`;
+  else if (t < 9.55) src = `r_chart/${pad(snap('chart', f))}.png`;
+  else if (t >= 16.45 && t < 25.3) src = `r_road/${pad(snap('road', f))}.png`;
   const jobs = [];
   if (src && !plate.src.endsWith(src)) { plate.src = src; jobs.push(plate.decode().catch(() => {})); }
   if (f >= 287) { const s2 = `r_sprite/${pad(Math.min(287 + Math.floor((f - 287) / 2) * 2, 899))}.png`;  // sprite is rendered on twos
