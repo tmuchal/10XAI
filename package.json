@@ -25,7 +25,8 @@
   "scripts": {
     "start": "node server/kanban.cjs",
     "dev": "node server/kanban.cjs",
-    "gate": "node lib/gate/index.cjs"
+    "gate": "node lib/gate/index.cjs",
+    "test": "node --test \"test/**/*.test.mjs\""
   },
   "dependencies": {
     "@slack/bolt": "^4.1.0"

@@ -26,6 +26,7 @@ const os = require("os");
 const { execSync, spawn } = require("child_process");
 
 const PORT = config.port;
+const handleDance = require("./dance.cjs")({ root: config.repoRoot, workspace: path.join(config.repoRoot, "workspace") });
 const PROJECT_NAME = config.projectName;
 const REPO_PATH = config.repoPath;          // the application repo this harness drives
 const HARNESS_ROOT = config.repoRoot;       // this 10XAI checkout
@@ -1957,6 +1958,9 @@ const server = http.createServer(async (req, res) => {
   res.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
   res.setHeader("Access-Control-Allow-Headers", "Content-Type");
   if (req.method === "OPTIONS") { res.writeHead(204); res.end(); return; }
+
+  // Dance Lab (/dance, /api/dance/*)
+  if (await handleDance(req, res)) return;
 
   if (req.url === "/events") {
     res.writeHead(200, { "Content-Type": "text/event-stream", "Cache-Control": "no-cache", Connection: "keep-alive" });

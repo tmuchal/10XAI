@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dance Lab · 10XAI</title>
+<link href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:#fafafa; --surface:#fff; --surface-2:#f4f4f5; --surface-3:#e4e4e7;
+  --border:#e4e4e7; --border-2:#d4d4d8;
+  --text:#18181b; --text-2:#52525b; --text-3:#71717a; --text-4:#a1a1aa;
+  --accent:#059669; --accent-h:#047857; --accent-bg:#d1fae5; --on-accent:#fff;
+  --pink:#db2777; --pink-bg:rgba(219,39,119,0.1);
+  --amber:#d97706; --amber-bg:rgba(217,119,6,0.12);
+  --blue:#2563eb; --blue-bg:rgba(37,99,235,0.1);
+  --red:#dc2626; --red-bg:rgba(220,38,38,0.1);
+  --stage:#0b0f15;
+  --mono:'JetBrains Mono',ui-monospace,monospace;
+}
+[data-theme="dark"] {
+  --bg:#0A0F16; --surface:#0E141D; --surface-2:#141C26; --surface-3:#1E2935;
+  --border:#1A2430; --border-2:#27323F;
+  --text:#EAF1E8; --text-2:#AEBBB3; --text-3:#7C8C84; --text-4:#56655E;
+  --accent:#79D86C; --accent-h:#93E884; --accent-bg:rgba(121,216,108,0.13); --on-accent:#06210b;
+  --pink:#F472B6; --pink-bg:rgba(244,114,182,0.13);
+  --amber:#FBBF24; --amber-bg:rgba(251,191,36,0.12);
+  --blue:#7FB5FF; --blue-bg:rgba(127,181,255,0.12);
+  --red:#FCA5A5; --red-bg:rgba(252,165,165,0.12);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{background:var(--bg);color:var(--text);font-family:'Pretendard Variable',Pretendard,-apple-system,sans-serif;font-size:13px;line-height:1.5;-webkit-font-smoothing:antialiased}
+body{min-height:100vh;overflow-x:hidden}
+button,select,input{font:inherit;color:inherit}
+a{color:var(--accent)}
+.num{font-family:var(--mono);font-variant-numeric:tabular-nums}
+
+/* header */
+.hdr{height:52px;padding:0 20px;border-bottom:1px solid var(--border);background:var(--surface);display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:20}
+.hdr-l{display:flex;align-items:center;gap:12px;min-width:0}
+.brand{font-size:14px;font-weight:700;letter-spacing:-0.02em;color:var(--text);text-decoration:none}
+.brand i{color:var(--accent);font-style:normal}
+.brand-sub{font-size:11px;color:var(--text-3);padding-left:10px;border-left:1px solid var(--border-2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.hdr-r{display:flex;gap:8px;align-items:center}
+.btn{background:var(--surface);border:1px solid var(--border-2);color:var(--text-2);padding:6px 11px;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;white-space:nowrap;text-decoration:none;display:inline-flex;align-items:center;gap:6px;transition:border-color .15s,color .15s,background .15s}
+.btn:hover{border-color:var(--accent);color:var(--text)}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:var(--on-accent);font-weight:800}
+.btn.primary:hover{background:var(--accent-h)}
+.btn:disabled{opacity:.5;cursor:default}
+.btn.sm{padding:4px 8px;font-size:11px}
+.btn.on{background:var(--accent-bg);border-color:var(--accent);color:var(--accent)}
+
+/* hero */
+.hero{padding:22px 20px 16px;background:linear-gradient(180deg,var(--surface),var(--bg));border-bottom:1px solid var(--border)}
+.hero h1{max-width:980px;margin:0 auto 4px;font-size:22px;letter-spacing:-0.03em;font-weight:800}
+.hero h1 em{font-style:normal;color:var(--accent)}
+.hero p.lead{max-width:980px;margin:0 auto 14px;color:var(--text-3);font-size:12.5px}
+.bar{display:flex;align-items:center;gap:8px;max-width:980px;margin:0 auto;background:var(--surface-2);border:1px solid var(--border-2);border-radius:14px;padding:7px;flex-wrap:wrap}
+.bar:focus-within{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-bg)}
+.bar input[type=url]{flex:1 1 260px;min-width:0;background:transparent;border:0;outline:0;font-family:var(--mono);font-size:13.5px;padding:10px 8px 10px 12px}
+.bar input::placeholder{color:var(--text-4)}
+.opts{max-width:980px;margin:10px auto 0;display:flex;gap:14px;flex-wrap:wrap;align-items:center;font-size:11.5px;color:var(--text-3)}
+.opts label{display:flex;gap:6px;align-items:center}
+.opts select,.opts input{background:var(--surface);border:1px solid var(--border);border-radius:7px;padding:4px 6px;font-size:11.5px;color:var(--text-2)}
+.opts input[type=number]{width:64px}
+.chips{display:flex;gap:6px;flex-wrap:wrap;margin-left:auto}
+.chip{font-size:10.5px;font-weight:600;padding:2px 8px;border-radius:999px;background:var(--surface-2);border:1px solid var(--border);color:var(--text-3);white-space:nowrap}
+.chip.ok{background:var(--accent-bg);color:var(--accent);border-color:transparent}
+.chip.warn{background:var(--amber-bg);color:var(--amber);border-color:transparent}
+
+/* layout */
+.main{max-width:1400px;margin:0 auto;padding:18px 20px 40px;display:grid;grid-template-columns:minmax(0,1.05fr) minmax(0,1fr);gap:18px;align-items:start}
+@media (max-width:1060px){.main{grid-template-columns:minmax(0,1fr)}}
+.col-l{position:sticky;top:64px;display:flex;flex-direction:column;gap:12px}
+@media (max-width:1060px){.col-l{position:static}}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:14px}
+.card h3{font-size:12px;font-weight:700;color:var(--text-2);text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px}
+
+/* stage */
+.stage{position:relative;aspect-ratio:16/9;background:var(--stage);border-radius:12px;overflow:hidden}
+.stage video,.stage canvas,.stage iframe{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;border:0}
+.stage .flip{position:absolute;inset:0}
+.stage .flip.mirrored{transform:scaleX(-1)}
+.stage .empty{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;color:#7C8C84;font-size:12.5px;text-align:center;padding:20px}
+.stage .empty b{color:#EAF1E8;font-size:15px}
+.stage .badge{position:absolute;top:10px;left:10px;background:rgba(10,15,22,.75);color:#EAF1E8;font-size:11px;font-weight:600;padding:3px 9px;border-radius:999px;pointer-events:none}
+.controls{display:flex;gap:6px;align-items:center;flex-wrap:wrap;margin-top:10px}
+.controls .time{font-family:var(--mono);font-size:11.5px;color:var(--text-3);margin-right:auto;min-width:92px}
+.seg{display:inline-flex;border:1px solid var(--border-2);border-radius:8px;overflow:hidden}
+.seg button{background:var(--surface);border:0;border-right:1px solid var(--border-2);padding:4px 8px;font-size:11px;font-weight:600;color:var(--text-3);cursor:pointer;font-family:var(--mono)}
+.seg button:last-child{border-right:0}
+.seg button.on{background:var(--accent-bg);color:var(--accent)}
+.loopchip{font-size:11px;font-family:var(--mono);color:var(--pink);background:var(--pink-bg);padding:3px 8px;border-radius:999px;display:none;cursor:pointer}
+.loopchip.on{display:inline-block}
+
+.fetch{margin-top:10px;padding:10px 12px;border:1px dashed var(--border-2);border-radius:10px;font-size:12px;color:var(--text-2);display:none}
+.fetch.on{display:block}
+.fetch .row{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:8px}
+.fetch label{display:flex;gap:6px;align-items:flex-start;font-size:11.5px;color:var(--text-3)}
+
+.analyze-row{display:flex;gap:10px;align-items:center;margin-top:10px}
+.progress{flex:1;height:6px;background:var(--surface-3);border-radius:3px;overflow:hidden}
+.progress i{display:block;height:100%;width:0;background:var(--accent);transition:width .2s}
+.status{font-size:11.5px;color:var(--text-3);margin-top:6px;min-height:18px}
+.status.err{color:var(--red)}
+
+.timeline svg{width:100%;height:96px;display:block;cursor:pointer}
+.legend{display:flex;gap:12px;flex-wrap:wrap;font-size:11px;color:var(--text-3);margin-top:6px}
+.legend span{display:inline-flex;gap:5px;align-items:center}
+.legend i{width:10px;height:10px;border-radius:3px;display:inline-block}
+
+/* tabs */
+.tabs{display:flex;gap:4px;border-bottom:1px solid var(--border);margin-bottom:14px;overflow-x:auto}
+.tab{background:transparent;border:0;border-bottom:2px solid transparent;padding:9px 12px;font-size:12.5px;font-weight:600;color:var(--text-3);cursor:pointer;white-space:nowrap}
+.tab.on{color:var(--text);border-bottom-color:var(--accent)}
+.pane{display:none}
+.pane.on{display:block}
+.placeholder{color:var(--text-3);font-size:12.5px;padding:30px 10px;text-align:center}
+
+/* breakdown */
+.arch{display:flex;gap:16px;align-items:center;flex-wrap:wrap}
+.arch .radar{flex:0 0 220px;max-width:100%}
+.arch .radar svg{width:100%;height:auto;display:block}
+.arch .txt{flex:1 1 220px;min-width:0}
+.arch .kicker{font-size:11px;font-weight:700;color:var(--accent);text-transform:uppercase;letter-spacing:.08em}
+.arch h2{font-size:20px;letter-spacing:-0.02em;margin:2px 0 4px}
+.arch .tag{color:var(--text-2);font-size:12.5px}
+.arch .second{color:var(--text-3);font-size:11.5px;margin-top:6px}
+.axes{margin-top:14px;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px 18px}
+@media (max-width:520px){.axes{grid-template-columns:minmax(0,1fr)}}
+.axis{display:grid;grid-template-columns:78px 1fr 30px;gap:8px;align-items:center;font-size:12px}
+.axis .lbl{color:var(--text-2);font-weight:600}
+.axis .track{height:6px;background:var(--surface-3);border-radius:3px;overflow:hidden}
+.axis .track i{display:block;height:100%;background:var(--accent);border-radius:3px}
+.axis .v{font-family:var(--mono);font-size:11.5px;color:var(--text-2);text-align:right}
+.stats{display:grid;grid-template-columns:repeat(auto-fill,minmax(128px,1fr));gap:8px;margin-top:14px}
+.stat{background:var(--surface-2);border:1px solid var(--border);border-radius:10px;padding:8px 10px}
+.stat .k{font-size:10.5px;color:var(--text-3);font-weight:600}
+.stat .n{font-family:var(--mono);font-size:16px;font-weight:700;color:var(--text);margin-top:1px}
+.stat .n small{font-size:10.5px;color:var(--text-3);font-weight:500;margin-left:3px}
+.stat .s{font-size:10.5px;color:var(--text-4)}
+.two{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin-top:14px}
+@media (max-width:620px){.two{grid-template-columns:minmax(0,1fr)}}
+.list{display:flex;flex-direction:column;gap:8px}
+.item{border-left:3px solid var(--accent);background:var(--surface-2);border-radius:0 10px 10px 0;padding:8px 10px}
+.item.minus{border-left-color:var(--amber)}
+.item b{display:block;font-size:12.5px}
+.item span{font-size:11.5px;color:var(--text-3)}
+.sub{font-size:12px;font-weight:700;margin-bottom:8px;color:var(--text-2)}
+.footnote{font-size:11px;color:var(--text-4);margin-top:12px}
+
+/* plan */
+.cues{display:grid;gap:8px}
+.cue{display:grid;grid-template-columns:110px 1fr;gap:10px;background:var(--surface-2);border-radius:10px;padding:9px 11px;font-size:12.5px}
+@media (max-width:520px){.cue{grid-template-columns:1fr}}
+.cue b{color:var(--accent);font-size:12px}
+.ladder{display:flex;gap:8px;flex-wrap:wrap}
+.rung{flex:1 1 90px;border:1px solid var(--border);border-radius:10px;padding:8px 10px;text-align:center;cursor:pointer;background:var(--surface)}
+.rung:hover{border-color:var(--accent)}
+.rung .x{font-family:var(--mono);font-weight:700;font-size:15px}
+.rung .b{font-size:11px;color:var(--text-3)}
+.focus{display:flex;gap:8px;flex-wrap:wrap}
+.drills{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:10px}
+.drill{border:1px solid var(--border);border-radius:12px;padding:11px 12px;background:var(--surface)}
+.drill .top{display:flex;justify-content:space-between;gap:8px;align-items:baseline}
+.drill .top b{font-size:13px}
+.drill .top span{font-family:var(--mono);font-size:11px;color:var(--text-3)}
+.drill .why{font-size:11px;color:var(--pink);margin:2px 0 6px}
+.drill ol{padding-left:16px;font-size:12px;color:var(--text-2)}
+.drill .target{margin-top:7px;font-size:11.5px;background:var(--accent-bg);color:var(--accent);padding:5px 8px;border-radius:7px}
+.block{margin-top:18px}
+.block>h4{font-size:12px;font-weight:700;color:var(--text-2);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px}
+table.tbl{width:100%;border-collapse:collapse;font-size:12px}
+table.tbl th,table.tbl td{text-align:left;padding:7px 8px;border-bottom:1px solid var(--border);vertical-align:top}
+table.tbl th{font-size:10.5px;color:var(--text-3);text-transform:uppercase;letter-spacing:.05em}
+table.tbl td.num{text-align:right;white-space:nowrap}
+
+/* practice */
+.cam{position:relative;aspect-ratio:16/9;background:var(--stage);border-radius:12px;overflow:hidden}
+.cam video,.cam canvas{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;transform:scaleX(-1)}
+.score{display:flex;gap:16px;align-items:center;margin-top:12px;flex-wrap:wrap}
+.big{font-family:var(--mono);font-size:44px;font-weight:800;line-height:1;min-width:92px}
+.big small{font-size:14px;color:var(--text-3)}
+.parts{flex:1;display:grid;gap:5px;min-width:200px}
+.lag{font-size:12px;color:var(--text-2);margin-top:8px}
+.good{color:var(--accent)} .mid{color:var(--amber)} .bad{color:var(--red)}
+
+/* coach */
+.coach-out{font-size:13px;line-height:1.65;color:var(--text)}
+.coach-out h1,.coach-out h2,.coach-out h3{font-size:14px;margin:14px 0 6px}
+.coach-out ul,.coach-out ol{padding-left:18px;margin:4px 0}
+.coach-out p{margin:6px 0}
+
+.recent{display:flex;flex-direction:column;gap:6px}
+.recent button{display:flex;justify-content:space-between;gap:10px;text-align:left;background:var(--surface-2);border:1px solid var(--border);border-radius:9px;padding:7px 10px;cursor:pointer;font-size:12px}
+.recent button:hover{border-color:var(--accent)}
+.recent span{color:var(--text-3);font-size:11px;white-space:nowrap}
+.hidden{display:none!important}
+</style>
+</head>
+<body data-theme="dark">
+<header class="hdr">
+  <div class="hdr-l">
+    <a class="brand" href="/">10X<i>·</i>AI</a>
+    <div class="brand-sub">Dance Lab — break down an idol dance, practise the feel</div>
+  </div>
+  <div class="hdr-r">
+    <a class="btn sm" href="/">← Board</a>
+    <button class="btn sm" id="theme-tog" title="Toggle theme">☾</button>
+  </div>
+</header>
+
+<section class="hero">
+  <h1>How do they <em>actually</em> dance it?</h1>
+  <p class="lead">Paste a YouTube dance video (dance-practice / fixed-cam works best) or upload a clip. Pose estimation runs locally in your browser and measures power, sharpness, groove, lines and rhythm — then turns the numbers into strengths, trade-offs and a practice plan.</p>
+  <div class="bar">
+    <input type="url" id="url" placeholder="https://www.youtube.com/watch?v=…  (dance practice video)" autocomplete="off">
+    <button class="btn primary" id="load-url">Load</button>
+    <label class="btn" for="file">⬆ Upload video</label>
+    <input type="file" id="file" accept="video/*" class="hidden">
+    <button class="btn" id="demo">✨ Demo dancer</button>
+  </div>
+  <div class="opts">
+    <label>Sample rate <select id="opt-fps"><option value="10">10 fps (fast)</option><option value="15" selected>15 fps</option><option value="24">24 fps (precise)</option></select></label>
+    <label>Model <select id="opt-model"><option value="lite">lite</option><option value="full" selected>full</option><option value="heavy">heavy</option></select></label>
+    <label>From <input type="number" id="opt-start" min="0" step="1" value="0"> s</label>
+    <label>To <input type="number" id="opt-end" min="0" step="1" placeholder="end"> s</label>
+    <div class="chips">
+      <span class="chip" id="chip-pose">Pose engine: idle</span>
+      <span class="chip" id="chip-yt">yt-dlp: …</span>
+      <span class="chip" id="chip-coach">AI coach: …</span>
+    </div>
+  </div>
+</section>
+
+<main class="main">
+  <div class="col-l">
+    <div class="card">
+      <div class="stage" id="stage">
+        <div class="flip" id="flip">
+          <video id="vid" playsinline preload="auto" crossorigin="anonymous" class="hidden"></video>
+          <iframe id="yt" class="hidden" allow="autoplay; encrypted-media" allowfullscreen title="YouTube player"></iframe>
+          <canvas id="overlay"></canvas>
+        </div>
+        <div class="empty" id="empty"><b>No video yet</b>Paste a link, upload a clip, or try the demo dancer.</div>
+        <div class="badge hidden" id="stage-badge"></div>
+      </div>
+      <div class="controls">
+        <button class="btn sm" id="play" disabled>▶ Play</button>
+        <span class="time" id="time">0:00 / 0:00</span>
+        <span class="loopchip" id="loopchip" title="Click to clear loop"></span>
+        <div class="seg" id="rate">
+          <button data-r="0.5">0.5x</button><button data-r="0.75">0.75x</button><button data-r="0.9">0.9x</button><button data-r="1" class="on">1x</button>
+        </div>
+        <button class="btn sm" id="mirror" title="Flip the video like a mirror">⇋ Mirror</button>
+        <button class="btn sm on" id="skel" title="Show the tracked skeleton">🦴 Skeleton</button>
+      </div>
+      <div class="fetch" id="fetch">
+        <div id="fetch-title"><b>YouTube video loaded for viewing.</b> To analyze it, the frames must be available locally.</div>
+        <div class="row">
+          <label><input type="checkbox" id="ack"> I'm using this video for personal dance study only and won't redistribute it.</label>
+        </div>
+        <div class="row">
+          <button class="btn primary sm" id="fetch-go" disabled>Fetch for analysis (yt-dlp)</button>
+          <span style="color:var(--text-3);font-size:11.5px">or</span>
+          <label class="btn sm" for="file">Upload a clip of it</label>
+          <span id="fetch-note" style="font-size:11px;color:var(--text-4)"></span>
+        </div>
+      </div>
+      <div class="analyze-row">
+        <button class="btn primary" id="analyze" disabled>Analyze dance</button>
+        <div class="progress"><i id="prog"></i></div>
+        <button class="btn sm hidden" id="cancel">Cancel</button>
+      </div>
+      <div class="status" id="status"></div>
+    </div>
+
+    <div class="card timeline hidden" id="timeline-card">
+      <h3>Timeline · energy & phrases</h3>
+      <svg id="timeline" viewBox="0 0 1000 96" preserveAspectRatio="none" role="img" aria-label="Energy over time"></svg>
+      <div class="legend">
+        <span><i style="background:var(--pink)"></i>peak</span>
+        <span><i style="background:var(--amber)"></i>build</span>
+        <span><i style="background:var(--blue)"></i>groove</span>
+        <span><i style="background:var(--surface-3)"></i>calm</span>
+        <span>★ killing-part candidate · click a phrase to loop it</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-r">
+    <div class="card">
+      <div class="tabs" role="tablist">
+        <button class="tab on" data-tab="breakdown">Breakdown</button>
+        <button class="tab" data-tab="plan">Practice plan</button>
+        <button class="tab" data-tab="practice">Practice mode</button>
+        <button class="tab" data-tab="coach">AI coach</button>
+      </div>
+
+      <div class="pane on" id="pane-breakdown"><div class="placeholder" id="bd-empty">Run an analysis to see how the dance is built.</div><div id="bd"></div></div>
+      <div class="pane" id="pane-plan"><div class="placeholder" id="plan-empty">The practice plan appears after analysis.</div><div id="plan"></div></div>
+
+      <div class="pane" id="pane-practice">
+        <div class="placeholder" id="pr-empty">Analyze a video first — Practice mode compares your webcam pose to the dancer, frame by frame.</div>
+        <div id="pr" class="hidden">
+          <div class="cam"><video id="cam" playsinline muted></video><canvas id="cam-overlay"></canvas></div>
+          <div class="controls">
+            <button class="btn primary sm" id="cam-start">📷 Start camera</button>
+            <button class="btn sm" id="sess-start" disabled>● Start session</button>
+            <button class="btn sm" id="sess-stop" disabled>■ Stop & score</button>
+            <span style="font-size:11px;color:var(--text-3)">Tip: turn on ⇋ Mirror and copy the reference like a mirror. Loop a phrase from the timeline.</span>
+          </div>
+          <div class="score">
+            <div class="big" id="live-score">–<small>/100</small></div>
+            <div class="parts" id="live-parts"></div>
+          </div>
+          <div class="lag" id="live-lag">Camera off.</div>
+          <div id="summary" class="block"></div>
+        </div>
+      </div>
+
+      <div class="pane" id="pane-coach">
+        <div class="placeholder" id="coach-empty">Analyze a video first. The AI coach turns the measurements into a written brief using your local <code>claude</code> CLI.</div>
+        <div id="coach" class="hidden">
+          <div class="controls" style="margin:0 0 12px">
+            <label style="font-size:12px;color:var(--text-2)">Language
+              <select id="coach-lang" class="btn sm"><option value="en">English</option><option value="ko">한국어</option></select>
+            </label>
+            <button class="btn primary sm" id="coach-go">Write my brief</button>
+          </div>
+          <div class="coach-out" id="coach-out"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card" style="margin-top:12px">
+      <h3>Recent analyses</h3>
+      <div class="recent" id="recent"><span style="color:var(--text-4)">None yet.</span></div>
+    </div>
+  </div>
+</main>
+
+<script type="module" src="/dance/app.mjs"></script>
+</body>
+</html>

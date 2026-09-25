@@ -139,3 +139,18 @@ lib/      agent runners, isolated git-worktree sandboxes, risk scoring & gate, c
 **Builders sell the 10X dream. 10XAI hands you the receipts — verified, measured, and runnable — before you waste a weekend.**
 
 Licensed under MIT — free to use, modify, and redistribute.
+
+---
+
+## Dance Lab — idol dance analysis (`/dance`)
+
+Open `http://localhost:8080/dance` (or **💃 Dance Lab** in the board header). Paste a YouTube dance video or upload a clip; dance-practice / fixed-cam videos work best.
+
+- **Measure.** MediaPipe Pose runs locally in your browser and follows the most central dancer. It records speed, sharp stops, bounce, arm extension, knee bend, travel, level changes and symmetry, all in torso-lengths so the camera distance doesn't matter. The audio track is beat-tracked, so it can also check whether hits land on the beat. Camera cuts and tracking switches split the analysis instead of creating fake speed spikes.
+- **Break down.** Eight 0–100 axes (Power, Sharpness, Flow, Groove, Lines, Footwork, Levels, Rhythm) produce a style profile (e.g. *Knife-sync precision (칼군무)*, *Smooth groove*, *Hard-hitting performance*). You also get strengths and trade-offs, each backed by a measured number, plus a phrase timeline with killing-part candidates.
+- **Practise.** The page gives concrete cues for the feel: stance angle, bounce direction, stop time, arm reach. It also builds a BPM tempo ladder, signature drills with measurable targets, a session plan and a 3-week progression.
+- **Practice mode.** Your webcam pose is compared to the dancer's, frame by frame. You get a live match score, a per-limb breakdown, and whether you're early or late. At the end you see *Reference vs You* numbers: energy, stops, reach, bounce and knee angle.
+- **AI coach (optional).** The local `claude` CLI writes a brief in English or Korean from the measurements.
+
+YouTube's embedded player can't be read frame by frame. To analyze a video, either upload a clip or, if `yt-dlp` is installed, fetch a local copy for personal study (this needs explicit confirmation). Videos and reports are stored in `workspace/dance/` (gitignored). Try **✨ Demo dancer** to see the full flow without a video.
+
