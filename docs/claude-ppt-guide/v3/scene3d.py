@@ -261,6 +261,31 @@ def build_uchu(origin=(0, 0, 0), s=1.0):
                 brow_z=[bpy.data.objects["ubrow-1"].location.z, bpy.data.objects["ubrow1"].location.z],
                 sclera=[bpy.data.objects["usclera-1"], bpy.data.objects["usclera1"]])
 
+# Uchu as the narrator: lip sync from the VO envelope, Hammy's gesture track, and signature "shock" beats
+SHOCK = [(6.2, 7.4), (13.25, 14.45), (29.0, 30.0)]
+def pose_uchu_narrator(U, f):
+    t = f / FPS
+    m = MOUTH[min(f, len(MOUTH) - 1)]
+    sh = max([min(smooth((t - a) / 0.2), smooth((b - t) / 0.3)) for a, b in SHOCK] + [0])
+    # small "o" at rest, opens with speech, big "O" on a shock beat
+    U["mouth"].scale = (0.75 + 0.15 * m + 0.3 * sh, 1.0, 0.45 + 0.75 * m + 0.6 * sh)
+    U["head"].rotation_euler = Euler((math.radians(2.5 * math.sin(t * 2.1) - 5 * m - 6 * sh), math.radians(2 * math.sin(t * 1.3)),
+                                      math.radians(5 * math.sin(t * 0.7) + 3 * math.sin(t * 23) * sh)))
+    for i, a_ in enumerate(U["ants"]):
+        a_.rotation_euler = Euler((math.radians((6 + 10 * sh) * math.sin(t * 7 + i)), math.radians((10 + 14 * sh) * math.sin(t * 5.5 + i * 1.7)), 0))
+    for br, z in zip(U["brows"], U["brow_z"]): br.location.z = z + 0.03 * m + 0.08 * sh
+    bl = 1.0 if (t % 3.1) > 0.11 or sh > 0.3 else 0.15
+    for sc_ in U["sclera"]: sc_.scale.z = 0.14 * bl * (1 + 0.15 * sh)
+    rot = {-1: [-15, 12], 1: [-15, -12]}
+    for (a, b, kind, side) in GEST:
+        if a - 0.35 <= t <= b + 0.35:
+            w = min(smooth((t - (a - 0.35)) / 0.35), smooth(((b + 0.35) - t) / 0.35))
+            tgt = {side: [-25, -side * (135 + 16 * math.sin(t * 13))]} if kind == "wave" else {side: [-35, -side * 95]} if kind == "point" else {-1: [-40, 60], 1: [-40, -60]}
+            for sd, (rx, ry) in tgt.items(): rot[sd] = [lerp(rot[sd][0], rx, w), lerp(rot[sd][1], ry, w)]
+    for sd in (-1, 1):  # hands fly up on shock beats
+        rot[sd] = [lerp(rot[sd][0], -45, sh * 0.8), lerp(rot[sd][1], -sd * 140, sh * 0.8)]
+    for sd, pv in U["arms"].items(): pv.rotation_euler = Euler((math.radians(rot[sd][0]), math.radians(rot[sd][1]), 0))
+
 # Uchu appears in three reaction beats (global seconds); arms fly up on each beat
 UCHU_BEATS = [(6.2, 9.5), (13.2, 16.4), (27.4, 30.0)]
 def pose_uchu(U, f):
@@ -342,11 +367,11 @@ def project(cam, name, co, f):
 
 # ---------------------------------------------------------------- shots
 H = None
-if SHOT == "sprite":
-    H = build_hammy()
-    rig_lights()
-    cam, aim = camera((0, -8.2, 1.75), (0, 0, 1.5), lens=50)
-    def per_frame(f): pose_hammy(H, f)
+if SHOT == "sprite":  # the narrator (Uchu) on transparent film
+    U = build_uchu()
+    rig_lights((0, 0, 2.0))
+    cam, aim = camera((0, -9.6, 2.35), (0, 0, 2.1), lens=50)
+    def per_frame(f): pose_uchu_narrator(U, f)
 
 elif SHOT == "uchu":
     U = build_uchu()
@@ -356,26 +381,26 @@ elif SHOT == "uchu":
 
 elif SHOT == "hero":
     glossy_floor()
-    H = build_hammy((0, 0, 0))
-    rig_lights()
+    U = build_uchu((0, 0, 0))
+    rig_lights((0, 0, 2.0))
     # cyclorama light panels behind
     for i, (x, c) in enumerate([(-5.5, "#7C5CFF"), (-2.2, "#3B82F6"), (2.2, "#22D3EE"), (5.5, "#C6F432")]):
         bpy.ops.mesh.primitive_cube_add(location=(x, 7 + abs(x) * 0.3, 3.2))
         p = bpy.context.object; p.scale = (0.08, 0.08, 3.2)
         p.data.materials.append(mat(f"bar{i}", c, emit=c, estr=9.0))
-    cam, aim = camera((0, -17, 3.6), (0, 0, 1.6), lens=45)
+    cam, aim = camera((0, -19, 4.0), (0, 0, 2.0), lens=45)
     def per_frame(f):
         t = f / FPS; p = smooth(t / 3.2)
-        cam.location = (lerp(-2.5, 0.6, p), lerp(-17, -8.4, p), lerp(3.6, 2.1, p))
-        aim.location = (0, 0, lerp(1.2, 1.7, p))
-        pose_hammy(H, f)
-        project(cam, "hammyHead", (0, -0.4, 3.0), f)
+        cam.location = (lerp(-2.5, 0.6, p), lerp(-19, -10.2, p), lerp(4.0, 2.6, p))
+        aim.location = (0, 0, lerp(1.6, 2.2, p))
+        pose_uchu_narrator(U, f)
+        project(cam, "hammyHead", (0, -0.4, 4.35), f)
 
 elif SHOT == "chart":
     glossy_floor(); neon_grid(60, 48)
     vals = [368, 385, 408, 410, 412, 447, 482]
     names = ["25.1Q", "25.2Q", "25.3Q", "25.4Q", "26.1Q", "26.2Q", "26.3Q"]
-    H = build_hammy((-1.6, -0.4, 0), s=0.72)
+    H = build_uchu((-1.7, -0.4, 0), s=0.62)
     H["root"].rotation_euler = (0, 0, math.radians(-22))
     rig_lights((1.5, 0, 1.5))
     bars = []
@@ -408,8 +433,8 @@ elif SHOT == "chart":
             cp.location = (x, 0, hh + 0.015); cp.hide_render = g <= 0.01
             project(cam, f"bar{i}", (x, 0, h * g + 0.35), f)
             project(cam, f"base{i}", (x, -0.6, 0), f)
-        pose_hammy(H, f)
-        project(cam, "hammyHead", (-1.6, -0.4, 2.3), f)
+        pose_uchu_narrator(H, f)
+        project(cam, "hammyHead", (-1.7, -0.4, 2.7), f)
 
 elif SHOT == "road":
     glossy_floor(200); neon_grid(140, 90)
