@@ -118,6 +118,14 @@ scene(10, 40, (R, s) => {
   const tada = el("div", `left:170px;top:104px;z-index:12;padding:8px 22px 10px;background:#c8372d;color:#fffaf0;border:4px solid ${INK1};border-radius:14px;font-size:36px;box-shadow:6px 7px 0 rgba(43,35,32,.25);white-space:nowrap;transform-origin:0 50%`, "짠! 제가 만든 페이지", cam); tada.className = "abs";
   const COLS = ["#f7d774", "#e0607e", "#3e8fb8", "#9fd3a8", "#e8894f"];
   const conf = Array.from({ length: 44 }, (_, i) => { const d = el("div", `left:0;top:0;width:${12 + c01_rnd(i) * 10}px;height:${8 + c01_rnd(i + 50) * 10}px;background:${COLS[i % 5]};border:2px solid ${INK1};border-radius:2px;z-index:15;opacity:0`, "", cam); d.className = "abs"; return d; });
+  // Noa's guide intro (35.9–39.3): nameplate, an "eye contact" reticle he keeps dodging, 0% stamp
+  const c01_plate = el("div", `left:1250px;top:300px;z-index:17;padding:10px 26px 12px;background:#fff3cf;border:4px solid ${INK1};border-radius:14px;box-shadow:6px 7px 0 rgba(43,35,32,.25);white-space:nowrap;opacity:0;transform-origin:0 100%`,
+    `<div style="font-size:24px;letter-spacing:4px;color:#c8372d">YOUR GUIDE</div><div style="font-size:48px;line-height:1.05">가이드 · 노아</div>`, cam); c01_plate.className = "abs";
+  const c01_ret = el("div", "left:0;top:0;z-index:36;opacity:0;pointer-events:none", `<svg width="160" height="160" viewBox="-80 -80 160 160" overflow="visible">
+    <g class="ring"><circle r="58" fill="none" stroke="#c8372d" stroke-width="6" stroke-dasharray="22 12"/><circle r="8" fill="#c8372d"/>
+    <path d="M0 -76 V-44 M0 44 V76 M-76 0 H-44 M44 0 H76" stroke="#c8372d" stroke-width="6" stroke-linecap="round"/></g>
+    <g transform="translate(40 -96)"><rect x="-6" y="-24" width="128" height="36" rx="10" fill="#fffaf0" stroke="${INK1}" stroke-width="3"/><text x="58" y="3" text-anchor="middle" font-size="24" font-family="GaeguKo" fill="${INK1}">아이컨택?</text></g></svg>`, cam); c01_ret.className = "abs"; const c01_ring = c01_ret.querySelector(".ring");
+  const c01_zero = el("div", `left:1250px;top:440px;z-index:19;padding:6px 22px 10px;border:6px solid #c8372d;border-radius:14px;background:rgba(255,250,240,.94);color:#c8372d;font-size:50px;white-space:nowrap;opacity:0;box-shadow:6px 7px 0 rgba(43,35,32,.22)`, "아이컨택 0%", cam); c01_zero.className = "abs";
   const toot = el("div", `left:0;top:0;z-index:16;font-size:40px;color:#c8372d;opacity:0;white-space:nowrap`, "뿌우~!", cam); toot.className = "abs";
 
   const noa = makeNoa(140); cam.appendChild(noa);
@@ -134,20 +142,22 @@ scene(10, 40, (R, s) => {
   // ---- game-show wheel ----
   const WC = [380, 470], WR = 200, SEG = [["에이전시", "🎬", "#f7d774"], ["쇼핑몰", "🛒", "#f2a7a0"], ["매장", "🏪", "#9fd3a8"], ["인플루언서", "📱", "#f7b8cb"]];
   const arcP = (a0, a1, r) => { const p = a => [Math.sin(a * Math.PI / 180) * r, -Math.cos(a * Math.PI / 180) * r]; const [x0, y0] = p(a0), [x1, y1] = p(a1); return `M0 0 L${x0.toFixed(1)} ${y0.toFixed(1)} A${r} ${r} 0 0 1 ${x1.toFixed(1)} ${y1.toFixed(1)} Z`; };
-  const segs = [0, 1, 2, 3].map(i => `<path d="${arcP(i * 90 - 45, i * 90 + 45, WR - 14)}" fill="${SEG[i][2]}" stroke="${INK1}" stroke-width="4"/>
-      <g transform="rotate(${i * 90})"><text x="0" y="${-(WR - 66)}" text-anchor="middle" font-size="44" font-family="GaeguKo">${SEG[i][1]}</text>
-      <text x="0" y="${-(WR - 126)}" text-anchor="middle" font-size="${i === 3 ? 30 : 36}" fill="${INK1}" font-family="GaeguKo">${SEG[i][0]}</text></g>`).join("");
+  const segs = [0, 1, 2, 3].map(i => `<path d="${arcP(i * 90 - 45, i * 90 + 45, WR - 14)}" fill="${SEG[i][2]}" stroke="${INK1}" stroke-width="4"/>`).join("");
+  // labels stay upright while the wheel spins (positioned per frame) so they are always readable
+  const labs = [0, 1, 2, 3].map(i => `<g class="lab"><text x="0" y="-14" text-anchor="middle" font-size="40" font-family="GaeguKo">${SEG[i][1]}</text>
+      <text x="0" y="26" text-anchor="middle" font-size="${i === 3 ? 30 : 36}" fill="${INK1}" font-family="GaeguKo">${SEG[i][0]}</text></g>`).join("");
   const bulbs = Array.from({ length: 16 }, (_, k) => { const a = k / 16 * 2 * Math.PI; return `<circle class="bl" cx="${(Math.sin(a) * (WR - 2)).toFixed(1)}" cy="${(-Math.cos(a) * (WR - 2)).toFixed(1)}" r="9" stroke="${INK1}" stroke-width="3"/>`; }).join("");
   const wheel = el("div", `left:${WC[0] - 320}px;top:${WC[1] - 300}px;width:640px;height:720px;z-index:5`, `<svg width="640" height="720" viewBox="-320 -300 640 720" overflow="visible">
       <path d="M-22 0 L-90 390 L90 390 L22 0 Z" fill="#c8372d" stroke="${INK1}" stroke-width="5" stroke-linejoin="round"/>
       <rect x="-120" y="380" width="240" height="30" rx="10" fill="#8f1f18" stroke="${INK1}" stroke-width="5"/>
       <circle cx="10" cy="12" r="${WR + 6}" fill="rgba(43,35,32,.2)"/>
       <circle cx="0" cy="0" r="${WR + 6}" fill="#e8894f" stroke="${INK1}" stroke-width="6"/>
-      <g class="rot">${segs}</g>
+      <g class="rot">${segs}</g><g class="labs">${labs}</g>
       <g class="bulbs">${bulbs}</g>
       <circle cx="0" cy="0" r="40" fill="#fffaf0" stroke="${INK1}" stroke-width="5"/><text x="0" y="10" text-anchor="middle" font-size="28" font-family="GaeguKo" fill="#c8372d">GO</text>
       <g class="ptr"><path d="M-26 ${-WR - 44} L26 ${-WR - 44} L0 ${-WR + 10} Z" fill="#fffaf0" stroke="${INK1}" stroke-width="5" stroke-linejoin="round"/><circle cx="0" cy="${-WR - 40}" r="10" fill="#c8372d" stroke="${INK1}" stroke-width="4"/></g>
       <g class="rays" opacity="0">${Array.from({ length: 9 }, (_, k) => { const a = (-80 + k * 20) * Math.PI / 180; return `<line x1="${Math.sin(a) * 60}" y1="${-WR - 40 - Math.cos(a) * 60}" x2="${Math.sin(a) * 100}" y2="${-WR - 40 - Math.cos(a) * 100}" stroke="${INK1}" stroke-width="6" stroke-linecap="round"/>`; }).join("")}</g></svg>`, cam); wheel.className = "abs";
+  const c01_labs = [...wheel.querySelectorAll(".lab")];
   const wRot = wheel.querySelector(".rot"), wPtr = wheel.querySelector(".ptr"), wRays = wheel.querySelector(".rays"), wBulbs = [...wheel.querySelectorAll(".bl")];
   const wTitle = el("div", `left:${WC[0] - 200}px;top:130px;width:400px;text-align:center;z-index:7;font-size:48px;color:#c8372d;text-shadow:4px 4px 0 #f7d774;-webkit-text-stroke:1.5px ${INK1};white-space:nowrap`, "업종 룰렛!", cam); wTitle.className = "abs";
   // mystery card (before the first spin)
@@ -191,6 +201,8 @@ scene(10, 40, (R, s) => {
     wheel.style.transform = `translate(${-900 * wOut * wOut}px, ${-700 * (1 - back(wIn))}px) rotate(${-200 * wOut * wOut}deg)`;
     wheel.style.transformOrigin = `320px 300px`;
     wRot.setAttribute("transform", `rotate(${ang})`);
+    c01_labs.forEach((g, i) => { const A = (ang + i * 90) * Math.PI / 180, r = i === 3 ? 122 : 118;
+      g.setAttribute("transform", `translate(${(Math.sin(A) * r).toFixed(1)} ${(-Math.cos(A) * r).toFixed(1)})`); });
     const spinning = SPIN.some(([a, b]) => t > a && t < b);
     const fr = ((ang % 22.5) + 22.5) % 22.5 / 22.5;
     wPtr.setAttribute("transform", `rotate(${spinning ? -18 * fr : 5 * c01_settle(t - (SPIN.find(([a, b]) => t >= b) || [0, 99])[1], 3, 5)} 0 ${-WR - 40})`);
@@ -294,11 +306,12 @@ scene(10, 40, (R, s) => {
     const rY = t < 33.9 ? lerp(-900, 0, rIn * rIn) : -26 * Math.abs(c01_settle(t - 33.9, 1.6, 4)) * 1;
     const rRot = t < 33.9 ? -4 * (1 - rIn) : 2.5 * c01_settle(t - 33.9, 1.3, 3);
     ref.style.opacity = t > 33.05 ? 1 : 0;
-    ref.style.transform = `translateY(${rY}px) rotate(${rRot}deg) scale(${1 + 0.015 * ease(seg(t, 34, 40))})`;
+    const c01_sh = ease(seg(t, 35.6, 36.2));
+    ref.style.transform = `translate(${-110 * c01_sh}px, ${rY}px) rotate(${rRot}deg) scale(${(1 + 0.015 * ease(seg(t, 34, 40))) * (1 - 0.12 * c01_sh)})`;
     ref.scrollTo(0.55 * ease(seg(t, 34.8, 39.6)), t);
     const tdP = back(seg(t, 34.0, 34.35));
     tada.style.opacity = seg(t, 34.0, 34.05);
-    tada.style.transform = `rotate(${-6 + 2 * Math.sin(t * 3)}deg) scale(${1.8 - 0.8 * tdP})`;
+    tada.style.transform = `translate(${-60 * c01_sh}px, ${10 * c01_sh}px) rotate(${-6 + 2 * Math.sin(t * 3)}deg) scale(${(1.8 - 0.8 * tdP) * (1 - 0.1 * c01_sh)})`;
     conf.forEach((d, i) => {
       const side = i % 2, dt = t - 33.95 - (i % 6) * 0.03;
       if (dt < 0 || dt > 3) { d.style.opacity = 0; return; }
@@ -311,6 +324,7 @@ scene(10, 40, (R, s) => {
     });
 
     // ---- Noa ----
+    let c01_s = 1, c01_dx = 0, c01_smear = 0;
     let nx = 180, ny = 716, hop = 0, mood = "happy", wave = false, talk = false, look = 1, flip = false, arm = null, sq = 0, gl = 0, nrot = 0;
     if (t < 32.4) {
       // hops in from the right, then works the wheel: crouch → swipe → watch → celebrate
@@ -333,10 +347,38 @@ scene(10, 40, (R, s) => {
       sq = t > 33.4 ? 0.15 * c01_settle(t - 33.4, 2.5, 5) : 0; look = 1; flip = true;
       mood = t > 32.6 && t < 33.4 ? "shock" : "happy";
       if (t > 35.0 && t < 35.5) { flip = false; look = 0; gl = seg(t, 35.0, 35.15) * (1 - seg(t, 35.3, 35.5)); }
-      if (t > 35.5) { arm = -18 + 6 * Math.sin(t * 5); talk = t > 35.6 && t < 38; }
+      if (t > 35.5 && t < 35.95) { arm = -18 + 6 * Math.sin(t * 5); talk = true; }
+      if (t >= 35.95) {
+        // guide intro: grows into a close-up, then dodges the "eye contact" reticle twice
+        c01_s = 1 + 0.85 * back(seg(t, 35.9, 36.4));
+        flip = false; look = 0;
+        const d1 = seg(t, 37.25, 37.42), d2 = seg(t, 37.85, 38.02);
+        c01_dx = -80 * out(d1) + 130 * out(d2);
+        if (t > 37.25) look = t < 37.85 ? -1 : 1;
+        if (t > 37.85) flip = true;
+        c01_smear = (d1 > 0 && d1 < 1) || (d2 > 0 && d2 < 1) ? (d2 > 0 ? 1 : -1) : 0;
+        sq = 0.1 * c01_settle(t - 37.42, 2.6, 6) + 0.1 * c01_settle(t - 38.02, 2.6, 6) + (t > 35.9 ? 0.12 * c01_settle(t - 36.35, 2.2, 5) : 0);
+        if (t > 38.35) { arm = null; gl = seg(t, 38.55, 38.7) * (1 - seg(t, 38.85, 39.05)); }
+        talk = t > 36.1 && t < 37.0;
+      }
+      nx += c01_dx;
     }
-    poseNoa(noa, t, { x: nx, y: ny, s: 1, hop, mood, wave, talk, look, flip, op: seg(t, 11.0, 11.05) });
-    noa.style.transform += ` rotate(${nrot}deg) scale(${1 + sq}, ${1 - sq})`;
+    poseNoa(noa, t, { x: nx, y: ny, s: c01_s, hop, mood, wave, talk, look, flip, arms: t > 38.35 ? "hips" : undefined, op: seg(t, 11.0, 11.05) });
+    noa.style.transform += ` rotate(${nrot}deg) scale(${1 + sq}, ${1 - sq}) skewX(${-14 * c01_smear}deg)`;
+    // intro props
+    const plP = back(seg(t, 36.05, 36.45));
+    c01_plate.style.opacity = clamp(plP * 2);
+    c01_plate.style.transform = `scale(${plP}) rotate(${-3 + wobble(t, 36.45, 3, 10, 4)}deg)`;
+    const fy = 868 - 0.6 * 154 * c01_s;
+    const rIn2 = popIn(c01_ret, t, 36.95, 0.3);
+    const rx = t < 37.3 ? 1470 + 70 : t < 37.85 ? lerp(1540, 1540 - 80, out(seg(t, 37.45, 37.7))) : lerp(1460, 1590, out(seg(t, 38.05, 38.3)));
+    c01_ret.style.opacity = rIn2 > 0 ? clamp(rIn2 * 3) * (1 - seg(t, 38.35, 38.5)) : 0;
+    c01_ret.style.transform = `translate(${rx - 80}px, ${fy - 80}px) scale(${(0.6 + 0.4 * back(rIn2)) * (1 + 0.25 * seg(t, 38.35, 38.5))})`;
+    c01_ring.setAttribute("transform", `rotate(${(t * 60) % 360})`);
+    const zS = seg(t, 38.35, 38.6);
+    c01_zero.style.opacity = zS > 0 ? 1 : 0;
+    c01_zero.style.transform = `rotate(-8deg) scale(${lerp(2.4, 1, back(zS)) * (1 + 0.05 * c01_settle(t - 38.6, 3, 5))})`;
+    if (t > 38.35 && t < 38.7) shakeCam(t, 38.4, 8, 0.3);
     noa.style.transformOrigin = nrot ? "50% 60%" : "50% 100%";
     if (arm !== null) noa.P.ar.setAttribute("transform", `rotate(${arm} 154 117)`);
     glint.setAttribute("opacity", gl); glint.setAttribute("transform", `translate(128 98) scale(${0.3 + 1.1 * gl}) rotate(${t * 200})`);
@@ -351,7 +393,7 @@ scene(10, 40, (R, s) => {
     toot.style.opacity = blow > 0.5 ? 1 : 0;
     toot.style.transform = `translate(${nx - 150}px, ${ny - 30}px) rotate(-10deg) scale(${0.9 + 0.2 * blow})`;
     sayBubble(bubS, t, 21.4, 22.7, "나도 볼에 담았다!", nx + 70, ny - 80);
-    sayBubble(bub, t, 35.3, 39.6, "이게 실제로 만든 페이지야 👀", 1420, 470);
+    sayBubble(bub, t, 34.5, 35.85, "진짜 페이지야 👀", 1400, 470);
   };
 });
 })();

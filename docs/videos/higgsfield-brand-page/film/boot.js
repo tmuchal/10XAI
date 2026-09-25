@@ -251,9 +251,71 @@ function stageFx(t) {
   });
   confetti(t);
 }
-window.READY = Promise.all([...DECOR_READY, ...[["700 40px GaeguKo", "가나다"], ["400 40px GaeguKo", "가"], ["700 40px GaeguLat", "Aa"], ["400 40px GaeguLat", "A"]].map(([f, x]) => document.fonts.load(f, x))]).then(() => document.fonts.ready);
+// ============================================================================ 3D INSERTS
+// Blender PNG/JPG sequences (assets/3d/<shot>/NNNN.*, see tools/blender/finalize.py) played by seq.js.
+// Manifest is inlined: fetch() of a local manifest.json is blocked under file:// (how the renderers load the page).
+// Keep frames/fps/ext in sync with assets/3d/manifest.json.
+const SHOTS3D = [
+  { name: "flythrough", start: 0.0, frames: 72, fps: 30, alpha: false, ext: "jpg", x: 0, y: 0, w: 1920, h: 1080 },
+  { name: "photobooth", start: 86.5, frames: 90, fps: 30, alpha: true, ext: "png", x: 1120, y: 170, w: 740, h: 740 },
+  { name: "coinfunnel", start: 163.0, frames: 90, fps: 30, alpha: true, ext: "png", x: 590, y: 140, w: 740, h: 740 },
+  { name: "curtaincall", start: 187.0, frames: 90, fps: 30, alpha: true, ext: "png", x: 0, y: 0, w: 1920, h: 1080 },
+];
+window.__pending = window.__pending || [];
+// RGBA inserts live inside #scenes so they share its scale(.92) about (960,300) and the #cam push/shake.
+// Placement below is given in final SCREEN px (judged against snaps) and converted to #scenes coords.
+const SCN = .92, toScene = (X, Y, W, H) => ({ x: 960 + (X - 960) / SCN, y: 300 + (Y - 300) / SCN, w: W / SCN, h: H / SCN });
+const INK3D = "drop-shadow(0 0 .9px rgba(43,35,32,.95)) drop-shadow(6px 8px 0 rgba(120,70,30,.2))";
+const INSERTS = [
+  // screen-space box of the whole square/16:9 source frame; drop = px of drop-in; boil = jiggle amount
+  { name: "photobooth", box: [960, 140, 760, 760], fadeIn: .12, fadeOut: .3, drop: 46, boil: 1.1 },
+  { name: "coinfunnel", box: [820, 236, 700, 700], fadeIn: .12, fadeOut: .3, drop: 40, boil: 1.1 },
+  { name: "curtaincall", box: [555, 506, 810, 456], fadeIn: .15, fadeOut: .3, drop: 30, boil: .8 },
+].map(o => {
+  const e = SHOTS3D.find(s => s.name === o.name), b = toScene(...o.box);
+  const wrap = el("div", `position:absolute;left:${b.x.toFixed(1)}px;top:${b.y.toFixed(1)}px;width:${b.w.toFixed(1)}px;height:${b.h.toFixed(1)}px;z-index:20;display:none;pointer-events:none;transform-origin:50% 100%`, null, $("scenes"));
+  const p = SEQ.attach(wrap, e, { x: 0, y: 0, w: b.w, h: b.h, fadeIn: o.fadeIn, fadeOut: o.fadeOut, z: 1 });
+  p.el.style.filter = INK3D;
+  return Object.assign(o, { wrap, p });
+});
+// opener fly-through: full frame ABOVE the whole stage (curtains z40-43, cite z45), under the captions (z50)
+const FLY = (() => {
+  const wrap = el("div", "position:absolute;inset:0;z-index:46;display:none;pointer-events:none;transform-origin:960px 470px", null, $("stage"));
+  const p = SEQ.attach(wrap, SHOTS3D[0], { x: 0, y: 0, w: 1920, h: 1080, fadeOut: .4, z: 1 });
+  return { wrap, p, end: SHOTS3D[0].start + p.duration };
+})();
+const ALL3D = [FLY, ...INSERTS];
+function warm3d(t) {   // fetch a shot's frames ~1.5 s before its window; drop the refs once it's over
+  ALL3D.forEach(({ p }) => {
+    const a = p.start, z = p.start + p.duration;
+    if (t > a - 1.5 && t < z) p.preload(); else if (p.warm && (t > z + .5 || t < a - 3)) p.release();
+  });
+}
+function fx3d(t) {
+  warm3d(t);
+  // fly-through: plays 0..2.4; last 0.4 s it pushes in (zoom toward the proscenium) while fading into the 2D stage
+  FLY.p.update(t);
+  const fv = FLY.p.frameAt(t) >= 0;
+  FLY.wrap.style.display = fv ? "block" : "none";
+  if (fv) FLY.wrap.style.transform = `scale(${(1 + .16 * ease(seg(t, FLY.end - .45, FLY.end))).toFixed(4)})`;
+  INSERTS.forEach((o, i) => {
+    o.p.update(t);
+    const v = o.p.frameAt(t) >= 0;
+    o.wrap.style.display = v ? "block" : "none";
+    if (!v) return;
+    const lt = t - o.p.start, end = o.p.duration;
+    const din = back(seg(lt, 0, .38)), dout = ease(seg(lt, end - .3, end));
+    o.wrap.style.transform = `translateY(${(-o.drop * (1 - din) + 18 * dout).toFixed(1)}px) scale(${(1 - .04 * dout).toFixed(4)})`;
+    jiggle(o.wrap, t, o.boil, 300 + i);   // 8 fps hand-drawn boil (rotate/translate props, separate from transform)
+  });
+}
+// READY also decodes the first frame of every shot, and waits for whatever render(0) queued.
+window.READY = Promise.all([...DECOR_READY, ...ALL3D.map(({ p }) => p.decodeFirst()),
+  ...[["700 40px GaeguKo", "가나다"], ["400 40px GaeguKo", "가"], ["700 40px GaeguLat", "Aa"], ["400 40px GaeguLat", "A"]].map(([f, x]) => document.fonts.load(f, x))])
+  .then(() => document.fonts.ready).then(() => Promise.all(window.__pending.splice(0)));
 const baseRender = render;
-window.render = t => { baseRender(t); stageFx(t); };
+// returns a Promise: the renderers' page.evaluate() awaits it, so every 3D frame is decoded before capture
+window.render = t => { baseRender(t); stageFx(t); fx3d(t); return Promise.all(window.__pending.splice(0)); };
 window.DURATION = DURATION;
 if (!location.search.includes("render")) {
   const t0 = performance.now();

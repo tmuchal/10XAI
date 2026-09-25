@@ -120,13 +120,17 @@ scene(106, 134, (R, s) => {
     const k = order.indexOf(i); d.leave = k < 11 ? 108.45 + k * .1 : 0;
     return d;
   });
-  const BIG = [["+32%", 32, "+", "로딩 1초 → 3초", "이탈 확률이 이만큼 올라요"], ["53%", 53, "", "3초 넘으면 떠나요", "모바일 방문자 · Google"]].map(([, v, pre, k1, k2], i) => {
-    const c = c04_box(BA, 430, 250, 1060, 460, i ? "#fbd9d3" : "#fff4d0", "z-index:40;display:flex;flex-direction:column;align-items:center;justify-content:center;overflow:visible");
+  // one number, one focal point: the 53% the narrator actually says (109.8 s)
+  const c04_rays = el("div", "left:960px;top:480px;width:0;height:0;z-index:39", `<svg width="1400" height="1400" viewBox="-700 -700 1400 1400" style="position:absolute;left:-700px;top:-700px;overflow:visible">${Array.from({ length: 18 }, (_, k) => `<path d="M${(Math.cos(k * .349 - .06) * 330).toFixed(0)} ${(Math.sin(k * .349 - .06) * 330).toFixed(0)} L${(Math.cos(k * .349) * 690).toFixed(0)} ${(Math.sin(k * .349) * 690).toFixed(0)} L${(Math.cos(k * .349 + .06) * 330).toFixed(0)} ${(Math.sin(k * .349 + .06) * 330).toFixed(0)}Z" fill="${k % 2 ? "#ffe39a" : "#fff4d0"}" stroke="${c04_INK}" stroke-width="3" stroke-linejoin="round"/>`).join("")}</svg>`, BA); c04_rays.className = "abs";
+  const c04_bA = makeBurst(BA, 26, 4);
+  const BIG = [["53%", 53, "", "3초 넘으면 떠나요", "모바일 방문자 · Google"]].map(([, v, pre, k1, k2], i) => {
+    const c = c04_box(BA, 430, 250, 1060, 460, "#fbd9d3", "z-index:40;display:flex;flex-direction:column;align-items:center;justify-content:center;overflow:visible");
     c.innerHTML = `<div class="sp" style="position:absolute;left:230px;top:4px;width:600px;height:290px"></div>
       <div class="n" style="position:relative;font-size:210px;line-height:1;color:#c8372d;text-shadow:6px 6px 0 #fff">0%</div>
       <div style="position:relative;margin-top:26px;font-size:50px;color:${c04_INK}">${k1}</div>
       <div style="position:relative;margin-top:6px;font-size:30px;color:#6b5d52">${k2}</div>`;
-    c.sp = c.querySelector(".sp"); c.sp.innerHTML = c04_SPLASH(i ? "#f7d774" : "#fbd35a"); c.n = c.querySelector(".n"); c.v = v; c.pre = pre;
+    c.sp = c.querySelector(".sp"); c.sp.innerHTML = c04_SPLASH("#f7d774");
+    c.st = el("div", `position:absolute;right:30px;bottom:-46px;padding:6px 22px 10px;border:5px solid #c8372d;border-radius:14px;background:#fffaf0;color:#c8372d;font-size:44px;white-space:nowrap;box-shadow:5px 6px 0 rgba(43,35,32,.2)`, "⏱ 3초 안에 떠야 해요", c); c.n = c.querySelector(".n"); c.v = v; c.pre = pre;
     return c;
   });
   // hamster wheel: Noa powers the loading, sunglasses fly off at 5 s
@@ -166,6 +170,7 @@ scene(106, 134, (R, s) => {
   L.noa = makeNoa(110); L.sec.appendChild(L.noa);
   const thumbF = el("div", "left:0;top:0;z-index:36", `<svg width="90" height="120" viewBox="0 0 90 120" overflow="visible"><path d="M30 118 V48 Q30 34 42 34 Q54 34 54 48 V62 Q66 56 74 66 Q86 64 88 78 V100 Q86 118 70 118Z" fill="#f6d7b8" stroke="${c04_INK}" stroke-width="4" stroke-linejoin="round"/><path d="M42 36 Q42 8 42 8" stroke="${c04_INK}" stroke-width="0"/></svg>`, BB); thumbF.className = "abs";
   const TICKS = [[114.0, 180], [115.3, 520], [116.6, 600]];
+  const c04_sl = [0, 1, 2, 3, 4, 5].map(i => { const l = el("div", `left:${i < 3 ? PX - 40 - i * 26 : PX + PW + 22 + (i - 3) * 26}px;top:${PY + 260 + (i % 3) * 90}px;width:8px;height:120px;border-radius:4px;background:${c04_INK};opacity:0;z-index:30`, "", BB); l.className = "abs"; return l; });
   const scrollAt = t => TICKS.reduce((S, [a, v], i) => lerp(S, v, back(seg(t, a, a + .7))), 0);
   // left: what each scroll triggers
   const lh = el("div", `left:200px;top:280px;width:500px;font-size:54px;color:${c04_INK};line-height:1.15`, "스크롤 1번 =<br><span style='color:#c8372d'>움직임 1개</span>", BB); lh.className = "abs";
@@ -175,7 +180,7 @@ scene(106, 134, (R, s) => {
   const spRows = SPEEDS.map(([n, v, c], i) => {
     const r = el("div", `left:1250px;top:${320 + i * 100}px;width:480px;height:84px`, `<div style="position:absolute;left:0;top:10px;width:64px;height:64px;border-radius:14px;border:4px solid ${c04_INK};background:${c}"></div>
       <div style="position:absolute;left:82px;top:14px;font-size:38px;color:${c04_INK}">${n}</div>
-      <div class="ar" style="position:absolute;left:190px;top:26px;height:32px;width:0;border-radius:16px;border:4px solid ${c04_INK};background:${c}"></div>`, BB);
+      <div class="ar" style="position:absolute;left:190px;top:26px;height:32px;width:0;border-radius:16px;border:4px solid ${c04_INK};background:repeating-linear-gradient(90deg,${c} 0 22px,rgba(43,35,32,.28) 22px 27px),${c}"></div>`, BB);
     r.className = "abs"; r.ar = r.querySelector(".ar"); r.v = v; return r;
   });
   const lookNoa = makeNoa(150); BB.appendChild(lookNoa);
@@ -193,7 +198,7 @@ scene(106, 134, (R, s) => {
     `<svg width="60" height="70" viewBox="0 0 60 70"><path d="M10 6 L56 35 L10 64Z" fill="#fff" stroke="${c04_INK}" stroke-width="4" stroke-linejoin="round"/></svg>`, vwrap);
   const pbar = el("div", `position:absolute;left:28px;right:28px;bottom:22px;height:22px;border-radius:11px;border:3px solid ${c04_INK};background:#fffaf0;z-index:35;overflow:hidden`, `<div class="pb" style="height:100%;width:0;background:#c8372d"></div>`, vwrap);
   const pb = pbar.querySelector(".pb");
-  const rec = el("div", `position:absolute;right:26px;top:36px;padding:2px 14px;border:3px solid ${c04_INK};border-radius:10px;background:#fff;font-size:30px;color:#c8372d;z-index:35`, "● 재생 중", vwrap);
+  const rec = el("div", `position:absolute;left:30px;bottom:60px;padding:2px 14px;border:3px solid ${c04_INK};border-radius:10px;background:#fff;font-size:30px;color:#c8372d;z-index:35`, "● 재생 중", vwrap);
   const cursor = el("div", "left:0;top:0;z-index:46", `<svg width="60" height="70" viewBox="0 0 60 70"><path d="M6 4 L6 56 L20 44 L30 66 L40 61 L30 40 L48 40Z" fill="#fff" stroke="${c04_INK}" stroke-width="4" stroke-linejoin="round"/></svg>`, BC); cursor.className = "abs";
     const ring = el("div", "left:1180px;top:230px;width:320px;height:320px", `<svg width="320" height="320" viewBox="0 0 320 320" style="position:relative">
     <circle cx="160" cy="160" r="128" fill="#fffaf0" stroke="${c04_INK}" stroke-width="5"/>
@@ -203,9 +208,10 @@ scene(106, 134, (R, s) => {
     <div class="n" style="position:absolute;left:0;right:0;top:108px;text-align:center;font-size:90px;color:#c8372d;line-height:1">0%</div>`, BC); ring.className = "abs";
   const ringSp = el("div", "position:absolute;left:-60px;top:-50px;width:440px;height:420px", c04_SPLASH("#fbd35a")); ring.insertBefore(ringSp, ring.firstChild);
   const arc = ring.querySelector(".arc"), ringN = ring.querySelector(".n");
+  const c04_bC = makeBurst(BC, 22, 7);
   const ringL = el("div", `position:absolute;left:-190px;top:372px;width:700px;text-align:center;font-size:40px;color:${c04_INK};line-height:1.25`, "영상 보고 구매를 결심했다<br><span style='font-size:26px;color:#6b5d52'>Wyzowl · 2026</span>", ring);
   const crowd = Array.from({ length: 20 }, (_, i) => {
-    const d = el("div", `left:${1150 + (i % 10) * 62}px;top:${720 + Math.floor(i / 10) * 72}px`, c04_person("#e9dcc0") + `<div class="bag" style="position:absolute;left:30px;top:30px;width:22px;height:24px;border:3px solid ${c04_INK};border-radius:4px;background:#f7d774;opacity:0"></div>`, BC);
+    const d = el("div", `left:${1122 + (i % 10) * 52}px;top:${720 + Math.floor(i / 10) * 72}px`, c04_person("#e9dcc0") + `<div class="bag" style="position:absolute;left:30px;top:30px;width:22px;height:24px;border:3px solid ${c04_INK};border-radius:4px;background:#f7d774;opacity:0"></div>`, BC);
     d.className = "abs"; d.body = d.querySelector("rect"); d.bag = d.querySelector(".bag"); return d;
   });
 
@@ -241,7 +247,7 @@ scene(106, 134, (R, s) => {
   const pC = el("div", `position:absolute;left:44px;top:220px;padding:12px 30px;border:4px solid ${c04_INK};border-radius:999px;background:#c8372d;color:#fff;font-size:34px;z-index:34;box-shadow:5px 6px 0 rgba(43,35,32,.25)`, "지금 시작하기 →", pvw);
   const pNoa = makeNoa(130); pvw.appendChild(pNoa);
   const sparks = [0, 1, 2, 3, 4].map(i => { const d = el("div", `position:absolute;left:0;top:0;font-size:40px;color:#f2a24e;z-index:36`, "✦", pvw); return d; });
-  const badge = el("div", `left:1230px;top:650px;z-index:37;padding:6px 20px 8px;border:5px solid #3e8fb8;border-radius:14px;background:rgba(255,250,240,.95);color:#3e8fb8;font-size:32px;white-space:nowrap`, "Claude가 코드로 만든 움직임", BD); badge.className = "abs";
+  const badge = el("div", `left:1016px;top:722px;z-index:37;padding:6px 20px 8px;border:5px solid #3e8fb8;border-radius:14px;background:rgba(255,250,240,.95);color:#3e8fb8;font-size:32px;white-space:nowrap`, "Claude가 코드로 만든 움직임", BD); badge.className = "abs";
   const proud = makeNoa(190); BD.appendChild(proud);
   const pb2 = makeBubble(BD);
 
@@ -307,15 +313,25 @@ scene(106, 134, (R, s) => {
       const dim = ease(seg(t, 109.6, 109.9));
       [track, room].forEach(e => { e.style.opacity = +e.style.opacity * (1 - .7 * dim); e.style.filter = dim > 0 ? `blur(${2 * dim}px)` : "none"; });
       BIG.forEach((c, i) => {
-        const a = [109.75, 111.0][i], z = [110.85, 113][i];
+        const a = 109.7, z = 112.05, hit = a + .62;
         const pin = back(seg(t, a, a + .35)), gone = ease(seg(t, z, z + .3));
         c.style.display = t > a && t < z + .3 ? "flex" : "none";
         c.style.opacity = clamp(pin * 2) * (1 - gone);
-        c.style.transform = `translate(${-900 * gone}px, ${200 * (1 - pin)}px) scale(${.5 + .5 * pin}) rotate(${(i ? 1.5 : -1.5) * pin - 12 * gone}deg)`;
-        const k = ease(seg(t, a + .1, a + .6)), sl = seg(t, a + .6, a + .85);
+        // impact frame: the card punches forward on the splat, then settles with a damped wobble
+        const kick = wobble(t, hit, 1, 16, 6);
+        c.style.transform = `translate(${-900 * gone}px, ${200 * (1 - pin)}px) scale(${(.5 + .5 * pin) * (1 + .05 * kick)}) rotate(${1.5 * pin + 2.2 * kick - 12 * gone}deg)`;
+        const k = ease(seg(t, a + .1, hit - .02)), sl = seg(t, hit, hit + .25);
         c.n.textContent = c.pre + Math.round(c.v * k) + "%";
         c.n.style.transform = `scale(${1 + .35 * Math.sin(Math.PI * sl)}) rotate(${-4 * Math.sin(Math.PI * sl)}deg)`;
-        c04_splat(c.sp, t, a + .6);
+        c04_splat(c.sp, t, hit);
+        c04_slam(c.st, t, 111.05, -5);
+        c.st.style.opacity = t > 111.05 ? 1 : 0;
+        const rp = seg(t, hit - .04, hit + .9);
+        c04_rays.style.display = rp > 0 && rp < 1 && gone < 1 ? "block" : "none";
+        c04_rays.style.opacity = (1 - rp) * .9;
+        c04_rays.style.transform = `scale(${.55 + .7 * out(rp)}) rotate(${12 * rp}deg)`;
+        c04_bA.fire(t, hit, 960, 470, 1.3);
+        shakeCam(t, hit, 12, .4); shakeCam(t, 111.33, 6, .3);
       });
       const tap = t > 107.6 && t < 112.3;
       const wt = el0, fly = seg(t, 109.55, 110.3);
@@ -342,7 +358,7 @@ scene(106, 134, (R, s) => {
       L.words.forEach((w, i) => {
         const p = back(seg(t, 113.1 + i * .22, 113.5 + i * .22));
         w.style.opacity = clamp(p * 2);
-        w.style.transform = `translate(${-60 * (1 - p)}px, ${300 + i * 58 - S * (1 - i * .14)}px) rotate(${-4 * (1 - p)}deg)`;
+        w.style.transform = `translate(${-60 * (1 - p)}px, ${78 + i * 60 - S * (1 - i * .14)}px) rotate(${-4 * (1 - p)}deg)`;
       });
       L.sec.style.transform = `translateY(${SH - S * 1}px)`;
       L.cards.forEach((c, i) => {
@@ -356,8 +372,12 @@ scene(106, 134, (R, s) => {
       poseNoa(L.noa, t, { x: 220, y: 256, s: 1, wave: t > 116.9, look: 1, op: seg(t, 116.7, 117) });
       // thumb swipes on each tick
       const tk = TICKS.map(([a]) => seg(t, a - .25, a + .5)).find(p => p > 0 && p < 1) || 0;
-      thumbF.style.opacity = clamp(seg(t, 113.4, 113.7)) * (1 - seg(t, 118.4, 118.7));
-      thumbF.style.transform = `translate(${PX + 300}px, ${PY + 500 - 170 * Math.sin(Math.PI * tk) - 60 * tk}px) rotate(${-10 + 10 * tk}deg)`;
+      const tOut = ease(seg(t, 117.15, 117.6));
+      thumbF.style.opacity = clamp(seg(t, 113.4, 113.7)) * (1 - seg(t, 117.4, 117.6));
+      thumbF.style.transform = `translate(${PX + 300 + 260 * tOut}px, ${PY + 500 - 170 * Math.sin(Math.PI * tk) - 60 * tk + 120 * tOut}px) rotate(${-10 + 10 * tk + 25 * tOut}deg)`;
+      // speed lines beside the phone while the page is being flicked
+      c04_sl.forEach((l, i) => { const v = clamp((Math.abs(vel) - 120) / 700);
+        l.style.opacity = v; l.style.transform = `translateY(${(-((t * 900 + i * 173) % 260)).toFixed(0)}px) scaleY(${(.4 + .8 * v).toFixed(2)})`; });
       const lIn = back(seg(t, 112.7, 113.2)); lh.style.opacity = clamp(lIn * 2); lh.style.transform = `translateX(${-120 * (1 - lIn)}px)`;
       const nT = TICKS.filter(([a]) => t >= a + .1).length, lastA = nT ? TICKS[nT - 1][0] + .1 : 0, bump = nT ? seg(t, lastA, lastA + .35) : 0;
       cntB.innerHTML = `움직임 <span style="font-size:96px;color:#c8372d;margin-left:14px">${nT}</span>`;
@@ -367,7 +387,9 @@ scene(106, 134, (R, s) => {
       spRows.forEach((r, i) => {
         const p = back(seg(t, 113.2 + i * .1, 113.6 + i * .1));
         r.style.opacity = clamp(p * 2); r.style.transform = `translateX(${160 * (1 - p)}px)`;
-        r.ar.style.width = Math.min(280, 30 + 120 * r.v + Math.abs(vel) * r.v * .35) + "px";
+        r.ar.style.width = Math.min(300, 40 + 180 * r.v + Math.abs(vel) * r.v * .12) + "px";
+        r.ar.style.backgroundPosition = `${(-S * r.v * .9).toFixed(1)}px 0`;       // stripes slide at the layer's own speed
+        r.style.translate = `${(Math.min(18, Math.abs(vel) * r.v * .03)).toFixed(1)}px 0`;
       });
       poseNoa(lookNoa, t, { x: 1560, y: 690, s: 1, look: -1, wave: t > 116.8 && t < 118.2, mood: vel > 200 ? "shock" : "happy", op: seg(t, 113, 113.4) });
     }
@@ -388,17 +410,17 @@ scene(106, 134, (R, s) => {
       const cm = ease(seg(t, 119.35, 119.85)), cOut = seg(t, 120.3, 120.6);
       cursor.style.opacity = seg(t, 119.3, 119.4) * (1 - cOut);
       cursor.style.transform = `translate(${lerp(820, 600, cm) + 30 * cOut}px, ${lerp(760, 540, cm) + 30 * cOut}px) scale(${1 - .15 * press + .15 * rel})`;
-      const rIn = back(seg(t, 120.3, 120.75)), home = ease(seg(t, 122.5, 123.0));
+      const rIn = back(seg(t, 120.85, 121.3)), home = ease(seg(t, 122.6, 123.1));
       ring.style.opacity = clamp(rIn * 2);
       ring.style.transform = `translate(${lerp(-380, 0, home)}px, ${lerp(20, 0, home)}px) scale(${(.4 + .6 * rIn) * lerp(1.5, 1, home)}) rotate(${-20 * (1 - rIn)}deg)`;
       ring.style.zIndex = 40;
-      vid.style.opacity = +vid.style.opacity * (1 - .7 * ease(seg(t, 120.3, 120.6)) * (1 - home));
-      const cp = ease(seg(t, 120.6, 121.6)), n = Math.round(85 * cp);
+      vid.style.opacity = +vid.style.opacity * (1 - .6 * ease(seg(t, 120.85, 121.15)) * (1 - home));
+      const cp = ease(seg(t, 121.0, 121.8)), n = Math.round(85 * cp);
       arc.setAttribute("stroke-dashoffset", 691 * (1 - .85 * cp));
       ringN.textContent = n + "%";
-      ringN.style.transform = `scale(${1 + .15 * Math.sin(Math.PI * seg(t, 121.6, 121.9))}) rotate(${-5 * Math.sin(Math.PI * seg(t, 121.6, 121.9))}deg)`;
-      c04_splat(ringSp, t, 121.6);
-      const lIn = back(seg(t, 121.7, 122.1)); ringL.style.opacity = clamp(lIn * 2); ringL.style.transform = `translateY(${30 * (1 - lIn)}px)`;
+      ringN.style.transform = `scale(${1 + .15 * Math.sin(Math.PI * seg(t, 121.8, 122.1))}) rotate(${-5 * Math.sin(Math.PI * seg(t, 121.8, 122.1))}deg)`;
+      c04_splat(ringSp, t, 121.8); c04_bC.fire(t, 121.8, 960, 400, 1.1); shakeCam(t, 121.8, 9, .35);
+      const lIn = back(seg(t, 121.9, 122.3)); ringL.style.opacity = clamp(lIn * 2); ringL.style.transform = `translateY(${30 * (1 - lIn)}px)`;
       crowd.forEach((d, i) => {
         const on = i < Math.round(17 * seg(t, 123.0, 124.2)), a = 123.0 + (i / 17) * 1.2;
         const pIn = back(seg(t, 122.8 + i * .02, 123.2 + i * .02));
@@ -430,17 +452,17 @@ scene(106, 134, (R, s) => {
       pT.style.opacity = clamp(tP * 2); pT.style.transform = `translateY(${80 * (1 - tP)}px) rotate(${-3 * (1 - tP)}deg)`;
       psc.update(125 + playT * 1.2, playT > 0 ? 1 : 0, { sunY: 220 - 240 * sunP, sunX: 600, hillX: 300 * hP });
       pC.style.opacity = clamp(cP * 3); pC.style.transform = `scale(${cP}) translateY(${-6 * Math.abs(Math.sin(playT * 4)) * (playT > 0 ? 1 : 0)}px)`;
-      poseNoa(pNoa, t, { x: 620 - 160 * seg(t, 130.6, 132.4), y: 330, s: 1, look: -1, op: seg(t, 130.5, 130.8), hop: playT > .6 ? (playT * 1.5) % 1 * .4 : 0, wave: playT > 1.8 });
+      poseNoa(pNoa, t, { x: 620 - 50 * seg(t, 130.6, 132.4), y: 330, s: 1, look: -1, op: seg(t, 130.5, 130.8), hop: playT > .6 ? (playT * 1.5) % 1 * .4 : 0, wave: playT > 1.8 });
       sparks.forEach((sp, i) => {
         const k = [1, 2, 3, 4, 4][i], p = seg(t, CODE[k][1] + .75, CODE[k][1] + 1.3);
         const pos = [[330, 50], [610, 150], [360, 330], [260, 210], [60, 200]][i];
         sp.style.opacity = p > 0 && p < 1 ? 1 - p : 0;
         sp.style.transform = `translate(${pos[0]}px, ${pos[1] - 40 * p}px) scale(${.5 + p}) rotate(${p * 90}deg)`;
       });
-      c04_slam(badge, t, 131.9, -4);
+      c04_slam(badge, t, 131.9, -4); shakeCam(t, 132.18, 7, .3);
       const nIn = back(seg(t, 130.3, 130.8));
-      poseNoa(proud, t, { x: 780, y: 690 + 280 * (1 - nIn), s: 1, talk: t > 130.9 && t < 133, wave: t > 131.2, look: 1, op: clamp(nIn * 3), hop: seg(t, 132.9, 133.4) > 0 && t < 133.4 ? seg(t, 132.9, 133.4) : 0 });
-      sayBubble(pb2, t, 130.9, 133.6, "이 영상도 Claude가 코드로 움직였어!", 960, 790);
+      poseNoa(proud, t, { x: 812, y: 742 + 280 * (1 - nIn), s: 1, talk: t > 130.9 && t < 133, wave: t > 131.2, look: 1, op: clamp(nIn * 3), hop: seg(t, 132.9, 133.4) > 0 && t < 133.4 ? seg(t, 132.9, 133.4) : 0 });
+      sayBubble(pb2, t, 130.9, 133.6, "이 영상도 Claude가 코드로 움직였어!", 990, 826);
     }
   };
 });
@@ -478,23 +500,23 @@ scene(106, 134, (R, s) => {
       let mood = rp < 1 ? "happy" : "happy", hop = off > 0 && off < 1 ? .2 + off * .8 : 0, look = 1, arms, wave = false;
       if (rp < 1) { arms = "up"; }
       if (t > 108.3 && t < 109.5) { wave = true; }
-      if (t > 110.9) { mood = "shock"; look = .8; }                          // 53% jaw-drop
+      if (t > 110.3) { mood = "shock"; look = .8; }                          // 53% jaw-drop
       if (swept) { mood = "shock"; hop = 0; }
       poseUchu(u, t, { x, y, mood, hop, look, arms, wave, op: rp > 0 && x < 1800 ? 1 : 0 });
-      if (t > 110.9) { const jd = seg(t, 111.55, 111.8) * (1 - seg(t, 112.2, 112.4));       // jaw drops extra-long on the splat
+      if (t > 110.3) { const jd = seg(t, 110.35, 110.6) * (1 - seg(t, 111.6, 111.8));       // jaw drops extra-long on the splat
         u.P.m.setAttribute("transform", `translate(100 131) scale(1 ${(1 + .45 * jd).toFixed(2)}) translate(-100 -131)`); u.P.lip.setAttribute("transform", u.P.m.getAttribute("transform")); u.P.tg.setAttribute("transform", `translate(0 ${(1 + 9 * jd).toFixed(1)})`); }
       else { u.P.m.removeAttribute("transform"); u.P.lip.removeAttribute("transform"); }
-      if (t < 109.6) sayBubble(ub, t, 107.6, 109.4, "1초 컷! 🚀", 330, 560);
-      else sayBubble(ub, t, 111.6, 112.3, "53%?!", 330, 560);
+      if (t < 109.6) sayBubble(ub, t, 107.6, 109.4, "1초 컷!", 400, 650);
+      else sayBubble(ub, t, 110.5, 111.8, "53%?!", 400, 650);
     } else {
       // C · 85% ring (120.8–124.9): pops up at the right edge
       u.P.m.removeAttribute("transform"); u.P.lip.removeAttribute("transform");
-      const cin = seg(t, 120.8, 121.2), cOut = seg(t, 124.6, 125.0);
+      const cin = seg(t, 121.1, 121.5), cOut = seg(t, 124.6, 125.0);
       let mood = "happy", hop = 0, arms, look = -1;
-      if (t > 121.5 && t < 122.9) { mood = "shock"; }
+      if (t > 121.8 && t < 122.9) { mood = "shock"; }
       if (t > 123.0 && t < 124.3) { hop = ((t - 123) * 1.8) % 1; arms = "up"; }
-      poseUchu(u, t, { x: 1615, y: lerp(1080, 712, back(cin)) + 300 * ease(cOut), s: 140 / 150, mood, hop, arms, look, op: cin > 0 && cOut < 1 ? 1 : 0 });
-      sayBubble(ub, t, 121.7, 122.9, "85%!!", 1440, 580);
+      poseUchu(u, t, { x: 1690, y: lerp(1080, 712, back(cin)) + 300 * ease(cOut), s: 140 / 150, mood, hop, arms, look, op: cin > 0 && cOut < 1 ? 1 : 0 });
+      sayBubble(ub, t, 121.9, 122.9, "85%!!", 1590, 520);
     }
   });
 })();

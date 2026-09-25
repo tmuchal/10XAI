@@ -75,15 +75,25 @@
         if (img.decode) pend.push(img.decode().catch(() => {}));
       }
     }
+    // preload(): fetch every frame into the memory cache (encoded bytes only; the per-frame
+    // img.decode() in update() does the actual decode, so a 90-frame 1080p shot costs ~its file size,
+    // not 90 decoded bitmaps). Refs are kept until release() so the cache entries stay warm.
+    let cache = null, cacheP = null;
     function preload() {
+      if (cacheP) return cacheP;
+      cache = [];
       const ps = [];
       for (let i = 0; i < frames; i++) {
-        const im = new Image(); im.src = url(i);
-        ps.push(im.decode ? im.decode().catch(() => {}) : Promise.resolve());
+        const im = new Image(); cache.push(im);
+        ps.push(new Promise(res => { im.onload = im.onerror = res; }));
+        im.src = url(i);
       }
-      return Promise.all(ps);
+      return (cacheP = Promise.all(ps));
     }
-    return { el: img, update, preload, frameAt, entry, start, duration: dur };
+    function release() { cache = null; cacheP = null; }
+    // decodeFirst(): decode frame 0 (used by READY so the first visible frame is never blank)
+    function decodeFirst() { const im = new Image(); im.src = url(0); return im.decode ? im.decode().catch(() => {}) : Promise.resolve(); }
+    return { el: img, update, preload, release, decodeFirst, frameAt, entry, start, duration: dur, get warm() { return !!cacheP; } };
   }
   window.SEQ = { attach };
 })();

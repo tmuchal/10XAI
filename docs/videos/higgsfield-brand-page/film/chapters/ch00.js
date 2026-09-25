@@ -85,6 +85,10 @@ scene(0, 10, (R, s) => {
   puff.setAttribute("cx", "140"); puff.setAttribute("cy", "122"); puff.setAttribute("fill", "#f0b27a"); puff.setAttribute("stroke", INK0); puff.setAttribute("stroke-width", "4");
   noa.P.b.appendChild(puff);
 
+  // speed lines trailing Noa's run-in (smear on the fast move)
+  const c00_speed = el("div", "left:0;top:0;z-index:29;opacity:0;pointer-events:none", `<svg width="260" height="170" overflow="visible">${[20, 52, 84, 116, 146].map((y, i) =>
+    `<path class="sl" d="M0 ${y} H${140 + (i % 2) * 70}" stroke="${INK0}" stroke-width="${6 - (i % 3)}" stroke-linecap="round" opacity="${0.35 + 0.15 * (i % 3)}"/>`).join("")}</svg>`, cam); c00_speed.className = "abs";
+  const c00_sl = [...c00_speed.querySelectorAll(".sl")];
   // sunglasses glint (looking at camera)
   const glint = document.createElementNS("http://www.w3.org/2000/svg", "path");
   glint.setAttribute("d", "M0 -14 L3 -3 L14 0 L3 3 L0 14 L-3 3 L-14 0 L-3 -3Z"); glint.setAttribute("fill", "#fff"); glint.setAttribute("stroke", INK0); glint.setAttribute("stroke-width", "2");
@@ -162,8 +166,8 @@ scene(0, 10, (R, s) => {
     const tdIn = back(seg(t, 3.55, 3.85));
     tada.style.opacity = seg(t, 3.55, 3.6);
     tada.style.transformOrigin = "0 0";
-    tada.style.left = (PH ? 1000 : 300) + "px"; tada.style.top = (PH ? 132 : 46) + "px";
-    tada.style.transform = PH ? `rotate(-4deg) scale(${0.72 * back(seg(t, 5.5, 5.8))})` : `rotate(-7deg) scale(${1.6 - 0.6 * tdIn})`;
+    tada.style.left = (PH ? 1000 : 390) + "px"; tada.style.top = (PH ? 132 : 150) + "px";
+    tada.style.transform = PH ? `rotate(-4deg) scale(${0.72 * back(seg(t, 5.5, 5.8))})` : `rotate(${-7 + wobble(t, 3.85, 4, 12, 5)}deg) scale(${(1.6 - 0.6 * tdIn) * (1 - 0.35 * ease(seg(t, 4.6, 4.9)))})`;
     // sparkles: burst at the reveal, twinkle round the title later
     sparks.forEach((d, i) => {
       if (i < 8) {
@@ -210,6 +214,10 @@ scene(0, 10, (R, s) => {
       else if (t < 7.8) { flip = false; look = 0; talk = t > 6.4 && t < 7.6; arm = -78 + 6 * Math.sin(t * 6); gl = seg(t, 6.3, 6.5) * (1 - seg(t, 6.75, 6.95)) + seg(t, 7.2, 7.35) * (1 - seg(t, 7.35, 7.55)); }
       else { talk = t > 8.1 && t < 8.9; look = 0.4; mood = t > 9.0 && t < 9.35 ? "shock" : "happy"; }
     }
+    const runV = !PH && t > 3.6 && t < 4.3 ? 1 - seg(t, 4.1, 4.3) : 0;
+    c00_speed.style.opacity = runV;
+    c00_speed.style.transform = `translate(${nx + 150}px, ${ny + 10}px)`;
+    c00_sl.forEach((l, i) => l.setAttribute("transform", `translate(${((t * 900 + i * 57) % 80).toFixed(1)} 0)`));
     const land = !PH && t > 4.8 ? c00_settle(t - 4.8, 2.5, 5) : PH ? 0.6 * c00_settle(t - 9.35, 2.5, 5) : 0;
     poseNoa(noa, t, { x: nx, y: ny, s: 1, mood, hop, flip, look, wave, talk, op: t > 3.55 && (PH || t < 4.9) ? 1 - (PH ? 0 : seg(t, 4.8, 4.9)) : 0 });
     noa.style.transform += ` rotate(${nrot}deg) scale(${1 + 0.12 * land}, ${1 - 0.12 * land})`;
@@ -219,7 +227,7 @@ scene(0, 10, (R, s) => {
     glint.setAttribute("transform", `translate(128 98) scale(${0.3 + 1.1 * gl}) rotate(${t * 200})`);
 
     sayBubble(bub, t, 4.3, 4.85, "으앗!", nx + 150, 560);
-    if (t < 6.3) sayBubble(bub2, t, 5.6, 6.3, "안녕, 난 노아!", 880, 600);
+    if (t < 6.3) sayBubble(bub2, t, 5.55, 6.3, "준비됐지?", 880, 600);
     else if (t < 7.9) sayBubble(bub2, t, 6.3, 7.9, "첫인상은 0.05초면 끝나.", 880, 600);
     else sayBubble(bub2, t, 8.05, 9.7, "이 봉투는… 마지막에 열자 🤫", 880, 600);
     // envelope: pops out at 7.9, wiggles, then gets stuffed into the cheek pouch at 9.0

@@ -230,6 +230,17 @@ scene(40, 72, (R, s) => {
   const tube = horn.querySelector(".tube"), curl = horn.querySelector(".curl");
   const bub = makeBubble(cam); bub.style.whiteSpace = "normal"; bub.style.width = "360px"; bub.style.textAlign = "center"; bub.style.wordBreak = "keep-all";
   const bubC = makeBubble(cam), bubN = makeBubble(cam);
+  // "coping" loading bar (63.6–71): crawls, stalls, then snaps to 100% when Uchu cheers him up
+  const c02_meter = el("div", `left:690px;top:318px;width:440px;z-index:37;opacity:0;transform-origin:50% 100%`, `
+    <div class="lb" style="font-size:32px;text-align:center;white-space:nowrap;margin-bottom:6px">멘탈 회복 중…</div>
+    <div style="position:relative;height:46px;border:4px solid ${INK2};border-radius:999px;background:#fffaf0;overflow:hidden;box-shadow:5px 6px 0 rgba(43,35,32,.2)">
+      <div class="fill" style="position:absolute;left:0;top:0;bottom:0;width:0;background:repeating-linear-gradient(-45deg,#9fd3f0 0 16px,#7cbfe6 16px 32px)"></div>
+      <div class="pc" style="position:absolute;left:0;right:0;top:3px;text-align:center;font-size:30px;line-height:1">3%</div></div>`, cam); c02_meter.className = "abs";
+  const c02_mFill = c02_meter.querySelector(".fill"), c02_mPc = c02_meter.querySelector(".pc"), c02_mLb = c02_meter.querySelector(".lb");
+  const c02_burst = makeBurst(cam, 22, 7);
+  const c02_glint = document.createElementNS("http://www.w3.org/2000/svg", "path");
+  c02_glint.setAttribute("d", "M0 -14 L3 -3 L14 0 L3 3 L0 14 L-3 3 L-14 0 L-3 -3Z"); c02_glint.setAttribute("fill", "#fff"); c02_glint.setAttribute("stroke", INK2); c02_glint.setAttribute("stroke-width", "2");
+  noa.P.b.appendChild(c02_glint);
 
   // customer timeline along the road: [arrive time, depart time] per station
   const STOPS = [[46.4, 46.7], [47.2, 47.7], [48.2, 48.9], [49.6, 49.9], [50.5, 51.2], [51.9, 53]];
@@ -338,7 +349,11 @@ scene(40, 72, (R, s) => {
     ref.style.opacity = fl2 > 0 ? 1 : 0;
     const rb = back(fl2);
     ref.style.transform = `scale(${rb}, 1) rotate(${1.5 * c02_settle(t - 60.5, 1.2, 3)}deg)`;
-    const f = ease(seg(t, 61.2, 71));
+    const H = ref.real ? ref.img.naturalHeight * (800 / ref.img.naturalWidth) : ref.mock.fullH * ref.k;
+    const viewH = ref.viewH;
+    // scroll lands on each section exactly as the narration names it: hook (60.4) · proof (61.3) · action (62.2)
+    const fP = H > viewH ? clamp((REF_MARKS[1][0] * H - 0.22 * viewH) / (H - viewH)) : 0;
+    const f = fP * ease(seg(t, 60.95, 61.45)) + (1 - fP) * ease(seg(t, 61.8, 62.35));
     ref.scrollTo(f, t);
 
     // stats
@@ -364,30 +379,32 @@ scene(40, 72, (R, s) => {
     blabels.forEach((l, i) => { l.style.opacity = seg(t, 53.7 + i * 0.2, 54 + i * 0.2) * (1 - toRef); });
 
     // reference notes + marks
-    const H = ref.real ? ref.img.naturalHeight * (800 / ref.img.naturalWidth) : ref.mock.fullH * ref.k;
-    const viewH = ref.viewH, off = f * Math.max(0, H - viewH);
-    let act = 0; REF_MARKS.forEach((m, i) => { if (m[0] * H - off < viewH * 0.8) act = i; });
+    const off = f * Math.max(0, H - viewH);
+    const act = t < 61.25 ? 0 : t < 62.15 ? 1 : 2;
+    const dimK = ease(seg(t, 63.1, 63.6));   // coping beat: the page steps back, the hamster steps up
+    ref.style.opacity = (fl2 > 0 ? 1 : 0) * (1 - 0.55 * dimK);
+    arrow.style.opacity = t > 60.5 ? 1 - dimK : 0;
     marks.forEach((m, i) => {
       const y = 150 + 44 + REF_MARKS[i][0] * H - off + 20;
       const vis = t > 60.5 && y > 190 && y < 830 ? 1 : 0;
       const pp = back(seg(t, 60.6 + i * 0.15, 60.9 + i * 0.15));
-      m.style.opacity = vis * (pp > 0 ? 1 : 0);
+      m.style.opacity = vis * (pp > 0 ? 1 : 0) * (1 - 0.6 * dimK);
       m.style.top = clamp(y, 190, 830) + "px";
       m.style.transform = `scale(${pp * (i === act ? 1.12 : 1)}) rotate(-3deg)`;
     });
     notes.forEach((n, i) => {
       const p = back(seg(t, 60.4 + i * 0.25, 60.9 + i * 0.25));
-      const on = i === act && t > 61;
-      n.style.opacity = seg(t, 60.4 + i * 0.25, 60.5 + i * 0.25);
-      n.style.transform = `translateX(${-80 * (1 - p)}px) scale(${on ? 1.05 : 0.96}) rotate(${on ? -1.5 : 0}deg)`;
+      const on = i === act && t > 60.4 && dimK < 1;
+      n.style.opacity = seg(t, 60.4 + i * 0.25, 60.5 + i * 0.25) * (1 - 0.55 * dimK);
+      const hit = on ? back(seg(t, [60.4, 61.25, 62.15][i], [60.4, 61.25, 62.15][i] + 0.3)) : 0;
+      n.style.transform = `translateX(${-80 * (1 - p) + 24 * hit}px) scale(${on ? 0.96 + 0.1 * hit : 0.96}) rotate(${on ? -1.5 : 0}deg)`;
       n.style.filter = on || t < 61 ? "none" : "saturate(.5)";
     });
     {
       const my = 150 + 44 + REF_MARKS[act][0] * H - off + 40, ny = 236 + act * 176 + 76;
-      const tgtY = clamp(my, 210, 850), vis = t > 61.2 ? 1 : 0;
+      const tgtY = clamp(my, 210, 850);
       arP.setAttribute("d", `M740 ${ny} C 830 ${ny}, 850 ${tgtY}, 920 ${tgtY}`);
       arH.setAttribute("d", `M926 ${tgtY} l-18 -11 l0 22 z`);
-      arrow.style.opacity = vis;
       arP.setAttribute("stroke-dashoffset", -t * 40);
     }
 
@@ -413,6 +430,7 @@ scene(40, 72, (R, s) => {
     sayBubble(bubC, t, 47.25, 47.9, "헉, 막혔다!", cx + 10, cy - 240);
 
     // ---------------- Noa ----------------
+    let c02_s = 1, c02_gl = 0;
     let nx, ny, mood = "happy", wave = false, talk = false, look = 0, flip = false, hop = 0, arm = null, sq = 0, nop = 1, rot = 0;
     const NS = 150 * 1.1; // Noa height
     if (t < 45.8) {
@@ -449,17 +467,41 @@ scene(40, 72, (R, s) => {
     } else {
       // reference: toots the horn at the reveal, then points at the active note
       const w = seg(t, 59.4, 60.2); nx = lerp(820, 700, ease(w)); ny = 870 - NS; flip = false; look = -1;
-      if (t > 61.2) { arm = null; flip = true; arm = -10 + 6 * Math.sin(t * 5); look = 1; }
+      if (t > 60.4 && t < 63.1) { flip = true; arm = -10 + 6 * Math.sin(t * 5); look = 1; }
+      if (t >= 63.1) {
+        // "demoted from hero to guide… coping": shuffles to centre stage, sulks, then perks up on "Chin up"
+        const c = ease(seg(t, 63.1, 63.8)); nx = lerp(700, 800, c); c02_s = lerp(1, 1.75, c);
+        hop = c > 0 && c < 1 ? ((t - 63.1) * 3) % 1 * 0.35 : 0;
+        if (t < 69.3) { mood = t > 63.7 ? "pout" : "happy"; look = -0.3 + 0.15 * Math.sin(t * 1.3); sq = t > 63.8 ? 0.05 + 0.02 * Math.sin(t * 1.6) : 0;
+          if (t > 65.6 && t < 66.1) sq += 0.08 * Math.sin(seg(t, 65.6, 66.1) * Math.PI); }   // big sigh
+        else { mood = "happy"; look = 0.4; const hp = seg(t, 69.45, 70.15); hop = hp > 0 && hp < 1 ? hp : 0; wave = t > 70.15; talk = t > 69.6 && t < 70.9;
+          sq = 0.12 * c02_settle(t - 70.15, 2.6, 5); c02_gl = seg(t, 70.3, 70.45) * (1 - seg(t, 70.6, 70.8)); }
+      }
       nop = 1;
     }
-    poseNoa(noa, t, { x: nx, y: ny, s: 1, mood, wave, talk, look, flip, hop, op: seg(t, 40.6, 40.7) * nop });
+    poseNoa(noa, t, { x: nx, y: ny, s: c02_s, mood, wave, talk, look, flip, hop, op: seg(t, 40.6, 40.7) * nop });
     noa.style.transform += ` rotate(${rot}deg) scale(${1 + sq}, ${1 - sq})`;
     noa.style.transformOrigin = rot ? "50% 60%" : "50% 100%";
     if (arm !== null) noa.P.ar.setAttribute("transform", `rotate(${arm} 154 118)`);
     // sulk cloud
-    const cl = seg(t, 43.2, 43.5) * (1 - seg(t, 45.0, 45.3));
-    cloud.style.opacity = cl;
-    cloud.style.transform = `translate(${nx + 5 + 6 * Math.sin(t * 2)}px, ${ny - 90 - 20 * seg(t, 45.0, 45.3)}px)`;
+    const cl = seg(t, 43.2, 43.5) * (1 - seg(t, 45.0, 45.3)), cl2 = seg(t, 63.7, 64.1) * (1 - seg(t, 69.3, 69.7));
+    cloud.style.opacity = t > 60 ? cl2 : cl;
+    cloud.style.transform = t > 60 ? `translate(${nx + 5 + 8 * Math.sin(t * 2)}px, ${870 - NS * c02_s - 120 - 30 * (1 - out(seg(t, 63.7, 64.1))) - 140 * ease(seg(t, 69.3, 69.7))}px)`
+      : `translate(${nx + 5 + 6 * Math.sin(t * 2)}px, ${ny - 90 - 20 * seg(t, 45.0, 45.3)}px)`;
+    c02_glint.setAttribute("opacity", c02_gl);
+    c02_glint.setAttribute("transform", `translate(128 98) scale(${0.3 + 1.1 * c02_gl}) rotate(${(t * 200) % 360})`);
+    // coping meter
+    const mIn = back(seg(t, 64.0, 64.4)), fixd = seg(t, 69.3, 69.55);
+    const pct = t < 69.3 ? 3 + 9 * ease(seg(t, 64.4, 66.6)) - 2 * seg(t, 66.6, 67.4) : lerp(10, 100, out(fixd));
+    c02_meter.style.opacity = clamp(mIn * 2) * (1 - seg(t, 71.0, 71.3));
+    c02_meter.style.transform = `scale(${(0.6 + 0.4 * mIn) * (1 + 0.1 * c02_settle(t - 69.55, 2.4, 5))}) rotate(${-2 + wobble(t, 69.55, 4, 12, 4)}deg)`;
+    c02_mFill.style.width = pct.toFixed(1) + "%";
+    c02_mFill.style.background = t > 69.5 ? "repeating-linear-gradient(-45deg,#9fd3a8 0 16px,#7fc08c 16px 32px)" : "repeating-linear-gradient(-45deg,#9fd3f0 0 16px,#7cbfe6 16px 32px)";
+    const pcT = Math.round(pct) + "%"; if (c02_mPc.textContent !== pcT) c02_mPc.textContent = pcT;
+    const lbT = t > 69.5 ? "회복 완료! 😎" : t > 66.6 && t < 67.6 ? "멘탈 회복 중… (역주행)" : "멘탈 회복 중…";
+    if (c02_mLb.textContent !== lbT) c02_mLb.textContent = lbT;
+    c02_burst.fire(t, 69.55, 910, 360, 0.8);
+    shakeCam(t, 69.55, 7, 0.35);
     drops.forEach((d, i) => d.setAttribute("transform", `translate(0 ${((t * 1.8 + i * 0.3) % 1) * 40})`));
     // GUIDE badge flies onto Noa and stays with him on the road
     const bIn = seg(t, 44.9, 45.3);
@@ -472,6 +514,8 @@ scene(40, 72, (R, s) => {
       mapProp.style.transform = `translate(${hx}px, ${hy}px) rotate(${-10 + 20 * Math.sin(t * 5)}deg)`; }
     sayBubble(bub, t, 43.3, 45.1, "주인공은 내가 아니라… 손님이래 😤", 690, 470);
     sayBubble(bubN, t, 47.9, 48.9, "지도 받아!", nx + 110, ny - 70);
+    if (t > 64.5 && t < 67.4) sayBubble(bubN, t, 64.6, 67.4, "괜찮아… 길잡이도 멋져… 😢", 1080, 560);
+    if (t > 69.5) sayBubble(bubN, t, 69.6, 71.6, "명대사는 내 몫! 😎", 1080, 560);
     if (t > 57.9 && t < 59.3) sayBubble(bubN, t, 57.9, 59.3, "317%… 어지러워", nx + 120, ny - 70);
     dizzy.style.opacity = t > 56.6 && t < 57.9 ? 1 : 0;
     dizzy.style.transform = `translate(${nx + 30 + 30 * Math.cos(t * 9)}px, ${ny + 10 + 8 * Math.sin(t * 9)}px)`;
@@ -500,11 +544,11 @@ scene(40, 72, (R, s) => {
       poseUchu(u, t, { x, y, mood: t < 43.5 ? "shock" : "happy", hop: cheer ? (t * 1.9) % 1 * .7 : 0, arms: cheer ? "up" : undefined, look: 1, op: aIn > 0 && aOut < 1 ? 1 : 0 });
       sayBubble(ub, t, 43.55, 45.5, "손님 최고! 👑", 200, 520);
     } else {
-      const x = lerp(250, 520, out(bIn)), y = 700 - 90 * Math.sin(bIn * Math.PI);
+      const x = lerp(180, 610, out(bIn)), y = 690 - 110 * Math.sin(bIn * Math.PI);
       const pat = t > 69.0 && t < 70.6;
       poseUchu(u, t, { x, y, mood: t < 67.8 ? "shock" : "happy", look: 1, talk: t > 67.7 && t < 68.9, arms: pat ? "point" : undefined, hop: t > 70.8 && t < 71.4 ? seg(t, 70.8, 71.4) : 0, op: bIn > 0 ? 1 : 0 });
       if (pat) u.P.ar.setAttribute("transform", `translate(138 160) rotate(${(-95 + 18 * Math.abs(Math.sin(t * 9))).toFixed(1)})`);
-      sayBubble(ub, t, 67.7, 70.4, "힘내, 노아! 🙌", 760, 560);
+      sayBubble(ub, t, 67.7, 69.5, "힘내, 노아! 🙌", 470, 520);
     }
   });
 })();
