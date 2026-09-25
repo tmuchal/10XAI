@@ -200,7 +200,7 @@ scene(106, 134, (R, s) => {
     <circle cx="160" cy="160" r="110" fill="none" stroke="#f1e4c8" stroke-width="30"/>
     <circle class="arc" cx="160" cy="160" r="110" fill="none" stroke="#c8372d" stroke-width="30" stroke-dasharray="691" stroke-dashoffset="691" transform="rotate(-90 160 160)" stroke-linecap="round"/>
     <circle cx="160" cy="160" r="94" fill="none" stroke="${c04_INK}" stroke-width="3"/><circle cx="160" cy="160" r="126" fill="none" stroke="${c04_INK}" stroke-width="3"/></svg>
-    <div class="n" style="position:absolute;left:0;right:0;top:108px;text-align:center;font-size:100px;color:#c8372d;line-height:1">0%</div>`, BC); ring.className = "abs";
+    <div class="n" style="position:absolute;left:0;right:0;top:108px;text-align:center;font-size:90px;color:#c8372d;line-height:1">0%</div>`, BC); ring.className = "abs";
   const ringSp = el("div", "position:absolute;left:-60px;top:-50px;width:440px;height:420px", c04_SPLASH("#fbd35a")); ring.insertBefore(ringSp, ring.firstChild);
   const arc = ring.querySelector(".arc"), ringN = ring.querySelector(".n");
   const ringL = el("div", `position:absolute;left:-190px;top:372px;width:700px;text-align:center;font-size:40px;color:${c04_INK};line-height:1.25`, "영상 보고 구매를 결심했다<br><span style='font-size:26px;color:#6b5d52'>Wyzowl · 2026</span>", ring);
@@ -307,7 +307,7 @@ scene(106, 134, (R, s) => {
       const dim = ease(seg(t, 109.6, 109.9));
       [track, room].forEach(e => { e.style.opacity = +e.style.opacity * (1 - .7 * dim); e.style.filter = dim > 0 ? `blur(${2 * dim}px)` : "none"; });
       BIG.forEach((c, i) => {
-        const a = [109.75, 111.0][i], z = [110.85, 99][i];
+        const a = [109.75, 111.0][i], z = [110.85, 113][i];
         const pin = back(seg(t, a, a + .35)), gone = ease(seg(t, z, z + .3));
         c.style.display = t > a && t < z + .3 ? "flex" : "none";
         c.style.opacity = clamp(pin * 2) * (1 - gone);
@@ -396,7 +396,7 @@ scene(106, 134, (R, s) => {
       const cp = ease(seg(t, 120.6, 121.6)), n = Math.round(85 * cp);
       arc.setAttribute("stroke-dashoffset", 691 * (1 - .85 * cp));
       ringN.textContent = n + "%";
-      ringN.style.transform = `scale(${1 + .35 * Math.sin(Math.PI * seg(t, 121.6, 121.9))}) rotate(${-5 * Math.sin(Math.PI * seg(t, 121.6, 121.9))}deg)`;
+      ringN.style.transform = `scale(${1 + .15 * Math.sin(Math.PI * seg(t, 121.6, 121.9))}) rotate(${-5 * Math.sin(Math.PI * seg(t, 121.6, 121.9))}deg)`;
       c04_splat(ringSp, t, 121.6);
       const lIn = back(seg(t, 121.7, 122.1)); ringL.style.opacity = clamp(lIn * 2); ringL.style.transform = `translateY(${30 * (1 - lIn)}px)`;
       crowd.forEach((d, i) => {
