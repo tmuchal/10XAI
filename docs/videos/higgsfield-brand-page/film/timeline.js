@@ -24,6 +24,7 @@ window.TIMELINE = /*JSON*/{
     { "id": "ch01", "dur": 30, "authoredAt": 10,  "label": "auto",       "sign": ["누구를 위한 페이지?", "Who is it for?"] },
     { "id": "ch02", "dur": 32, "authoredAt": 40,  "label": "auto",       "sign": ["전체 흐름 잡기", "Shaping the flow"] },
     { "id": "ch03", "dur": 34, "authoredAt": 72,  "label": "auto",       "sign": ["캐릭터 일관성", "One consistent character"] },
+    { "id": "ch03s","dur": 20, "authoredAt": 0,   "label": "auto",       "sign": ["Seedance 2.5 × 프롬프팅", "Seedance 2.5 prompting"] },
     { "id": "ch04", "dur": 28, "authoredAt": 106, "label": "auto",       "sign": ["몰입감 만들기", "Building immersion"] },
     { "id": "ch05", "dur": 26, "authoredAt": 134, "label": "auto",       "sign": ["전문성 × 유머", "Expertise × humor"] },
     { "id": "ch06", "dur": 24, "authoredAt": 160, "label": "auto",       "sign": ["결국, 매출로", "Turning it into sales"] },

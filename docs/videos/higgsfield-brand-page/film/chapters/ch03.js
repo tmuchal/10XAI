@@ -107,7 +107,7 @@ scene(72, 106, (R, s) => {
 
   // ============ step rail (82–99.5)
   const RAIL = [["1", "캐릭터 시트", "얼굴 + 앞 · 뒤 전신", 82, 86.5], ["2", "Soul ID", "사진 20장+ 학습", 86.5, 91],
-                ["3", "레퍼런스", "Kling · Seedance", 91, 95], ["4", "의상·헤어 고정", "+ 네거티브", 95, 96.7], ["5", "시드 < 레퍼런스", "레퍼런스가 이김", 96.7, 99.5]];
+                ["3", "레퍼런스", "Kling · Seedance 2.5", 91, 95], ["4", "의상·헤어 고정", "+ 네거티브", 95, 96.7], ["5", "시드 < 레퍼런스", "레퍼런스가 이김", 96.7, 99.5]];
   const rail = RAIL.map((r, i) => {
     const n = c03_box(R, 1430, 228 + i * 122, 360, 104, "#fffaf0", "display:flex;align-items:center;gap:14px;padding:0 16px;transform-origin:0 50%");
     n.innerHTML = `<div class="num" style="flex:none;width:52px;height:52px;border-radius:50%;border:4px solid ${c03_INK};background:#fbe3b0;display:grid;place-items:center;font-size:30px">${r[0]}</div>
@@ -192,7 +192,7 @@ scene(72, 106, (R, s) => {
   const saved = c03_stamp(card, 10, 206, "저장 완료 ✓", "#2f9e5a", -8);
 
   // ============ D · Reference Element → Kling / Seedance (91–95)
-  const MACH = [["Kling 3.0", "#9fd3f0", 600, "park"], ["Seedance 2.0", "#f7b6c8", 1030, "sunset"]].map(([nm, col, x, pal], i) => {
+  const MACH = [["Kling 3.0", "#9fd3f0", 600, "park"], ["Seedance 2.5", "#f7b6c8", 1030, "sunset"]].map(([nm, col, x, pal], i) => {
     const m = c03_box(R, x, 236, 360, 580, col, "overflow:visible");
     m.innerHTML = `<div style="position:absolute;left:120px;top:-22px;width:120px;height:26px;border:4px solid ${c03_INK};border-radius:8px;background:#fffaf0"></div>
       <div style="position:absolute;left:20px;top:24px;font-size:34px;color:${c03_INK};white-space:nowrap">${nm}</div>

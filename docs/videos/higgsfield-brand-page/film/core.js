@@ -15,7 +15,7 @@
 //   makeFilm(pal) -> div.film with .update(t, speed)   (bright watercolor landscape)
 //   makeNoa(size, variant) / poseNoa(n, t, {x,y,s,wave,talk,look,mood,flip,hop,op})
 //   makeBubble(parent) / sayBubble(b, t, a, z, text, x, y)
-//   brandPage(), refWindow(parent,x,y,w,h) (.scrollTo(frac,t)), scene(a,b,build), chapter(root,k,t)
+//   brandPage(), refWindow(parent,x,y,w,h) (.scrollTo(frac,t), .sectionFrac(role,fb), .boxOf(role)), scene(a,b,build), chapter(root,k,t)
 // Added:
 //   hash(i, j=0, k=0) -> 0..1      deterministic noise (use instead of Math.random)
 //   boilStep(t) -> int             the current 8 fps "line boil" step (hand-drawn wobble clock)
@@ -38,6 +38,10 @@
 // ============================================================================
 const REF_URL = "noainostory.higgsfield.app";
 const REF_MARKS = [[0.02, "훅 · Hook"], [0.4, "증거 · Proof"], [0.86, "행동 · Action"]];
+const REF_ROLES = ["hook", "proof", "action"];   // REF_MARKS[i] <-> role name in ref/roles.json (plus "cta")
+// ref/layout.js (tools/capture-ref.cjs) sets window.REF_LAYOUT: the captured page's geometry + resolved roles.
+// Loaded here, synchronously, before any chapter builds; a missing file is fine (the fraction fallbacks apply).
+try { if (!window.REF_LAYOUT && document.readyState === "loading") document.write('<script src="ref/layout.js"><\/script>'); } catch (e) {}
 
 const DURATION = TIMELINE.total, FADE = TIMELINE.fade;
 const $ = id => document.getElementById(id);
@@ -398,8 +402,32 @@ function refWindow(parent, x, y, w, h) {
   win.view = view; win.k = k; win.mock = mock; win.img = img; win.viewH = h - 44;
   // scroll to a fraction of the page height
   win.scrollTo = (f, t) => {
-    if (win.real) { const H = img.naturalHeight * (w / img.naturalWidth); img.style.transform = `translateY(${-f * Math.max(0, H - win.viewH)}px)`; }
-    else { mock.update(t); mock.style.transform = `scale(${k}) translateY(${-f * Math.max(0, mock.fullH - win.viewH / k)}px)`; }
+    if (win.real) { const H = img.naturalHeight * (w / img.naturalWidth); win.off = f * Math.max(0, H - win.viewH); img.style.transform = `translateY(${-win.off}px)`; }
+    else { mock.update(t); win.off = f * Math.max(0, mock.fullH - win.viewH / k) * k; mock.style.transform = `scale(${k}) translateY(${-f * Math.max(0, mock.fullH - win.viewH / k)}px)`; }
+  };
+  win.off = 0;
+  // Geometry of the REAL page (needs ref/page.png + ref/layout.js); every helper returns its fallback / null
+  // without them, so chapters keep today's hand-tuned fractions on the mock.
+  //   layout()                    REF_LAYOUT when the real page is shown and a layout is loaded, else null
+  //   sectionFrac(role, fb, al)   scroll fraction that centres the role's section in the view (al = 0..1 of view
+  //                               height; a section taller than the view gets its top near the top), else fb
+  //   boxOf(role, part="el")      {x, y, w, h, cx, cy} of the role's element ("el") or section ("section") in
+  //                               WINDOW coordinates (0,0 = window top-left, title bar included) at the current
+  //                               scroll (last scrollTo), else null
+  win.layout = () => (win.real && window.REF_LAYOUT && REF_LAYOUT.page && REF_LAYOUT.roles) ? REF_LAYOUT : null;
+  const pageS = L => w / L.page.w;                                          // layout px -> window px
+  win.sectionFrac = (role, fb = 0, al = 0.5) => {
+    const L = win.layout(), r = L && L.roles[role]; if (!r || !r.section) return fb;
+    const s = pageS(L), H = img.naturalHeight * (w / img.naturalWidth), maxOff = H - win.viewH;
+    if (maxOff <= 0) return 0;
+    const y = r.section[1] * s, hh = r.section[3] * s;
+    const off = hh <= win.viewH ? y + hh / 2 - al * win.viewH : y - 0.04 * win.viewH;
+    return clamp(off / maxOff);
+  };
+  win.boxOf = (role, part = "el") => {
+    const L = win.layout(), r = L && L.roles[role], b = r && (r[part] || r.section); if (!b) return null;
+    const s = pageS(L), x = b[0] * s, y = 44 + b[1] * s - win.off, bw = b[2] * s, bh = b[3] * s;
+    return { x, y, w: bw, h: bh, cx: x + bw / 2, cy: y + bh / 2 };
   };
   REFS.push(win);
   return win;

@@ -352,8 +352,10 @@ scene(40, 72, (R, s) => {
     const H = ref.real ? ref.img.naturalHeight * (800 / ref.img.naturalWidth) : ref.mock.fullH * ref.k;
     const viewH = ref.viewH;
     // scroll lands on each section exactly as the narration names it: hook (60.4) · proof (61.3) · action (62.2)
-    const fP = H > viewH ? clamp((REF_MARKS[1][0] * H - 0.22 * viewH) / (H - viewH)) : 0;
-    const f = fP * ease(seg(t, 60.95, 61.45)) + (1 - fP) * ease(seg(t, 61.8, 62.35));
+    // (with a captured layout, ref/roles.json picks the three sections; else the REF_MARKS fractions)
+    const fH = ref.sectionFrac("hook", 0), fA = ref.sectionFrac("action", 1);
+    const fP = ref.sectionFrac("proof", H > viewH ? clamp((REF_MARKS[1][0] * H - 0.22 * viewH) / (H - viewH)) : 0);
+    const f = fH + (fP - fH) * ease(seg(t, 60.95, 61.45)) + (fA - fP) * ease(seg(t, 61.8, 62.35));
     ref.scrollTo(f, t);
 
     // stats
@@ -385,7 +387,8 @@ scene(40, 72, (R, s) => {
     ref.style.opacity = (fl2 > 0 ? 1 : 0) * (1 - 0.55 * dimK);
     arrow.style.opacity = t > 60.5 ? 1 - dimK : 0;
     marks.forEach((m, i) => {
-      const y = 150 + 44 + REF_MARKS[i][0] * H - off + 20;
+      const bx = ref.boxOf(REF_ROLES[i]);   // real page: the label sits on the role's element (vertically centred)
+      const y = bx ? 150 + bx.cy - 24 : 150 + 44 + REF_MARKS[i][0] * H - off + 20;
       const vis = t > 60.5 && y > 190 && y < 830 ? 1 : 0;
       const pp = back(seg(t, 60.6 + i * 0.15, 60.9 + i * 0.15));
       m.style.opacity = vis * (pp > 0 ? 1 : 0) * (1 - dimK);
@@ -401,7 +404,8 @@ scene(40, 72, (R, s) => {
       n.style.filter = on || t < 61 ? "none" : "saturate(.5)";
     });
     {
-      const my = 150 + 44 + REF_MARKS[act][0] * H - off + 40, ny = 236 + act * 176 + 76;
+      const bx = ref.boxOf(REF_ROLES[act]);
+      const my = bx ? 150 + bx.cy : 150 + 44 + REF_MARKS[act][0] * H - off + 40, ny = 236 + act * 176 + 76;
       const tgtY = clamp(my, 210, 850);
       arP.setAttribute("d", `M740 ${ny} C 830 ${ny}, 850 ${tgtY}, 920 ${tgtY}`);
       arH.setAttribute("d", `M926 ${tgtY} l-18 -11 l0 22 z`);

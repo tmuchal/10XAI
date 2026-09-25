@@ -314,7 +314,7 @@ scene(10, 40, (R, s) => {
     ref.style.opacity = t > 33.05 ? 1 : 0;
     const c01_sh = ease(seg(t, 35.6, 36.2));
     ref.style.transform = `translate(${-110 * c01_sh}px, ${rY}px) rotate(${rRot}deg) scale(${(1 + 0.015 * ease(seg(t, 34, 40))) * (1 - 0.12 * c01_sh)})`;
-    ref.scrollTo(0.55 * ease(seg(t, 34.8, 39.6)), t);
+    ref.scrollTo(ref.sectionFrac("proof", 0.55) * ease(seg(t, 34.8, 39.6)), t);   // "the page I built" glides to its proof
     const tdP = back(seg(t, 34.0, 34.35));
     tada.style.opacity = seg(t, 34.0, 34.05);
     tada.style.transform = `translate(${-60 * c01_sh}px, ${10 * c01_sh}px) rotate(${-6 + 2 * Math.sin(t * 3)}deg) scale(${(1.8 - 0.8 * tdP) * (1 - 0.1 * c01_sh)})`;

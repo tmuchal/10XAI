@@ -162,7 +162,7 @@ scene(0, 10, (R, s) => {
       const pb = back(seg(t, 5.3, 5.9)) , rr = 2.5 + 1.2 * c00_settle(t - 5.9, 1.2, 3);
       ref.style.transform = `translate(${1030 - 340}px, ${196 - 90 + 40 * (1 - pb)}px) scale(0.56) rotate(${rr}deg)`;
     }
-    ref.scrollTo(0.04 * ease(seg(t, 3.7, 4.6)) * (1 - PH), t);
+    ref.scrollTo(ref.sectionFrac("hook", 0.04) * ease(seg(t, 3.7, 4.6)) * (1 - PH), t);   // hook = hero (roles.json)
     const tdIn = back(seg(t, 3.55, 3.85));
     tada.style.opacity = seg(t, 3.55, 3.6);
     tada.style.transformOrigin = "0 0";
