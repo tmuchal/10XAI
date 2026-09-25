@@ -1,0 +1,194 @@
+<meta charset="utf-8">
+<title>네온 성수: 데드 레인</title>
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=IBM+Plex+Mono:wght@500;600&family=IBM+Plex+Sans+KR:wght@400;600&display=swap">
+<style>
+:root{color-scheme:dark;--night:#07060c;--panel:rgba(8,8,16,.82);--line:rgba(255,255,255,.12);--ink:#ece9ff;--dim:#9591b5;--mag:#ff2e88;--cyan:#29e7ff;--amber:#ffb347;--green:#3dff9b;--red:#ff4d5e;--toxic:#7dff9b;
+  --display:"Black Han Sans","Apple SD Gothic Neo","Malgun Gothic",sans-serif;--body:"IBM Plex Sans KR","Apple SD Gothic Neo","Malgun Gothic",system-ui,sans-serif;--mono:"IBM Plex Mono",ui-monospace,Menlo,monospace}
+[hidden]{display:none!important}
+html,body{height:100%;margin:0;background:var(--night);color:var(--ink);font-family:var(--body);overflow:hidden;touch-action:none;-webkit-user-select:none;user-select:none}
+#c3d{position:fixed;inset:0;width:100%;height:100%;display:block;background:#07060c}
+.hud{position:fixed;inset:0;pointer-events:none}
+.tl{position:absolute;left:18px;top:calc(env(safe-area-inset-top,0px) + 16px);max-width:min(420px,52vw);display:flex;flex-direction:column;gap:5px}
+#mTitle{font-family:var(--display);font-size:22px;color:var(--amber);text-shadow:0 0 12px rgba(255,179,71,.5),2px 2px 0 #000}
+#mObj{font-size:14px;line-height:1.45;background:var(--panel);border-left:3px solid var(--amber);padding:7px 11px;text-wrap:balance}
+#wave{background:rgba(40,6,14,.85);border-left:3px solid var(--red);padding:6px 10px;font-size:13px}
+#wave .bar{margin-top:5px}#wave .bar i{background:var(--red)}
+.tr{position:absolute;right:18px;top:calc(env(safe-area-inset-top,0px) + 14px);display:flex;flex-direction:column;align-items:flex-end;gap:3px;text-align:right}
+#clock{font-family:var(--mono);font-size:13px;color:var(--dim);letter-spacing:.06em}
+#money{font-family:var(--mono);font-weight:600;font-size:30px;color:var(--green);text-shadow:0 0 14px rgba(61,255,155,.45),2px 2px 0 #000}
+#scrap{font-family:var(--mono);font-size:14px;color:#ff9a3a;text-shadow:1px 1px 0 #000}
+.bl{position:absolute;left:18px;bottom:calc(env(safe-area-inset-bottom,0px) + 16px);display:flex;flex-direction:column;gap:6px}
+#mini{width:180px;height:180px;border-radius:50%;box-shadow:0 0 0 2px rgba(0,0,0,.8),0 0 0 4px rgba(255,46,136,.35),0 0 28px rgba(255,46,136,.2);background:#05060a}
+.bars{display:flex;flex-direction:column;gap:4px;width:180px}
+.bar{height:6px;background:rgba(0,0,0,.6);box-shadow:0 0 0 1px rgba(255,255,255,.12);overflow:hidden}
+.bar i{display:block;height:100%;width:100%;transition:width .12s}
+#bstBar{background:var(--cyan)}
+body.boost #vig{opacity:1!important;background:radial-gradient(ellipse at center,transparent 50%,rgba(41,231,255,.35) 100%)}
+body.boost #c3d{filter:saturate(1.3) hue-rotate(-8deg)}
+#hpBar{background:var(--green)}#arBar{background:#8ab4ff}#stBar{background:var(--amber)}#carHp{background:var(--cyan)}
+.br{position:absolute;right:18px;bottom:calc(env(safe-area-inset-bottom,0px) + 18px);text-align:right;display:flex;flex-direction:column;align-items:flex-end;gap:4px}
+#wName{font-family:var(--display);font-size:20px;text-shadow:2px 2px 0 #000}
+#wAmmo{font-family:var(--mono);font-size:34px;font-weight:600;text-shadow:0 0 12px rgba(41,231,255,.35),2px 2px 0 #000}
+#wSlots{display:flex;gap:6px}#wSlots span{font-family:var(--mono);font-size:12px;width:22px;height:22px;display:flex;align-items:center;justify-content:center;border:1px solid var(--line);background:var(--panel)}
+#wSlots span.on{border-color:var(--cyan);color:var(--cyan)}#wSlots span.off{opacity:.3}
+#cross{position:absolute;left:50%;top:50%;width:0;height:0;--s:10px}
+#cross i{position:absolute;background:rgba(255,255,255,.9);box-shadow:0 0 3px #000}
+#cross i:nth-child(1){width:2px;height:8px;left:-1px;top:calc(-1 * var(--s) - 8px)}#cross i:nth-child(2){width:2px;height:8px;left:-1px;top:var(--s)}
+#cross i:nth-child(3){height:2px;width:8px;top:-1px;left:calc(-1 * var(--s) - 8px)}#cross i:nth-child(4){height:2px;width:8px;top:-1px;left:var(--s)}
+#cross b{position:absolute;left:-1.5px;top:-1.5px;width:3px;height:3px;background:var(--cyan);border-radius:50%}
+#hitmark{position:absolute;left:50%;top:50%;width:26px;height:26px;margin:-13px 0 0 -13px;opacity:0;background:linear-gradient(45deg,transparent 45%,#fff 45%,#fff 55%,transparent 55%),linear-gradient(-45deg,transparent 45%,#fff 45%,#fff 55%,transparent 55%);-webkit-mask:radial-gradient(circle,transparent 5px,#000 6px);mask:radial-gradient(circle,transparent 5px,#000 6px)}
+#hitmark.show{opacity:1}#hitmark.head{filter:drop-shadow(0 0 4px var(--mag)) hue-rotate(0deg)}#hitmark.kill{transform:scale(1.35);filter:drop-shadow(0 0 5px var(--red))}
+#dmgdir{position:absolute;left:50%;top:50%;width:260px;height:260px;opacity:0;border-radius:50%;border-top:6px solid rgba(255,40,72,.8);transform:translate(-50%,-50%)}
+#dmgdir.show{animation:dd .8s ease-out}@keyframes dd{0%{opacity:1}100%{opacity:0}}
+#vig{position:absolute;inset:0;opacity:0;background:radial-gradient(ellipse at center,transparent 45%,rgba(160,0,24,.55) 100%)}
+#prompt{position:absolute;left:50%;top:calc(50% + 70px);transform:translateX(-50%);font-size:15px;background:var(--panel);padding:6px 14px;border:1px solid var(--line);white-space:nowrap;opacity:0;transition:opacity .15s}
+#prompt.show{opacity:1}#prompt kbd{font-family:var(--mono);background:var(--amber);color:#111;padding:0 6px;margin-right:6px;font-weight:600}#prompt small{color:var(--dim)}
+#holdRing{position:absolute;left:50%;top:50%;width:54px;height:54px;margin:-27px 0 0 -27px;border-radius:50%;--p:0;background:conic-gradient(var(--amber) calc(var(--p)*360deg),rgba(255,255,255,.12) 0);-webkit-mask:radial-gradient(circle,transparent 21px,#000 22px);mask:radial-gradient(circle,transparent 21px,#000 22px)}
+#banner{position:absolute;left:0;right:0;top:28%;text-align:center;opacity:0;transition:opacity .4s}#banner.show{opacity:1}
+.b-main{font-family:var(--display);font-size:clamp(40px,8vw,88px);line-height:1;transform:skewX(-8deg);color:var(--amber);text-shadow:0 0 30px rgba(255,179,71,.55),4px 4px 0 #000}
+.b-main.bad{color:var(--red);text-shadow:0 0 30px rgba(255,77,94,.6),4px 4px 0 #000}.b-main.cy{color:var(--cyan);text-shadow:0 0 30px rgba(41,231,255,.6),4px 4px 0 #000}
+.b-sub{font-family:var(--mono);font-size:clamp(14px,2vw,20px);margin-top:10px;letter-spacing:.14em;text-shadow:2px 2px 0 #000}
+#toasts{position:absolute;right:18px;top:calc(env(safe-area-inset-top,0px) + 120px);display:flex;flex-direction:column;align-items:flex-end;gap:5px}
+.toast{font-size:13px;background:var(--panel);border-right:3px solid var(--c);padding:5px 10px;transition:opacity .5s,transform .5s}.toast.out{opacity:0;transform:translateX(20px)}
+#msg{position:absolute;left:50%;bottom:calc(env(safe-area-inset-bottom,0px) + 22px);transform:translate(-50%,16px);width:min(560px,calc(100vw - 40px));display:flex;gap:10px;align-items:center;background:rgba(8,8,16,.92);border:1px solid rgba(255,46,136,.45);padding:8px 12px;opacity:0;transition:opacity .3s,transform .3s}
+#msg.show{opacity:1;transform:translate(-50%,0)}#msg img{width:44px;height:44px}
+#msgFrom{font-family:var(--mono);font-size:11px;letter-spacing:.16em}#msgKo{font-size:15px;line-height:1.45}#msgEn{font-size:12px;color:var(--dim);font-style:italic}
+#zone{position:absolute;right:18px;bottom:calc(env(safe-area-inset-bottom,0px) + 118px);font-family:var(--display);font-size:30px;text-align:right;text-shadow:0 0 16px rgba(255,46,136,.6),3px 3px 0 #000;opacity:0;transition:opacity .6s}
+#zone small{display:block;font-family:var(--mono);font-size:11px;color:var(--mag);letter-spacing:.18em}#zone.show{opacity:1}
+#marker{position:absolute;left:0;top:0;display:flex;flex-direction:column;align-items:center;gap:2px;margin:-14px 0 0 -14px}
+#marker i{width:18px;height:18px;border:3px solid #ffd400;transform:rotate(45deg);box-shadow:0 0 12px rgba(255,212,0,.7);background:rgba(255,212,0,.15)}
+#marker b{font-family:var(--mono);font-size:11px;color:#ffd400;text-shadow:1px 1px 0 #000}
+#marker.edge i{border-color:#ffb347}
+#buildBar{position:absolute;left:50%;bottom:calc(env(safe-area-inset-bottom,0px) + 22px);transform:translateX(-50%);width:min(900px,calc(100vw - 40px));background:rgba(10,8,6,.9);border:1px solid rgba(255,179,71,.5);padding:10px 12px;pointer-events:auto;display:flex;flex-direction:column;gap:8px}
+#buildBar h4{margin:0;font-family:var(--display);font-weight:400;font-size:18px;color:var(--amber)}#buildBar h4 small{font-family:var(--mono);font-size:11px;color:var(--dim);margin-left:10px;letter-spacing:.1em}
+#buildList{display:flex;gap:6px;overflow-x:auto}.bitem{flex:none;background:#16120c;border:1px solid var(--line);color:var(--ink);padding:6px 10px;text-align:left;cursor:pointer;font-family:var(--body)}
+.bitem b{display:block;font-size:13px}.bitem small{font-family:var(--mono);font-size:11px;color:#ff9a3a}.bitem.on{border-color:var(--amber);box-shadow:0 0 12px rgba(255,179,71,.3)}
+#buildDesc{font-size:12px;color:var(--dim)}
+/* overlays */
+.ov{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(4,4,10,.8);padding:18px 16px;overflow:auto;pointer-events:auto}
+.panel{width:min(680px,100%);background:#0c0b14;border:1px solid rgba(255,46,136,.4);box-shadow:0 0 50px rgba(255,46,136,.12);padding:18px;display:flex;flex-direction:column;gap:12px;margin:auto}
+.panel h2{margin:0;font-family:var(--display);font-weight:400;font-size:30px;color:var(--mag)}.panel h2 small{display:block;font-family:var(--mono);font-size:11px;color:var(--dim);letter-spacing:.2em}
+.ctr{display:grid;grid-template-columns:1fr auto;gap:2px 12px;align-items:center;background:#13121e;border-left:3px solid var(--line);padding:10px 12px}
+.ctr.story{border-color:var(--amber)}.ctr.on{border-color:var(--cyan)}
+.ctr em{grid-column:1;font-style:normal;font-family:var(--mono);font-size:10px;color:var(--dim);letter-spacing:.14em}.ctr b{grid-column:1;font-size:16px}.ctr span{grid-column:1;font-size:13px;color:var(--dim);line-height:1.45}.ctr button{grid-column:2;grid-row:1/4}
+.brow{display:flex;justify-content:space-between;align-items:center;gap:12px;background:#13121e;padding:9px 12px}.brow b{display:block}.brow small{font-size:12px;color:var(--dim)}
+.btn{font-family:var(--display);font-size:18px;padding:9px 18px;background:var(--amber);color:#140a00;border:0;cursor:pointer;transform:skewX(-8deg);box-shadow:4px 4px 0 #000}
+.btn.ghost{background:transparent;color:var(--ink);box-shadow:inset 0 0 0 2px rgba(255,255,255,.3),4px 4px 0 #000;font-family:var(--body);font-size:13px;font-weight:600}
+.btn:disabled{opacity:.35;cursor:default}.btn:focus-visible{outline:3px solid var(--cyan);outline-offset:3px}
+.meta{font-family:var(--mono);font-size:12px;color:var(--dim)}
+#cut{position:fixed;inset:0;pointer-events:auto;cursor:pointer}
+#cut .lb{position:absolute;left:0;right:0;height:11vh;background:#000}#cut .lb.t{top:0}#cut .lb.b{bottom:0}
+#cut .cbox{position:absolute;left:50%;bottom:calc(11vh + 18px);transform:translateX(-50%);width:min(880px,calc(100vw - 32px));display:flex;gap:14px;align-items:flex-end}
+#cut img{width:116px;height:116px;flex:none;border:2px solid var(--c);box-shadow:0 0 26px var(--c)}
+#cut .ctext{flex:1;background:rgba(6,6,12,.9);border-top:2px solid var(--c);padding:10px 14px;min-width:0}
+#cutName{font-family:var(--display);font-size:20px;color:var(--c)}#cutName small{font-family:var(--mono);font-size:11px;color:var(--dim);letter-spacing:.15em;margin-left:8px}
+#cutKo{font-size:18px;line-height:1.5}#cutEn{font-size:13px;color:var(--dim);font-style:italic;line-height:1.45;margin-top:3px}
+.chint{font-family:var(--mono);font-size:11px;color:var(--dim);text-align:right;margin-top:6px}
+#fade{position:fixed;inset:0;background:#000;opacity:0;pointer-events:none;transition:opacity .8s}#fade.on{opacity:1}
+/* title */
+#titleScr{position:fixed;inset:0;overflow:auto;background:radial-gradient(ellipse at 70% 20%,rgba(255,46,136,.25),transparent 55%),radial-gradient(ellipse at 20% 90%,rgba(41,231,255,.18),transparent 50%),linear-gradient(180deg,#0a0612,#07060c);display:flex;align-items:center;justify-content:center;padding:24px 16px;pointer-events:auto}
+#titleScr::before{content:"";position:fixed;inset:0;background:repeating-linear-gradient(100deg,transparent 0 14px,rgba(170,190,255,.05) 14px 15px);pointer-events:none}
+.tcard{position:relative;width:min(860px,100%);display:flex;flex-direction:column;gap:16px}
+.eyebrow{font-family:var(--mono);letter-spacing:.3em;color:var(--mag);font-size:12px}
+.logo{font-family:var(--display);font-size:clamp(56px,13vw,124px);line-height:.88;margin:0;color:#fff;text-shadow:0 0 18px var(--mag),0 0 60px rgba(255,46,136,.5),5px 5px 0 #1a0010;transform:skewX(-6deg)}
+.logo em{font-style:normal;color:var(--toxic);text-shadow:0 0 18px var(--toxic),0 0 60px rgba(125,255,155,.45),5px 5px 0 #002010}
+.tag{font-size:16px;line-height:1.6;margin:0;max-width:40em}.tag span{display:block;font-size:13px;color:var(--dim);font-style:italic;margin-top:4px}
+.cast{display:flex;gap:10px;flex-wrap:wrap}.cast figure{margin:0;display:flex;gap:10px;align-items:center;background:rgba(10,10,20,.72);border-left:3px solid var(--c);padding:5px 12px 5px 5px;flex:1 1 200px}
+.cast img{width:56px;height:56px}.cast b{font-family:var(--display);font-weight:400;font-size:17px;color:var(--c);display:block}.cast small{font-size:12px;color:var(--dim);line-height:1.35;display:block}
+.row{display:flex;gap:12px;flex-wrap:wrap;align-items:center}
+.qsel{display:flex;gap:6px}.qsel button{background:transparent;border:1px solid var(--line);color:var(--dim);font-family:var(--mono);font-size:12px;padding:6px 10px;cursor:pointer}.qsel button.on{border-color:var(--cyan);color:var(--cyan)}
+.keys{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:5px 16px;font-size:13px;color:var(--dim);margin:0;padding:0;list-style:none}
+.keys kbd{font-family:var(--mono);color:var(--ink);background:rgba(255,255,255,.08);border:1px solid var(--line);padding:0 6px;margin-right:6px}
+#loading{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(7,6,12,.94);font-family:var(--display);font-size:32px;color:var(--toxic);text-shadow:0 0 20px rgba(125,255,155,.5);pointer-events:auto}
+#bigmap{max-width:100%;max-height:100%}
+/* touch */
+#touch{position:fixed;inset:0;pointer-events:none}
+#lookZone{position:absolute;right:0;top:0;width:55%;height:100%;pointer-events:auto}
+#joy{position:absolute;left:28px;bottom:calc(env(safe-area-inset-bottom,0px) + 30px);width:130px;height:130px;border-radius:50%;border:2px solid rgba(41,231,255,.35);background:rgba(10,10,20,.35);pointer-events:auto}
+#joy i{position:absolute;left:50%;top:50%;width:54px;height:54px;margin:-27px 0 0 -27px;border-radius:50%;background:rgba(41,231,255,.35)}
+.tb{position:absolute;right:16px;bottom:calc(env(safe-area-inset-bottom,0px) + 110px);display:grid;grid-template-columns:repeat(3,58px);gap:10px;pointer-events:auto}
+.tb button{width:58px;height:58px;border-radius:50%;border:2px solid rgba(255,255,255,.25);background:rgba(10,10,20,.55);color:var(--ink);font-family:var(--body);font-weight:600;font-size:12px;padding:0}
+.tb button.fire{border-color:var(--red);color:var(--red)}.tb button.on{background:rgba(255,255,255,.22)}
+body.touch .bl{transform:scale(.7);transform-origin:left bottom;bottom:170px}body.touch .br{bottom:calc(env(safe-area-inset-bottom,0px) + 330px)}
+@media (max-width:640px){#mTitle{font-size:17px}#mObj{font-size:12px}#money{font-size:22px}#wAmmo{font-size:24px}#cut img{width:70px;height:70px}#cutKo{font-size:15px}}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+
+<canvas id="c3d"></canvas>
+
+<div class="hud" id="hud" hidden>
+  <div class="tl"><div id="mTitle"></div><div id="mObj"></div><div id="wave" hidden><span id="waveTxt"></span><div class="bar"><i id="coreBar"></i></div></div></div>
+  <div class="tr"><div id="clock"></div><div id="money">$0</div><div id="scrap"></div></div>
+  <div id="toasts"></div>
+  <div class="bl">
+    <canvas id="mini" width="180" height="180"></canvas>
+    <div class="bars"><div class="bar"><i id="hpBar"></i></div><div class="bar"><i id="arBar"></i></div><div class="bar"><i id="stBar"></i></div><div class="bar"><i id="bstBar"></i></div><div class="bar" id="carHpWrap" hidden><i id="carHp"></i></div></div>
+  </div>
+  <div class="br"><div id="wSlots"></div><div id="wName"></div><div id="wAmmo"></div></div>
+  <div id="zone"></div>
+  <div id="vig"></div><div id="dmgdir"></div>
+  <div id="cross"><i></i><i></i><i></i><i></i><b></b></div><div id="hitmark"></div>
+  <div id="holdRing" hidden></div>
+  <div id="prompt"></div>
+  <div id="marker" hidden><i></i><b id="mkDist"></b></div>
+  <div id="banner"><div class="b-main" id="bMain"></div><div class="b-sub" id="bSub"></div></div>
+  <div id="msg"><img id="msgPic" alt=""><div><div id="msgFrom"></div><div id="msgKo"></div><div id="msgEn"></div></div></div>
+  <div id="buildBar" hidden><h4>쉘터 건설<small>1–7 선택 · R 회전 · 클릭 설치 · B 닫기</small></h4><div id="buildList"></div><div id="buildDesc"></div></div>
+</div>
+
+<div id="touch" hidden>
+  <div id="lookZone"></div>
+  <div id="joy"><i id="joyKnob"></i></div>
+  <div class="tb">
+    <button class="fire" data-key="Fire">사격</button><button data-key="Aim">조준</button><button data-key="KeyR">재장전</button>
+    <button data-key="KeyE">행동</button><button data-key="KeyF">탑승</button><button data-key="KeyX">무기</button>
+    <button data-key="KeyB">건설</button><button data-key="KeyZ">부스트</button><button data-key="KeyM">지도</button>
+  </div>
+</div>
+
+<div id="cut" hidden><div class="lb t"></div><div class="lb b"></div>
+  <div class="cbox"><img id="cutPic" alt=""><div class="ctext"><div id="cutName"></div><div id="cutKo"></div><div id="cutEn"></div><div class="chint">E · Enter · 클릭 — 다음</div></div></div></div>
+
+<div class="ov" id="board" hidden><div class="panel"><h2>해결사 의뢰<small>FIXER CONTRACTS · YOON MI-RA</small></h2><div id="boardList" style="display:flex;flex-direction:column;gap:8px"></div><div class="meta" id="boardStats"></div><div class="row"><button class="btn ghost" id="boardClose">닫기 (Esc)</button></div></div></div>
+<div class="ov" id="bench" hidden><div class="panel"><h2>작업대<small>WORKBENCH · CRAFT · UPGRADE</small></h2><div id="benchList" style="display:flex;flex-direction:column;gap:6px"></div><div class="meta" id="benchStats"></div><div class="row"><button class="btn ghost" id="benchClose">닫기 (Esc)</button></div></div></div>
+<div class="ov" id="mapScr" hidden><canvas id="bigmap"></canvas></div>
+<div class="ov" id="pauseScr" hidden><div class="panel"><h2>일시정지<small>PAUSED</small></h2><ul class="keys">
+  <li><kbd>WASD</kbd>이동 · 운전</li><li><kbd>마우스</kbd>시점 · 조준</li><li><kbd>좌클릭</kbd>사격 · 설치</li><li><kbd>우클릭</kbd>정밀 조준</li><li><kbd>Shift</kbd>달리기</li><li><kbd>Space</kbd>점프 · 핸드브레이크</li>
+  <li><kbd>R</kbd>재장전 · 건설 회전</li><li><kbd>1–4</kbd>무기</li><li><kbd>Q</kbd>빠른 칼질</li><li><kbd>E</kbd>상호작용 (길게: 핫와이어)</li><li><kbd>F</kbd>차 타기 · 내리기</li><li><kbd>B</kbd>쉘터 건설</li><li><kbd>V</kbd>손전등</li><li><kbd>Z</kbd>뉴로 부스트 (슬로모션)</li><li><kbd>M</kbd>지도</li></ul>
+  <div class="row"><button class="btn" id="btnResume">계속하기</button><div class="qsel"><span class="meta" style="align-self:center">그래픽 (새로고침)</span><button data-q2="high">높음</button><button data-q2="med">중간</button><button data-q2="low">낮음</button></div></div></div></div>
+<div class="ov" id="deathScr" hidden><div class="panel" style="border-color:rgba(255,77,94,.5)"><h2 style="color:var(--red)">쓰러졌다<small>YOU WENT DOWN</small></h2><p class="tag" id="deathSub"></p><div class="row"><button class="btn" id="btnRespawn">쉘터에서 깨어나기</button></div></div></div>
+<div class="ov" id="endScr" hidden><div class="panel"><h2>성수의 밤<small>ENDING · THE RAIN STOPS</small></h2><p class="tag">TTUK 코어가 꺼지자 드론 메시가 하나씩 떨어졌다. 3년 만에 비가 그쳤다. 블랙 로스터리의 커피는 아직 따뜻하다.<span>With the TTUK core severed, the drone mesh fell out of the sky. For the first time in three years, the rain stopped.</span></p><p class="meta" id="endStats"></p><div class="row"><button class="btn" id="btnFree">자유 모드로 계속</button></div></div></div>
+<div id="fade"></div>
+
+<div id="titleScr">
+  <div class="tcard">
+    <div class="eyebrow">NEON SEONGSU · DEAD RAIN · 격리구역 7</div>
+    <h1 class="logo">네온 성수<br><em>데드 레인</em></h1>
+    <p class="tag">2077년, OMNI의 프로젝트 TTUK가 드론 메시로 뿌린 포자가 성수동을 네온 감염체의 구역으로 바꿨다. 레이더 갱이 거리를 나눠 먹는다. 해결사 윤미라의 의뢰를 받아 싸우고, 차를 훔치고, 붉은 벽돌 창고에 쉘터를 지어라.<span>OMNI's Project TTUK spread spores through its drone mesh and turned Seongsu into a neon-infected quarantine zone. Take contracts from the fixer, steal cars, and build a shelter in the red-brick warehouse.</span></p>
+    <div class="cast">
+      <figure style="--c:var(--cyan)"><img id="titlePic0" alt=""><figcaption><b>한서진</b><small>러너 · 전 OMNI 드론 엔지니어</small></figcaption></figure>
+      <figure style="--c:var(--mag)"><img id="titlePic1" alt=""><figcaption><b>윤미라</b><small>해결사 · 블랙 로스터리 쉘터</small></figcaption></figure>
+      <figure style="--c:var(--amber)"><img id="titlePic2" alt=""><figcaption><b>강태오</b><small>드라이버 · 레이더에게 붙잡혀 있다</small></figcaption></figure>
+    </div>
+    <div class="row"><button class="btn" id="btnStart">게임 시작</button><button class="btn ghost" id="btnNew" hidden>새 게임</button>
+      <div class="qsel"><span class="meta" style="align-self:center">그래픽</span><button data-q="high">높음 · 반사</button><button data-q="med">중간</button><button data-q="low">낮음</button></div></div>
+    <ul class="keys">
+      <li><kbd>클릭</kbd>시점 고정</li><li><kbd>WASD</kbd>이동 · 운전</li><li><kbd>좌클릭</kbd>사격</li><li><kbd>우클릭</kbd>조준</li><li><kbd>F</kbd>차 타기</li><li><kbd>E</kbd>상호작용</li><li><kbd>B</kbd>쉘터 건설</li><li><kbd>Z</kbd>뉴로 부스트</li><li><kbd>M</kbd>지도</li>
+    </ul>
+    <div class="meta">3D · WebGL 필요. 느리면 그래픽을 낮춤으로. 진행은 이 브라우저에 저장된다.</div>
+  </div>
+</div>
+<div id="loading" hidden>격리구역 7 로딩 중…</div>
+
+<script src="vendor/three.min.js"></script>
+<script src="vendor/three-extras.js"></script>
+<script src="js/world.js"></script>
+<script src="js/actors.js"></script>
+<script src="js/ai.js"></script>
+<script src="js/vehicles.js"></script>
+<script src="js/shelter.js"></script>
+<script src="js/data.js"></script>
+<script src="js/main.js"></script>

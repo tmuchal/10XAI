@@ -60,3 +60,10 @@ Single source of truth for the game (`index.html`) and the promo video (`promo/`
 11. Your phone keeps score. The whole neighborhood is watching. / 휴대폰 속 SNS에 모든 게 올라간다. 동네 전체가 지켜보고 있다.
 12. Tonight, they take back Seongsu. / 오늘 밤, 두 사람은 성수를 되찾는다.
 13. Neon Seongsu. Play it free in your browser. / 네온 성수. 브라우저에서 무료로 플레이하세요.
+
+## 6. Dead Rain (3D game, `games/neon-seongsu-3d/`)
+
+- **2076**: Project TTUK goes live early. The "pacifying" spores seeded through the drone mesh mutate and turn residents into **neon-infected** (네온 감염체), who are drawn to light and sound.
+- **2077**: Seongsu is walled off as **Quarantine Zone 7**. The rain carries spores. The **Ttukseom Raiders** (뚝섬 레이더즈, led by Boss Hwang 황 두목) hold the station yard and the pier.
+- **Black Roastery** is the last shelter. Yoon Mi-ra runs it as the fixer. Han Seo-jin comes back to the zone; Old Kang and Kang Tae-o are rescued along the way.
+- **Ending:** the TTUK core is pulled from under OMNI Tower, the drone mesh falls, and the rain stops for the first time in three years.
