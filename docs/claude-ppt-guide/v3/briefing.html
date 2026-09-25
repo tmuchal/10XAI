@@ -54,6 +54,7 @@
 
 <!-- A · HERO -->
 <section class="scene" id="A" data-t="0 3.2">
+  <div class="abs" style="left:0;top:0;width:1100px;height:1080px;background:linear-gradient(90deg,rgba(5,6,10,.92) 0%,rgba(5,6,10,.75) 45%,transparent 100%)"></div>
   <div class="abs" style="left:120px;top:320px">
     <div class="kick" data-a="0.15 .5 up">Q3 2026 · 30-second briefing</div>
     <div style="font-size:112px;font-weight:800;line-height:1.04;margin-top:18px;overflow:hidden"><div data-a="0.3 .6 rise">3분기 실적,</div></div>
@@ -65,11 +66,10 @@
 
 <!-- B · PAST (3D chart) -->
 <section class="scene" id="B" data-t="3.2 9.55">
-  <div class="panel" style="left:96px;top:120px;width:560px;padding:32px 36px" data-a="3.35 .5 up">
-    <div class="kick">Past · 과거 7개 분기</div>
-    <div class="muted" style="font-size:24px;margin-top:18px;font-weight:600">3분기 매출</div>
-    <div style="font-size:96px;font-weight:800;line-height:1.05"><span data-count="5.2 1.4 482 0">0</span><span style="font-size:48px;font-weight:700"> 억 원</span></div>
-    <div style="display:flex;gap:10px;margin-top:16px">
+  <div class="panel" style="left:96px;top:96px;height:132px;padding:18px 30px;display:flex;align-items:center;gap:30px" data-a="3.35 .5 up">
+    <div><div class="kick">Past · 과거 7개 분기</div><div class="muted" style="font-size:22px;margin-top:6px;font-weight:600">3분기 매출</div></div>
+    <div style="font-size:78px;font-weight:800;line-height:1"><span data-count="5.2 1.4 482 0">0</span><span style="font-size:38px;font-weight:700"> 억 원</span></div>
+    <div style="display:flex;flex-direction:column;gap:8px">
       <span class="pill" style="background:var(--lime);color:#0B0C10" data-a="6.3 .4 pop">▲ 18.1% YoY</span>
       <span class="pill" style="background:rgba(124,92,255,.22);color:#CFC6FF;border:1px solid rgba(124,92,255,.5)" data-a="3.8 .4 pop">6분기 연속 성장</span>
     </div>
@@ -277,7 +277,8 @@ function seek(f) {
   if (id === 'D') {
     for (let i = 0; i < 4; i++) { const a = anchor('road', 'gate' + i, f), el = document.getElementById('gl' + i);
       if (!a || a[2] <= 0.5) { el.style.opacity = 0; continue; }
-      const s = Math.max(0.55, Math.min(1.25, 9 / a[2])); const vis = clamp((a[2] - 2.5) / 3) * clamp((60 - a[2]) / 20);
+      const next = [0, 1, 2, 3].find(j => { const b = anchor('road', 'gate' + j, f); return b && b[2] > 4; });
+      const s = Math.max(0.9, Math.min(1.5, 14 / a[2])); const vis = i === next ? clamp((a[2] - 4) / 3) * clamp((45 - a[2]) / 10) : 0;
       el.style.left = a[0]*1920 + 'px'; el.style.top = a[1]*1080 + 'px'; el.style.opacity = vis * eo((t - 16.8 - i*0.1) / 0.4);
       el.style.transform = `translate(-50%,-100%) scale(${s})`; }
     [...document.querySelectorAll('#fc .fcb')].forEach(r => { const i = +r.dataset.i; const p = eb((t - 21.1 - i*0.12) / 0.5); r.style.transformOrigin = 'center bottom'; r.style.transformBox = 'fill-box'; r.style.transform = `scaleY(${p})`; });
