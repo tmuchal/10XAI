@@ -1,0 +1,314 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<title>Story Site Explainer</title>
+<style>
+  :root {
+    --bg: #0b0d17; --panel: #151a2e; --panel2: #1d2440; --line: #2b3458;
+    --text: #eef1ff; --muted: #9aa3c7; --accent: #c6ff3d; --coral: #ff6b5b; --sky: #5ec8ff; --violet: #9b7bff;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { width: 1920px; height: 1080px; overflow: hidden; background: var(--bg); color: var(--text);
+    font-family: "Noto Sans CJK KR", "Noto Sans KR", "Apple SD Gothic Neo", system-ui, sans-serif; }
+  #stage { position: relative; width: 1920px; height: 1080px; overflow: hidden;
+    background: radial-gradient(1200px 700px at 20% 10%, #1a2150 0%, transparent 60%),
+                radial-gradient(900px 600px at 90% 90%, #2a1640 0%, transparent 60%), var(--bg); }
+  .scene { position: absolute; inset: 0; opacity: 0; }
+  .mono { font-family: "DejaVu Sans Mono", ui-monospace, monospace; }
+  .caption { position: absolute; left: 0; right: 0; bottom: 70px; text-align: center; }
+  .caption .ko { font-size: 46px; font-weight: 700; letter-spacing: -0.5px; }
+  .caption .en { font-size: 26px; color: var(--muted); margin-top: 10px; }
+  .step { position: absolute; left: 110px; top: 90px; display: flex; align-items: center; gap: 22px; }
+  .step .num { width: 76px; height: 76px; border-radius: 22px; background: var(--accent); color: #0b0d17;
+    font-size: 40px; font-weight: 800; display: grid; place-items: center; }
+  .step .title { font-size: 44px; font-weight: 800; }
+  .step .sub { font-size: 24px; color: var(--muted); margin-top: 4px; }
+  .win { position: absolute; background: var(--panel); border: 2px solid var(--line); border-radius: 22px;
+    box-shadow: 0 40px 120px rgba(0,0,0,.5); overflow: hidden; }
+  .win .bar { height: 52px; background: var(--panel2); display: flex; align-items: center; gap: 10px; padding: 0 20px; }
+  .dot { width: 14px; height: 14px; border-radius: 50%; }
+  .urlbox { margin-left: 18px; flex: 1; height: 32px; border-radius: 10px; background: #0e1222; color: var(--muted);
+    font-size: 19px; display: flex; align-items: center; padding: 0 16px; }
+  .cursor { display: inline-block; width: 3px; height: 1em; background: var(--accent); vertical-align: -3px; margin-left: 2px; }
+  .btn { display: inline-flex; align-items: center; justify-content: center; border-radius: 14px; font-weight: 700; }
+  .tile { position: absolute; border-radius: 18px; overflow: hidden; }
+  .check { color: var(--accent); font-weight: 800; }
+  .progress { position: absolute; left: 0; bottom: 0; height: 6px; background: var(--accent); }
+  .chips { position: absolute; top: 34px; right: 60px; display: flex; gap: 10px; }
+  .chip { font-size: 18px; padding: 8px 14px; border-radius: 999px; border: 2px solid var(--line); color: var(--muted); }
+  .chip.on { border-color: var(--accent); color: var(--accent); }
+</style>
+</head>
+<body>
+<div id="stage">
+
+  <!-- 0: Title -->
+  <div class="scene" id="s0">
+    <div id="s0-title" style="position:absolute;left:0;right:0;top:250px;text-align:center">
+      <div style="font-size:34px;color:var(--accent);font-weight:700;letter-spacing:2px">CLAUDE × HIGGSFIELD</div>
+      <div style="font-size:96px;font-weight:900;letter-spacing:-2px;margin-top:22px">이런 스토리 사이트,<br>이렇게 만듭니다</div>
+      <div style="font-size:32px;color:var(--muted);margin-top:26px">How to build an AI story site that lives at <span class="mono" style="color:var(--text)">*.higgsfield.app</span></div>
+    </div>
+    <div class="win" id="s0-win" style="left:560px;top:760px;width:800px;height:110px">
+      <div class="bar" style="height:110px">
+        <div class="dot" style="background:#ff5f57"></div><div class="dot" style="background:#febc2e"></div><div class="dot" style="background:#28c840"></div>
+        <div class="urlbox mono" style="height:52px;font-size:28px;color:var(--text)"><span id="s0-url"></span><span class="cursor" id="s0-cur"></span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 1: Connect -->
+  <div class="scene" id="s1">
+    <div class="step"><div class="num">1</div><div><div class="title">Claude에 Higgsfield 연결</div><div class="sub">Connect the Higgsfield MCP connector (OAuth, no API key)</div></div></div>
+    <div class="win" style="left:360px;top:240px;width:1200px;height:600px">
+      <div class="bar"><div class="dot" style="background:#ff5f57"></div><div class="dot" style="background:#febc2e"></div><div class="dot" style="background:#28c840"></div>
+        <div style="margin-left:18px;color:var(--muted);font-size:20px">Claude · Settings → Connectors → Add custom connector</div></div>
+      <div style="padding:50px 70px">
+        <div style="font-size:22px;color:var(--muted)">Name</div>
+        <div style="margin-top:10px;height:64px;border-radius:14px;background:#0e1222;border:2px solid var(--line);font-size:28px;display:flex;align-items:center;padding:0 22px"><span id="s1-name"></span></div>
+        <div style="font-size:22px;color:var(--muted);margin-top:34px">Remote MCP server URL</div>
+        <div id="s1-urlfield" style="margin-top:10px;height:64px;border-radius:14px;background:#0e1222;border:2px solid var(--line);font-size:28px;display:flex;align-items:center;padding:0 22px" class="mono"><span id="s1-url"></span></div>
+        <div style="margin-top:44px;display:flex;gap:24px;align-items:center">
+          <div class="btn" id="s1-btn" style="width:220px;height:66px;background:var(--accent);color:#0b0d17;font-size:26px">Connect</div>
+          <div id="s1-ok" style="font-size:28px;opacity:0"><span class="check">✓</span> Signed in with Higgsfield · connected</div>
+        </div>
+        <div class="mono" id="s1-cc" style="margin-top:40px;font-size:18px;white-space:nowrap;color:var(--muted);opacity:0">Claude Code: claude mcp add --transport http --scope user higgsfield https://mcp.higgsfield.ai/mcp</div>
+      </div>
+    </div>
+    <div class="caption"><div class="ko">커넥터 URL 하나 붙여넣고 로그인하면 끝</div><div class="en">Paste one URL, sign in: Claude can now call Higgsfield</div></div>
+  </div>
+
+  <!-- 2: Describe -->
+  <div class="scene" id="s2">
+    <div class="step"><div class="num">2</div><div><div class="title">만들고 싶은 사이트를 설명</div><div class="sub">Describe the story, the look, and the address</div></div></div>
+    <div class="win" style="left:260px;top:230px;width:1400px;height:620px">
+      <div class="bar"><div class="dot" style="background:#ff5f57"></div><div class="dot" style="background:#febc2e"></div><div class="dot" style="background:#28c840"></div>
+        <div style="margin-left:18px;color:var(--muted);font-size:20px">Claude</div></div>
+      <div style="padding:40px 60px">
+        <div id="s2-user" style="margin-left:auto;width:1060px;background:#2a3363;border-radius:26px 26px 6px 26px;padding:30px 36px;font-size:29px;line-height:1.55;min-height:230px"><span id="s2-text"></span><span class="cursor" id="s2-cur"></span></div>
+        <div id="s2-reply" style="margin-top:34px;width:1180px;background:var(--panel2);border-radius:26px 26px 26px 6px;padding:26px 34px;font-size:27px;line-height:1.5;opacity:0">
+          좋아요. 플랜: <b>① 스토리 분할</b> → <b>② 장면 이미지·영상 생성</b> → <b>③ 사이트 빌드</b> → <b>④ 배포</b>.<br>
+          <span style="color:var(--muted)">먼저 크레딧 예상치를 알려드릴게요.</span>
+        </div>
+      </div>
+    </div>
+    <div class="caption"><div class="ko">스토리 · 분위기 · 주소를 한 번에 말하기</div><div class="en">One prompt: story, visual style, subdomain</div></div>
+  </div>
+
+  <!-- 3: Generate assets -->
+  <div class="scene" id="s3">
+    <div class="step"><div class="num">3</div><div><div class="title">장면 이미지 → 움직이는 영상</div><div class="sub">Claude generates stills, you pick, then it animates them</div></div></div>
+    <div class="chips"><div class="chip" id="s3-c1">Soul · 이미지</div><div class="chip" id="s3-c2">Kling 3.0 · 영상</div></div>
+    <div id="s3-grid"></div>
+    <div id="s3-credit" style="position:absolute;right:110px;top:250px;width:380px;background:var(--panel);border:2px solid var(--line);border-radius:20px;padding:26px 30px">
+      <div style="font-size:22px;color:var(--muted)">Credits <span style="font-size:18px">(예시 · example)</span></div>
+      <div class="mono" style="font-size:54px;font-weight:700;margin-top:6px" id="s3-cr">150</div>
+      <div style="font-size:21px;color:var(--muted);margin-top:14px;line-height:1.5">스틸 먼저: 싸게 반복<br>영상은 고른 컷만</div>
+    </div>
+    <div class="caption"><div class="ko">스틸로 룩을 정하고, 고른 컷만 영상으로</div><div class="en">Iterate on cheap stills; animate only the frames you chose</div></div>
+  </div>
+
+  <!-- 4: Build & deploy -->
+  <div class="scene" id="s4">
+    <div class="step"><div class="num">4</div><div><div class="title">Claude가 사이트를 짓고 배포</div><div class="sub">Higgsfield website builder: create → code → deploy</div></div></div>
+    <div class="win" style="left:200px;top:230px;width:1520px;height:640px;background:#090b14">
+      <div class="bar"><div class="dot" style="background:#ff5f57"></div><div class="dot" style="background:#febc2e"></div><div class="dot" style="background:#28c840"></div>
+        <div style="margin-left:18px;color:var(--muted);font-size:20px">terminal</div></div>
+      <div class="mono" id="s4-term" style="padding:34px 44px;font-size:26px;line-height:1.75;white-space:pre"></div>
+    </div>
+    <div class="caption"><div class="ko">React 앱 + 서버 1개, 명령 몇 줄이면 라이브</div><div class="en">React 19 + TanStack Start on one Cloudflare Worker</div></div>
+  </div>
+
+  <!-- 5: Live site -->
+  <div class="scene" id="s5">
+    <div class="step"><div class="num">5</div><div><div class="title">스크롤하면 이야기가 움직인다</div><div class="sub">Live at your subdomain: scroll-driven story sections</div></div></div>
+    <div class="win" style="left:410px;top:220px;width:1100px;height:640px">
+      <div class="bar"><div class="dot" style="background:#ff5f57"></div><div class="dot" style="background:#febc2e"></div><div class="dot" style="background:#28c840"></div>
+        <div class="urlbox mono" style="color:var(--text)">🔒 noainostory.higgsfield.app</div></div>
+      <div style="position:relative;height:588px;overflow:hidden">
+        <div id="s5-page" style="position:absolute;left:0;right:0;top:0"></div>
+        <div id="s5-bar" style="position:absolute;right:10px;top:10px;width:8px;height:120px;border-radius:4px;background:rgba(255,255,255,.35)"></div>
+      </div>
+    </div>
+    <div class="caption" style="bottom:60px"><div class="ko">완성된 사이트: 챕터마다 장면이 움직인다</div><div class="en">The finished site: each chapter plays its own moving scene</div></div>
+  </div>
+
+  <!-- 6: Checklist -->
+  <div class="scene" id="s6">
+    <div style="position:absolute;left:0;right:0;top:70px;text-align:center">
+      <div style="font-size:30px;color:var(--accent);font-weight:700;letter-spacing:2px">BEFORE YOU HIT DEPLOY</div>
+      <div style="font-size:70px;font-weight:900;margin-top:14px">배포 전 체크리스트</div>
+    </div>
+    <div id="s6-list" style="position:absolute;left:380px;top:270px;width:1160px"></div>
+    <div class="caption"><div class="ko">연결은 무료, 생성은 크레딧. 배포는 즉시 공개</div><div class="en">Connecting is free, generating costs credits, deploys go live instantly</div></div>
+  </div>
+
+  <div class="progress" id="prog"></div>
+</div>
+
+<script>
+// Deterministic timeline: render(t) draws the frame for time t (seconds).
+// Open normally to autoplay; the renderer calls window.render(t) per frame.
+const SCENES = [[0, 6], [6, 15], [15, 24], [24, 33], [33, 42], [42, 51], [51, 60]];
+const DURATION = 60, FADE = 0.5;
+const $ = id => document.getElementById(id);
+const clamp = (v, a = 0, b = 1) => Math.min(b, Math.max(a, v));
+const seg = (t, a, b) => clamp((t - a) / (b - a));
+const ease = x => x < .5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2;
+const type = (s, p) => s.slice(0, Math.round(s.length * clamp(p)));
+const blink = t => (Math.floor(t * 2) % 2 === 0 ? 1 : 0);
+
+// Scene 3 grid: 6 stills (gradient art), tile 2 gets picked and animated.
+const PALETTES = [["#ff6b5b", "#5b2a86"], ["#5ec8ff", "#16225a"], ["#c6ff3d", "#1b5e4a"],
+                  ["#ffb347", "#7a1f3d"], ["#9b7bff", "#10143a"], ["#ff8fd1", "#243b8a"]];
+const grid = $("s3-grid");
+PALETTES.forEach((p, i) => {
+  const d = document.createElement("div");
+  d.className = "tile"; d.id = "tile" + i;
+  const x = 110 + (i % 3) * 400, y = 250 + Math.floor(i / 3) * 290;
+  Object.assign(d.style, { left: x + "px", top: y + "px", width: "370px", height: "260px",
+    background: `linear-gradient(135deg, ${p[0]}, ${p[1]})` });
+  d.innerHTML = `<div class="sun" style="position:absolute;width:90px;height:90px;border-radius:50%;background:rgba(255,255,255,.85);left:60%;top:22%"></div>
+    <div class="hill" style="position:absolute;left:-10%;right:-10%;bottom:-40px;height:130px;border-radius:50% 50% 0 0;background:rgba(0,0,0,.35)"></div>
+    <div class="fig" style="position:absolute;width:26px;height:64px;border-radius:13px;background:#0b0d17;left:30%;bottom:70px"></div>
+    <div class="lbl" style="position:absolute;left:16px;top:14px;font-size:18px;font-weight:700;color:#fff;text-shadow:0 1px 4px #000">Scene ${i + 1}</div>`;
+  grid.appendChild(d);
+});
+
+// Scene 4 terminal script: [startTime, text, color]
+const TERM = [
+  [24.6, "$ higgsfield website create --type website --subdomain noainostory", "#eef1ff"],
+  [26.4, "  ✓ repo + site provisioned", "#c6ff3d"],
+  [27.2, "$ # Claude edits app/: hero, 5 chapters, scroll-driven video", "#9aa3c7"],
+  [28.6, "  ✓ app/routes/index.tsx   ✓ app/components/Chapter.tsx", "#c6ff3d"],
+  [29.6, "$ git push && higgsfield website deploy", "#eef1ff"],
+  [31.0, "  ✓ live → https://noainostory.higgsfield.app", "#c6ff3d"],
+  [31.8, "  (publish to the community feed: only if you ask)", "#9aa3c7"],
+];
+
+// Scene 5 story page
+const CH = [["프롤로그", "Prologue", PALETTES[1]], ["1장 · 비 오는 골목", "Chapter 1", PALETTES[0]],
+            ["2장 · 네온의 밤", "Chapter 2", PALETTES[4]], ["3장 · 새벽", "Chapter 3", PALETTES[3]],
+            ["에필로그", "Epilogue", PALETTES[2]]];
+const page = $("s5-page");
+CH.forEach((c, i) => {
+  const s = document.createElement("section");
+  Object.assign(s.style, { position: "relative", height: "588px", overflow: "hidden",
+    background: `linear-gradient(160deg, ${c[2][0]}, ${c[2][1]})` });
+  s.innerHTML = `<div class="px" style="position:absolute;left:-5%;right:-5%;bottom:-60px;height:260px;border-radius:50% 50% 0 0;background:rgba(0,0,0,.35)"></div>
+    <div class="fig" style="position:absolute;width:40px;height:100px;border-radius:20px;background:#0b0d17;bottom:150px;left:20%"></div>
+    <div class="txt" style="position:absolute;left:80px;top:200px">
+      <div style="font-size:22px;letter-spacing:3px;color:rgba(255,255,255,.8)">${c[1].toUpperCase()}</div>
+      <div style="font-size:64px;font-weight:900;color:#fff;text-shadow:0 4px 20px rgba(0,0,0,.4)">${c[0]}</div></div>`;
+  page.appendChild(s);
+});
+
+// Scene 6 checklist
+const CHECKS = [
+  ["크레딧 먼저 확인", "Check balance and per-model cost before each video render"],
+  ["스틸 → 영상 순서", "Lock the look on cheap stills, then animate"],
+  ["배포 = 즉시 공개", "Every deploy ships live; there is no preview stage"],
+  ["피드 공개는 선택", "Listing on the community feed happens only when you ask"],
+  ["초상·로고·저작권", "No real likeness, logos, or borrowed footage without rights"],
+];
+$("s6-list").innerHTML = CHECKS.map((c, i) => `<div id="ck${i}" style="display:flex;gap:26px;align-items:center;margin-bottom:18px">
+  <div style="width:56px;height:56px;border-radius:16px;border:3px solid var(--accent);display:grid;place-items:center;font-size:34px" class="check"><span id="ckm${i}">✓</span></div>
+  <div><div style="font-size:38px;font-weight:800">${c[0]}</div><div style="font-size:23px;color:var(--muted)">${c[1]}</div></div></div>`).join("");
+
+const PROMPT = "noainostory라는 스크롤형 스토리 사이트를 만들어줘. 비 오는 서울 골목의 택배 기사 이야기, 5개 챕터. 챕터마다 시네마틱 이미지 1장 + 5초 영상. 주소는 noainostory.higgsfield.app";
+
+function render(t) {
+  SCENES.forEach(([a, b], i) => {
+    const o = i === 0 ? 1 - seg(t, b - FADE, b)
+            : i === SCENES.length - 1 ? seg(t, a, a + FADE)
+            : Math.min(seg(t, a, a + FADE), 1 - seg(t, b - FADE, b));
+    $("s" + i).style.opacity = o;
+    $("s" + i).style.transform = `scale(${1 + 0.02 * (1 - o)})`;
+  });
+  $("prog").style.width = (100 * t / DURATION) + "%";
+
+  // 0 title
+  const e0 = ease(seg(t, 0, 1.2));
+  $("s0-title").style.transform = `translateY(${40 * (1 - e0)}px)`; $("s0-title").style.opacity = e0;
+  $("s0-win").style.opacity = seg(t, 1.2, 1.8);
+  $("s0-url").textContent = type("noainostory.higgsfield.app", seg(t, 1.8, 4));
+  $("s0-cur").style.opacity = blink(t);
+
+  // 1 connect
+  $("s1-name").textContent = type("Higgsfield", seg(t, 6.6, 7.6));
+  $("s1-url").textContent = type("https://mcp.higgsfield.ai/mcp", seg(t, 7.8, 10));
+  const press = seg(t, 10.4, 10.7) - seg(t, 10.7, 11);
+  $("s1-btn").style.transform = `scale(${1 - 0.08 * press})`;
+  $("s1-ok").style.opacity = seg(t, 11.2, 11.7);
+  $("s1-cc").style.opacity = seg(t, 12.2, 12.8);
+
+  // 2 describe
+  $("s2-text").textContent = type(PROMPT, seg(t, 15.6, 20.8));
+  $("s2-cur").style.opacity = t < 21 ? blink(t) : 0;
+  const r = ease(seg(t, 21.3, 22));
+  $("s2-reply").style.opacity = r; $("s2-reply").style.transform = `translateY(${20 * (1 - r)}px)`;
+
+  // 3 assets
+  const pick = 2;
+  PALETTES.forEach((_, i) => {
+    const el = $("tile" + i);
+    const appear = ease(seg(t, 24.5 + i * 0.35, 25.1 + i * 0.35));
+    const chosen = seg(t, 28, 28.6);
+    let o = appear, sc = 0.85 + 0.15 * appear;
+    if (i !== pick) o *= 1 - 0.7 * chosen; else sc *= 1 + 0.05 * chosen;
+    el.style.opacity = o; el.style.transform = `scale(${sc})`;
+    el.style.outline = i === pick && chosen > 0 ? `${Math.round(6 * chosen)}px solid #c6ff3d` : "none";
+    // animate the chosen tile once "video" starts
+    const vid = i === pick ? seg(t, 29, 33) : 0;
+    const tt = (t - 29) * (vid > 0 ? 1 : 0);
+    el.querySelector(".sun").style.transform = `translateY(${vid ? -30 * vid : 0}px)`;
+    el.querySelector(".fig").style.transform = `translateX(${vid ? 180 * vid : 0}px) translateY(${vid ? -6 * Math.abs(Math.sin(tt * 8)) : 0}px)`;
+    el.querySelector(".hill").style.transform = `translateX(${vid ? -30 * vid : 0}px)`;
+    el.querySelector(".lbl").textContent = i === pick && vid > 0 ? "▶ Scene 3 · 5s video" : `Scene ${i + 1}`;
+  });
+  $("s3-c1").className = "chip" + (t < 28.6 ? " on" : "");
+  $("s3-c2").className = "chip" + (t >= 28.6 ? " on" : "");
+  const cr = 150 - Math.round(12 * seg(t, 24.5, 27)) - Math.round(30 * seg(t, 29, 30));
+  $("s3-cr").textContent = cr;
+
+  // 4 terminal
+  $("s4-term").innerHTML = TERM.filter(l => t >= l[0]).map((l, i, arr) => {
+    const isCmd = l[1].startsWith("$");
+    const txt = isCmd ? type(l[1], seg(t, l[0], l[0] + 1.1)) : l[1];
+    return `<div style="color:${l[2]}">${txt.replace(/</g, "&lt;")}</div>`;
+  }).join("");
+
+  // 5 live site: scroll through chapters with parallax
+  // hold on each chapter, then glide to the next
+  const sp = [0, 1, 2, 3].reduce((a, k) => a + ease(seg(t, 43.2 + k * 1.8, 44.1 + k * 1.8)), 0) / (CH.length - 1);
+  const y = sp * 588 * (CH.length - 1);
+  page.style.transform = `translateY(${-y}px)`;
+  $("s5-bar").style.transform = `translateY(${sp * 450}px)`;
+  [...page.children].forEach((s, i) => {
+    const rel = (i * 588 - y) / 588; // 0 when section is in view
+    s.querySelector(".px").style.transform = `translateY(${rel * 120}px)`;
+    s.querySelector(".fig").style.transform = `translateX(${(-rel) * 260}px)`;
+    const tx = s.querySelector(".txt");
+    tx.style.opacity = clamp(1 - Math.abs(rel) * 1.6);
+    tx.style.transform = `translateY(${rel * 80}px)`;
+  });
+
+  // 6 checklist
+  CHECKS.forEach((_, i) => {
+    const p = ease(seg(t, 52 + i * 0.7, 52.6 + i * 0.7));
+    $("ck" + i).style.opacity = p; $("ck" + i).style.transform = `translateX(${-40 * (1 - p)}px)`;
+    $("ckm" + i).style.opacity = seg(t, 52.4 + i * 0.7, 52.7 + i * 0.7);
+  });
+}
+window.render = render;
+window.DURATION = DURATION;
+
+if (!location.search.includes("render")) {
+  const t0 = performance.now();
+  const loop = now => { render(((now - t0) / 1000) % DURATION); requestAnimationFrame(loop); };
+  requestAnimationFrame(loop);
+} else render(0);
+</script>
+</body>
+</html>
