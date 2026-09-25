@@ -51,6 +51,7 @@ Example: a 20 s chapter `ch03s` between ch03 and ch04.
    by 20 s automatically; labels renumber (ch04 becomes "CHAPTER 05").
 3. `film/index.html`: add `<script src="chapters/ch03s.js"></script>` after `ch03.js`.
 4. Cues for the new chapter: add `{ "ch": "ch03s", "at": … }` rows to `tools/narration.json` and `tools/sfx-cues.json`.
-   The boundary at ch03s's start needs its own curtain sweep (copy ch04's `{"ch": "ch04", "at": -0.78, "type": "curtain", …}`
-   row as `"ch": "ch03s"`); music swells/whooshes/chimes per boundary are generated from the timeline.
+   The new boundary needs its own curtain sounds: copy ch03's two `"type": "curtain"` rows (`"at": -0.78` close and
+   `"at": 0.47` open) with `"ch": "ch03s"`. Music swells/whooshes/chimes per boundary come from the timeline.
+   (Cue `note` texts quote the old absolute times; they are comments only.)
 5. `node tools/check-globals.cjs`, then rebuild narration + SFX, then snap the new chapter and its two boundaries.
