@@ -187,10 +187,14 @@ function makeFilm(pal) {
 //   body: fur colour · glasses:true → nerdy round clear glasses instead of sunglasses ·
 //   spiky:true → punk mohawk tuft · party:true → party hat, no sunglasses (extras) ·
 //   beret: "#hex" → small beret · scarf: null → no scarf / "#hex" → scarf colour.
+//   back:true → seen from behind (character-sheet back view): no face/eyes/mouth, back of the
+//   ears, sunglasses arms hooked over the ears, scarf knot + hanging ends, and a centre tail.
+//   poseNoa works unchanged on a back-view Noa (look/mood/talk just have nothing to move).
 const NOA = { body: "#e9a257", belly: "#f7d9a8", scarf: "#f2c14e" };
 function makeNoa(size = 200, v = {}) {
   const c = Object.assign({}, NOA, v);
   const shades = !c.glasses && !c.party;
+  const bk = !!c.back;
   const e = el("div"); e.className = "noa"; e.style.width = size + "px"; e.style.height = size * 1.1 + "px";
   const S = `stroke="${INK}" stroke-linejoin="round" stroke-linecap="round"`;
   const id = "n" + uid;
@@ -201,22 +205,27 @@ function makeNoa(size = 200, v = {}) {
     <defs><radialGradient id="${id}f" cx=".38" cy=".3" r=".8"><stop offset="0" stop-color="#fff" stop-opacity=".38"/><stop offset=".45" stop-color="#fff" stop-opacity="0"/><stop offset="1" stop-color="#9a4a14" stop-opacity=".2"/></radialGradient></defs>
     <ellipse class="sh" cx="100" cy="204" rx="62" ry="8" fill="rgba(120,70,30,.22)"/>
     <g class="b">
-      <g class="earl"><circle cx="62" cy="66" r="18" fill="${c.body}" ${S} stroke-width="4.5"/><circle cx="63" cy="67" r="9.5" fill="#f5a3b5"/></g>
-      <g class="earr"><circle cx="138" cy="66" r="18" fill="${c.body}" ${S} stroke-width="4.5"/><circle cx="137" cy="67" r="9.5" fill="#f5a3b5"/></g>
-      <circle class="tl" cx="166" cy="182" r="8" fill="${c.body}" ${S} stroke-width="4"/>
+      <g class="earl"><circle cx="62" cy="66" r="18" fill="${c.body}" ${S} stroke-width="4.5"/>${bk ? `<path d="M52 60 Q62 54 72 62" stroke="${INK}" stroke-width="2.5" fill="none" opacity=".35"/>` : `<circle cx="63" cy="67" r="9.5" fill="#f5a3b5"/>`}</g>
+      <g class="earr"><circle cx="138" cy="66" r="18" fill="${c.body}" ${S} stroke-width="4.5"/>${bk ? `<path d="M128 62 Q138 54 148 60" stroke="${INK}" stroke-width="2.5" fill="none" opacity=".35"/>` : `<circle cx="137" cy="67" r="9.5" fill="#f5a3b5"/>`}</g>
+      ${bk ? "" : `<circle class="tl" cx="166" cy="182" r="8" fill="${c.body}" ${S} stroke-width="4"/>`}
       ${[74, 126].map(x => `<ellipse class="lg" cx="${x}" cy="196" rx="17" ry="8.5" fill="${c.belly}" ${S} stroke-width="4"/>`).join("")}
       <path d="M100 56 C140 56 160 80 164 104 C183 110 185 146 166 153 C168 181 144 198 100 198 C56 198 32 181 34 153 C15 146 17 110 36 104 C40 80 60 56 100 56Z" fill="${c.body}" ${S} stroke-width="5.5"/>
-      <ellipse cx="100" cy="176" rx="40" ry="20" fill="${c.belly}"/>
-      <g class="ckl"><ellipse cx="50" cy="128" rx="17" ry="19" fill="${c.belly}" opacity=".85"/></g>
-      <g class="ckr"><ellipse cx="150" cy="128" rx="17" ry="19" fill="${c.belly}" opacity=".85"/></g>
+      ${bk ? `<path d="M64 84 Q100 72 136 84 M58 110 Q100 98 142 110" stroke="${INK}" stroke-width="2.5" fill="none" opacity=".22" stroke-linecap="round"/>` : `<ellipse cx="100" cy="176" rx="40" ry="20" fill="${c.belly}"/>`}
+      <g class="ckl"${bk ? ` style="display:none"` : ""}><ellipse cx="50" cy="128" rx="17" ry="19" fill="${c.belly}" opacity=".85"/></g>
+      <g class="ckr"${bk ? ` style="display:none"` : ""}><ellipse cx="150" cy="128" rx="17" ry="19" fill="${c.belly}" opacity=".85"/></g>
       <path d="M100 56 C140 56 160 80 164 104 C183 110 185 146 166 153 C168 181 144 198 100 198 C56 198 32 181 34 153 C15 146 17 110 36 104 C40 80 60 56 100 56Z" fill="url(#${id}f)"/>
       <path d="M66 70 Q84 62 104 64" stroke="#fff" stroke-opacity=".45" stroke-width="5" fill="none" stroke-linecap="round"/>
       <path d="M92 58 Q96 66 100 58 Q104 66 108 58" stroke="${INK}" stroke-width="2.5" fill="none" opacity=".45"/>
       ${c.scarf ? `<path d="M34 146 Q100 164 166 146 L167 161 Q100 180 33 161Z" fill="${c.scarf}" ${S} stroke-width="4"/><path d="M52 154 Q66 158 80 159" stroke="#fff" stroke-opacity=".5" stroke-width="3" fill="none" stroke-linecap="round"/>
-        <g class="st"><path d="M128 162 Q142 176 146 194 L122 188 Q126 176 118 164Z" fill="${c.scarf}" ${S} stroke-width="3.5"/></g>` : ""}
+        ${bk ? `<g class="st"><path d="M98 166 Q86 174 79 186 L93 188 Q95 177 102 168Z" fill="${c.scarf}" ${S} stroke-width="3.5"/><path d="M102 166 Q114 174 121 186 L107 188 Q105 177 98 168Z" fill="${c.scarf}" ${S} stroke-width="3.5"/></g>
+        <ellipse cx="100" cy="160" rx="13" ry="10" fill="${c.scarf}" ${S} stroke-width="3.5"/><path d="M94 157 Q100 162 106 157" stroke="${INK}" stroke-width="2" fill="none" opacity=".5"/>` :
+        `<g class="st"><path d="M128 162 Q142 176 146 194 L122 188 Q126 176 118 164Z" fill="${c.scarf}" ${S} stroke-width="3.5"/></g>`}` : ""}
+      ${bk ? `<circle class="tl" cx="100" cy="190" r="10" fill="${c.body}" ${S} stroke-width="4"/><path d="M95 186 Q99 183 103 185" stroke="#fff" stroke-opacity=".5" stroke-width="2.5" fill="none" stroke-linecap="round"/>` : ""}
       <g class="pwl"><rect x="28" y="152" width="30" height="20" rx="10" fill="${c.body}" ${S} stroke-width="4.5"/><path d="M32 158 v8 M37 158 v9" stroke="${INK}" stroke-width="2" opacity=".5"/></g>
       <g class="pwr"><rect x="142" y="152" width="30" height="20" rx="10" fill="${c.body}" ${S} stroke-width="4.5"/><path d="M168 158 v8 M163 158 v9" stroke="${INK}" stroke-width="2" opacity=".5"/></g>
-      <g class="face">
+      ${bk && shades ? `<g class="sgb" fill="none" stroke="#211c1b" stroke-linecap="round"><path d="M30 104 Q44 92 60 82" stroke-width="6"/><path d="M170 104 Q156 92 140 82" stroke-width="6"/>
+        <path d="M26 100 L34 96 L36 108 L28 110Z M174 100 L166 96 L164 108 L172 110Z" fill="#211c1b" stroke-width="3"/></g>` : ""}
+      <g class="face"${bk ? ` style="display:none"` : ""}>
         <ellipse cx="100" cy="126" rx="28" ry="18" fill="${c.belly}"/>
         <ellipse cx="56" cy="134" rx="10" ry="6" fill="#ff8aa2" opacity=".55"/><ellipse cx="144" cy="134" rx="10" ry="6" fill="#ff8aa2" opacity=".55"/>
         ${whisk(-1)}${whisk(1)}
