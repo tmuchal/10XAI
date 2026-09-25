@@ -4,6 +4,7 @@
 > Working title (EN): *Prompts aren't enough: automating content with ontology and harness engineering*
 > Format: long-form YouTube, 16–18 min, plus 3 Shorts cut from it
 > Case study: this repo (10XAI), shown running on camera
+> Animated storyboard (3:00 short, 20 shots, playable animatic): [`storyboard.html`](storyboard.html)
 
 The planning notes are in English, following the repo rule. The narration lines in §5 are in Korean because they are the spoken script.
 

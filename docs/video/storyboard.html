@@ -1,0 +1,740 @@
+<title>Harness Theater</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Gaegu:wght@400;700&family=Gowun+Dodum&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+:root{
+  color-scheme: dark;
+  --ground:#16100e; --panel:#211815; --panel-2:#2b1f1a; --line:#3e2f28;
+  --text:#f3e8da; --muted:#b9a695; --dim:#8a7868;
+  --marquee:#f5c84c; --curtain:#c43a32; --curtain-dk:#8f231e;
+  --teal:#4aa3a8; --orange:#e7793b; --green:#86c77f; --pink:#f2a3b5; --red:#d9483b;
+  --hand:"Gaegu","Gowun Dodum",system-ui,sans-serif;
+  --body:"Gowun Dodum",system-ui,-apple-system,"Apple SD Gothic Neo","Malgun Gothic",sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+}
+*{box-sizing:border-box}
+body{background:var(--ground);color:var(--text);font-family:var(--body);font-size:15px;line-height:1.6;margin:0;padding-inline:16px}
+a{color:var(--marquee)}
+button{font:inherit;color:inherit;cursor:pointer}
+:focus-visible{outline:3px solid var(--marquee);outline-offset:3px;border-radius:6px}
+.wrap{max-width:1180px;margin:0 auto}
+
+/* marquee header */
+.marquee{position:relative;margin-inline:-16px;padding:64px 16px 36px;background:
+  radial-gradient(ellipse at 50% 120%, #3a1c16 0%, transparent 70%), var(--ground);overflow:hidden}
+.marquee::before{content:"";position:absolute;inset:0 0 auto 0;height:18px;background:var(--curtain);border-bottom:2px solid var(--curtain-dk)}
+.marquee::after{content:"";position:absolute;left:0;right:0;top:18px;height:26px;background:radial-gradient(circle at 50% 0,var(--curtain) 64%,var(--curtain-dk) 66%,transparent 69%) 0 0/56px 26px repeat-x}
+.eyebrow{font-family:var(--mono);font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+h1{font-family:var(--hand);font-weight:700;font-size:clamp(52px,9vw,104px);line-height:.95;margin:.18em 0 .1em;color:var(--marquee);text-wrap:balance;text-shadow:0 3px 0 #7a4b12}
+h1 small{display:block;font-size:.34em;color:var(--text);text-shadow:none;font-weight:400;margin-top:.25em}
+.logline{max-width:64ch;font-size:17px;color:var(--text)}
+.facts{display:flex;flex-wrap:wrap;gap:8px 22px;margin:18px 0 24px;font-family:var(--mono);font-size:13px;color:var(--muted)}
+.facts b{color:var(--text);font-weight:500}
+.actions{display:flex;flex-wrap:wrap;gap:12px}
+.btn{display:inline-flex;align-items:center;gap:10px;border:0;border-radius:999px;padding:12px 22px;font-family:var(--hand);font-weight:700;font-size:22px;line-height:1}
+.btn-play{background:var(--marquee);color:#2a1a0c;box-shadow:0 4px 0 #9c7419}
+.btn-play:active{transform:translateY(2px);box-shadow:0 2px 0 #9c7419}
+.btn-ghost{background:transparent;color:var(--text);border:2px solid var(--line);text-decoration:none}
+.tri{width:0;height:0;border-left:13px solid currentColor;border-top:8px solid transparent;border-bottom:8px solid transparent}
+
+/* sections */
+section{padding-block:40px;border-top:1px solid var(--line)}
+h2{font-family:var(--hand);font-weight:700;font-size:40px;line-height:1.05;margin:0 0 6px;text-wrap:balance}
+.lede{color:var(--muted);max-width:66ch;margin:0 0 22px}
+h3{font-family:var(--hand);font-weight:700;font-size:26px;margin:0}
+
+/* timeline */
+.tl{display:flex;height:34px;border-radius:8px;overflow:hidden;border:2px solid var(--line)}
+.tl button{border:0;padding:0;border-right:1px solid rgba(0,0,0,.35);position:relative;min-width:0}
+.tl button:hover{filter:brightness(1.15)}
+.tl button span{position:absolute;inset:auto 0 3px 0;font-family:var(--mono);font-size:10px;color:#1b120e;opacity:.8;text-align:center;overflow:hidden;white-space:nowrap}
+.tl-legend{display:flex;flex-wrap:wrap;gap:6px 18px;margin-top:10px;font-size:13px;color:var(--muted)}
+.tl-legend i{display:inline-block;width:12px;height:12px;border-radius:3px;margin-right:6px;vertical-align:-1px}
+.tl-scale{display:flex;justify-content:space-between;font-family:var(--mono);font-size:11px;color:var(--dim);margin-top:4px;font-variant-numeric:tabular-nums}
+
+/* cast */
+.cast{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:14px}
+.who{background:var(--panel);border:1px solid var(--line);border-radius:10px;overflow:hidden}
+.who svg{display:block;width:100%;height:auto;background:#fbe3a8}
+.who div{padding:10px 12px 12px}
+.who b{font-family:var(--hand);font-size:21px;display:block;line-height:1.1}
+.who em{font-style:normal;font-family:var(--mono);font-size:11px;color:var(--muted)}
+.who p{margin:6px 0 0;font-size:13px;color:var(--muted);line-height:1.45}
+.props{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:14px;margin-top:14px}
+.bible{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.2fr);gap:28px;margin-top:28px}
+@media (max-width:820px){.bible{grid-template-columns:1fr}}
+.swatches{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:8px}
+.sw{display:flex;gap:8px;align-items:center;font-size:12px}
+.sw i{width:30px;height:30px;border-radius:50%;flex:none;border:2px solid #3a2418}
+.sw span{display:block;line-height:1.25}
+.sw code{font-family:var(--mono);font-size:11px;color:var(--muted)}
+.rules{margin:0;padding-left:20px;color:var(--text)}
+.rules li{margin-bottom:8px;max-width:62ch}
+.subpill{display:inline-block;background:#2c2e47;color:#f5c84c;font-family:var(--hand);font-weight:700;font-size:22px;padding:4px 16px;border-radius:8px;border:2px solid #15151f}
+
+/* storyboard */
+.seq{margin-top:34px}
+.seq-head{display:flex;align-items:baseline;gap:14px;flex-wrap:wrap;margin-bottom:14px}
+.seq-head .chip{font-family:var(--mono);font-size:12px;padding:3px 9px;border-radius:999px;color:#1b120e;font-weight:500}
+.seq-head .tc{font-family:var(--mono);font-size:12px;color:var(--muted);font-variant-numeric:tabular-nums}
+.shots{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px}
+@media (max-width:880px){.shots{grid-template-columns:1fr}}
+.shot{background:var(--panel);border:1px solid var(--line);border-radius:12px;overflow:hidden;display:flex;flex-direction:column}
+.shot .frame{display:block;width:100%;border:0;padding:0;background:#2b1913;position:relative}
+.shot .frame svg{display:block;width:100%;height:auto}
+.shot .frame .hint{position:absolute;right:10px;top:10px;background:rgba(22,16,14,.78);color:var(--text);font-family:var(--mono);font-size:11px;padding:4px 8px;border-radius:6px;opacity:0;transition:opacity .15s}
+.shot .frame:hover .hint,.shot .frame:focus-visible .hint{opacity:1}
+.shot-meta{display:flex;flex-wrap:wrap;gap:6px 14px;align-items:baseline;padding:12px 16px 0;font-family:var(--mono);font-size:12px;color:var(--muted);font-variant-numeric:tabular-nums}
+.shot-meta .id{font-family:var(--hand);font-weight:700;font-size:24px;color:var(--text);line-height:1}
+.shot-meta .dur{color:var(--marquee)}
+.shot dl{margin:8px 0 0;padding:0 16px 16px;display:grid;grid-template-columns:78px minmax(0,1fr);gap:7px 12px;font-size:14px}
+.shot dt{font-family:var(--mono);font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--dim);padding-top:3px}
+.shot dd{margin:0;line-height:1.5}
+.shot dd.line{font-family:var(--hand);font-size:22px;font-weight:700;line-height:1.25;color:var(--marquee)}
+.shot dd.line small{display:block;font-family:var(--body);font-weight:400;font-size:13px;color:var(--muted);margin-top:3px}
+
+/* map table */
+.tablewrap{overflow-x:auto;border:1px solid var(--line);border-radius:10px}
+table{border-collapse:collapse;width:100%;min-width:680px;font-size:14px}
+th,td{text-align:left;padding:10px 14px;border-bottom:1px solid var(--line);vertical-align:top}
+th{font-family:var(--mono);font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--dim);font-weight:500;background:var(--panel)}
+td:first-child{font-family:var(--hand);font-size:19px;font-weight:700;white-space:nowrap}
+td code{font-family:var(--mono);font-size:12px;color:#e9c98f}
+tr:last-child td{border-bottom:0}
+
+/* notes */
+.steps{counter-reset:s;list-style:none;margin:0;padding:0;display:grid;gap:12px;max-width:760px}
+.steps li{counter-increment:s;display:grid;grid-template-columns:40px minmax(0,1fr);gap:12px}
+.steps li::before{content:counter(s);font-family:var(--hand);font-weight:700;font-size:26px;color:#1b120e;background:var(--marquee);border-radius:50%;width:36px;height:36px;display:grid;place-items:center}
+.steps b{display:block}
+.steps span{color:var(--muted)}
+.cols{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:26px;margin-top:30px}
+.cols ul{margin:8px 0 0;padding-left:18px;color:var(--muted)}
+.cols li{margin-bottom:4px}
+footer{padding-block:30px 60px;color:var(--dim);font-size:13px;border-top:1px solid var(--line)}
+
+/* player */
+.player{position:fixed;inset:0;z-index:50;background:rgba(10,7,6,.96);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:calc(16px + env(safe-area-inset-top,0px)) 16px calc(16px + env(safe-area-inset-bottom,0px))}
+.p-screen{width:min(100%,1100px,calc((100vh - 190px) * 16 / 9));aspect-ratio:16/9;max-width:100%;border-radius:10px;overflow:hidden;background:#000;box-shadow:0 0 0 2px #2c201b,0 20px 60px rgba(0,0,0,.6)}
+.p-screen svg{display:block;width:100%;height:100%}
+.p-bar{width:min(100%,1100px);display:flex;flex-direction:column;gap:10px}
+.p-prog{position:relative;height:12px;border-radius:6px;display:flex;overflow:hidden;cursor:pointer;background:#2b1f1a}
+.p-prog i{display:block;height:100%;opacity:.35;border-right:1px solid rgba(0,0,0,.5)}
+.p-head{position:absolute;top:0;bottom:0;left:0;width:0;background:rgba(245,200,76,.85);pointer-events:none}
+.p-ctrl{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.p-ctrl button{background:#2b1f1a;border:1px solid var(--line);border-radius:8px;min-width:44px;height:40px;padding:0 12px;font-family:var(--mono);font-size:13px}
+.p-ctrl .pp{background:var(--marquee);color:#1b120e;border-color:#9c7419;font-weight:500;min-width:84px}
+.p-time{font-family:var(--mono);font-size:13px;color:var(--muted);font-variant-numeric:tabular-nums}
+.p-info{flex:1 1 240px;min-width:0;font-size:13px;color:var(--muted)}
+.p-info b{font-family:var(--hand);font-size:20px;color:var(--text);margin-right:8px}
+.p-close{position:absolute;top:calc(12px + env(safe-area-inset-top,0px));right:16px;background:transparent;border:1px solid var(--line);border-radius:8px;height:38px;padding:0 12px;font-family:var(--mono);font-size:13px}
+
+/* camera + line boil (animatic only) */
+.cam{transform-box:view-box;transform-origin:50% 50%}
+@keyframes cam-push{from{transform:scale(1)}to{transform:scale(1.08)}}
+@keyframes cam-pull{from{transform:scale(1.08)}to{transform:scale(1)}}
+@keyframes cam-pan{from{transform:scale(1.06) translateX(16px)}to{transform:scale(1.06) translateX(-16px)}}
+@keyframes cam-static{from{transform:none}to{transform:none}}
+@keyframes boil{0%{filter:url(#ink)}33%{filter:url(#ink2)}66%{filter:url(#ink3)}}
+.boil g[filter="url(#ink)"]{animation:boil .5s steps(1,end) infinite}
+@media (prefers-reduced-motion: reduce){.boil g[filter="url(#ink)"]{animation:none}.cam{animation:none!important}}
+</style>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+  <defs>
+    <filter id="ink" x="-10%" y="-10%" width="120%" height="120%"><feTurbulence type="fractalNoise" baseFrequency="0.03" numOctaves="2" seed="3" result="n"/><feDisplacementMap in="SourceGraphic" in2="n" scale="3.4" xChannelSelector="R" yChannelSelector="G"/></filter>
+    <filter id="ink2" x="-10%" y="-10%" width="120%" height="120%"><feTurbulence type="fractalNoise" baseFrequency="0.03" numOctaves="2" seed="9" result="n"/><feDisplacementMap in="SourceGraphic" in2="n" scale="3.4" xChannelSelector="R" yChannelSelector="G"/></filter>
+    <filter id="ink3" x="-10%" y="-10%" width="120%" height="120%"><feTurbulence type="fractalNoise" baseFrequency="0.03" numOctaves="2" seed="17" result="n"/><feDisplacementMap in="SourceGraphic" in2="n" scale="3.4" xChannelSelector="R" yChannelSelector="G"/></filter>
+    <filter id="wash" x="-5%" y="-5%" width="110%" height="110%"><feTurbulence type="fractalNoise" baseFrequency="0.011" numOctaves="3" seed="4" result="n"/><feDisplacementMap in="SourceGraphic" in2="n" scale="22" xChannelSelector="R" yChannelSelector="G"/></filter>
+    <filter id="soft" x="-40%" y="-40%" width="180%" height="180%"><feGaussianBlur stdDeviation="16"/></filter>
+    <filter id="grain" x="0" y="0" width="100%" height="100%"><feTurbulence type="fractalNoise" baseFrequency="0.85" numOctaves="2" seed="5" stitchTiles="stitch"/><feColorMatrix type="matrix" values="0 0 0 0 0.36  0 0 0 0 0.25  0 0 0 0 0.14  0 0 0 0.20 0"/></filter>
+    <radialGradient id="sun" cx="50%" cy="28%" r="78%"><stop offset="0" stop-color="#fff4c6"/><stop offset=".5" stop-color="#fbdca0"/><stop offset="1" stop-color="#f2b49a"/></radialGradient>
+    <radialGradient id="sheet" cx="50%" cy="40%" r="70%"><stop offset="0" stop-color="#fff2cc"/><stop offset="1" stop-color="#f8d9a6"/></radialGradient>
+    <clipPath id="bd"><rect x="24" y="0" width="912" height="430"/></clipPath>
+  </defs>
+</svg>
+
+<header class="marquee">
+  <div class="wrap">
+    <div class="eyebrow">Animated short · storyboard v1 · 10XAI video series</div>
+    <h1>하네스 극장<small>Harness Theater: ontology and harness engineering, told with boxes</small></h1>
+    <p class="logline">A hype post walks onto a watercolor stage, promising everything for free. Dr. Harness feeds it into the 10XAI machine and pumps up the risk meter. After that, reins, bells, name tags and one stubborn barrier show how an ontology and a harness make AI work something you can check.</p>
+    <div class="facts">
+      <span>Runtime <b>3:00</b></span><span>Shots <b>20</b></span><span>Sequences <b>6</b></span><span>Frame <b>16:9 · 12 fps on 2s</b></span><span>Voice <b>Korean VO + burned-in subtitles</b></span>
+    </div>
+    <div class="actions">
+      <button class="btn btn-play" id="playAll" type="button"><span class="tri" aria-hidden="true"></span>Play animatic</button>
+      <a class="btn btn-ghost" href="#board">Read the storyboard</a>
+    </div>
+  </div>
+</header>
+
+<main class="wrap">
+  <section id="timeline" aria-labelledby="tl-h">
+    <h2 id="tl-h">Running order</h2>
+    <p class="lede">Each block is one shot, sized by its screen time. Click a block to play the animatic from that shot.</p>
+    <div class="tl" id="tl"></div>
+    <div class="tl-scale"><span>0:00</span><span>0:30</span><span>1:00</span><span>1:30</span><span>2:00</span><span>2:30</span><span>3:00</span></div>
+    <div class="tl-legend" id="tlLegend"></div>
+  </section>
+
+  <section id="cast" aria-labelledby="cast-h">
+    <h2 id="cast-h">Cast and props</h2>
+    <p class="lede">This follows the reference clip: watercolor sunburst backdrop, red theater curtains, a wooden stage, boxy orange characters with <b>^ ^</b> eyes, a rumpled scientist, and a gauge-and-pump gag. Every character stands for a real part of the pipeline.</p>
+    <div class="cast" id="castGrid"></div>
+    <div class="props" id="propGrid"></div>
+
+    <div class="bible">
+      <div>
+        <h3>Palette</h3>
+        <div class="swatches" id="swatches" style="margin-top:12px"></div>
+        <h3 style="margin-top:24px">Subtitle style</h3>
+        <p style="margin:10px 0 0"><span class="subpill">위험도 올리는 중… 72.</span></p>
+        <p style="color:var(--muted);font-size:13px;margin-top:8px">Gaegu Bold, #F5C84C on a #2C2E47 pill, bottom center, 30 Korean characters max. The English subtitles ship as a separate SRT file.</p>
+      </div>
+      <div>
+        <h3>Animation rules</h3>
+        <ul class="rules" style="margin-top:12px">
+          <li>Characters animate on 2s (12 fps). Their outlines "boil" through three wobble frames. The animatic player on this page shows the effect.</li>
+          <li>Backgrounds are painted once per set: day stage, night stage, Kanban wall. They never boil or move, except for the camera.</li>
+          <li>All outlines use one warm brown ink (#3A2418), never black, at about 3px for a 960px-wide frame. Characters get one soft watercolor highlight and no gradients.</li>
+          <li>Every gag lands on a beat. The three big hits are the pumps (S04), the bell (S09) and the approval stamp (S16).</li>
+          <li>Only Dr. Harness speaks real words. The boxes chatter in "뽀뽀" gibberish, with subtitles carrying the meaning.</li>
+          <li>On-screen numbers (72 in S04, 78 in S16, $0.40 · 12 min in S17) are placeholders. Replace them with the numbers from your own dry run before final animation (CLAUDE.md rule 5: claimed vs. measured).</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section id="board" aria-labelledby="board-h">
+    <h2 id="board-h">Storyboard</h2>
+    <p class="lede">Twenty shots in six sequences. Each card lists the camera, the action, the subtitle line (Korean on screen, English below it), the sound and the animation notes. Click any frame to play the animatic from there.</p>
+    <div id="seqs"></div>
+  </section>
+
+  <section id="map" aria-labelledby="map-h">
+    <h2 id="map-h">What each gag means</h2>
+    <p class="lede">Every metaphor on stage maps to a real concept and a real file in this repo, so the long-form video can cut straight from the cartoon to the code.</p>
+    <div class="tablewrap">
+      <table>
+        <thead><tr><th>On stage</th><th>Concept</th><th>Where it lives in 10XAI</th><th>Shots</th></tr></thead>
+        <tbody>
+          <tr><td>Card-boxes</td><td>Task cards, and the agents that work them</td><td><code>lib/model/card.cjs</code>, <code>agents/*.md</code></td><td>S03, S13</td></tr>
+          <tr><td>Name tags</td><td>Ontology object types and their properties</td><td><code>metadata.kind · claim · measured · risk · gate</code></td><td>S13, S15</td></tr>
+          <tr><td>Ropes</td><td>Links between objects (claim → evidence, claim ↔ measured)</td><td><code>claimGap()</code> in <code>card.cjs</code></td><td>S13, S14</td></tr>
+          <tr><td>Action buttons</td><td>Action types: the only verbs that may change state</td><td><code>POST /api/ingest</code>, <code>/api/verify/run</code>, <code>/api/execute/run</code></td><td>S13</td></tr>
+          <tr><td>Reins + mission scroll</td><td>Guides (feedforward)</td><td>Agent frontmatter <code>mission</code>, <code>tools_allowed</code>; <code>CLAUDE.md</code></td><td>S07, S08</td></tr>
+          <tr><td>Bell fence</td><td>Computational sensors</td><td><code>RISK_GATE_THRESHOLD = 70</code>, <code>HARD_FLAG_RE</code></td><td>S09</td></tr>
+          <tr><td>Judge boxes</td><td>Inferential sensors and cross-checking</td><td><code>agents/verify-agent.md</code> → <code>runner: both</code></td><td>S09, S10</td></tr>
+          <tr><td>RISK meter + pump</td><td>Risk score 0–100</td><td><code>metadata.risk.score</code></td><td>S04, S15, S20</td></tr>
+          <tr><td>progress.txt poster</td><td>State kept in files across context resets</td><td>Anthropic's long-running agent pattern; the ops thread</td><td>S11</td></tr>
+          <tr><td>Striped barrier + stamp</td><td>Human approval gate</td><td>Gate / Review column; <code>lib/gate/index.cjs</code></td><td>S16</td></tr>
+          <tr><td>Sandbox</td><td>Isolated execution</td><td><code>lib/runner/worktree-manager.cjs</code></td><td>S17</td></tr>
+          <tr><td>Chalkboard</td><td>Claimed vs. measured</td><td><code>metadata.claim</code> vs. <code>metadata.measured</code></td><td>S17</td></tr>
+          <tr><td>SKILL.md package</td><td>Export to the library</td><td><code>agents/deploy-agent.md</code>, <code>library/</code></td><td>S18</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section id="notes" aria-labelledby="notes-h">
+    <h2 id="notes-h">Production plan</h2>
+    <p class="lede">Five passes, from locked script to final export. The frames on this page are layered vector SVG, so they can be imported directly as a rough first pass.</p>
+    <ol class="steps">
+      <li><div><b>Lock the script and record a scratch VO</b><span>Record Dr. Harness's Korean lines at a calm, slightly amused pace. The 20 lines total about 2:10 of speech, which leaves room for gags and music.</span></div></li>
+      <li><div><b>Cut the animatic</b><span>Screen-record "Play animatic" on this page, lay the scratch VO and temp music under it, and fix the timing before anything gets drawn.</span></div></li>
+      <li><div><b>Paint the sets and build the rigs</b><span>Paint three watercolor plates (day stage, night stage, Kanban wall) in Procreate or Krita with a wet brush plus a dry ink liner. Rig the six characters in After Effects or Rive: body, face, legs, arm nubs and hat on separate layers.</span></div></li>
+      <li><div><b>Animate on 2s and add the boil</b><span>Key the gag beats first (S04 pumps, S09 bell, S16 stamp), then do the in-betweens. Add the three-frame line boil at the end.</span></div></li>
+      <li><div><b>Mix, subtitle and export</b><span>Ukulele, toy piano and kazoo at about 100 BPM. Burn in the Korean subtitles and export the English SRT. Deliver 16:9 at 1920×1080, plus three Shorts re-staged for 9:16 from S04, S16 and S17.</span></div></li>
+    </ol>
+    <div class="cols">
+      <div>
+        <h3>Asset list</h3>
+        <ul>
+          <li>6 characters: Dr. Harness, card-box, gap-fill box, Hype Box, risky box, judge box (Claude and Codex colorways)</li>
+          <li>15 props: RISK meter, pump, 10XAI machine, bell fence, gate barrier, stamp, sandbox, stopwatch, coin, chalkboard, PUBLISH door, progress.txt poster, label maker, SKILL.md package, library shelf</li>
+          <li>3 sets: day stage, night stage, Kanban wall</li>
+        </ul>
+      </div>
+      <div>
+        <h3>Sound palette</h3>
+        <ul>
+          <li>Music: ukulele theme, toy-piano stings, kazoo fanfare</li>
+          <li>Foley: woodblock footsteps, pump squeaks, bell ding, padlock clunk, heavy stamp</li>
+          <li>Box voices: pitched-up gibberish, one "뽀!" per line</li>
+        </ul>
+      </div>
+      <div>
+        <h3>Where it goes in the long-form</h3>
+        <ul>
+          <li>Use this short as the explainer segment (plan §5, 02:30–08:30), then hard-cut to the live 10XAI demo.</li>
+          <li>Reuse S04 as the cold-open hook.</li>
+          <li>End the long-form on S20 so the call to action matches.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+</main>
+<footer class="wrap">Storyboard for <code>docs/video/ontology-harness-content-automation.md</code>. Style reference: the "P(doom) pump" animated clip the creator shared. Characters and sets here are original designs.</footer>
+
+<div class="player" id="player" hidden role="dialog" aria-modal="true" aria-label="Animatic player">
+  <button class="p-close" id="pClose" type="button">Close · Esc</button>
+  <div class="p-screen" id="pScreen"></div>
+  <div class="p-bar">
+    <div class="p-prog" id="pProg" role="slider" aria-label="Animatic position" aria-valuemin="0" aria-valuemax="180" aria-valuenow="0" tabindex="0"><div class="p-head" id="pHead"></div></div>
+    <div class="p-ctrl">
+      <button id="pPrev" type="button" aria-label="Previous shot">◀◀</button>
+      <button id="pPlay" class="pp" type="button">Pause</button>
+      <button id="pNext" type="button" aria-label="Next shot">▶▶</button>
+      <span class="p-time" id="pTime">0:00 / 3:00</span>
+      <div class="p-info" id="pInfo"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+const INK='#3a2418';
+const FONT="Gaegu, 'Gowun Dodum', sans-serif";
+const esc=s=>String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+const n=v=>+(+v).toFixed(1);
+function T(x,y,s,z,o){o=o||{};z=z||20;return `<text x="${n(x)}" y="${n(y)}" font-size="${n(z)}" text-anchor="${o.a||'middle'}" fill="${o.f||INK}" font-family="${FONT}" font-weight="${o.w||700}"${o.r?` transform="rotate(${o.r} ${n(x)} ${n(y)})"`:''}>${esc(s)}</text>`}
+const G=(s,extra)=>`<g filter="url(#ink)"${extra||''}>${s}</g>`;
+function rng(seed){let s=seed%2147483647;if(s<=0)s+=2147483646;return()=>{s=s*16807%2147483647;return (s-1)/2147483646}}
+
+/* ---------- set ---------- */
+function stage(o){o=o||{};
+  let g=`<rect width="960" height="540" fill="#2b1913"/>`;
+  g+=`<g clip-path="url(#bd)"><g filter="url(#wash)"><rect x="0" y="-30" width="960" height="490" fill="url(#sun)"/>`;
+  const cx=480,cy=150,R=1000;
+  for(let i=0;i<18;i++){const a0=i/18*Math.PI*2,a1=a0+Math.PI/18;
+    g+=`<polygon points="${cx},${cy} ${n(cx+R*Math.cos(a0))},${n(cy+R*Math.sin(a0))} ${n(cx+R*Math.cos(a1))},${n(cy+R*Math.sin(a1))}" fill="${i%2?'#f6b9a3':'#fff0b0'}" opacity="${i%2?.3:.5}"/>`;}
+  g+=`<ellipse cx="230" cy="110" rx="170" ry="90" fill="#f5a39b" opacity=".25" filter="url(#soft)"/><ellipse cx="760" cy="300" rx="190" ry="100" fill="#f3b07a" opacity=".22" filter="url(#soft)"/><ellipse cx="560" cy="60" rx="140" ry="60" fill="#fff8d8" opacity=".5" filter="url(#soft)"/>`;
+  g+=`</g>`;
+  if(o.bg)g+=o.bg;
+  if(o.night)g+=`<rect x="0" y="0" width="960" height="440" fill="#1f2b58" opacity=".58"/>`;
+  g+=`</g>`;
+  g+=`<polygon points="24,428 936,428 960,540 0,540" fill="#d58b4c"/>`;
+  for(let i=-7;i<=7;i++)g+=`<line x1="${480+i*64}" y1="428" x2="${480+i*80}" y2="540" stroke="#a9612d" stroke-width="2" opacity=".55"/>`;
+  g+=`<line x1="40" y1="476" x2="920" y2="476" stroke="#a9612d" stroke-width="1.5" opacity=".35"/><line x1="24" y1="428" x2="936" y2="428" stroke="${INK}" stroke-width="3"/>`;
+  if(o.night)g+=`<rect y="428" width="960" height="112" fill="#1f2b58" opacity=".35"/>`;
+  if(o.spots)o.spots.forEach(x=>{g+=`<polygon points="${x-26},0 ${x+26},0 ${x+120},462 ${x-120},462" fill="#fff8d6" opacity=".26"/><ellipse cx="${x}" cy="462" rx="120" ry="16" fill="#fff8d6" opacity=".35"/>`});
+  return g;
+}
+function curtains(){
+  const half=`<path d="M0,0 L118,0 C96,90 88,180 102,262 C84,330 62,430 74,540 L0,540 Z" fill="#c43a32" stroke="${INK}" stroke-width="3"/>
+  <path d="M34,0 C28,110 38,210 46,262 C34,350 28,450 30,540" fill="none" stroke="#8f231e" stroke-width="3" opacity=".8"/>
+  <path d="M76,0 C66,110 68,200 80,262 C62,340 52,440 54,540" fill="none" stroke="#8f231e" stroke-width="3" opacity=".8"/>
+  <path d="M12,0 L14,540" stroke="#e5675a" stroke-width="7" opacity=".3"/>
+  <rect x="72" y="252" width="48" height="18" rx="9" fill="#f0b52b" stroke="${INK}" stroke-width="2.5"/>`;
+  let v='M0,0 L960,0 L960,18';for(let x=960;x>0;x-=64)v+=` Q${x-32},46 ${x-64},18`;v+=' Z';
+  return G(`${half}<g transform="translate(960,0) scale(-1,1)">${half}</g><path d="${v}" fill="#a92c26" stroke="${INK}" stroke-width="3"/>`);
+}
+function sub(s){if(!s)return'';const z=25;let w=44;for(const ch of s)w+=/[ᄀ-￿]/.test(ch)?z*.96:(ch===' '?z*.3:z*.5);w=Math.min(w,900);
+  return `<rect x="${n(480-w/2)}" y="474" width="${n(w)}" height="44" rx="9" fill="#2c2e47" opacity=".94" stroke="#15151f" stroke-width="2"/>${T(480,504,s,z,{f:'#f5c84c'})}`}
+
+/* ---------- characters ---------- */
+function face(x,top,s,h,m,sw,blush){
+  const ey=top+h*.36,dx=s*.18,er=s*.065,my=top+h*.56;
+  const st=`fill="none" stroke="${INK}" stroke-width="${n(sw)}" stroke-linecap="round" stroke-linejoin="round"`;
+  const up=c=>`<path d="M${n(c-er)},${n(ey+er*.55)} L${n(c)},${n(ey-er*.6)} L${n(c+er)},${n(ey+er*.55)}" ${st}/>`;
+  const dot=c=>`<circle cx="${n(c)}" cy="${n(ey)}" r="${n(s*.036)}" fill="${INK}"/>`;
+  const smile=`<path d="M${n(x-s*.08)},${n(my)} Q${n(x)},${n(my+s*.1)} ${n(x+s*.08)},${n(my)}" ${st}/>`;
+  const oh=`<ellipse cx="${n(x)}" cy="${n(my+s*.03)}" rx="${n(s*.035)}" ry="${n(s*.045)}" ${st}/>`;
+  let g='';
+  if(m==='happy')g=up(x-dx)+up(x+dx)+smile;
+  else if(m==='worried'){const sx=x+s*.4,sy=top+h*.1;g=dot(x-dx)+dot(x+dx)+`<path d="M${n(x-s*.1)},${n(my+s*.04)} q${n(s*.05)},${n(-s*.05)} ${n(s*.1)},0 t${n(s*.1)},0" ${st}/>`+`<path d="M${n(sx)},${n(sy)} C${n(sx+s*.05)},${n(sy+s*.07)} ${n(sx+s*.04)},${n(sy+s*.12)} ${n(sx)},${n(sy+s*.12)} C${n(sx-s*.04)},${n(sy+s*.12)} ${n(sx-s*.05)},${n(sy+s*.07)} ${n(sx)},${n(sy)} Z" fill="#9ad3ee" stroke="${INK}" stroke-width="1.8"/>`;}
+  else if(m==='dizzy'){for(const c of [x-dx,x+dx])g+=`<path d="M${n(c-er)},${n(ey-er)} L${n(c+er)},${n(ey+er)} M${n(c+er)},${n(ey-er)} L${n(c-er)},${n(ey+er)}" ${st}/>`;g+=oh;}
+  else if(m==='alert'){for(const c of [x-dx,x+dx])g+=`<circle cx="${n(c)}" cy="${n(ey)}" r="${n(s*.075)}" fill="#fffaf0" stroke="${INK}" stroke-width="${n(sw*.8)}"/><circle cx="${n(c+s*.015)}" cy="${n(ey+s*.01)}" r="${n(s*.032)}" fill="${INK}"/>`;g+=oh;}
+  else if(m==='sleep'){for(const c of [x-dx,x+dx])g+=`<path d="M${n(c-er)},${n(ey)} Q${n(c)},${n(ey+er*.9)} ${n(c+er)},${n(ey)}" ${st}/>`;g+=`<path d="M${n(x-s*.03)},${n(my+s*.03)} L${n(x+s*.03)},${n(my+s*.03)}" ${st}/>`;}
+  else if(m==='cool'){g=`<path d="M${n(x-s*.34)},${n(ey-s*.04)} L${n(x+s*.34)},${n(ey-s*.04)}" stroke="${INK}" stroke-width="${n(sw)}"/>`;for(const c of [x-dx,x+dx])g+=`<rect x="${n(c-s*.11)}" y="${n(ey-s*.06)}" width="${n(s*.22)}" height="${n(s*.13)}" rx="${n(s*.04)}" fill="#1d1c26"/><path d="M${n(c-s*.07)},${n(ey-s*.03)} l${n(s*.04)},0" stroke="#fffaf0" stroke-width="2"/>`;g+=`<path d="M${n(x-s*.13)},${n(my-s*.01)} Q${n(x)},${n(my+s*.15)} ${n(x+s*.13)},${n(my-s*.01)} Z" fill="#fffaf0" stroke="${INK}" stroke-width="${n(sw*.9)}" stroke-linejoin="round"/>`;}
+  else if(m==='sheepish'){g=up(x-dx)+up(x+dx)+`<path d="M${n(x-s*.06)},${n(my+s*.03)} L${n(x+s*.06)},${n(my+s*.03)}" ${st}/>`;blush=true;}
+  if(blush)g+=`<ellipse cx="${n(x-s*.29)}" cy="${n(my)}" rx="${n(s*.065)}" ry="${n(s*.035)}" fill="#f07f86" opacity=".65"/><ellipse cx="${n(x+s*.29)}" cy="${n(my)}" rx="${n(s*.065)}" ry="${n(s*.035)}" fill="#f07f86" opacity=".65"/>`;
+  return g;
+}
+function box(x,fy,s,o){o=o||{};s=s||80;
+  const h=s*.66,lh=s*.16,top=fy-lh-h,L=x-s/2;
+  const c=o.c||'#e7793b',hi=o.hi||'#f7aa68',lc=o.lc||'#c45c28',sw=Math.max(2.4,s*.034);
+  let g='';
+  for(const p of [-.4,-.27,.17,.3])g+=`<rect x="${n(x+p*s)}" y="${n(fy-lh-3)}" width="${n(s*.09)}" height="${n(lh+3)}" fill="${lc}" stroke="${INK}" stroke-width="${n(sw)}"/>`;
+  if(o.arms!=='none'){const u=o.arms==='down'?-1:1,ay=top+h*.42;
+    g+=`<path d="M${n(L+3)},${n(ay)} l${n(-s*.15)},${n(-s*.13*u)} l${n(s*.07)},${n(s*.2*u)} z" fill="${c}" stroke="${INK}" stroke-width="${n(sw)}" stroke-linejoin="round"/>`;
+    g+=`<path d="M${n(L+s-3)},${n(ay)} l${n(s*.15)},${n(-s*.13*u)} l${n(-s*.07)},${n(s*.2*u)} z" fill="${c}" stroke="${INK}" stroke-width="${n(sw)}" stroke-linejoin="round"/>`;}
+  g+=`<rect x="${n(L)}" y="${n(top)}" width="${n(s)}" height="${n(h)}" rx="${n(s*.05)}" fill="${c}" stroke="${INK}" stroke-width="${n(sw*1.15)}"${o.dash?' stroke-dasharray="9 6"':''}/>`;
+  g+=`<rect x="${n(L+s*.09)}" y="${n(top+h*.1)}" width="${n(s*.46)}" height="${n(h*.3)}" rx="${n(s*.06)}" fill="${hi}" opacity=".55"/>`;
+  if(o.harness){const by=top+h*.74;g+=`<rect x="${n(L-2)}" y="${n(by)}" width="${n(s+4)}" height="${n(s*.09)}" fill="#6b3f22" stroke="${INK}" stroke-width="${n(sw*.8)}"/><rect x="${n(x-s*.07)}" y="${n(by-s*.02)}" width="${n(s*.14)}" height="${n(s*.13)}" rx="2" fill="#f5c84c" stroke="${INK}" stroke-width="${n(sw*.8)}"/>`;}
+  g+=face(x,top,s,h,o.mood||'happy',sw,o.blush);
+  if(o.label)g+=T(x,top+h*.92,o.label,s*.14,{f:'#fffaf0'});
+  if(o.tag){const tw=o.tag.length*s*.095+s*.2,th=s*.21,ty=top+h*.7;g+=`<rect x="${n(x-tw/2)}" y="${n(ty)}" width="${n(tw)}" height="${n(th)}" rx="3" fill="#fffaf0" stroke="${INK}" stroke-width="2"/>`+T(x,ty+th*.76,o.tag,s*.16);}
+  if(o.hat){const hx=x+s*.2;g+=`<path d="M${n(hx-s*.12)},${n(top+sw)} L${n(hx)},${n(top-s*.33)} L${n(hx+s*.12)},${n(top+sw)} Z" fill="#f4a6b8" stroke="${INK}" stroke-width="${n(sw)}" stroke-linejoin="round"/><path d="M${n(hx-s*.07)},${n(top-s*.1)} L${n(hx+s*.075)},${n(top-s*.12)}" stroke="#fffaf0" stroke-width="${n(sw)}"/><circle cx="${n(hx)}" cy="${n(top-s*.34)}" r="${n(s*.045)}" fill="#f5c84c" stroke="${INK}" stroke-width="${n(sw*.7)}"/>`;}
+  if(o.mag){const d=o.mag==='l'?-1:1,lx=x+d*s*.78,ly=top-s*.06,lr=s*.19;
+    g+=`<line x1="${n(x+d*s*.6)}" y1="${n(top+h*.22)}" x2="${n(lx-d*lr*.7)}" y2="${n(ly+lr*.7)}" stroke="${INK}" stroke-width="${n(s*.07)}" stroke-linecap="round"/><circle cx="${n(lx)}" cy="${n(ly)}" r="${n(lr)}" fill="#d9f1f4" fill-opacity=".75" stroke="${INK}" stroke-width="${n(sw*1.2)}"/><path d="M${n(lx-lr*.5)},${n(ly-lr*.2)} Q${n(lx-lr*.4)},${n(ly-lr*.55)} ${n(lx-lr*.05)},${n(ly-lr*.6)}" stroke="#fffaf0" stroke-width="${n(sw)}" fill="none" stroke-linecap="round"/>`;}
+  if(o.extra)g+=o.extra;
+  return G(g,o.rot?` transform="rotate(${o.rot} ${n(x)} ${n(fy-s*.4)})"`:'');
+}
+const GOLD={c:'#e9b949',hi:'#fde58c',lc:'#c99a2a'};
+const RED={c:'#d9483b',hi:'#f08a7a',lc:'#a8302a'};
+const TEAL={c:'#4aa3a8',hi:'#8fd3d5',lc:'#2f7c80'};
+const GRAY={c:'#b8b2aa',hi:'#dcd7cf',lc:'#8f8a83',dash:true};
+
+function doc(x,fy,sc,o){o=o||{};sc=sc||1;
+  const la=o.la||[-34,-50],ra=o.ra||[34,-50];
+  let g=`<rect x="-17" y="-42" width="13" height="40" fill="#34507f" stroke="${INK}" stroke-width="2.5"/><rect x="4" y="-42" width="13" height="40" fill="#34507f" stroke="${INK}" stroke-width="2.5"/><ellipse cx="-13" cy="-3" rx="12" ry="5.5" fill="${INK}"/><ellipse cx="12" cy="-3" rx="12" ry="5.5" fill="${INK}"/>`;
+  g+=`<path d="M-24,-98 L24,-98 L33,-36 L-33,-36 Z" fill="#fbfaf3" stroke="${INK}" stroke-width="3" stroke-linejoin="round"/><path d="M-5,-98 L0,-84 L5,-98 Z" fill="#2f8f9a" stroke="${INK}" stroke-width="2"/><path d="M-12,-98 L0,-76 L12,-98" fill="none" stroke="${INK}" stroke-width="2"/><rect x="9" y="-70" width="13" height="10" fill="none" stroke="${INK}" stroke-width="2"/><line x1="13" y1="-75" x2="13" y2="-66" stroke="#2f8f9a" stroke-width="3"/>`;
+  for(const [sx,a] of [[-22,la],[22,ra]])g+=`<path d="M${sx},-92 L${a[0]},${a[1]}" stroke="${INK}" stroke-width="12" stroke-linecap="round"/><path d="M${sx},-92 L${a[0]},${a[1]}" stroke="#fbfaf3" stroke-width="7" stroke-linecap="round"/><circle cx="${a[0]}" cy="${a[1]}" r="5.5" fill="#f3cda4" stroke="${INK}" stroke-width="2"/>`;
+  g+=`<polygon points="-24,-120 -30,-142 -17,-137 -13,-158 -3,-141 5,-160 10,-141 22,-153 20,-135 28,-128 22,-118" fill="#2b1c16" stroke="${INK}" stroke-width="2" stroke-linejoin="round"/><circle cx="0" cy="-118" r="21" fill="#f3cda4" stroke="${INK}" stroke-width="3"/><path d="M-20,-124 Q-9,-135 0,-128 Q9,-137 20,-124 L19,-136 L-19,-136 Z" fill="#2b1c16"/>`;
+  g+=`<circle cx="-8" cy="-116" r="7.5" fill="#fff" fill-opacity=".55" stroke="${INK}" stroke-width="2.5"/><circle cx="8" cy="-116" r="7.5" fill="#fff" fill-opacity=".55" stroke="${INK}" stroke-width="2.5"/><circle cx="-7" cy="-115.5" r="2.2" fill="${INK}"/><circle cx="9" cy="-115.5" r="2.2" fill="${INK}"/>`;
+  const m=o.m||'smile';
+  if(m==='o')g+=`<ellipse cx="0" cy="-103" rx="3.2" ry="4" fill="${INK}"/>`;
+  else if(m==='flat')g+=`<path d="M-5,-103 L5,-103" stroke="${INK}" stroke-width="2.5" stroke-linecap="round"/>`;
+  else if(m==='grin')g+=`<path d="M-8,-106 Q0,-96 8,-106 Z" fill="#fffaf0" stroke="${INK}" stroke-width="2.2" stroke-linejoin="round"/>`;
+  else g+=`<path d="M-6,-106 Q0,-100 6,-106" fill="none" stroke="${INK}" stroke-width="2.5" stroke-linecap="round"/>`;
+  if(o.q)g+=`<text x="30" y="-150" font-size="38" fill="#3b7fd0" font-family="${FONT}" font-weight="700" transform="rotate(14 30 -150)">?</text><text x="44" y="-172" font-size="22" fill="#3b7fd0" font-family="${FONT}" font-weight="700">?</text>`;
+  return G(`<g transform="translate(${x},${fy}) scale(${o.flip?-sc:sc},${sc})">${g}</g>`);
+}
+
+/* ---------- props ---------- */
+function sign(x,y,w,lines,o){o=o||{};const z=o.z||26,lh=z*1.2,h=lines.length*lh+22;
+  let g='';
+  if(o.hang)g+=`<line x1="${n(x-w/2+16)}" y1="${y}" x2="${n(x-w/2+16)}" y2="0" stroke="${INK}" stroke-width="2"/><line x1="${n(x+w/2-16)}" y1="${y}" x2="${n(x+w/2-16)}" y2="0" stroke="${INK}" stroke-width="2"/>`;
+  if(o.stick)g+=`<line x1="${x}" y1="${n(y+h-4)}" x2="${o.stick[0]}" y2="${o.stick[1]}" stroke="#8a5a2b" stroke-width="9" stroke-linecap="round"/>`;
+  g+=`<rect x="${n(x-w/2)}" y="${y}" width="${w}" height="${n(h)}" rx="6" fill="${o.fill||'#fff6df'}" stroke="${INK}" stroke-width="3"/>`;
+  lines.forEach((l,i)=>g+=T(x,y+11+z+i*lh,l,z,{f:o.f}));
+  return G(g,o.r?` transform="rotate(${o.r} ${x} ${n(y+h/2)})"`:'');
+}
+function bubble(x,y,w,lines,tail,o){o=o||{};const z=o.z||24,lh=z*1.15,h=lines.length*lh+22;
+  let g=`<polygon points="${x-14},${n(y+h-6)} ${x+14},${n(y+h-6)} ${tail[0]},${tail[1]}" fill="#fffaf0" stroke="${INK}" stroke-width="3" stroke-linejoin="round"/>`;
+  g+=`<rect x="${n(x-w/2)}" y="${y}" width="${w}" height="${n(h)}" rx="${n(Math.min(h/2,26))}" fill="#fffaf0" stroke="${INK}" stroke-width="3"/><polygon points="${x-11},${n(y+h-4)} ${x+11},${n(y+h-4)} ${x},${n(y+h+2)}" fill="#fffaf0"/>`;
+  lines.forEach((l,i)=>g+=T(x,y+11+z*.95+i*lh,l,z,{f:o.f}));
+  return G(g);
+}
+function meter(x,y,v,o){o=o||{};const H=o.H||200,W=36,r=34,bot=y+H,hot=v>=70,fc=hot?'#d9483b':'#6db35f',lvl=(H-24)*v/100;
+  let g=`<rect x="${x-62}" y="${y-50}" width="124" height="36" rx="5" fill="#f7e6c4" stroke="${INK}" stroke-width="3"/>${T(x,y-24,o.label||'RISK',24)}`;
+  g+=`<rect x="${x-W/2}" y="${y}" width="${W}" height="${H}" rx="${W/2}" fill="#fffaf0" stroke="${INK}" stroke-width="3"/><rect x="${x-W/2+7}" y="${n(bot-lvl-6)}" width="${W-14}" height="${n(lvl+10)}" rx="6" fill="${fc}"/>`;
+  for(let i=0;i<=10;i++){const yy=bot-12-(H-24)*i/10;g+=`<line x1="${x+W/2-11}" y1="${n(yy)}" x2="${x+W/2-3}" y2="${n(yy)}" stroke="${INK}" stroke-width="2"/>`;}
+  const y70=bot-12-(H-24)*.7;
+  g+=`<line x1="${x-W/2-18}" y1="${n(y70)}" x2="${x+W/2+18}" y2="${n(y70)}" stroke="#c0302a" stroke-width="3" stroke-dasharray="6 5"/>${T(x+W/2+36,y70+7,'70',20,{f:'#c0302a'})}`;
+  g+=`<circle cx="${x}" cy="${bot+r-8}" r="${r}" fill="${fc}" stroke="${INK}" stroke-width="3"/>${T(x,bot+r+1,String(v),28)}`;
+  return G(g);
+}
+function pump(x,by,pushed,to){const hy=pushed?by-176:by-222;let g='';
+  if(to)g+=`<path d="M${x+24},${by-22} C${x+90},${by+6} ${to[0]-80},${to[1]+50} ${to[0]},${to[1]}" fill="none" stroke="#2c2e47" stroke-width="8" stroke-linecap="round"/>`;
+  g+=`<rect x="${x-72}" y="${by-14}" width="144" height="14" rx="3" fill="#3d4160" stroke="${INK}" stroke-width="2.5"/><line x1="${x}" y1="${by-150}" x2="${x}" y2="${hy}" stroke="#9aa0ad" stroke-width="7"/>`;
+  g+=`<rect x="${x-24}" y="${by-152}" width="48" height="140" rx="12" fill="#2f8f9a" stroke="${INK}" stroke-width="3"/><rect x="${x-14}" y="${by-140}" width="10" height="110" rx="5" fill="#7cc6cc" opacity=".6"/><rect x="${x-26}" y="${by-160}" width="52" height="14" rx="4" fill="#3d4160" stroke="${INK}" stroke-width="2.5"/>`;
+  g+=`<rect x="${x-46}" y="${hy-12}" width="92" height="14" rx="7" fill="#3d4160" stroke="${INK}" stroke-width="2.5"/>`;
+  return G(g);
+}
+function machine(x,fy){let g=`<polygon points="${x-105},${fy-262} ${x+105},${fy-262} ${x+42},${fy-200} ${x-42},${fy-200}" fill="#c9cfd8" stroke="${INK}" stroke-width="3" stroke-linejoin="round"/>`;
+  g+=`<polygon points="${x+113},${fy-84} ${x+190},${fy-34} ${x+190},${fy-10} ${x+113},${fy-56}" fill="#7fa0b6" stroke="${INK}" stroke-width="3" stroke-linejoin="round"/>`;
+  g+=`<rect x="${x-115}" y="${fy-204}" width="230" height="198" rx="10" fill="#8fb3c9" stroke="${INK}" stroke-width="3"/><rect x="${x-100}" y="${fy-192}" width="70" height="120" rx="8" fill="#b7d0de" opacity=".6"/>`;
+  g+=`<rect x="${x-72}" y="${fy-180}" width="144" height="46" rx="6" fill="#fff6df" stroke="${INK}" stroke-width="3"/>`+T(x,fy-146,'10XAI',34);
+  [[-60,'#fffaf0'],[0,'#fffaf0'],[60,'#fffaf0']].forEach(([dx,f],i)=>{g+=`<circle cx="${x+dx}" cy="${fy-88}" r="18" fill="${f}" stroke="${INK}" stroke-width="2.5"/><line x1="${x+dx}" y1="${fy-88}" x2="${x+dx+[10,-6,12][i]}" y2="${fy-88-[8,12,-4][i]}" stroke="#c0302a" stroke-width="3" stroke-linecap="round"/>`});
+  g+=`<circle cx="${x+92}" cy="${fy-190}" r="7" fill="#d9483b" stroke="${INK}" stroke-width="2"/><rect x="${x-100}" y="${fy-8}" width="30" height="10" fill="${INK}"/><rect x="${x+70}" y="${fy-8}" width="30" height="10" fill="${INK}"/>`;
+  return G(g);
+}
+function kanbanBg(hl){const cols=[['Decomposed','#8fb2e0'],['Verifying','#f1c15a'],['Gate / Review','#e8766a'],['Verified','#86c77f']];let g='';
+  cols.forEach(([t,c],i)=>{const x=122+i*182,on=hl===undefined||hl===i;g+=`<rect x="${x}" y="58" width="168" height="252" rx="8" fill="${c}" opacity="${on?.62:.22}" stroke="${INK}" stroke-width="${on?3:2}"/>`+T(x+84,88,t,22);for(let j=0;j<3;j++)g+=`<rect x="${x+18}" y="${104+j*50}" width="132" height="36" rx="4" fill="#fffaf0" opacity="${on?.85:.45}" stroke="${INK}" stroke-width="1.5"/>`;});
+  return G(g);}
+function gate(x,fy,open,len){len=len||220;let s='';for(let i=12;i<len-6;i+=26)s+=`<rect x="${i}" y="-9" width="13" height="18" fill="#d9483b"/>`;
+  let g=`<rect x="${x-14}" y="${fy-120}" width="28" height="120" fill="#5b4a6a" stroke="${INK}" stroke-width="3"/><rect x="${x-26}" y="${fy-12}" width="52" height="12" fill="#3d4160" stroke="${INK}" stroke-width="2.5"/>`;
+  g+=`<g transform="translate(${x},${fy-100}) rotate(${open?-72:0})"><rect x="0" y="-9" width="${len}" height="18" rx="7" fill="#fffaf0"/>${s}<rect x="0" y="-9" width="${len}" height="18" rx="7" fill="none" stroke="${INK}" stroke-width="3"/></g>`;
+  g+=`<circle cx="${x}" cy="${fy-100}" r="11" fill="#f0b52b" stroke="${INK}" stroke-width="2.5"/>`;
+  return G(g);}
+function sandbox(x,fy,w){w=w||360;const d=70;const r=rng(w*7);let dots='';for(let i=0;i<40;i++){const px=x-w/2+50+r()*(w-100),py=fy-d+14+r()*(d-18);dots+=`<circle cx="${n(px)}" cy="${n(py)}" r="${n(1.5+r()*2)}" fill="#d4a95a"/>`}
+  return G(`<polygon points="${x-w/2},${fy} ${x+w/2},${fy} ${x+w/2-40},${fy-d} ${x-w/2+40},${fy-d}" fill="#b77945" stroke="${INK}" stroke-width="3" stroke-linejoin="round"/><polygon points="${x-w/2+18},${fy-6} ${x+w/2-18},${fy-6} ${x+w/2-50},${fy-d+10} ${x-w/2+50},${fy-d+10}" fill="#f1d08a"/>${dots}<rect x="${x-w/2}" y="${fy}" width="${w}" height="16" fill="#9c6236" stroke="${INK}" stroke-width="3"/>`);}
+function fence(x1,x2,fy,ding){let g='';
+  for(const yy of [fy-62,fy-32])g+=`<line x1="${x1}" y1="${yy}" x2="${x2}" y2="${yy}" stroke="${INK}" stroke-width="12" stroke-linecap="round"/><line x1="${x1}" y1="${yy}" x2="${x2}" y2="${yy}" stroke="#e9dcc4" stroke-width="7" stroke-linecap="round"/>`;
+  for(let px=x1;px<=x2;px+=85)g+=`<rect x="${px-7}" y="${fy-84}" width="14" height="84" rx="3" fill="#e9dcc4" stroke="${INK}" stroke-width="2.5"/>`;
+  for(let bx=x1+42;bx<x2;bx+=85){const hit=ding&&Math.abs(bx-ding)<43,rot=hit?-22:0;g+=`<g transform="rotate(${rot} ${bx} ${fy-56})"><line x1="${bx}" y1="${fy-56}" x2="${bx}" y2="${fy-48}" stroke="${INK}" stroke-width="2"/><path d="M${bx-10},${fy-30} Q${bx-10},${fy-50} ${bx},${fy-50} Q${bx+10},${fy-50} ${bx+10},${fy-30} Z" fill="#f5c84c" stroke="${INK}" stroke-width="2.5" stroke-linejoin="round"/><circle cx="${bx}" cy="${fy-28}" r="3.5" fill="${INK}"/></g>`;
+    if(hit)g+=`<path d="M${bx-30},${fy-70} l-14,-10 M${bx+26},${fy-74} l12,-14 M${bx+32},${fy-44} l18,-2 M${bx-34},${fy-42} l-16,2" stroke="${INK}" stroke-width="3" stroke-linecap="round"/>`+T(bx+8,fy-94,'딩!',34,{f:'#c0302a',r:-8});}
+  return G(g);}
+function door(x,fy,locked){let g=`<rect x="${x-70}" y="${fy-215}" width="140" height="36" rx="5" fill="#fff6df" stroke="${INK}" stroke-width="3"/>`+T(x,fy-189,'발행 PUBLISH',21);
+  g+=`<rect x="${x-56}" y="${fy-172}" width="112" height="172" fill="#7a4e33" stroke="${INK}" stroke-width="3"/><rect x="${x-44}" y="${fy-160}" width="88" height="160" fill="#a86a42" stroke="${INK}" stroke-width="2.5"/><rect x="${x-32}" y="${fy-146}" width="64" height="52" fill="none" stroke="#7a4e33" stroke-width="3"/><rect x="${x-32}" y="${fy-80}" width="64" height="62" fill="none" stroke="#7a4e33" stroke-width="3"/><circle cx="${x+30}" cy="${fy-88}" r="5" fill="#f0b52b" stroke="${INK}" stroke-width="2"/>`;
+  if(locked){const px=x+30,py=fy-78;g+=`<path d="M${px-9},${py} v-10 a9,9 0 0 1 18,0 v10" fill="none" stroke="#9aa0ad" stroke-width="6"/><rect x="${px-14}" y="${py}" width="28" height="24" rx="4" fill="#f0b52b" stroke="${INK}" stroke-width="2.5"/><circle cx="${px}" cy="${py+10}" r="3" fill="${INK}"/><rect x="${px-1.5}" y="${py+10}" width="3" height="8" fill="${INK}"/>`;}
+  return G(g);}
+function rope(x1,y1,x2,y2,label,sag){sag=sag===undefined?30:sag;const mx=(x1+x2)/2,my=(y1+y2)/2+sag*2;
+  let g=`<path d="M${x1},${y1} Q${mx},${my} ${x2},${y2}" fill="none" stroke="#8a5a2b" stroke-width="5" stroke-linecap="round"/><path d="M${x1},${y1} Q${mx},${my} ${x2},${y2}" fill="none" stroke="#d9b07a" stroke-width="2" stroke-dasharray="4 7"/>`;
+  if(label)g+=T(mx,(y1+y2)/2+sag+(sag<0?-10:24),label,19,{f:'#6b3f22'});
+  return G(g);}
+function sheet(x,y,w,h,title,items){let g=`<line x1="${x-w/2+20}" y1="${y}" x2="${x-w/2+20}" y2="0" stroke="${INK}" stroke-width="2"/><line x1="${x+w/2-20}" y1="${y}" x2="${x+w/2-20}" y2="0" stroke="${INK}" stroke-width="2"/>`;
+  g+=`<path d="M${x-w/2},${y} L${x+w/2-26},${y} L${x+w/2},${y+26} L${x+w/2},${y+h} L${x-w/2},${y+h} Z" fill="#fffaf0" stroke="${INK}" stroke-width="3" stroke-linejoin="round"/><path d="M${x+w/2-26},${y} L${x+w/2-26},${y+26} L${x+w/2},${y+26}" fill="#eadfc8" stroke="${INK}" stroke-width="2"/>`;
+  g+=T(x,y+40,title,28,{f:'#2c2e47'})+`<line x1="${x-w/2+20}" y1="${y+54}" x2="${x+w/2-20}" y2="${y+54}" stroke="#d9cdb4" stroke-width="2"/>`;
+  items.forEach(([t,done],i)=>{const yy=y+92+i*42,lx=x-w/2+26;g+=done?`<path d="M${lx},${yy-10} l7,8 l14,-18" fill="none" stroke="#3d8a3a" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>`:`<path d="M${lx},${yy-8} h17 m-7,-7 l7,7 l-7,7" fill="none" stroke="#c0302a" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/>`;g+=T(lx+32,yy,t,23,{a:'start'});});
+  return G(g);}
+function board(x,y,w,h,rows){let g=`<line x1="${x+34}" y1="${y+h}" x2="${x+14}" y2="440" stroke="#7a4e33" stroke-width="8"/><line x1="${x+w-34}" y1="${y+h}" x2="${x+w-14}" y2="440" stroke="#7a4e33" stroke-width="8"/><rect x="${x}" y="${y}" width="${w}" height="${h}" rx="6" fill="#7a4e33" stroke="${INK}" stroke-width="3"/><rect x="${x+10}" y="${y+10}" width="${w-20}" height="${h-20}" rx="3" fill="#2f4a3f"/>`;
+  rows.forEach(([t,c,z],i)=>g+=T(x+26,y+48+i*40,t,z||26,{a:'start',f:c}));return G(g);}
+function banner(y,text,z){z=z||46;const x1=200,x2=760,h=76;
+  let g=`<polygon points="${x1-74},${y+20} ${x1+12},${y+20} ${x1+12},${y+h+20} ${x1-74},${y+h+20} ${x1-50},${y+20+h/2}" fill="#d9a92f" stroke="${INK}" stroke-width="3" stroke-linejoin="round"/><polygon points="${x2+74},${y+20} ${x2-12},${y+20} ${x2-12},${y+h+20} ${x2+74},${y+h+20} ${x2+50},${y+20+h/2}" fill="#d9a92f" stroke="${INK}" stroke-width="3" stroke-linejoin="round"/>`;
+  g+=`<rect x="${x1}" y="${y}" width="${x2-x1}" height="${h}" fill="#f5c84c" stroke="${INK}" stroke-width="3"/><polygon points="${x1},${y+h} ${x1+12},${y+h+20} ${x1+12},${y+h}" fill="#8f6b17"/><polygon points="${x2},${y+h} ${x2-12},${y+h+20} ${x2-12},${y+h}" fill="#8f6b17"/>`;
+  g+=T(480,y+h/2+z*.36,text,z);return G(g);}
+function pkg(x,fy,s,label){const h=s*.8,top=fy-h;return G(`<rect x="${n(x-s/2)}" y="${n(top)}" width="${s}" height="${n(h)}" rx="4" fill="#d7a86e" stroke="${INK}" stroke-width="3"/><rect x="${n(x-s*.06)}" y="${n(top)}" width="${n(s*.12)}" height="${n(h)}" fill="#d9483b"/><rect x="${n(x-s/2)}" y="${n(top+h*.28)}" width="${s}" height="${n(s*.1)}" fill="#d9483b"/><ellipse cx="${n(x-s*.13)}" cy="${n(top-7)}" rx="${n(s*.13)}" ry="${n(s*.07)}" fill="#d9483b" stroke="${INK}" stroke-width="2.5"/><ellipse cx="${n(x+s*.13)}" cy="${n(top-7)}" rx="${n(s*.13)}" ry="${n(s*.07)}" fill="#d9483b" stroke="${INK}" stroke-width="2.5"/><rect x="${n(x-s*.36)}" y="${n(top+h*.55)}" width="${n(s*.72)}" height="${n(s*.22)}" rx="3" fill="#fffaf0" stroke="${INK}" stroke-width="2"/>`+T(x,top+h*.55+s*.16,label,s*.15));}
+function shelf(x,y,w,labels){let g='';g+=`<line x1="${x+20}" y1="${y+14}" x2="${x+20}" y2="${y+40}" stroke="${INK}" stroke-width="4"/><line x1="${x+w-20}" y1="${y+14}" x2="${x+w-20}" y2="${y+40}" stroke="${INK}" stroke-width="4"/><rect x="${x}" y="${y}" width="${w}" height="14" fill="#8a5a2b" stroke="${INK}" stroke-width="3"/>`;
+  labels.forEach((l,i)=>{const px=x+18+i*((w-36)/labels.length);g+=`<rect x="${n(px)}" y="${y-46}" width="56" height="46" rx="3" fill="#d7a86e" stroke="${INK}" stroke-width="2.5"/><rect x="${n(px+24)}" y="${y-46}" width="8" height="46" fill="#d9483b"/>`+T(px+28,y-16,l,17,{f:'#2c2e47'});});return G(g);}
+function star(x,y,r,f){f=f||'#f5c84c';let p=[];for(let i=0;i<10;i++){const a=-Math.PI/2+i*Math.PI/5,rr=i%2?r*.45:r;p.push(n(x+rr*Math.cos(a))+','+n(y+rr*Math.sin(a)));}return `<polygon points="${p.join(' ')}" fill="${f}" stroke="${INK}" stroke-width="2" stroke-linejoin="round"/>`;}
+function motion(x,y,k,len,dir){dir=dir||-1;let g='';for(let i=0;i<k;i++)g+=`<line x1="${x}" y1="${y+i*14}" x2="${x+dir*len*(1-i*.15)}" y2="${y+i*14}" stroke="${INK}" stroke-width="3" stroke-linecap="round" opacity=".7"/>`;return G(g);}
+function confetti(k,seed,area){area=area||[130,40,830,400];const r=rng(seed),cs=['#f06b8b','#f5c84c','#6db35f','#5a8fd8','#e7793b','#fffaf0'];let g='';for(let i=0;i<k;i++){const x=area[0]+r()*(area[2]-area[0]),y=area[1]+r()*(area[3]-area[1]);g+=`<rect x="${n(x)}" y="${n(y)}" width="11" height="5" rx="1" fill="${cs[i%cs.length]}" transform="rotate(${n(r()*180)} ${n(x)} ${n(y)})"/>`;}return g;}
+function dice(x,y,s,rot){const d=[[.3,.3],[.7,.7],[.5,.5],[.3,.7],[.7,.3]];return G(`<g transform="rotate(${rot} ${x} ${y})"><rect x="${x-s/2}" y="${y-s/2}" width="${s}" height="${s}" rx="${s*.18}" fill="#fffaf0" stroke="${INK}" stroke-width="2.5"/>${d.map(([a,b])=>`<circle cx="${n(x-s/2+a*s)}" cy="${n(y-s/2+b*s)}" r="${n(s*.08)}" fill="${INK}"/>`).join('')}</g>`);}
+function bomb(x,y){return G(`<circle cx="${x}" cy="${y}" r="24" fill="#2b2b33" stroke="${INK}" stroke-width="3"/><rect x="${x-8}" y="${y-32}" width="16" height="10" fill="#555a66" stroke="${INK}" stroke-width="2"/><path d="M${x},${y-32} q8,-18 22,-16" fill="none" stroke="#8a5a2b" stroke-width="3"/><circle cx="${x-8}" cy="${y-8}" r="5" fill="#fffaf0" opacity=".45"/>`+star(x+24,y-50,11,'#f5c84c')+T(x,y+8,'prod',15,{f:'#f5c84c'}));}
+function stopwatch(x,y){return G(`<rect x="${x-6}" y="${y-36}" width="12" height="10" fill="#9aa0ad" stroke="${INK}" stroke-width="2"/><circle cx="${x}" cy="${y}" r="27" fill="#fffaf0" stroke="${INK}" stroke-width="3"/><line x1="${x}" y1="${y}" x2="${x+12}" y2="${y-14}" stroke="#c0302a" stroke-width="3" stroke-linecap="round"/><circle cx="${x}" cy="${y}" r="3" fill="${INK}"/>`);}
+function coin(x,y){return G(`<ellipse cx="${x}" cy="${y}" rx="22" ry="22" fill="#f5c84c" stroke="${INK}" stroke-width="3"/><ellipse cx="${x}" cy="${y}" rx="15" ry="15" fill="none" stroke="#c99a2a" stroke-width="2"/>`+T(x,y+8,'$',22));}
+function flower(x,y,c){return G(`<line x1="${x}" y1="${y}" x2="${x+10}" y2="${y+22}" stroke="#4e8a3e" stroke-width="3"/>${[0,72,144,216,288].map(a=>`<circle cx="${n(x+8*Math.cos(a*Math.PI/180))}" cy="${n(y+8*Math.sin(a*Math.PI/180))}" r="6" fill="${c}" stroke="${INK}" stroke-width="1.5"/>`).join('')}<circle cx="${x}" cy="${y}" r="4" fill="#f5c84c"/>`);}
+function arrow(x1,y,x2){return G(`<path d="M${x1},${y} L${x2-14},${y}" stroke="${INK}" stroke-width="4" stroke-dasharray="12 9" stroke-linecap="round"/><path d="M${x2-20},${y-12} L${x2},${y} L${x2-20},${y+12}" fill="none" stroke="${INK}" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>`);}
+function flag(x,fy){return G(`<line x1="${x}" y1="${fy}" x2="${x}" y2="${fy-120}" stroke="${INK}" stroke-width="4"/><path d="M${x},${fy-120} L${x+56},${fy-104} L${x},${fy-86} Z" fill="#6db35f" stroke="${INK}" stroke-width="3" stroke-linejoin="round"/>`);}
+
+/* ---------- shots ---------- */
+const SEQS=[
+  {name:'Cold open',color:'#e7793b'},
+  {name:'The problem',color:'#e8766a'},
+  {name:'Harness',color:'#4aa3a8'},
+  {name:'Ontology',color:'#f5c84c'},
+  {name:'Gate, sandbox, measure',color:'#86c77f'},
+  {name:'Curtain call',color:'#f2a3b5'}
+];
+const SHOTS=[
+{seq:0,dur:5,cam:'Wide · slow push',k:'push',
+ action:'Curtains already open. Hype Box, in sunglasses on a purple podium, holds up a placard. Card-boxes in party hats cheer as confetti falls.',
+ ko:'프롬프트 하나면 다 된대!!',en:'One prompt does it all!!',sfx:'Crowd cheer, kazoo fanfare, confetti rustle',anim:'Crowd hops on 2s; the placard wobbles ±4°; confetti loops.',
+ draw(){return G(`<rect x="410" y="428" width="140" height="38" rx="4" fill="#6d5a9c" stroke="${INK}" stroke-width="3"/>`+T(480,455,'★ ★ ★',20,{f:'#f5c84c'}))
+  +box(480,430,124,Object.assign({mood:'cool'},GOLD))
+  +sign(660,62,330,['프롬프트 1개로','SaaS 완성! 무료!!'],{z:32,r:-4,stick:[560,342]})
+  +box(170,470,84,{hat:true})+box(285,480,78,{hat:true})+box(685,480,78,{hat:true})+box(795,470,84,{hat:true})
+  +T(215,372,'와아!',26,{r:-10})+T(752,378,'대박!',26,{r:8})+confetti(46,7);}},
+{seq:0,dur:5,cam:'Wide · static',k:'static',
+ action:'Dr. Harness shuffles in from stage left with a clipboard. A blue "?" pops up overhead. One box calls out that it\'s free.',
+ ko:'…정말로?',en:'…Really?',sfx:'Woodblock footsteps; slide-whistle "?" pop',anim:'4-frame walk cycle; the "?" squashes and stretches in.',
+ draw(){return box(640,440,80,Object.assign({mood:'cool'},GOLD))+box(760,470,70,{hat:true})+box(545,474,64,{hat:true})
+  +bubble(560,236,190,['무료래요!'],[548,392])
+  +motion(160,380,3,40)+doc(230,470,1.25,{q:true,m:'flat',ra:[30,-62]})
+  +G(`<rect x="255" y="370" width="38" height="50" rx="3" fill="#c89b62" stroke="${INK}" stroke-width="2.5"/><rect x="260" y="378" width="28" height="36" fill="#fffaf0"/><rect x="266" y="366" width="16" height="7" rx="2" fill="#9aa0ad" stroke="${INK}" stroke-width="1.5"/>`);}},
+{seq:0,dur:6,cam:'Medium · pan right with the output',k:'pan',
+ action:'Dr. Harness feeds the post into the funnel of the 10XAI machine. The dials spin, the machine shudders, and card-boxes slide out of the chute one by one: ×8. One of them is gray and dashed: a step the author skipped.',
+ ko:'일단 돌려보자.',en:"Let's just run it.",sfx:'Paper swish, machine rattle, 8× "ka-chunk"',anim:'Machine shakes 2px at 12 fps; each box squashes on landing; "×8" stamps in last.',
+ draw(){return machine(460,445)
+  +G(`<g transform="rotate(-16 440 150)"><rect x="405" y="125" width="72" height="52" rx="3" fill="#fffaf0" stroke="${INK}" stroke-width="2.5"/>${T(441,158,'무료!',22,{f:'#c0302a'})}</g>`)
+  +doc(200,470,1.2,{ra:[56,-140],la:[-30,-60],m:'smile'})
+  +box(612,418,40,{rot:-28,mood:'happy'})+box(690,468,50,{})+box(752,468,50,Object.assign({mood:'worried'},GRAY))+box(812,468,46,{mood:'alert'})
+  +T(760,378,'×8',44,{f:'#c0302a',r:-6});}},
+{seq:0,dur:9,cam:'Medium → slow push to the meter',k:'push',
+ action:'Dr. Harness pumps a teal pump wired to the RISK thermometer. The liquid climbs past the dashed 70 line and the bulb flips from green to red: 72. A red card-box starts sweating.',
+ ko:'위험도 올리는 중… 72.',en:'Upping the risk score… 72.',sfx:'Three pump squeaks, rising slide whistle, alarm "ding-ding"',anim:'The same gag as the reference: three pumps, the meter rises in steps, and the bulb color snaps at 70.',
+ draw(){return meter(730,112,72)
+  +pump(590,458,true,[696,338])
+  +doc(468,470,1.15,{la:[70,-163],ra:[102,-163],m:'grin'})
+  +box(240,468,86,Object.assign({mood:'worried',tag:'risk 72'},RED))
+  +T(250,356,'!!',38,{f:'#c0302a'});}},
+{seq:1,dur:13,cam:'Wide · spotlights on, one at a time',k:'static',
+ action:'Three spotlights click on in turn. Left: a dizzy box with dice tumbling over its head. Middle: a dotted, empty outline in the line-up. Right: a worried box holding a lit bomb tagged "prod".',
+ ko:'매번 다르고, 단계를 빼먹고, 가끔은 사고를 쳐요.',en:'Different every time, steps skipped, and sometimes a disaster.',sfx:'Three spotlight "clunks", dice rattle, fuse hiss',anim:'Spotlights hit at 0s, 4s and 8s; the dice tumble on a loop; the fuse spark flickers.',
+ draw(){return sign(220,104,210,['매번 달라요'],{hang:true})+sign(480,104,210,['빼먹은 단계'],{hang:true})+sign(740,104,210,['위험한 행동'],{hang:true})
+  +box(220,462,96,{mood:'dizzy'})+dice(190,318,30,-18)+dice(252,300,26,22)
+  +box(390,462,64,{})+G(`<rect x="448" y="400" width="64" height="44" rx="3" fill="none" stroke="${INK}" stroke-width="3" stroke-dasharray="8 7" opacity=".7"/>`+T(480,432,'?',32,{f:'#6b3f22'}))+box(570,462,64,{})
+  +box(740,462,96,{mood:'worried'})+bomb(812,362);},
+ st:{spots:[220,480,740]}},
+{seq:1,dur:12,cam:'Wide · camera shakes on each impact',k:'static',
+ action:'A giant "MODEL" box stampedes around the stage with no reins, knocking boxes over and scattering papers. Dr. Harness stays calm and points at it.',
+ ko:'모델 탓이 아니야. 구조가 없어서지.',en:"It's not the model's fault. There's no structure.",sfx:'Stampede thumps, a crash, paper flutter; the music drops out for the line',anim:'The big box runs a figure-8; 3px camera shake per thump; freeze on the line.',
+ draw(){return motion(430,330,4,60)+box(570,470,170,{mood:'dizzy',label:'MODEL',rot:-7})
+  +star(500,300,12)+star(640,286,10)+star(575,272,8)
+  +box(790,468,58,{mood:'dizzy',rot:78})
+  +G(`<rect x="690" y="226" width="44" height="32" fill="#fffaf0" stroke="${INK}" stroke-width="2" transform="rotate(24 712 242)"/><rect x="408" y="232" width="40" height="30" fill="#fffaf0" stroke="${INK}" stroke-width="2" transform="rotate(-30 428 247)"/>`)
+  +doc(200,470,1.2,{ra:[60,-108],m:'flat'});}},
+{seq:2,dur:7,cam:'Wide · static title card',k:'static',
+ action:'A painted yellow ribbon drops in: "하네스 = 모델 빼고 전부". Below it is a picture equation: the MODEL box, plus harness gear (belt, reins, mission scroll, bell), equals the same box wearing it.',
+ ko:'하네스는 모델을 뺀 전부예요.',en:'The harness is everything except the model.',sfx:'Ribbon unfurl, toy-piano chord',anim:'The ribbon drops with a bounce; each part of the equation pops in on a beat.',
+ draw(){return banner(62,'하네스 = 모델 빼고 전부',42)+T(480,196,'Agent = Model + Harness',28,{f:'#6b3f22'})
+  +box(220,450,96,{mood:'happy',label:'MODEL'})+T(345,400,'+',72)
+  +G(`<ellipse cx="480" cy="416" rx="54" ry="20" fill="none" stroke="#6b3f22" stroke-width="10"/><rect x="466" y="404" width="26" height="22" rx="3" fill="#f5c84c" stroke="${INK}" stroke-width="2.5"/><rect x="440" y="336" width="80" height="34" rx="4" fill="#fffaf0" stroke="${INK}" stroke-width="2.5"/><circle cx="440" cy="353" r="9" fill="#eadfc8" stroke="${INK}" stroke-width="2"/><circle cx="520" cy="353" r="9" fill="#eadfc8" stroke="${INK}" stroke-width="2"/>`+T(480,360,'mission',17)+`<path d="M530,380 Q530,362 542,362 Q554,362 554,380 Z" fill="#f5c84c" stroke="${INK}" stroke-width="2.5"/>`)
+  +T(610,400,'=',72)+box(750,450,96,{mood:'happy',harness:true})+star(812,334,10)+star(690,342,8);}},
+{seq:2,dur:9,cam:'Medium · track right along the arrow',k:'pan',
+ action:'Dr. Harness holds reins attached to a box in harness. A thought bubble shows its mission.md and its allowed tools. A dashed arrow and a flag show where it is being steered before it takes a step.',
+ ko:'고삐는 \'가이드\' — 하기 전에 방향을 잡아요.',en:'The reins are guides: they set direction before the agent acts.',sfx:'Leather creak, a soft "giddy-up" kazoo',anim:'The reins tug once; the box turns toward the flag, then trots.',
+ draw(){return sign(220,66,250,['GUIDE','피드포워드'],{hang:true,z:26})
+  +bubble(580,150,250,['mission.md','tools: Read, Bash'],[572,356],{z:22})
+  +doc(200,470,1.2,{ra:[56,-74],la:[44,-60],m:'smile'})
+  +G(`<path d="M267,381 Q390,452 508,432" fill="none" stroke="#6b3f22" stroke-width="5" stroke-linecap="round"/><path d="M253,398 Q380,470 508,440" fill="none" stroke="#6b3f22" stroke-width="5" stroke-linecap="round"/>`)
+  +box(560,462,100,{mood:'happy',harness:true})
+  +arrow(650,330,790)+flag(812,450);}},
+{seq:2,dur:10,cam:'Wide · static',k:'static',
+ action:'A fence hung with bells runs across the stage. A running box bumps it and a bell rings "딩!". The left sign reads computational sensors (tests, rules, the 70 line). On the right, a judge box with a magnifier stands for inferential sensors.',
+ ko:'센서는 \'피드백\' — 하고 나서 재요.',en:'Sensors are feedback: they measure after the agent acts.',sfx:'Bump, bright bell "ding", the judge\'s "hmm"',anim:'The box bounces back with stars; the bell swings three times; the judge\'s lens glints.',
+ draw(){return sign(230,78,240,['계산형 센서','테스트 · 규칙 · 70'],{hang:true,z:24})+sign(725,78,230,['추론형 센서','LLM이 판정'],{hang:true,z:24})
+  +fence(150,810,432,467)
+  +box(420,472,96,{mood:'dizzy',rot:-10})+star(372,360,9)+star(468,352,7)
+  +box(735,472,96,{mood:'alert',mag:'l'});}},
+{seq:2,dur:7,cam:'Medium · two-shot',k:'static',
+ action:'Two judge boxes, orange Claude and teal Codex, inspect the same small card-box. One holds up an O and the other an X. The hanging sign reads "disagree → REVIEW".',
+ ko:'중요한 건 두 모델이 교차 검증해요.',en:'When the stakes are high, two models cross-check.',sfx:'Two "boop" stamps, one happy and one sour',anim:'The judges turn to face each other at the disagreement; the card-box slides toward the Review sign.',
+ draw(){return sign(480,70,300,['의견 불일치 → REVIEW'],{hang:true,z:24})
+  +bubble(250,176,110,['O'],[292,346],{z:46,f:'#3d8a3a'})+bubble(710,176,110,['X'],[668,346],{z:46,f:'#c0302a'})
+  +box(300,468,108,{mood:'alert',mag:'r',label:'Claude'})+box(660,468,108,Object.assign({mood:'alert',mag:'l',label:'Codex'},TEAL))
+  +box(480,470,66,{mood:'worried',tag:'card 4'});}},
+{seq:2,dur:7,cam:'Wide · night grade, slow push',k:'push',
+ action:'Night. One box falls asleep (context reset). Another box reads a hanging poster, progress.txt, which lists what is done and "next: execute".',
+ ko:'기억은 모델 머리가 아니라, 파일에.',en:"Memory lives in files, not in the model's head.",sfx:'Crickets, a soft snore, a page turn',anim:'Z\'s float up; the checkmarks draw on one at a time.',
+ draw(){return G(`<circle cx="840" cy="80" r="0" fill="none"/>`)
+  +sign(250,80,250,['컨텍스트 리셋…'],{hang:true,z:24})
+  +box(250,468,100,{mood:'sleep'})+T(318,356,'Z',34,{f:'#fffaf0'})+T(342,326,'z',26,{f:'#fffaf0'})+T(360,304,'z',20,{f:'#fffaf0'})
+  +sheet(690,96,260,236,'progress.txt',[['카드 분해',true],['위험 검증',true],['다음: 실행',false]])
+  +box(525,470,96,{mood:'alert'});},
+ st:{night:true,bg:`<circle cx="820" cy="64" r="0"/><circle cx="160" cy="60" r="26" fill="#fdf1c4" opacity=".95"/><circle cx="152" cy="54" r="5" fill="#e9dca8"/><circle cx="168" cy="68" r="4" fill="#e9dca8"/>`}},
+{seq:3,dur:6,cam:'Medium · static',k:'static',
+ action:'A messy pile of boxes in mixed moods. Dr. Harness, label maker in hand, looks puzzled. The label tape prints "???".',
+ ko:'그런데… 뭘 기준으로 재지?',en:'But… what do we measure against?',sfx:'Label-maker clicks, a wobbly "boing"',anim:'The pile wobbles; the label tape feeds out in three clicks.',
+ draw(){return box(520,470,72,{mood:'dizzy'})+box(600,470,72,{mood:'worried',rot:4})+box(682,470,64,{mood:'sleep',rot:-3})
+  +box(548,412,64,{mood:'alert',rot:-12})+box(636,410,60,{mood:'happy',rot:10})+box(592,360,56,{mood:'dizzy',rot:-20})
+  +doc(220,470,1.2,{q:true,m:'o',ra:[44,-72]})
+  +G(`<rect x="258" y="370" width="44" height="30" rx="6" fill="#f5c84c" stroke="${INK}" stroke-width="2.5"/><rect x="302" y="378" width="74" height="15" fill="#fffaf0" stroke="${INK}" stroke-width="2"/>`+T(339,391,'???',15));}},
+{seq:3,dur:10,cam:'Wide · tilt down from the signs to the boxes',k:'push',
+ action:'Three signs: Nouns (Objects), Links, Verbs (Actions). The boxes line up wearing tags: Source, Claim, Step, Risk, Evidence. Ropes join them with "has", "becomes" and "supportedBy". A panel shows the only buttons allowed: ingest, verify, publish.',
+ ko:'온톨로지 = 명사 · 관계 · 동사',en:'Ontology = nouns, links, verbs.',sfx:'Five label clicks, rope whips, button beeps',anim:'The tags slap on in order; the ropes draw left to right; the buttons light up last.',
+ draw(){return sign(215,50,190,['명사','Objects'],{hang:true,z:24})+sign(445,50,190,['관계','Links'],{hang:true,z:24})
+  +sign(730,40,190,['동사','Actions'],{hang:true,z:22})
+  +G(`<rect x="640" y="142" width="180" height="76" rx="8" fill="#3d4160" stroke="${INK}" stroke-width="3"/><circle cx="676" cy="170" r="14" fill="#6db35f" stroke="${INK}" stroke-width="2.5"/><circle cx="730" cy="170" r="14" fill="#f5c84c" stroke="${INK}" stroke-width="2.5"/><circle cx="784" cy="170" r="14" fill="#d9483b" stroke="${INK}" stroke-width="2.5"/>`+T(676,206,'ingest',14,{f:'#fffaf0'})+T(730,206,'verify',14,{f:'#fffaf0'})+T(784,206,'publish',14,{f:'#fffaf0'}))
+  +rope(330,388,810,388,'supportedBy',-70)
+  +rope(205,428,295,428,'has',8)+rope(365,428,455,428,'becomes',8)+rope(525,428,615,428,'has',8)
+  +box(170,462,70,{tag:'Source'})+box(330,462,70,{tag:'Claim'})+box(490,462,70,{tag:'Step'})+box(650,462,70,Object.assign({tag:'Risk',mood:'worried'},RED))+box(810,462,70,Object.assign({tag:'Evidence'},TEAL));}},
+{seq:3,dur:9,cam:'Medium · pan to the door',k:'pan',
+ action:'The Claim box walks up to the PUBLISH door, trailing a broken rope. The Evidence box is left behind at the other end of it. The door is padlocked and won\'t open.',
+ ko:'근거에 연결 안 된 주장은 발행 불가.',en:"A claim that isn't linked to evidence can't be published.",sfx:'Tiptoe steps, door rattle, padlock "clunk"',anim:'The box tugs the handle twice, looks back at the broken rope, and droops.',
+ draw(){return sign(740,56,220,['근거 없음','= 잠김'],{hang:true,z:26})
+  +door(740,452,true)
+  +G(`<path d="M232,440 Q300,470 356,462 l8,-6 l-4,10 l8,-2" fill="none" stroke="#8a5a2b" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/><path d="M426,464 Q480,470 512,446 l6,6 l-2,-10 l8,2" fill="none" stroke="#8a5a2b" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>`)
+  +box(190,468,86,Object.assign({tag:'Evidence',mood:'worried'},TEAL))
+  +motion(466,372,3,34)+box(565,468,96,{tag:'Claim',mood:'worried'});}},
+{seq:3,dur:10,cam:'Medium → push in to the plug',k:'push',
+ action:'A cable runs from a box\'s "risk: 72" tag straight into the RISK meter, which reads 72. Dr. Harness gives a thumbs-up: the type the ontology created is exactly what the harness checks.',
+ ko:'온톨로지가 타입을 만들고, 하네스가 그 타입을 검사해요.',en:'The ontology makes the types; the harness checks them.',sfx:'Plug "click!", rising meter tone',anim:'The plug goes in on the beat; the meter animates to 72; hold 2s on the full picture.',
+ draw(){return meter(740,112,72)
+  +G(`<path d="M512,440 C600,450 600,250 700,250" fill="none" stroke="#2c2e47" stroke-width="7" stroke-linecap="round"/><rect x="694" y="240" width="18" height="20" rx="3" fill="#9aa0ad" stroke="${INK}" stroke-width="2.5"/>`)
+  +T(650,212,'딸깍!',30,{f:'#c0302a',r:-8})
+  +box(450,466,96,{mood:'happy',tag:'risk: 72'})
+  +doc(200,470,1.2,{ra:[40,-126],m:'grin'})+G(`<rect x="241" y="302" width="14" height="22" rx="5" fill="#f3cda4" stroke="${INK}" stroke-width="2"/>`);}},
+{seq:4,dur:12,cam:'Wide · Kanban wall behind',k:'static',
+ action:'The Kanban wall sits behind, with Gate / Review lit up. A red box (risk 78) insists "I\'m fine!" at a closed striped barrier. The barrier stays down until Dr. Harness stamps it approved.',
+ ko:'AI가 \'괜찮다\' 해도, 70 넘으면 사람이 봐요.',en:"Even if the AI says it's fine, above 70 a human takes a look.",sfx:'Barrier "thunk", protest gibberish, a heavy "KA-CHUNK" stamp, the barrier creaks up',anim:'The box pushes the barrier twice with no give; the stamp comes down; the barrier lifts 72°.',
+ draw(){return sign(400,240,150,['GATE','risk ≥ 70'],{z:22,stick:[400,340]})
+  +gate(400,462,false,236)
+  +bubble(730,186,220,['저 괜찮아요!'],[722,368],{z:26})
+  +box(735,470,108,Object.assign({mood:'alert',tag:'risk 78'},RED))
+  +doc(190,470,1.2,{ra:[42,-140],m:'flat'})
+  +G(`<circle cx="240" cy="272" r="10" fill="#8a5a2b" stroke="${INK}" stroke-width="2.5"/><rect x="233" y="278" width="14" height="22" fill="#8a5a2b" stroke="${INK}" stroke-width="2.5"/><rect x="218" y="298" width="44" height="16" rx="3" fill="#c0302a" stroke="${INK}" stroke-width="2.5"/>`)
+  +T(300,268,'승인?',28,{f:'#c0302a',r:-6});},
+ st:{bg:kanbanBg(2)}},
+{seq:4,dur:12,cam:'Medium · pan from the sandbox to the chalkboard',k:'pan',
+ action:'Safe boxes play in an actual sandbox labelled "git worktree", with a stopwatch and a coin next to it. A chalkboard compares claimed (free · 5 min) with measured ($0.40 · 12 min ▲).',
+ ko:'주장 vs 측정 — 숫자로 보여줘요.',en:'Claimed vs. measured, in numbers.',sfx:'Sand scoops, stopwatch ticks, coin "ching", chalk scratch',anim:'The stopwatch hand sweeps; the chalk writes the measured line; the ▲ blinks red.',
+ draw(){return sign(270,70,250,['SANDBOX','= git worktree'],{hang:true,z:24})
+  +sandbox(340,456,380)
+  +box(258,442,60,{hat:true})+box(340,438,58,{mood:'alert'})+box(422,442,60,{})
+  +G(`<line x1="440" y1="410" x2="470" y2="372" stroke="#8a5a2b" stroke-width="4"/><path d="M466,366 l14,-10 l6,14 z" fill="#9aa0ad" stroke="${INK}" stroke-width="2"/>`)
+  +board(600,90,262,196,[['주장 claimed','#f3e6c8',22],['무료 · 5분','#f3e6c8',28],['측정 measured','#f5c84c',22],['$0.40 · 12분 ▲','#f08a7a',28]])
+  +stopwatch(596,420)+coin(660,432);}},
+{seq:4,dur:8,cam:'Wide · static',k:'static',
+ action:'Verified boxes hop into a kraft-paper package labelled SKILL.md. Next to it, a LIBRARY shelf already holds CLI and JSON packages.',
+ ko:'검증된 것만 포장해서 라이브러리로.',en:'Only verified work gets packaged into the library.',sfx:'Three hop "boing"s, tape rip, shelf "thock"',anim:'The boxes arc in along dotted paths; the package closes with a ribbon tie.',
+ draw(){return sign(760,96,170,['LIBRARY'],{hang:true,z:24})+shelf(650,250,220,['CLI','JSON','MD'])
+  +G(`<path d="M240,400 Q300,260 430,350" fill="none" stroke="${INK}" stroke-width="3" stroke-dasharray="4 9" stroke-linecap="round"/>`)
+  +box(225,468,66,{})+box(330,318,56,{rot:-18})
+  +pkg(480,462,130,'SKILL.md')+star(560,330,9)+star(410,300,7);}},
+{seq:5,dur:14,cam:'Wide · slow pull out',k:'pull',
+ action:'Curtain call. Everyone bows. Hype Box, sunglasses off and lying on the floor, blushes and bows too. Flowers land on the stage.',
+ ko:'말보다, 돌려보고 말하자.',en:'Run it before you talk about it.',sfx:'Applause, ukulele outro theme',anim:'Staggered bows 0.2s apart; flowers toss in on arcs.',
+ draw(){return box(180,466,64,{arms:'down',hat:true})+box(280,466,64,Object.assign({arms:'down'},GRAY))+box(380,466,64,Object.assign({arms:'down'},TEAL))
+  +doc(480,470,1,{la:[-20,-50],ra:[20,-50],m:'grin'})
+  +box(585,466,64,Object.assign({arms:'down'},RED))+box(685,466,64,{arms:'down'})
+  +box(790,466,70,Object.assign({mood:'sheepish',arms:'down'},GOLD))
+  +G(`<rect x="826" y="462" width="16" height="9" rx="3" fill="#1d1c26"/><rect x="846" y="462" width="16" height="9" rx="3" fill="#1d1c26"/><line x1="842" y1="466" x2="846" y2="466" stroke="#1d1c26" stroke-width="2"/>`)
+  +flower(240,494,'#f06b8b')+flower(520,500,'#f5c84c')+flower(720,492,'#fffaf0')+confetti(30,21,[140,40,820,300]);},
+ st:{spots:[480]}},
+{seq:5,dur:9,cam:'Wide · static end card',k:'static',
+ action:'End card: a "10XAI" ribbon and the repo URL. The RISK meter is back at a calm green 10, and a box in a party hat waves.',
+ ko:'다음 게시물, 붙여넣어 보실래요?',en:'Want to paste in the next post?',sfx:'Final kazoo sting',anim:'The box waves on a loop; the meter settles with a small bounce (a callback to S04).',
+ draw(){return banner(56,'10XAI',50)+T(480,196,'github.com/tmuchal/10XAI',28,{f:'#6b3f22'})
+  +meter(760,214,10,{H:150})+pump(640,458,false,[726,390])
+  +box(330,466,84,{hat:true})+G(`<path d="M392,392 l22,-16" stroke="${INK}" stroke-width="3" stroke-linecap="round"/><path d="M396,404 l24,-6" stroke="${INK}" stroke-width="3" stroke-linecap="round"/>`)
+  +doc(190,470,1.2,{ra:[40,-128],m:'smile'});}}
+];
+
+let t=0;SHOTS.forEach((s,i)=>{s.id='S'+String(i+1).padStart(2,'0');s.start=t;t+=s.dur;});
+const TOTAL=t;
+const fmt=s=>{s=Math.max(0,Math.floor(s+1e-6));return Math.floor(s/60)+':'+String(s%60).padStart(2,'0')};
+function frame(sh){return `<svg viewBox="0 0 960 540" role="img" aria-label="${esc(sh.id+'. '+sh.action)}"><g class="cam">${stage(sh.st)}${sh.draw()}${curtains()}</g>${sub(sh.ko)}<rect width="960" height="540" filter="url(#grain)" opacity=".6" style="mix-blend-mode:multiply" pointer-events="none"/></svg>`;}
+const FRAMES=SHOTS.map(frame);
+
+/* ---------- page: timeline ---------- */
+const tl=document.getElementById('tl');
+tl.innerHTML=SHOTS.map((s,i)=>`<button type="button" data-i="${i}" style="flex:${s.dur} 1 0;background:${SEQS[s.seq].color}" title="${s.id} · ${fmt(s.start)} · ${esc(s.en)}" aria-label="Play from ${s.id}, ${fmt(s.start)}"><span>${s.id.slice(1)}</span></button>`).join('');
+document.getElementById('tlLegend').innerHTML=SEQS.map((q,i)=>{const sh=SHOTS.filter(s=>s.seq===i),a=sh[0].start,b=sh[sh.length-1].start+sh[sh.length-1].dur;return `<span><i style="background:${q.color}"></i>${q.name} <span style="font-family:var(--mono);font-size:11px">${fmt(a)}–${fmt(b)}</span></span>`}).join('');
+tl.addEventListener('click',e=>{const b=e.target.closest('button');if(b)openPlayer(+b.dataset.i)});
+
+/* ---------- page: cast ---------- */
+function mini(inner,vb){return `<svg viewBox="${vb||'0 0 240 210'}" role="img"><rect width="100%" height="100%" fill="url(#sheet)"/>${inner}<rect width="100%" height="100%" filter="url(#grain)" opacity=".5" style="mix-blend-mode:multiply"/></svg>`}
+const CAST=[
+  ['하네스 박사','Dr. Harness','Host and the only speaking role. Calm, curious, slightly rumpled. Korean VO.',doc(120,196,1,{ra:[40,-120],m:'smile'})],
+  ['카드박스','Card-box','Every task card and every agent. Orange, ^ ^ eyes, four stubby legs. Speaks gibberish.',box(120,186,112,{hat:true})],
+  ['빈칸박스','Gap-fill box','A step the author skipped. Gray, drawn with a dashed outline until the step is filled in.',box(120,186,112,Object.assign({mood:'worried'},GRAY))],
+  ['하입박스','Hype Box','The viral post. Gold, sunglasses, grinning until the curtain call.',box(120,186,112,Object.assign({mood:'cool'},GOLD))],
+  ['위험박스','Risky box','A card with risk ≥ 70. Red, sweating, always sure it\'s fine.',box(120,186,112,Object.assign({mood:'alert',tag:'risk 78'},RED))],
+  ['심판박스','Judge box','Inferential sensors. Teal for Codex, orange for Claude, always holding a magnifier.',box(104,186,104,Object.assign({mood:'alert',mag:'r'},TEAL))]
+];
+document.getElementById('castGrid').innerHTML=CAST.map(([ko,en,d,svg])=>`<figure class="who" style="margin:0">${mini(svg)}<div><b>${ko}</b><em>${en}</em><p>${d}</p></div></figure>`).join('');
+const PROPS=[
+  ['RISK meter + pump','The P(doom) gag, repurposed. Red above the dashed 70 line.',mini(meter(210,64,72,{H:120})+pump(92,236,true,[176,210]),'0 0 300 260')],
+  ['Gate barrier','Closed for risk ≥ 70. Only the approval stamp lifts it.',mini(gate(64,220,false,210)+sign(64,40,120,['GATE'],{z:24,stick:[64,120]}),'0 0 300 260')],
+  ['Sandbox','Where safe cards run: an isolated git worktree.',mini(sandbox(150,200,250)+box(115,180,46,{})+box(185,180,46,{hat:true}),'0 0 300 260')],
+  ['PUBLISH door','Locked for any claim without an evidence rope.',mini(door(150,236,true),'0 0 300 260')]
+];
+document.getElementById('propGrid').innerHTML=PROPS.map(([t,d,svg])=>`<figure class="who" style="margin:0">${svg}<div><b>${t}</b><p>${d}</p></div></figure>`).join('');
+const SW=[['Wash yellow','#FBDCA0'],['Sunburst pink','#F6B9A3'],['Curtain red','#C43A32'],['Card orange','#E7793B'],['Stage wood','#D58B4C'],['Ink brown','#3A2418'],['Pump teal','#2F8F9A'],['Subtitle navy','#2C2E47'],['Marquee yellow','#F5C84C'],['Risk red','#D9483B'],['Safe green','#6DB35F'],['Gap-fill gray','#B8B2AA']];
+document.getElementById('swatches').innerHTML=SW.map(([nm,h])=>`<div class="sw"><i style="background:${h}"></i><span>${nm}<br><code>${h}</code></span></div>`).join('');
+
+/* ---------- page: storyboard ---------- */
+document.getElementById('seqs').innerHTML=SEQS.map((q,si)=>{const sh=SHOTS.map((s,i)=>[s,i]).filter(([s])=>s.seq===si);const a=sh[0][0].start,last=sh[sh.length-1][0],b=last.start+last.dur;
+  return `<div class="seq" id="seq${si+1}"><div class="seq-head"><span class="chip" style="background:${q.color}">SEQ ${si+1}</span><h3>${q.name}</h3><span class="tc">${fmt(a)}–${fmt(b)} · ${b-a}s</span></div><div class="shots">${sh.map(([s,i])=>`
+  <article class="shot" id="${s.id}">
+    <button class="frame" type="button" data-i="${i}" aria-label="Play animatic from ${s.id}">${FRAMES[i]}<span class="hint">▶ play from here</span></button>
+    <div class="shot-meta"><span class="id">${s.id}</span><span>${fmt(s.start)}–${fmt(s.start+s.dur)}</span><span class="dur">${s.dur}s</span><span>${esc(s.cam)}</span></div>
+    <dl>
+      <dt>Action</dt><dd>${esc(s.action)}</dd>
+      <dt>Line</dt><dd class="line">${esc(s.ko)}<small>${esc(s.en)}</small></dd>
+      <dt>Sound</dt><dd>${esc(s.sfx)}</dd>
+      <dt>Animate</dt><dd>${esc(s.anim)}</dd>
+    </dl>
+  </article>`).join('')}</div></div>`}).join('');
+document.getElementById('seqs').addEventListener('click',e=>{const b=e.target.closest('.frame');if(b)openPlayer(+b.dataset.i)});
+
+/* ---------- animatic player ---------- */
+const reduce=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+const player=document.getElementById('player'),screen=document.getElementById('pScreen'),prog=document.getElementById('pProg'),head=document.getElementById('pHead'),btnPlay=document.getElementById('pPlay'),timeEl=document.getElementById('pTime'),info=document.getElementById('pInfo');
+prog.insertAdjacentHTML('afterbegin',SHOTS.map(s=>`<i style="flex:${s.dur} 1 0;background:${SEQS[s.seq].color}"></i>`).join(''));
+const P={i:0,playing:false,t0:0,el:0,raf:0,last:null};
+function cam(){return screen.querySelector('.cam')}
+function show(i,keep){P.i=Math.max(0,Math.min(SHOTS.length-1,i));P.el=0;P.t0=performance.now();const s=SHOTS[P.i];
+  screen.innerHTML=FRAMES[P.i];
+  if(!reduce){screen.classList.add('boil');const c=cam();c.style.animation=`cam-${s.k} ${s.dur}s linear both`;c.style.animationPlayState=P.playing?'running':'paused';}
+  info.innerHTML=`<b>${s.id}</b>${esc(s.en)} <span style="color:var(--dim)">· ${esc(s.cam)}</span>`;
+  paint(s.start);}
+function paint(sec){head.style.width=(sec/TOTAL*100)+'%';timeEl.textContent=fmt(sec)+' / '+fmt(TOTAL);prog.setAttribute('aria-valuenow',Math.floor(sec));}
+function tick(now){if(!P.playing)return;const s=SHOTS[P.i],el=P.el+(now-P.t0)/1000;
+  if(el>=s.dur){if(P.i<SHOTS.length-1){show(P.i+1)}else{P.el=s.dur;pause();paint(TOTAL);return;}}else paint(s.start+el);
+  P.raf=requestAnimationFrame(tick);}
+function play(){if(P.playing)return;if(P.i===SHOTS.length-1&&P.el>=SHOTS[P.i].dur)show(0);P.playing=true;P.t0=performance.now();const c=cam();if(c)c.style.animationPlayState='running';btnPlay.textContent='Pause';P.raf=requestAnimationFrame(tick);}
+function pause(){if(!P.playing)return;P.el+=(performance.now()-P.t0)/1000;P.playing=false;cancelAnimationFrame(P.raf);const c=cam();if(c)c.style.animationPlayState='paused';btnPlay.textContent='Play';}
+function openPlayer(i){P.last=document.activeElement;player.hidden=false;document.documentElement.style.overflow='hidden';P.playing=false;show(i||0);play();document.getElementById('pClose').focus();}
+function closePlayer(){pause();player.hidden=true;screen.innerHTML='';document.documentElement.style.overflow='';if(P.last&&P.last.focus)P.last.focus();}
+function jump(i){const was=P.playing;pause();show(i);if(was)play();}
+btnPlay.addEventListener('click',()=>P.playing?pause():play());
+document.getElementById('pPrev').addEventListener('click',()=>jump(P.i-1));
+document.getElementById('pNext').addEventListener('click',()=>jump(P.i+1));
+document.getElementById('pClose').addEventListener('click',closePlayer);
+document.getElementById('playAll').addEventListener('click',()=>openPlayer(0));
+prog.addEventListener('click',e=>{const r=prog.getBoundingClientRect(),sec=(e.clientX-r.left)/r.width*TOTAL;let i=SHOTS.findIndex(s=>sec<s.start+s.dur);if(i<0)i=SHOTS.length-1;jump(i)});
+document.addEventListener('keydown',e=>{if(player.hidden)return;
+  if(e.key==='Escape'){e.preventDefault();closePlayer()}
+  else if(e.key===' '&&e.target.tagName!=='BUTTON'){e.preventDefault();P.playing?pause():play()}
+  else if(e.key==='ArrowRight'){e.preventDefault();jump(P.i+1)}
+  else if(e.key==='ArrowLeft'){e.preventDefault();jump(P.i-1)}
+  else if(e.key==='Tab'){const f=[...player.querySelectorAll('button,[tabindex="0"]')];const a=f.indexOf(document.activeElement);if(e.shiftKey&&a<=0){e.preventDefault();f[f.length-1].focus()}else if(!e.shiftKey&&a===f.length-1){e.preventDefault();f[0].focus()}}});
+})();
+</script>
