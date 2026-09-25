@@ -84,6 +84,7 @@ scene(72, 106, (R, s) => {
             [99.5, "배경과 앵글이 달라도, 같은 사람", "Different scenes and angles, same person"]];
   s.cite = [[72, "Higgsfield Soul ID · Kling 3.0 Elements"]];
   chapter(R, "CHAPTER 03", "사람(캐릭터) 일관성 유지");
+  R.style.wordBreak = "keep-all";
 
   // ============ A · gag: three generated shots, three different Noas (72–81.9)
   const gag = el("div", "left:0;top:0;width:1920px;height:1080px;transform-origin:960px 560px", "", R); gag.className = "abs";
@@ -91,7 +92,7 @@ scene(72, 106, (R, s) => {
   const board = c03_box(gag, 120, 262, 1680, 372, "#e8c48f", "background-image:radial-gradient(rgba(120,70,30,.18) 2px,transparent 2.5px);background-size:22px 22px");
   const wanted = el("div", `left:760px;top:574px;z-index:37;padding:4px 22px 6px;border:4px solid ${c03_INK};border-radius:10px;background:#fffaf0;font-size:30px;color:#c8372d;white-space:nowrap`, "WANTED · 진짜 노아는?", gag); wanted.className = "abs";
   const shots = GAG.map(([pal, v], i) => {
-    const f = c03_frame(gag, 150 + i * 560, 300, 500, 290, c03_PAL[pal], `AI SHOT ${i + 1}`, v);
+    const f = c03_frame(gag, 150 + i * 560, 300, 500, 290, c03_PAL[pal], `AI 생성 컷 ${i + 1}`, v);
     f.st = c03_stamp(gag, 150 + i * 560 + 250, 528, "✗ 다른 얼굴", "#c8372d", -10 + i * 5);
     el("div", `position:absolute;left:236px;top:6px;width:26px;height:26px;border-radius:50%;background:#c8372d;border:3px solid ${c03_INK};z-index:37;box-shadow:2px 3px 0 rgba(43,35,32,.3)`, "", f);
     el("div", `position:absolute;right:12px;top:10px;z-index:35;padding:0 12px;border:3px solid ${c03_INK};border-radius:8px;background:#fbd9d3;font-size:22px;color:${c03_INK}`, ["털 색 ✗", "안경 ✗", "머리·털 ✗"][i], f);
@@ -118,7 +119,7 @@ scene(72, 106, (R, s) => {
   // ============ B · character sheet drawn stroke by stroke (82–86.6)
   const SX = 130, SY = 228, PW = 280, PH = 380;
   const sheet = c03_box(R, SX, SY, 1270, 600, "#fffaf0", `background-image:linear-gradient(#e9dcc0 2px,transparent 2px),linear-gradient(90deg,#e9dcc0 2px,transparent 2px);background-size:40px 40px`);
-  el("div", `position:absolute;left:26px;top:12px;font-size:28px;letter-spacing:3px;color:#c8372d`, "CHARACTER SHEET · NOA", sheet);
+  el("div", `position:absolute;left:26px;top:12px;font-size:28px;letter-spacing:3px;color:#c8372d`, "캐릭터 시트 · 노아 <span style='font-size:22px;color:#6b5d52'>CHARACTER SHEET</span>", sheet);
   const VIEWS = [["정면", "FRONT"], ["3/4", "THREE-QUARTER"], ["측면", "SIDE"], ["클로즈업", "CLOSE-UP"]];
   const panels = VIEWS.map((v, i) => {
     const p = el("div", `position:absolute;left:${26 + i * 306}px;top:62px;width:${PW}px;height:${PH}px;border-radius:12px;overflow:hidden;background:${["#fbe3b0", "#d8eef7", "#e4f2d6", "#fbd9d3"][i]}`, "", sheet);
@@ -167,9 +168,9 @@ scene(72, 106, (R, s) => {
     return d;
   });
   const cnt = c03_box(R, 150, 800, 250, 66, "#fffaf0", "display:grid;place-items:center;font-size:32px;color:#2b2320");
-  const train = c03_box(R, 420, 800, 300, 66, "#fffaf0", "overflow:hidden");
+  const train = c03_box(R, 420, 800, 340, 66, "#fffaf0", "overflow:hidden");
   const trainFill = el("div", "position:absolute;left:0;top:0;bottom:0;width:0;background:repeating-linear-gradient(-45deg,#f7d774 0 18px,#f2c14e 18px 36px)", "", train);
-  const trainTx = el("div", "position:absolute;left:70px;top:10px;font-size:30px;color:#2b2320;white-space:nowrap", "학습 중 · 3~5분", train);
+  const trainTx = el("div", "position:absolute;left:70px;top:11px;font-size:28px;color:#2b2320;white-space:nowrap", "학습 중 · 3~5분", train);
   const clock = el("div", "position:absolute;left:14px;top:5px", `<svg width="54" height="54"><circle cx="27" cy="27" r="22" fill="#fff" stroke="${c03_INK}" stroke-width="4"/><path class="hd" d="M27 27 V11" stroke="${c03_INK}" stroke-width="4" stroke-linecap="round"/><path class="hd2" d="M27 27 H38" stroke="#c8372d" stroke-width="4" stroke-linecap="round"/></svg>`, train);
   const hands = [clock.querySelector(".hd"), clock.querySelector(".hd2")];
   // the Soul ID card (later becomes the Reference Element)
@@ -183,14 +184,14 @@ scene(72, 106, (R, s) => {
     <div class="rt" style="position:absolute;left:150px;top:-34px;padding:4px 18px;border:4px solid ${c03_INK};border-radius:12px;background:#9fd3f0;font-size:28px;color:${c03_INK};white-space:nowrap;opacity:0">Reference Element</div>`;
   const cNoa = makeNoa(150); card.querySelector(".ph").appendChild(cNoa);
   const cardRt = card.querySelector(".rt");
-  const saved = c03_stamp(card, 300, 222, "SAVED ✓", "#2f9e5a", -8);
+  const saved = c03_stamp(card, 300, 222, "저장 완료 ✓", "#2f9e5a", -8);
 
   // ============ D · Reference Element → Kling / Seedance (91–95)
   const MACH = [["Kling 3.0", "#9fd3f0", 600, "park"], ["Seedance 2.0", "#f7b6c8", 1030, "sunset"]].map(([nm, col, x, pal], i) => {
     const m = c03_box(R, x, 236, 360, 580, col, "overflow:visible");
     m.innerHTML = `<div style="position:absolute;left:120px;top:-22px;width:120px;height:26px;border:4px solid ${c03_INK};border-radius:8px;background:#fffaf0"></div>
       <div style="position:absolute;left:24px;top:22px;font-size:40px;color:${c03_INK}">${nm}</div>
-      <div style="position:absolute;left:24px;top:72px;font-size:22px;color:#4b3f3a">VIDEO MODEL</div>
+      <div style="position:absolute;left:24px;top:72px;font-size:22px;color:#4b3f3a">영상 생성 모델</div>
       <svg class="gear" style="position:absolute;right:18px;top:26px" width="70" height="70" viewBox="-35 -35 70 70"><g class="g">
         ${Array.from({ length: 8 }, (_, k) => `<rect x="-7" y="-33" width="14" height="14" rx="3" fill="#f7d774" stroke="${c03_INK}" stroke-width="3" transform="rotate(${k * 45})"/>`).join("")}
         <circle r="23" fill="#f7d774" stroke="${c03_INK}" stroke-width="4"/><circle r="8" fill="#fffaf0" stroke="${c03_INK}" stroke-width="3"/></g></svg>
@@ -242,26 +243,26 @@ scene(72, 106, (R, s) => {
     <rect x="10" y="20" width="110" height="112" rx="20" fill="#fff" stroke="${c03_INK}" stroke-width="5"/>
     ${[[38, 48], [92, 48], [65, 76], [38, 104], [92, 104]].map(([x, y]) => `<circle cx="${x}" cy="${y}" r="8" fill="${c03_INK}"/>`).join("")}
     <path d="M120 70 L150 58" stroke="${c03_INK}" stroke-width="6" stroke-linecap="round"/></svg>`, tugP);
-  const diceL = el("div", `position:absolute;left:30px;top:440px;width:230px;text-align:center;font-size:30px;color:${c03_INK};line-height:1.2`, "SEED<br><span style='font-size:24px;color:#6b5d52'>약한 신호</span>", tugP);
+  const diceL = el("div", `position:absolute;left:30px;top:440px;width:230px;text-align:center;font-size:30px;color:${c03_INK};line-height:1.2`, "시드<br><span style='font-size:24px;color:#6b5d52'>약한 신호 · seed</span>", tugP);
   const frameC = el("div", `position:absolute;left:376px;top:196px;width:136px;height:170px;border:6px solid ${c03_INK};border-radius:10px;background:#f7d774;transform-origin:50% 100%`, "", tugP);
   const frameIn = el("div", `position:absolute;left:10px;top:10px;right:10px;bottom:10px;border:3px solid ${c03_INK};background:#d8eef7;overflow:hidden`, "", frameC);
   const fNoa = makeNoa(96); frameIn.appendChild(fNoa);
-  const frameL = el("div", `position:absolute;left:350px;top:440px;width:240px;text-align:center;font-size:30px;color:${c03_INK};line-height:1.2`, "REFERENCE<br><span style='font-size:24px;color:#6b5d52'>강한 신호</span>", tugP);
-  const win = el("div", `position:absolute;left:360px;top:96px;padding:4px 20px;border:4px solid ${c03_INK};border-radius:14px;background:#f7d774;font-size:40px;color:#c8372d;z-index:5`, "WIN!", tugP);
+  const frameL = el("div", `position:absolute;left:350px;top:440px;width:240px;text-align:center;font-size:30px;color:${c03_INK};line-height:1.2`, "레퍼런스<br><span style='font-size:24px;color:#6b5d52'>강한 신호 · reference</span>", tugP);
+  const win = el("div", `position:absolute;left:360px;top:96px;padding:4px 20px;border:4px solid ${c03_INK};border-radius:14px;background:#f7d774;font-size:40px;color:#c8372d;z-index:5`, "승리!", tugP);
   const conf = Array.from({ length: 14 }, (_, i) => el("div", `position:absolute;left:0;top:0;width:14px;height:22px;border:2px solid ${c03_INK};border-radius:3px;background:${["#c8372d", "#f7d774", "#9fd3f0", "#bfe3a6"][i % 4]}`, "", tugP));
 
   // ============ F · result: the same Noa in three scenes (99.5–106)
   const res = el("div", "left:0;top:0;width:1920px;height:1080px;transform-origin:960px 480px", "", R); res.className = "abs";
   const oks = [["beach", "해변 · 롱숏"], ["park", "공원 · 클로즈업"], ["sunset", "노을 · 측면"]].map(([pal, lb], i) => {
     const f = c03_frame(res, 150 + i * 560, 250, 500, 300, c03_PAL[pal], lb);
-    f.st = c03_stamp(res, 150 + i * 560 + 250, 470, "✓ SAME NOA", "#2f9e5a", -8 + i * 6);
+    f.st = c03_stamp(res, 150 + i * 560 + 250, 470, "✓ 같은 노아", "#2f9e5a", -8 + i * 6);
     return f;
   });
   const idBadge = c03_box(res, 150, 640, 420, 110, "#fff4d0", "display:flex;align-items:center;gap:16px;padding:0 20px");
   idBadge.innerHTML = `<div style="width:66px;height:66px;border-radius:50%;border:4px solid ${c03_INK};background:#bfe3a6;display:grid;place-items:center;font-size:40px">✓</div>
     <div style="line-height:1.15"><div style="font-size:24px;letter-spacing:2px;color:#c8372d">SOUL ID · NOA</div><div style="font-size:30px;color:${c03_INK}">3개 장면, 1개 얼굴</div></div>`;
   const before = c03_box(res, 1300, 712, 450, 130, "#fffaf0", "overflow:hidden");
-  el("div", `position:absolute;left:14px;top:6px;font-size:22px;color:#6b5d52;z-index:40`, "BEFORE", before);
+  el("div", `position:absolute;left:14px;top:6px;font-size:22px;color:#6b5d52;z-index:40`, "이전 결과", before);
   const bNoas = GAG.map(([, v], i) => { const n = makeNoa(88, v); before.appendChild(n); return n; });
   const bX = el("div", `position:absolute;left:0;top:0;width:450px;height:130px;z-index:41`, `<svg width="450" height="130"><path class="x" d="M110 20 L400 118 M400 20 L110 118" stroke="#c8372d" stroke-width="8" stroke-linecap="round" fill="none" stroke-dasharray="320" stroke-dashoffset="320"/></svg>`, before);
   const bXp = bX.querySelector(".x");
@@ -373,7 +374,7 @@ scene(72, 106, (R, s) => {
       d.style.transform = `translate(${x}px, ${y}px) rotate(${lerp(-30, d.rot, p) * (1 - conv)}deg) scale(${(.35 + .65 * p) * (1 - .7 * conv)})`;
       poseNoa(d.n, t, { x: 1, y: 8, s: d.ns, look: d.look, flip: d.flip });
     });
-    cnt.innerHTML = `사진 <span style="color:#c8372d;font-size:40px">&nbsp;${Math.min(20, shot)}${shot >= 20 ? "+" : ""}&nbsp;</span>장`;
+    cnt.innerHTML = `사진 <span style="color:#c8372d;font-size:40px">&nbsp;${Math.min(20, shot)}</span>장${shot >= 20 ? "+" : ""}`;
     const cIn = back(seg(t, 86.8, 87.2));
     cnt.style.opacity = clamp(cIn * 2) * (1 - bOut); cnt.style.transform = `scale(${.6 + .4 * cIn}) rotate(-2deg)`;
     const tIn = back(seg(t, 88.4, 88.8)), tp = ease(seg(t, 88.7, 89.7));

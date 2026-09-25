@@ -66,6 +66,7 @@ scene(106, 134, (R, s) => {
             [125, "④ 부드러운 애니메이션은 Opus에게 코드로", "4. Ask Opus to write the animation code"]];
   s.cite = [[106, "Google mobile speed research"], [119, "Wyzowl Video Marketing Statistics 2026"], [125, "Anthropic · Introducing Claude Opus 5"]];
   chapter(R, "CHAPTER 04", "몰입감 만들기");
+  R.style.wordBreak = "keep-all";
   const beat = () => { const b = el("div", "left:0;top:0;width:1920px;height:1080px", "", R); b.className = "abs"; return b; };
   const BA = beat(), BB = beat(), BC = beat(), BD = beat();
   // paper-strip wipe that sweeps between beats
@@ -109,7 +110,7 @@ scene(106, 134, (R, s) => {
   const pct = el("div", `position:absolute;left:470px;top:6px;font-size:54px;color:#c8372d;white-space:nowrap`, "", room);
   el("div", `position:absolute;left:0;right:0;top:330px;bottom:0;background:#e9dcc0;border-top:4px solid ${c04_INK}`, "", room);
   el("div", `position:absolute;left:600px;top:110px;width:110px;height:224px;border:5px solid ${c04_INK};border-bottom:0;border-radius:10px 10px 0 0;background:#bfe3a6`, "", room);
-  el("div", `position:absolute;left:612px;top:80px;padding:0 10px;border:3px solid ${c04_INK};border-radius:8px;background:#c8372d;color:#fff;font-size:22px`, "EXIT", room);
+  el("div", `position:absolute;left:612px;top:80px;padding:0 10px;border:3px solid ${c04_INK};border-radius:8px;background:#c8372d;color:#fff;font-size:22px`, "출구", room);
   const door = el("div", `position:absolute;left:605px;top:115px;width:100px;height:219px;background:#e0a64f;border:4px solid ${c04_INK};transform-origin:0 50%`, `<div style="position:absolute;right:12px;top:100px;width:14px;height:14px;border-radius:50%;background:#f7d774;border:3px solid ${c04_INK}"></div>`, room);
   const COLS = ["#9fd3f0", "#f2a7a0", "#bfe3a6", "#f7d774", "#cdbff3"];
   const order = Array.from({ length: 20 }, (_, i) => i).sort((a, b) => c04_hash(a, 3) - c04_hash(b, 3));
@@ -135,7 +136,7 @@ scene(106, 134, (R, s) => {
   const tapNoa = makeNoa(120); BA.appendChild(tapNoa);
   const tapSg = tapNoa.querySelector(".sg");
   const shades = el("div", "left:0;top:0;z-index:38", `<svg width="90" height="34" viewBox="60 82 80 34"><g fill="#211c1b" stroke="${c04_INK}" stroke-width="3.5" stroke-linejoin="round"><path d="M66 86 H95 Q99 86 98 92 L96 103 Q94 110 87 110 H75 Q68 110 67 103 L64 92 Q63 86 66 86Z"/><path d="M104 86 H133 Q137 86 136 92 L134 103 Q132 110 125 110 H113 Q106 110 105 103 L102 92 Q101 86 104 86Z"/></g><path d="M97 91 Q101 87 105 91" stroke="${c04_INK}" stroke-width="4" fill="none"/></svg>`, BA); shades.className = "abs";
-  const whoosh = el("div", `left:1300px;top:600px;font-size:34px;color:#c8372d;z-index:38;white-space:nowrap`, "5초…!!", BA); whoosh.className = "abs";
+  const whoosh = el("div", `left:1560px;top:586px;font-size:36px;color:#c8372d;z-index:38;white-space:nowrap`, "5초…!!", BA); whoosh.className = "abs";
   const tapB = makeBubble(BA);
 
   // ============ B · scroll → something moves (112.5–119)
@@ -150,7 +151,7 @@ scene(106, 134, (R, s) => {
   L.near = el("div", `position:absolute;left:-40px;top:0;width:${SW + 80}px;height:260px`, `<svg width="${SW + 80}" height="260" viewBox="0 0 424 260"><path d="M0 70 Q90 10 190 60 T424 40 V260 H0Z" fill="#94d07c" stroke="${c04_INK}" stroke-width="4"/></svg>`, scr);
   L.words = ["이야기가", "브랜드가", "되는 곳"].map((w, i) => el("div", `position:absolute;left:${24 + i * 22}px;top:0;font-size:46px;color:${c04_INK};white-space:nowrap;text-shadow:3px 3px 0 #fff`, w, scr));
   L.sec = el("div", `position:absolute;left:0;top:0;width:${SW}px;height:900px;background:#fffaf0;border-top:4px solid ${c04_INK}`, "", scr);
-  el("div", `position:absolute;left:22px;top:22px;font-size:30px;color:${c04_INK}`, "우리의 작업", L.sec);
+  el("div", `position:absolute;left:22px;top:22px;font-size:30px;color:${c04_INK}`, "작업 사례", L.sec);
   L.cards = [0, 1, 2].map(i => {
     const c = el("div", `position:absolute;left:${22 + (i % 2) * 156}px;top:${70 + Math.floor(i / 2) * 170}px;width:140px;height:150px;border:4px solid ${c04_INK};border-radius:14px;overflow:hidden;background:#fff`, "", L.sec);
     const sc = c04_scape([c04_PARK, c04_SUNSET, c04_LILAC][i]); sc.style.height = "96px"; sc.style.bottom = "auto"; c.appendChild(sc);
@@ -204,7 +205,7 @@ scene(106, 134, (R, s) => {
     <circle cx="160" cy="160" r="94" fill="none" stroke="${c04_INK}" stroke-width="3"/><circle cx="160" cy="160" r="126" fill="none" stroke="${c04_INK}" stroke-width="3"/></svg>
     <div class="n" style="position:absolute;left:0;right:0;top:112px;text-align:center;font-size:92px;color:#c8372d;line-height:1">0%</div>`, BC); ring.className = "abs";
   const arc = ring.querySelector(".arc"), ringN = ring.querySelector(".n");
-  const ringL = el("div", `left:1110px;top:570px;width:680px;text-align:center;font-size:34px;color:${c04_INK};line-height:1.25`, "영상을 보고 구매를 결심한 적 있다<br><span style='font-size:24px;color:#6b5d52'>Wyzowl · 2026</span>", BC); ringL.className = "abs";
+  const ringL = el("div", `left:1110px;top:570px;width:680px;text-align:center;font-size:34px;color:${c04_INK};line-height:1.25`, "영상을 보고 구매를 결심한 적이 있다<br><span style='font-size:24px;color:#6b5d52'>Wyzowl · 2026</span>", BC); ringL.className = "abs";
   const crowd = Array.from({ length: 20 }, (_, i) => {
     const d = el("div", `left:${1150 + (i % 10) * 62}px;top:${700 + Math.floor(i / 10) * 76}px`, c04_person("#e9dcc0") + `<div class="bag" style="position:absolute;left:30px;top:30px;width:22px;height:24px;border:3px solid ${c04_INK};border-radius:4px;background:#f7d774;opacity:0"></div>`, BC);
     d.className = "abs"; d.body = d.querySelector("rect"); d.bag = d.querySelector(".bag"); return d;
@@ -242,7 +243,7 @@ scene(106, 134, (R, s) => {
   const pC = el("div", `position:absolute;left:44px;top:220px;padding:12px 30px;border:4px solid ${c04_INK};border-radius:999px;background:#c8372d;color:#fff;font-size:34px;z-index:34;box-shadow:5px 6px 0 rgba(43,35,32,.25)`, "지금 시작하기 →", pvw);
   const pNoa = makeNoa(130); pvw.appendChild(pNoa);
   const sparks = [0, 1, 2, 3, 4].map(i => { const d = el("div", `position:absolute;left:0;top:0;font-size:40px;color:#f2a24e;z-index:36`, "✦", pvw); return d; });
-  const badge = el("div", `left:1230px;top:650px;z-index:37;padding:6px 20px 8px;border:5px solid #3e8fb8;border-radius:14px;background:rgba(255,250,240,.95);color:#3e8fb8;font-size:32px;white-space:nowrap`, "ANIMATED IN CODE · CLAUDE", BD); badge.className = "abs";
+  const badge = el("div", `left:1230px;top:650px;z-index:37;padding:6px 20px 8px;border:5px solid #3e8fb8;border-radius:14px;background:rgba(255,250,240,.95);color:#3e8fb8;font-size:32px;white-space:nowrap`, "Claude가 코드로 만든 움직임 <span style='font-size:22px'>ANIMATED IN CODE</span>", BD); badge.className = "abs";
   const proud = makeNoa(190); BD.appendChild(proud);
   const pb2 = makeBubble(BD);
 

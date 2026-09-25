@@ -32,7 +32,7 @@ scene(184, 192, (R, s) => {
   const chips = CH.map(([c, bg], i) => el("div", `padding:6px 18px 8px;font-size:30px;white-space:nowrap;${c07_card(bg, 999)};box-shadow:4px 5px 0 rgba(43,35,32,.22)`, c, chipRow));
   // URL marquee with light bulbs
   const NB = 26;
-  const mq = c07_abs(`left:510px;top:410px;width:900px;height:110px;${c07_card("#c8372d", 22)};z-index:6`, `
+  const mq = c07_abs(`left:510px;top:386px;width:900px;height:110px;${c07_card("#c8372d", 22)};z-index:6`, `
     <div style="position:absolute;left:18px;top:14px;right:18px;bottom:14px;border-radius:14px;background:#fffaf0;border:3px solid ${INK};display:flex;align-items:center;justify-content:center;font-size:54px;white-space:nowrap">
       <span>noainostory</span><span style="color:#d4623a">.higgsfield.app</span></div>
     ${Array.from({ length: NB }, (_, i) => { const k = i < 11 ? [40 + i * 82, 7] : i < 13 ? [893, 30 + (i - 11) * 50] : i < 24 ? [860 - (i - 13) * 82, 103] : [7, 80 - (i - 24) * 50];
@@ -40,8 +40,11 @@ scene(184, 192, (R, s) => {
   const bulbs = [...mq.querySelectorAll(".bulb")];
   // cast: Noa in the middle, extras either side
   const noa = makeNoa(260); R.appendChild(noa);
-  const EX = [[{ party: true, scarf: null }, 380, -1], [{ glasses: true }, 590, -1], [{ party: true, scarf: null }, 1170, 1], [{ spiky: true }, 1380, 1]]
-    .map(([v, x, from]) => { const n = makeNoa(160, v); R.appendChild(n); return { n, x, from }; });
+  const EX = [[380, -1, 170], [590, -1, 350], [1170, 1, 1400], [1380, 1, 1580]]
+    .map(([x, from, side]) => { const n = makeNoa(160, { party: true, scarf: null }); R.appendChild(n); return { n, x, from, side }; });
+  const puff = c07_abs("left:0;top:0;width:0;height:0;z-index:35", Array.from({ length: 8 }, (_, i) => `<div style="position:absolute;left:-26px;top:-26px;width:52px;height:52px;border-radius:50%;background:#fffaf0;border:3px solid ${INK}"></div>`).join(""), R);
+  const puffs = [...puff.children];
+  const spark = c07_abs("left:0;top:0;width:60px;height:60px;z-index:34", `<svg width="60" height="60" viewBox="-30 -30 60 60"><path d="M0 -28 L7 -7 L28 0 L7 7 L0 28 L-7 7 L-28 0 L-7 -7 Z" fill="#f7d774" stroke="${INK}" stroke-width="3" stroke-linejoin="round"/></svg>`, R);
   const bub = makeBubble(R);
   // flowers tossed onto the stage
   const roses = [0, 1, 2].map(i => c07_abs("left:0;top:0;width:60px;height:60px;z-index:32", `<svg width="60" height="60" viewBox="-30 -30 60 60">
@@ -70,20 +73,30 @@ scene(184, 192, (R, s) => {
     // cast: walk in, line up, bow twice
     const bowAt = (tt, d) => { const a = seg(t, tt, tt + .35), z = seg(t, tt + .35 + d, tt + .75 + d); return ease(a) * (1 - ease(z)); };
     const nIn = out(seg(t, 184.5, 185.2));
-    const bowN = Math.max(bowAt(188.0, .45), bowAt(189.55, .5));
-    poseNoa(noa, t, { x: 830, y: 622 + 300 * (1 - nIn), s: 1, talk: t > 186.9 && t < 187.9, wave: t > 185.3 && t < 186.8, hop: t > 185.2 && t < 185.9 ? (t - 185.2) / .7 : 0, op: nIn });
-    c07_bow(noa, bowN);
-    EX.forEach(({ n, x, from }, i) => {
+    // Noa: wave, lower the sunglasses + wink, then poof away so the 3D bow owns centre stage (187–190), then pop back
+    const gone = seg(t, 186.85, 187.1) * (1 - seg(t, 190.05, 190.3)), back2 = back(seg(t, 190.05, 190.45));
+    const winkP = seg(t, 185.9, 186.15) * (1 - seg(t, 186.6, 186.8));
+    poseNoa(noa, t, { x: 830, y: 622 + 300 * (1 - nIn), s: t > 190 ? Math.max(.01, back2) : Math.max(.01, 1 - gone), talk: t > 186.1 && t < 186.7,
+      wave: (t > 185.3 && t < 185.9) || t > 190.4, hop: t > 185.2 && t < 185.9 ? (t - 185.2) / .7 : 0, blink: winkP < .5, op: gone >= 1 && t < 190.05 ? 0 : nIn });
+    if (noa.P.sg) noa.P.sg.setAttribute("transform", `translate(0 ${18 * ease(winkP)})`);
+    if (winkP > .5) { noa.P.e1.setAttribute("d", "M69 99 Q80 88 91 99"); noa.P.e2.setAttribute("d", "M110 99 Q120 106 130 99"); }
+    const sp = seg(t, 186.2, 186.7);
+    spark.style.opacity = sp > 0 && sp < 1 ? Math.sin(sp * Math.PI) : 0; spark.style.transform = `translate(${830 + 190}px, ${720}px) scale(${0.4 + sp}) rotate(${sp * 180}deg)`;
+    const pf = t > 186.85 && t < 187.45 ? seg(t, 186.85, 187.45) : t > 190.05 && t < 190.65 ? seg(t, 190.05, 190.65) : -1;
+    puffs.forEach((e, i) => { const a = i / 8 * 6.283, d = 30 + 110 * out(clamp(pf));
+      e.style.opacity = pf < 0 ? 0 : 1 - pf; e.style.transform = `translate(${960 + Math.cos(a) * d}px, ${780 + Math.sin(a) * d * .6}px) scale(${1 - .6 * clamp(pf)})`; });
+    EX.forEach(({ n, x, from, side }, i) => {
       const a = 184.7 + i * .15, w = ease(seg(t, a, a + 1.1)), walking = t > a && t < a + 1.1;
-      const xx = lerp(x + from * 700, x, w);
+      const st = ease(seg(t, 186.9 + i * .05, 187.4 + i * .05));
+      const xx = lerp(lerp(x + from * 700, x, w), side, st);
       const bw = Math.max(bowAt(188.0 + (i < 2 ? (1 - i) : i - 2) * .09 + .05, .45), bowAt(189.55 + .06 * i, .5));
-      poseNoa(n, t + i * .3, { x: xx, y: 722, s: 1, look: -from * .5, flip: from > 0 && walking, hop: walking ? ((t - a) * 3.2) % 1 : (t > 186.8 && t < 187.6 ? (t - 186.8) / .8 : 0), wave: t > 190.2 && i % 2 === 0, op: seg(t, a, a + .2) });
+      poseNoa(n, t + i * .3, { x: xx, y: 722, s: 1, look: -from * .5, flip: from > 0 && walking, hop: walking ? ((t - a) * 3.2) % 1 : (t > 186.9 && t < 187.5 ? (t - 186.9) / .6 : 0), wave: t > 190.2 && i % 2 === 0, op: seg(t, a, a + .2) });
       c07_bow(n, bw);
     });
-    sayBubble(bub, t, 186.9, 188.0, "고마워요! 🙇", 1070, 600);
+    sayBubble(bub, t, 185.95, 186.85, "고마워요! 😎", 1070, 600);
     // roses land at the cast's feet
     roses.forEach((r, i) => {
-      const a = 188.3 + i * .22, p = seg(t, a, a + .7), tx = [770, 1130, 1150][i], sx = [300, 1650, 1500][i];
+      const a = 188.3 + i * .22, p = seg(t, a, a + .7), tx = [300, 1500, 1680][i], sx = [700, 1200, 1300][i];
       const x = lerp(sx, tx, p), y = lerp(960, 850, p) - 360 * 4 * p * (1 - p);
       r.style.opacity = t > a ? 1 : 0; r.style.transform = `translate(${x - 30}px, ${y - 30}px) rotate(${(1 - p) * 540 + [20, -30, 60][i]}deg)`;
     });
