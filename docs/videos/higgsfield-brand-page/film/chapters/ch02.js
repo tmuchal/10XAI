@@ -104,7 +104,7 @@ scene(40, 72, (R, s) => {
 
   // ================= story road (46–53) =================
   const ST = [[230, 818], [560, 806], [835, 690], [600, 575], [320, 470], [590, 330]];
-  const road = c02_road([[140, 824], ...ST, [720, 300]]);
+  const road = c02_road([[180, 824], ...ST, [720, 300]]);
   const U = i => i + 1; // station i sits at point index i+1
   const roadEl = el("div", "left:0;top:0;width:1000px;height:900px;z-index:3", `<svg width="1000" height="900" overflow="visible">
     <path class="r0" d="${road.d}" fill="none" stroke="${INK2}" stroke-width="66" stroke-linecap="round"/>
@@ -113,7 +113,7 @@ scene(40, 72, (R, s) => {
   const rPaths = ["r0", "r1", "r2"].map(c => roadEl.querySelector("." + c));
   // stations: numbered badge + label, plus a prop
   const LBL = [["주인공", "Hero"], ["문제", "Problem"], ["가이드", "Guide"], ["계획", "Plan"], ["행동", "Action"], ["성공", "Success"]];
-  const LPOS = [[130, 568], [470, 640], [790, 430], [560, 420], [140, 290], [740, 250]];
+  const LPOS = [[175, 568], [470, 640], [790, 430], [560, 420], [175, 290], [740, 250]];
   const stations = ST.map((p, i) => {
     const d = el("div", `left:${LPOS[i][0]}px;top:${LPOS[i][1]}px;z-index:20;white-space:nowrap;display:flex;align-items:center;gap:8px;padding:4px 14px 6px 6px;background:#fffaf0;border:3px solid ${INK2};border-radius:999px;box-shadow:4px 5px 0 rgba(43,35,32,.2);transform-origin:20% 100%`,
       `<span style="display:grid;place-items:center;width:40px;height:40px;border-radius:50%;background:${C02_COL[i]};border:3px solid ${INK2};font-size:24px">${i + 1}</span><span style="font-size:30px">${LBL[i][0]}</span><span style="font-size:22px;color:#6b5d52">${LBL[i][1]}</span>`, cam);
@@ -147,7 +147,7 @@ scene(40, 72, (R, s) => {
   });
 
   // ================= page wireframe (right) =================
-  const WX = 1060, WY = 170, WW = 720, WH = 690;
+  const WX = 1030, WY = 170, WW = 720, WH = 690;
   const wire = el("div", `left:${WX}px;top:${WY}px;width:${WW}px;height:${WH}px;word-break:keep-all;background:#fffaf0;border:4px solid ${INK2};border-radius:18px;overflow:hidden;box-shadow:9px 11px 0 rgba(43,35,32,.22);z-index:8;transform-origin:50% 50%`, `
     <div style="height:48px;background:#f6d9a0;border-bottom:4px solid ${INK2};display:flex;align-items:center;gap:9px;padding:0 16px">
       <i style="width:13px;height:13px;border-radius:50%;background:#ff5f57;border:2px solid ${INK2}"></i><i style="width:13px;height:13px;border-radius:50%;background:#febc2e;border:2px solid ${INK2}"></i><i style="width:13px;height:13px;border-radius:50%;background:#28c840;border:2px solid ${INK2}"></i>
@@ -155,19 +155,34 @@ scene(40, 72, (R, s) => {
     <div class="vp" style="position:absolute;left:0;right:0;top:52px;bottom:0;overflow:hidden"><div class="inner" style="position:absolute;left:0;right:0;top:0;padding:14px 18px"></div></div>
     <div class="sb" style="position:absolute;right:6px;top:60px;width:10px;height:120px;border-radius:5px;background:#6b5d52;opacity:.5"></div>`, cam); wire.className = "abs";
   const inner = wire.querySelector(".inner"), sbar = wire.querySelector(".sb");
-  const ROWS = [["HERO", 140, `<div class="h1" style="font-size:38px;position:relative;white-space:nowrap">우리 회사는 업계 최고!<svg class="strike" width="400" height="30" style="position:absolute;left:-6px;top:14px" overflow="visible"><path d="M0 16 Q100 4 200 14 T400 10" stroke="#c8372d" stroke-width="7" fill="none" stroke-linecap="round" stroke-dasharray="420" stroke-dashoffset="420"/></svg></div><div class="h2" style="font-size:40px;color:#c8372d;white-space:nowrap"></div>`],
-    ["PROBLEM", 76, `<span style="font-size:26px">"이런 게 불편하셨죠?"</span>`],
-    ["GUIDE", 76, `<span style="font-size:26px">후기 128 · 경력 7년 · ★4.6</span>`],
-    ["PLAN", 76, ["상담", "제작", "오픈"].map((x, k) => `<span style="font-size:24px;padding:2px 12px;border:3px solid ${INK2};border-radius:999px;background:#fffaf0;margin-right:8px">${k + 1} ${x}</span>`).join("")],
-    ["CTA", 76, `<span class="cta" style="font-size:26px;padding:4px 18px 6px;border:3px solid ${INK2};border-radius:999px;background:#c8372d;color:#fffaf0">지금 상담 예약 →</span>`],
-    ["SUCCESS", 76, `<span style="font-size:26px">"문의가 두 배가 됐어요" ★★★★★</span>`]];
-  const rows = ROWS.map((r, i) => {
-    const d = el("div", `position:relative;height:${r[1]}px;margin-bottom:10px;border:3px solid ${INK2};border-radius:12px;background:#f3ead8;display:flex;align-items:center;gap:14px;padding:0 16px;transform-origin:0 50%`,
-      `<span class="bd" style="flex:none;display:grid;place-items:center;width:40px;height:40px;border-radius:50%;background:${C02_COL[i]};border:3px solid ${INK2};font-size:24px">${i + 1}</span>
-       <span style="flex:none;width:122px;font-size:22px;white-space:nowrap;color:#6b5d52">${r[0]}</span><div style="flex:1;min-width:0">${r[2]}</div>`, inner);
+  const SECT = [["주인공", "Hero", "당신의 고민, 3일이면 끝"], ["문제", "Problem", "이런 게 불편하셨죠?"], ["가이드", "Guide", "후기 128 · 경력 7년"],
+    ["계획", "Plan", "1 상담 → 2 제작 → 3 오픈"], ["행동", "Action", "지금 상담 예약 →"], ["성공", "Success", "“문의가 두 배가 됐어요”"]];
+  const rows = SECT.map((r, i) => {
+    const d = el("div", `position:relative;height:92px;margin-bottom:10px;border:3px solid ${INK2};border-radius:12px;background:${C02_COL[i]};display:flex;align-items:center;gap:14px;padding:0 16px;white-space:nowrap`,
+      `<span class="bd" style="flex:none;display:grid;place-items:center;width:46px;height:46px;border-radius:50%;background:#fffaf0;border:3px solid ${INK2};font-size:28px">${i + 1}</span>
+       <span style="flex:none;width:110px;font-size:34px">${r[0]}</span><span style="font-size:28px;color:#4a3f38">${r[2]}</span>`, inner);
     d.bd = d.querySelector(".bd"); return d;
   });
-  const h1 = rows[0].querySelector(".h1"), h2 = rows[0].querySelector(".h2"), strike = rows[0].querySelector(".strike path");
+  // one big section card at a time (40.5–53), plus a pill strip that assembles the page
+  const sec = el("div", `left:1000px;top:196px;width:760px;height:470px;z-index:9;background:#fffaf0;border:5px solid ${INK2};border-radius:22px;overflow:hidden;box-shadow:10px 12px 0 rgba(43,35,32,.22);word-break:keep-all`, `
+    <div style="height:56px;background:#f6d9a0;border-bottom:4px solid ${INK2};display:flex;align-items:center;padding:0 20px;font-size:28px">내 페이지 설계도 · <span class="sn" style="margin-left:8px;color:#c8372d">섹션 1/6</span></div>
+    <div class="panes" style="position:absolute;left:0;right:0;top:60px;bottom:0"></div>`, cam); sec.className = "abs";
+  const secN = sec.querySelector(".sn");
+  const panes = SECT.map((r, i) => {
+    let ex = `<div style="font-size:50px;line-height:1.2">${r[2]}</div>`;
+    if (i === 0) ex = `<div class="h1" style="font-size:50px;position:relative;white-space:nowrap;display:inline-block">우리 회사는 업계 최고!<svg class="strike" width="520" height="40" style="position:absolute;left:-10px;top:24px" overflow="visible"><path d="M0 18 Q130 4 260 16 T520 10" stroke="#c8372d" stroke-width="10" fill="none" stroke-linecap="round" stroke-dasharray="560" stroke-dashoffset="560"/></svg></div><div class="h2" style="font-size:54px;color:#c8372d;white-space:nowrap"></div>`;
+    if (i === 3) ex = `<div style="display:flex;gap:14px">${["상담", "제작", "오픈"].map((x, k) => `<span class="pc" style="display:inline-block;font-size:42px;padding:6px 22px 10px;border:4px solid ${INK2};border-radius:999px;background:${C02_COL[3]}">${k + 1} ${x}</span>`).join("")}</div>`;
+    if (i === 4) ex = `<span class="cta" style="display:inline-block;font-size:46px;padding:10px 34px 14px;border:4px solid ${INK2};border-radius:999px;background:#c8372d;color:#fffaf0;box-shadow:5px 6px 0 rgba(43,35,32,.25)">지금 상담 예약 →</span>`;
+    if (i === 5) ex = `<div style="font-size:48px">“문의가 두 배가 됐어요”</div><div style="font-size:44px;color:#d98c1f">★★★★★</div>`;
+    const d = el("div", `position:absolute;inset:0;padding:30px 36px;display:none`, `
+      <div style="display:flex;align-items:center;gap:20px"><span class="bd" style="display:grid;place-items:center;width:96px;height:96px;border-radius:50%;background:${C02_COL[i]};border:5px solid ${INK2};font-size:56px">${i + 1}</span>
+        <span style="font-size:84px;line-height:1">${r[0]}</span><span style="font-size:32px;color:#6b5d52;align-self:flex-end;margin-bottom:8px">${r[1]} 섹션</span></div>
+      <div class="ex" style="margin-top:34px">${ex}</div>`, sec.querySelector(".panes"));
+    d.bd = d.querySelector(".bd"); d.ex = d.querySelector(".ex"); return d;
+  });
+  const h1 = panes[0].querySelector(".h1"), h2 = panes[0].querySelector(".h2"), strike = panes[0].querySelector(".strike path");
+  const pills = SECT.map((r, i) => { const d = el("div", `left:${1000 + i * 128}px;top:700px;width:118px;height:104px;z-index:9;border:4px solid ${INK2};border-radius:14px;background:#efe6d6;text-align:center;padding-top:6px;box-shadow:4px 5px 0 rgba(43,35,32,.18)`,
+    `<div style="display:grid;place-items:center;width:40px;height:40px;margin:0 auto;border-radius:50%;background:#fffaf0;border:3px solid ${INK2};font-size:24px">${i + 1}</div><div style="font-size:28px;white-space:nowrap">${r[0]}</div>`, cam); d.className = "abs"; return d; });
   // scroll-as-scene-change sections below the rows
   const SCN = [[PAL.dawn, "장면 1 · 새벽의 첫 컷"], [PAL.forest, "장면 2 · 숲으로 스크롤"], [PAL.sea, "장면 3 · 바다에서 CTA"]];
   const scenesF = SCN.map(([pl, lab]) => {
@@ -180,14 +195,14 @@ scene(40, 72, (R, s) => {
   const wheel = mouse.querySelector(".wh");
 
   // ================= stats (53–60) =================
-  const BASE = 790, UNIT = 1.22;
+  const BASE = 790, UNIT = 1.0;
   const bars = [[180, 100, "#d7cfc4"], [290, 162, "#f7d774"], [520, 100, "#d7cfc4"], [630, 417, "#e8894f"]].map(([x, v, c]) => {
     const d = el("div", `left:${x}px;top:${BASE}px;width:96px;height:0;z-index:10;background:${c};border:4px solid ${INK2};border-bottom:none;border-radius:10px 10px 0 0;box-shadow:6px 0 0 rgba(43,35,32,.18)`, "", cam);
     d.className = "abs"; d.v = v; return d; });
-  const baseLine = el("div", `left:150px;top:${BASE}px;width:640px;height:5px;background:${INK2};border-radius:3px;z-index:11;transform-origin:0 50%`, "", cam); baseLine.className = "abs";
-  const nums = [[338, "+62%", 62], [678, "+317%", 317]].map(([cx, txt, v]) => { const d = el("div", `left:${cx - 140}px;top:0;width:280px;text-align:center;z-index:12;font-size:78px;color:#c8372d;text-shadow:4px 4px 0 #f7d774;-webkit-text-stroke:2px ${INK2};opacity:0`, txt, cam); d.className = "abs"; d.v = v; return d; });
-  const blabels = [[288, "평균 체류시간"], [628, "스크롤 깊이"]].map(([cx, txt]) => { const d = el("div", `left:${cx - 140}px;top:${BASE + 12}px;width:280px;text-align:center;z-index:12;font-size:30px;opacity:0`, txt, cam); d.className = "abs"; return d; });
-  const legend = el("div", `left:150px;top:230px;z-index:12;font-size:24px;white-space:nowrap;opacity:0`, `<span style="display:inline-block;width:22px;height:22px;background:#d7cfc4;border:3px solid ${INK2};vertical-align:-3px"></span> 정적 페이지 &nbsp; <span style="display:inline-block;width:22px;height:22px;background:#e8894f;border:3px solid ${INK2};vertical-align:-3px"></span> 인터랙티브`, cam); legend.className = "abs";
+  const baseLine = el("div", `left:180px;top:${BASE}px;width:620px;height:6px;background:${INK2};border-radius:3px;z-index:11;transform-origin:0 50%`, "", cam); baseLine.className = "abs";
+  const nums = [[338, "+62%", 62], [678, "+317%", 317]].map(([cx, txt, v], i) => { const d = el("div", `left:${cx - 230}px;top:0;width:460px;text-align:center;z-index:12;font-size:${i ? 160 : 136}px;line-height:1;white-space:nowrap;color:#c8372d;text-shadow:4px 4px 0 #f7d774;-webkit-text-stroke:4px ${INK2};text-shadow:7px 7px 0 #f7d774;opacity:0`, txt, cam); d.className = "abs"; d.v = v; return d; });
+  const blabels = [[288, "평균 체류시간"], [628, "스크롤 깊이"]].map(([cx, txt]) => { const d = el("div", `left:${cx - 140}px;top:${BASE + 12}px;width:280px;text-align:center;z-index:12;font-size:36px;white-space:nowrap;opacity:0`, txt, cam); d.className = "abs"; return d; });
+  const legend = el("div", `left:180px;top:220px;z-index:12;font-size:28px;white-space:nowrap;opacity:0`, `<span style="display:inline-block;width:22px;height:22px;background:#d7cfc4;border:3px solid ${INK2};vertical-align:-3px"></span> 정적 페이지 &nbsp; <span style="display:inline-block;width:22px;height:22px;background:#e8894f;border:3px solid ${INK2};vertical-align:-3px"></span> 인터랙티브`, cam); legend.className = "abs";
   const dizzy = el("div", `left:0;top:0;z-index:33;font-size:30px;color:#d98c1f;opacity:0;white-space:nowrap`, "★ ✦ ★", cam); dizzy.className = "abs";
 
   // ================= reference (60–72) =================
@@ -195,7 +210,7 @@ scene(40, 72, (R, s) => {
   ref.style.transformOrigin = "50% 50%";
   const NOTES = [["훅 · Hook", "첫 화면에서 붙잡기", [0, 1]], ["증거 · Proof", "작업 · 숫자 · 후기", [2, 3]], ["행동 · Action", "분명한 버튼 하나", [4, 5]]];
   const notes = NOTES.map((n, i) => {
-    const d = el("div", `left:170px;top:${236 + i * 176}px;width:560px;height:152px;z-index:14;background:${["#fbe3b0", "#f8d3df", "#d5ecd0"][i]};border:4px solid ${INK2};border-radius:14px;padding:14px 22px;box-shadow:7px 8px 0 rgba(43,35,32,.22);transform-origin:0 50%`,
+    const d = el("div", `left:180px;top:${236 + i * 176}px;width:560px;height:152px;z-index:14;background:${["#fbe3b0", "#f8d3df", "#d5ecd0"][i]};border:4px solid ${INK2};border-radius:14px;padding:14px 22px;box-shadow:7px 8px 0 rgba(43,35,32,.22);transform-origin:0 50%`,
       `<div style="font-size:44px;line-height:1.05">${n[0]}</div><div style="font-size:28px;color:#6b5d52">${n[1]}</div>
        <div style="position:absolute;right:18px;top:16px;display:flex;gap:8px">${n[2].map(k => `<span style="display:grid;place-items:center;width:40px;height:40px;border-radius:50%;background:${C02_COL[k]};border:3px solid ${INK2};font-size:24px">${k + 1}</span>`).join("")}</div>`, cam);
     d.className = "abs"; return d; });
@@ -277,18 +292,37 @@ scene(40, 72, (R, s) => {
     flagCloth.setAttribute("d", `M20 12 Q60 ${2 + 8 * Math.sin(t * 6)} 100 16 L100 64 Q60 ${52 + 8 * Math.sin(t * 6 + 1)} 20 62 Z`);
     burst(t, 52.0, ST[5][0] + 60, ST[5][1] - 160, 0, 0, 18);
 
-    // wireframe rows light up with the customer
-    const wIn = back(seg(t, 40.4, 41.0));
-    rows.forEach((r, i) => {
-      const lit = (t > 45.9 && rk >= i && t < 53) || (i === 0 && t > 42.6 && t < 53);
-      const now = rk === i && t < 52.9 && t > 45.9;
-      r.style.background = lit ? C02_COL[i] : "#f3ead8";
-      r.style.transform = `scale(${now ? 1.035 : 1})`;
-      r.bd.style.transform = `scale(${now ? 1 + 0.25 * Math.abs(Math.sin((t - STOPS[i][0]) * 8)) * (1 - seg(t, STOPS[i][0] + 0.5, STOPS[i][0] + 0.8)) : 1})`;
-      r.style.opacity = t < 53 ? seg(t, 40.6 + i * 0.08, 40.9 + i * 0.08) : 1;
+    // big section card: flips to the section the customer just reached, then collapses into the page
+    const wIn = back(seg(t, 52.85, 53.3));
+    const SW = [40.5, ...STOPS.slice(1).map(st => st[0] - 0.1)];
+    let cur = 0; SW.forEach((w, i) => { if (t >= w) cur = i; });
+    const dSw = Math.min(...SW.slice(1).map(w => Math.abs(t - w)));
+    const flipY = dSw < 0.16 ? dSw / 0.16 : 1;
+    const secIn = back(seg(t, 40.4, 40.95)), col = seg(t, 52.5, 52.95);
+    sec.style.opacity = secIn > 0 && col < 1 ? 1 : 0;
+    sec.style.transformOrigin = "50% 50%";
+    sec.style.transform = `translate(${60 * col}px, ${-40 * (1 - secIn) + 200 * col * col}px) scale(${(0.6 + 0.4 * secIn) * (1 - 0.8 * col)}, ${flipY * (0.6 + 0.4 * secIn) * (1 - 0.8 * col)}) rotate(${-1 + 1.2 * c02_settle(t - Math.max(...SW.filter(w => w <= t), 40.95), 1.4, 3.5)}deg)`;
+    secN.textContent = `섹션 ${cur + 1}/6`;
+    panes.forEach((pn, i) => {
+      pn.style.display = i === cur ? "block" : "none";
+      if (i !== cur) return;
+      const a = SW[i] + 0.1, p = back(seg(t, a, a + 0.4));
+      pn.ex.style.transform = `translateY(${30 * (1 - p)}px) scale(${0.8 + 0.2 * p})`; pn.ex.style.opacity = clamp(p * 1.5);
+      pn.ex.style.transformOrigin = "0 50%";
+      pn.bd.style.transform = `scale(${1 + 0.3 * Math.abs(c02_settle(t - a, 2.2, 4))}) rotate(${-8 * c02_settle(t - a, 1.5, 3)}deg)`;
     });
-    strike.setAttribute("stroke-dashoffset", 420 * (1 - ease(seg(t, 42.7, 43.1))));
-    h1.style.opacity = 1 - seg(t, 43.3, 43.5); h1.style.display = t > 43.5 ? "none" : "block";
+    if (cur === 4) { const pc = seg(t, 50.6, 50.72) - seg(t, 50.8, 51.0); panes[4].querySelector(".cta").style.transform = `scale(${1 - 0.1 * pc})`; }
+    if (cur === 3) panes[3].querySelectorAll(".pc").forEach((c, k) => { c.style.transform = `translateY(${-16 * Math.sin(seg(t, 48.9 + k * 0.23, 49.15 + k * 0.23) * Math.PI)}px)`; });
+    pills.forEach((pl, i) => {
+      const lit = (i === 0 && t > 40.5) || (t > 45.9 && rk >= i);
+      const lp = back(seg(t, SW[i] + 0.2, SW[i] + 0.55));
+      pl.style.background = lit ? C02_COL[i] : "#efe6d6";
+      pl.style.opacity = seg(t, 40.7 + i * 0.07, 40.9 + i * 0.07) * (1 - seg(t, 52.5, 52.85));
+      pl.style.transform = `translateY(${lit ? -10 * Math.sin(Math.min(1, lp) * Math.PI) : 0}px) scale(${lit && i === cur && t < 52.5 ? 1.08 : 1}) translateY(${-60 * seg(t, 52.5, 52.85)}px)`;
+    });
+    rows.forEach((r, i) => { const p = back(seg(t, 52.95 + i * 0.05, 53.25 + i * 0.05)); r.style.transform = `scale(${p})`; r.style.transformOrigin = "0 50%"; });
+    strike.setAttribute("stroke-dashoffset", 560 * (1 - ease(seg(t, 42.7, 43.1))));
+    h1.style.display = t > 43.5 ? "none" : "inline-block";
     h2.textContent = type("당신의 고민, 3일이면 끝 ★", seg(t, 43.5, 44.6));
     // scrolling: rows scroll away, then snap from scene to scene
     const sc = 620 * ease(seg(t, 53.3, 54.3)) + 442 * ease(seg(t, 55.3, 56.1)) + 442 * ease(seg(t, 57.2, 58.0));
@@ -299,8 +333,8 @@ scene(40, 72, (R, s) => {
     wheel.setAttribute("transform", `translate(0 ${(t * 2 % 1) * 10})`);
     // flip into the reference page
     const fl1 = seg(t, 59.4, 59.9), fl2 = seg(t, 59.9, 60.5);
-    wire.style.opacity = fl1 < 1 ? 1 : 0;
-    wire.style.transform = `translateY(${40 * (1 - wIn)}px) scale(${fl1 < 1 ? 1 - fl1 : 1}, 1) rotate(${-1 + (1 - wIn) * 4}deg)`;
+    wire.style.opacity = fl1 < 1 && t > 52.85 ? 1 : 0;
+    wire.style.transform = `scale(${(0.5 + 0.5 * wIn) * (fl1 < 1 ? 1 - fl1 : 1)}, ${0.5 + 0.5 * wIn}) rotate(${-1 + (1 - wIn) * 4}deg)`;
     ref.style.opacity = fl2 > 0 ? 1 : 0;
     const rb = back(fl2);
     ref.style.transform = `scale(${rb}, 1) rotate(${1.5 * c02_settle(t - 60.5, 1.2, 3)}deg)`;
@@ -321,11 +355,11 @@ scene(40, 72, (R, s) => {
     });
     nums.forEach((n, i) => {
       const a = i ? 56.2 : 54.6, p = seg(t, a, a + 0.9);
-      const top = BASE - n.v * 0 - (i ? 417 : 162) * UNIT - 100;
+      const top = BASE - (i ? 417 : 162) * UNIT - (i ? 180 : 156);
       n.textContent = "+" + Math.round(n.v * out(p)) + "%";
       n.style.top = top + "px";
       n.style.opacity = (p > 0 ? 1 : 0) * (1 - toRef);
-      n.style.transform = `scale(${back(seg(t, a, a + 0.35)) * (1 + 0.12 * Math.abs(c02_settle(t - a - 0.9, 2.5, 5)))}) rotate(-4deg)`;
+      n.style.transform = `translate(${6 * Math.sin(t * 70) * (1 - seg(t, a + 0.9, a + 1.1)) * (p > 0 ? 1 : 0)}px, 0) scale(${lerp(2.6, 1, back(seg(t, a, a + 0.35))) * (1 + 0.14 * Math.abs(c02_settle(t - a - 0.9, 2.5, 5)))}) rotate(-5deg)`;
     });
     blabels.forEach((l, i) => { l.style.opacity = seg(t, 53.7 + i * 0.2, 54 + i * 0.2) * (1 - toRef); });
 
