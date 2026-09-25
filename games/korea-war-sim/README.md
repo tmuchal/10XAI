@@ -48,6 +48,29 @@ python3 -m http.server -d games/korea-war-sim   # then open http://localhost:800
 
 The game autosaves to `localStorage` every turn.
 
+## Advisor dialogue (집무실)
+
+Decisions are presented as conversations in the leader's war office (`js/council.js`) rather than plain pop-ups.
+
+- **Scenes.** Coups, uprisings, elections, assassination attempts, cabinet plots, slush-fund scandals, national events, peace or alliance offers and the monthly briefing each open a visual-novel scene. The scene has a painted office backdrop, the portrait of the minister who would bring the news, and a dialogue box with a name plate and typewriter text. Tap to advance. The choices then appear as large stacked buttons with the same effect previews as before, marked with which advisor recommended each one. Every rule and number is unchanged: the scene returns the same choice index the old modal did.
+- **Who speaks.** The reporting minister depends on the situation:
+  - Coup: intelligence chief, then the chief of staff and the defence minister.
+  - Uprising: interior minister.
+  - Election: interior, then foreign and intelligence.
+  - Plot: intelligence chief, or interior if the plotter is the intelligence chief.
+  - Scandal: foreign minister, and the economy minister pleads his own case.
+  - Offers: foreign minister.
+  - National events: each event maps to a post, for example 국채 → economy and 촛불 → interior.
+
+  The advisor who most disagrees then argues back. Each minister's lines follow his trait (a hawk urges force, a technocrat quotes the budget, a corrupt minister hints at side deals, an ambitious one is suspiciously agreeable) and his loyalty. A disloyal minister turns curt or sarcastic, and a plotting intelligence chief under-reports the plots.
+- **Briefing.** The briefing is a three-voice exchange: the finance minister reports the budget, the military chief reports the front and the intelligence chief reports threats. The full report stays one tap away (보고서), and the trend charts remain in the 전황 tab.
+- **Fast play.** Use **넘기기 ▸▸** or Esc to skip straight to the choices. Tapping while text is typing completes the line. The number keys 1–9 pick a choice. **간단히** in a scene, or the menu setting 결정 연출, switches back to the old compact modal. The menu setting 대사 표시 turns off the typewriter. Reduced-motion users get instant text.
+- **Talking to advisors.** The 참모와 대화 button (권력 tab, and inside any scene) opens a free conversation with any minister.
+  - When the artifact runtime grants Claude sampling, you can type freely. The minister answers in character, grounded in a compact summary of the game state, and his last line carries a hidden emotion and loyalty tag. The tag changes his portrait and nudges his loyalty by at most ±3 per minister per month.
+  - You get 5 messages per minister per month. The last 12 turns per minister are saved in `G.advisor`.
+  - Without AI, each minister offers scripted questions answered from live game data: 전선 상황은?, 예산은?, 쿠데타 위험은?, 다음 목표는?, plus one question specific to his post.
+- **Portraits** come from the shared `js/art.js` (`ART.portrait`). Each minister gets a deterministic look based on post, regime, culture and trait. A simple built-in silhouette is used if `ART` is missing.
+
 ## Code
 
 | File | Role |
@@ -59,3 +82,5 @@ The game autosaves to `localStorage` every turn.
 | `js/engine.js` | World generation, movement, combat, missiles and nukes, economy, politics, diplomacy, victory |
 | `js/ai.js` | Computer players: bounded pathfinding, operations, deployment, missiles, nuclear doctrine |
 | `js/ui.js` | Canvas renderer (tactical hexes and a political overview when zoomed out), input, panels, turn flow |
+| `js/art.js` | Shared portrait/background painter (`ART`), copied from `games/story-sim` |
+| `js/council.js` | War-office dialogue scenes, minister looks and lines, advisor chat (AI or scripted) |

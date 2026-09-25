@@ -951,9 +951,9 @@ function cabinetSection() {
       <div class="row"><span><span class="sub">${esc(title)}</span><br><b>${esc(m.name)}</b> <span class="mtrait" title="${esc(MINISTER_TRAITS[m.trait].desc)}">${esc(MINISTER_TRAITS[m.trait].name)}</span></span><span class="num skill" title="능력">${stars(m.skill)}</span></div>
       <div class="mbars"><span class="sub">충성 ${Math.round(m.loyalty)}</span>${bar(m.loyalty, m.loyalty > 55 ? 'var(--ok)' : m.loyalty > 35 ? 'var(--warn)' : 'var(--danger)')}<span class="sub">야망 ${Math.round(m.ambition)}</span>${bar(m.ambition, m.ambition > 65 ? 'var(--danger)' : 'var(--muted)')}</div>
       <div class="sub">${esc(p.desc)} · ${esc(FACTION_BASE[m.fac] === FACTION_BASE.party ? factionLabel(me(), 'party') : FACTION_BASE[m.fac])} 계열 · 재임 ${G.turn - m.since}개월${danger ? ' · <span class="neg">반역 징후</span>' : ''}</div>
-      <div class="btnrow">${btn('교체', 'appoint', p.id)}${btn('숙청', 'purge-min', p.id, { cls: 'sm danger' })}${btn('비자금 매수 (30)', 'bribe-min', p.id, { disabled: (P().slush || 0) < 30 })}</div></div>`;
+      <div class="btnrow">${btn('대화', 'advisor', p.id, { cls: 'sm primary' })}${btn('교체', 'appoint', p.id)}${btn('숙청', 'purge-min', p.id, { cls: 'sm danger' })}${btn('비자금 매수 (30)', 'bribe-min', p.id, { disabled: (P().slush || 0) < 30 })}</div></div>`;
   }).join('');
-  return `<div class="sec"><h3>내각 · 군 수뇌부</h3><p class="sub">각료의 능력은 전투·경제·첩보·치안에 반영됩니다. 야망이 충성보다 25 이상 높은 각료는 반역을 꾀하고, 군·보안 계열이면 쿠데타 위험을 키웁니다. 숙청하면 나머지 각료가 두려움에 충성합니다.</p><div class="ministers">${cards}</div></div>`;
+  return `<div class="sec"><div class="row"><h3>내각 · 군 수뇌부</h3>${btn('참모와 대화', 'advisor', null, { cls: 'sm primary' })}</div><p class="sub">각료의 능력은 전투·경제·첩보·치안에 반영됩니다. 야망이 충성보다 25 이상 높은 각료는 반역을 꾀하고, 군·보안 계열이면 쿠데타 위험을 키웁니다. 숙청하면 나머지 각료가 두려움에 충성합니다.</p><div class="ministers">${cards}</div></div>`;
 }
 function slushSection() {
   const N = P(), e = economyPreview(me());
@@ -1193,6 +1193,7 @@ function act(a, arg) {
     case 'appoint': return showCandidates(arg);
     case 'purge-min': { const m = G.cabinet[arg]; return confirmBox('각료 숙청', `${postTitle(me(), arg)} ${m.name}을(를) 반역 혐의로 체포합니다. ${FACTION_BASE[m.fac]} 계열 충성 -10, 권력 기반 +6, 다른 각료들의 충성 +8.`, '체포 명령', () => { purgeMinister(arg); UI.keepScroll = true; after(); }, true); }
     case 'bribe-min': bribeMinister(arg); UI.keepScroll = true; return after();
+    case 'advisor': return vnChatOpen(arg || null);
     case 'bribe-fac': if (bribeFaction(arg)) toast('비밀 자금 전달 완료', 'good'); UI.keepScroll = true; return after();
     case 'menu': return showMenu();
     case 'new': closeModal(); return showStart(1);
@@ -1330,7 +1331,10 @@ function reportHtml(r) {
   </div>`;
 }
 async function showReport() {
-  await modalChoice(`<div class="title-block"><span class="eyebrow">${esc(G.report.date)} · 월간 정세 보고</span><h2>${esc(G.leader.title)}께 올리는 보고</h2></div>${reportHtml(G.report)}`, [{ label: '확인' }, { label: '보고서 자동 표시 끄기' }]).then(k => { if (k === 1) G.flags.brief = false; });
+  // The briefing is played as a short exchange in the war office (js/council.js); compact mode keeps the old modal.
+  const k = await decideBriefing(`<div class="title-block"><span class="eyebrow">${esc(G.report.date)} · 월간 정세 보고</span><h2>${esc(G.leader.title)}께 올리는 보고</h2></div>${reportHtml(G.report)}`, [{ label: '확인' }, { label: '추이 차트 보기 (전황 탭)' }, { label: '보고서 자동 표시 끄기' }]);
+  if (k === 2) G.flags.brief = false;
+  if (k === 1) { UI.sheet = null; openSheet('war'); }
 }
 function modalChoice(html, choices) {
   return new Promise(res => {
@@ -1348,8 +1352,9 @@ async function presentCrisis(kind) {
     const post = kind.slice(5), m = G.cabinet[post];
     if (!m) return;
     const ev = SLUSH_EVENTS.plot, N = P();
-    const k = await modalChoice(`<div class="title-block"><span class="eyebrow nuke">${esc(dateLabel())} · 정보 보고</span><h2>${esc(ev.title)}</h2></div><p>${esc(ev.text)}</p><p><b>${esc(postTitle(me(), post))} ${esc(m.name)}</b> — 충성 ${Math.round(m.loyalty)} · 야망 ${Math.round(m.ambition)} · ${esc(MINISTER_TRAITS[m.trait].name)}</p>`,
-      [{ label: '즉시 체포·숙청', cls: 'danger' }, { label: (N.slush || 0) >= 30 ? '비자금으로 회유 (30)' : '회유 (자금 부족)' }, { label: '감시만 한다' }]);
+    const info = `<b>${esc(postTitle(me(), post))} ${esc(m.name)}</b> — 충성 ${Math.round(m.loyalty)} · 야망 ${Math.round(m.ambition)} · ${esc(MINISTER_TRAITS[m.trait].name)}`;
+    const k = await decideCrisis('plot', `<div class="title-block"><span class="eyebrow nuke">${esc(dateLabel())} · 정보 보고</span><h2>${esc(ev.title)}</h2></div><p>${esc(ev.text)}</p><p>${info}</p>`,
+      [{ label: '즉시 체포·숙청', cls: 'danger' }, { label: (N.slush || 0) >= 30 ? '비자금으로 회유 (30)' : '회유 (자금 부족)' }, { label: '감시만 한다' }], { eyebrow: `${dateLabel()} · 정보 보고`, title: ev.title, text: ev.text, info, post });
     if (k === 0) purgeMinister(post);
     else if (k === 1 && (N.slush || 0) >= 30) { bribeMinister(post); m.ambition = clamp(m.ambition - 15, 0, 100); }
     else { m.ambition = clamp(m.ambition + 5, 0, 100); if (m.fac === 'army' || m.fac === 'sec') N.fac[m.fac] = clamp(N.fac[m.fac] - 5, 0, 100); }
@@ -1357,22 +1362,25 @@ async function presentCrisis(kind) {
   }
   if (kind === 'scandal') {
     const ev = SLUSH_EVENTS.scandal, N = P();
-    const k = await modalChoice(`<div class="title-block"><span class="eyebrow nuke">${esc(dateLabel())} · 폭로</span><h2>${esc(ev.title)}</h2></div><p>${esc(ev.text)}</p>`,
-      [{ label: '가짜뉴스로 규정·언론 탄압' }, { label: '측근에게 책임 전가 (경제장관 경질)' }]);
+    const k = await decideCrisis('scandal', `<div class="title-block"><span class="eyebrow nuke">${esc(dateLabel())} · 폭로</span><h2>${esc(ev.title)}</h2></div><p>${esc(ev.text)}</p>`,
+      [{ label: '가짜뉴스로 규정·언론 탄압' }, { label: '측근에게 책임 전가 (경제장관 경질)' }], { eyebrow: `${dateLabel()} · 폭로`, title: ev.title, text: ev.text });
     if (k === 0) { N.fac.people = clamp(N.fac.people - 8, 0, 100); N.rep = clamp(N.rep - 5, -100, 100); N.fac.sec = clamp(N.fac.sec + 3, 0, 100); }
     else { const old = G.cabinet.economy; if (old) { G.cabinet.economy = null; logMsg(`[${nName(me())}] ${old.name} 경제장관 비리로 구속`, 'decree', me()); } N.fac.people = clamp(N.fac.people - 3, 0, 100); }
     after(); return;
   }
   const N = P(), ev = POL_EVENTS[kind], head = `<div class="title-block"><span class="eyebrow nuke">${esc(dateLabel())} · 정권 위기</span><h2>${esc(ev.title)}</h2></div><p>${esc(ev.text)}</p>`;
+  const sc = (info, extra) => ({ eyebrow: `${dateLabel()} · 정권 위기`, title: ev.title, text: ev.text, info, ...extra });
   if (kind === 'coup') {
     const p = clamp(0.25 + N.fac.sec / 150 + N.power / 200 - (N.fac.army < 30 ? 0.1 : 0), 0.1, 0.95);
-    const k = await modalChoice(head + `<p class="sub">군부 충성 ${Math.round(N.fac.army)} · 보안기관 충성 ${Math.round(N.fac.sec)} · 권력 기반 ${Math.round(N.power)} · 비자금 ${fmt(N.slush || 0)}억$</p>`, [{ label: `보안군 투입 진압 (성공 ${pct(p)})` }, { label: '군부와 타협 (60억$, 권력 -15)' }, { label: (N.slush || 0) >= 150 ? `해외 망명 (계좌 ${fmt(N.slush)}억$)` : '해외 망명 (빈손)', cls: 'danger' }]);
+    const info = `군부 충성 ${Math.round(N.fac.army)} · 보안기관 충성 ${Math.round(N.fac.sec)} · 권력 기반 ${Math.round(N.power)} · 비자금 ${fmt(N.slush || 0)}억$`;
+    const k = await decideCrisis('coup', head + `<p class="sub">${info}</p>`, [{ label: `보안군 투입 진압 (성공 ${pct(p)})` }, { label: '군부와 타협 (60억$, 권력 -15)' }, { label: (N.slush || 0) >= 150 ? `해외 망명 (계좌 ${fmt(N.slush)}억$)` : '해외 망명 (빈손)', cls: 'danger' }], sc(info));
     if (k === 0) { if (Math.random() < p) { N.fac.army = 55; N.power = clamp(N.power + 10, 0, 100); N.rep -= 3; N.stab = clamp(N.stab - 3, 0, 100); logMsg(`[${nName(me())}] 쿠데타 진압 — 주모자 처형`, 'decree', me()); toast('쿠데타를 진압했습니다', 'good'); } else N.flags.overthrown = '쿠데타로 실각'; }
     else if (k === 1) { N.fac.army = clamp(N.fac.army + 20, 0, 100); N.money -= 60; N.power = clamp(N.power - 15, 0, 100); N.stab = clamp(N.stab - 4, 0, 100); logMsg(`[${nName(me())}] 군부와 권력 분점 합의`, 'decree', me()); }
     else exile();
   } else if (kind === 'uprising') {
     const p = clamp(N.fac.sec / 100 + 0.2, 0.1, 0.95);
-    const k = await modalChoice(head + `<p class="sub">민중 지지 ${Math.round(N.fac.people)} · 보안기관 충성 ${Math.round(N.fac.sec)}</p>`, [{ label: `유혈 진압 (성공 ${pct(p)}, 평판 -20)`, cls: 'danger' }, { label: '개혁 약속 (권력 -20)' }]);
+    const info = `민중 지지 ${Math.round(N.fac.people)} · 보안기관 충성 ${Math.round(N.fac.sec)}`;
+    const k = await decideCrisis('uprising', head + `<p class="sub">${info}</p>`, [{ label: `유혈 진압 (성공 ${pct(p)}, 평판 -20)`, cls: 'danger' }, { label: '개혁 약속 (권력 -20)' }], sc(info));
     if (k === 0) {
       if (Math.random() < p) { N.fac.people = clamp(N.fac.people - 10, 0, 100); N.rep -= 20; N.stab = clamp(N.stab + 3, 0, 100); N.power = clamp(N.power + 5, 0, 100); logMsg(`[${nName(me())}] 시위 유혈 진압`, 'decree', me()); G.flags.unPending = { by: me(), why: '시위대 유혈 진압' }; }
       else { N.stab = clamp(N.stab - 15, 0, 100); N.fac.people -= 10; if (N.stab < 15) N.flags.overthrown = '혁명으로 실각'; else toast('진압 실패 — 정권이 흔들립니다', 'bad'); }
@@ -1381,7 +1389,8 @@ async function presentCrisis(kind) {
     const p = electionOdds(me());
     const opts = [{ label: `선거 실시 (승리 ${pct(p)})` }];
     if (N.gov === 'democracy') opts.push({ label: '비상계엄 · 선거 취소', cls: 'danger' });
-    const k = await modalChoice(head + `<p class="sub">민중 지지 ${Math.round(N.fac.people)} · 안정도 ${Math.round(N.stab)}${flag(me(), 'rigged') ? ' · 개표 조작 준비됨' : ''}</p>`, opts);
+    const info = `민중 지지 ${Math.round(N.fac.people)} · 안정도 ${Math.round(N.stab)}${flag(me(), 'rigged') ? ' · 개표 조작 준비됨' : ''}`;
+    const k = await decideCrisis('election', head + `<p class="sub">${info}</p>`, opts, sc(info, { odds: p }));
     if (k === 0) {
       if (Math.random() < p) {
         N.nextElection = G.turn + (regime(me()).elections || 36); N.fac.people = clamp(N.fac.people + 5, 0, 100); N.power = clamp(N.power + 5, 0, 100);
@@ -1390,14 +1399,14 @@ async function presentCrisis(kind) {
       } else N.flags.overthrown = '선거 패배 — 정권 교체';
     } else enactDecree(me(), 'martial');
   } else if (kind === 'assassination') {
-    const k = await modalChoice(head, [{ label: '경호 강화 (20억$)' }, { label: '배후 색출 · 보복 (비밀경찰)' }]);
+    const k = await decideCrisis('assassination', head, [{ label: '경호 강화 (20억$)' }, { label: '배후 색출 · 보복 (비밀경찰)' }], sc(''));
     if (k === 0) N.money -= 20; else { N.fac.sec = clamp(N.fac.sec + 6, 0, 100); N.fac.people -= 4; }
   }
   after();
 }
 async function presentEvent(ev) {
   if (!ev) return;
-  const k = await modalChoice(`<div class="title-block"><span class="eyebrow">${esc(dateLabel())} · 국가 사건</span><h2>${esc(ev.title)}</h2></div><p>${esc(ev.text)}</p><p class="sub">${ev.choices.map(c => `${esc(c.label)}: ${fxText(c.fx)}`).join(' / ')}</p>`, ev.choices);
+  const k = await decideEvent(ev, `<div class="title-block"><span class="eyebrow">${esc(dateLabel())} · 국가 사건</span><h2>${esc(ev.title)}</h2></div><p>${esc(ev.text)}</p><p class="sub">${ev.choices.map(c => `${esc(c.label)}: ${fxText(c.fx)}`).join(' / ')}</p>`);
   applyEvent(me(), ev, k); after();
 }
 function fxText(fx) {
@@ -1416,7 +1425,8 @@ async function presentOffers() {
     if (o.type === 'peace' && !atWar(me(), o.from)) continue;
     if (o.type === 'alliance' && (allied(me(), o.from) || atWar(me(), o.from))) continue;
     const txt = o.type === 'peace' ? `${NATIONS[o.from].name}이(가) 강화를 제안합니다. 수락하면 현재 전선을 기준으로 종전하고 6턴간 휴전합니다.` : `${NATIONS[o.from].name}이(가) 군사 동맹을 제안합니다.`;
-    const k = await modalChoice(`<div class="title-block"><span class="eyebrow">외교 전문</span><h2>${o.type === 'peace' ? '강화 제안' : '동맹 제안'} — ${esc(NATIONS[o.from].short)}</h2></div><p>${esc(txt)}</p>`, [{ label: '수락' }, { label: '거절' }]);
+    const ttl = `${o.type === 'peace' ? '강화 제안' : '동맹 제안'} — ${NATIONS[o.from].short}`;
+    const k = await decideCrisis('offer', `<div class="title-block"><span class="eyebrow">외교 전문</span><h2>${esc(ttl)}</h2></div><p>${esc(txt)}</p>`, [{ label: '수락' }, { label: '거절' }], { eyebrow: `${dateLabel()} · 외교 전문`, title: ttl, text: txt });
     if (k === 0) { if (o.type === 'peace') makePeace(me(), o.from); else { G.ally[pk(me(), o.from)] = 1; addRel(me(), o.from, 10); logMsg(`[${nName(me())}] ↔ [${nName(o.from)}] 군사 동맹 체결`, 'peace', me()); cache.supply = {}; cache.comp = {}; } }
     else addRel(me(), o.from, -3);
     after();
@@ -1440,6 +1450,8 @@ function showMenu() {
     <button class="btn" type="button" id="m-load" ${hasSave ? '' : 'disabled'}>불러오기</button>
     <button class="btn" type="button" id="m-new">새 게임</button><button class="btn" type="button" id="m-help">규칙</button>
     ${G ? `<button class="btn" type="button" id="m-fog">전장의 안개: ${G.fog ? '켜짐' : '꺼짐'}</button><button class="btn" type="button" id="m-brief">월간 보고 팝업: ${G.flags.brief !== false ? '켜짐' : '꺼짐'}</button>` : ''}
+    <button class="btn" type="button" id="m-vn">결정 연출: ${vnCompact() ? '간단한 창' : '집무실 대화'}</button>
+    <button class="btn" type="button" id="m-vn-type">대사 표시: ${VN.prefs.instant ? '즉시' : '타자기'}</button>
     <button class="btn" type="button" id="m-close">닫기</button></div>
     <p class="sub">매 턴 자동 저장됩니다. 키보드: E 턴 종료 · N 다음 부대 · F 대기 · Esc 닫기 · 방향키 · +/−.</p>`);
   const on = (id, fn) => { const b = $(id); if (b) b.onclick = fn; };
@@ -1449,6 +1461,8 @@ function showMenu() {
   on('#m-help', () => showHelp());
   on('#m-fog', () => { G.fog = !G.fog; refreshVision(); after(); closeModal(); });
   on('#m-brief', () => { G.flags.brief = G.flags.brief === false; closeModal(); });
+  on('#m-vn', () => { VN.prefs.compact = !vnCompact(); vnSavePrefs(); showMenu(); });
+  on('#m-vn-type', () => { VN.prefs.instant = !VN.prefs.instant; vnSavePrefs(); showMenu(); });
   on('#m-close', closeModal);
 }
 function showHelp() {
