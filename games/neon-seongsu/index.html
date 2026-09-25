@@ -46,6 +46,7 @@ canvas#game{position:fixed;inset:0;width:100%;height:100%;display:block;backgrou
 .bar.hp i{background:var(--green)}
 .bar.car i{background:#8ff4ff}
 .bar.emp i{background:var(--mag)}
+.bar.nitro i{background:#ff7a2e}
 .bar-label{display:flex;justify-content:space-between;font-family:var(--mono);font-size:10px;color:var(--dim);letter-spacing:.1em}
 #zone{position:absolute;right:16px;bottom:calc(env(safe-area-inset-bottom,0px) + 92px);font-family:var(--display);font-size:30px;text-shadow:0 0 16px rgba(255,46,136,.6),3px 3px 0 #000;opacity:0;transition:opacity .6s;text-align:right}
 #zone small{display:block;font-family:var(--mono);font-size:12px;color:var(--mag);letter-spacing:.2em}
@@ -113,7 +114,7 @@ canvas#game{position:fixed;inset:0;width:100%;height:100%;display:block;backgrou
 .ph-app{display:flex;justify-content:space-between;align-items:baseline;font-family:var(--display);font-size:24px;padding:2px 18px 8px}
 .ph-app small{font-family:var(--mono);font-size:10px;color:var(--dim);letter-spacing:.14em}
 #phBody{flex:1;overflow-y:auto;padding:0 12px 12px;display:flex;flex-direction:column;gap:8px;touch-action:pan-y}
-.ph-nav{display:grid;grid-template-columns:repeat(5,1fr);border-top:1px solid var(--line)}
+.ph-nav{display:grid;grid-template-columns:repeat(4,1fr);border-top:1px solid var(--line)}
 .ph-nav button{background:none;border:0;color:var(--dim);font-family:var(--body);font-size:11px;padding:11px 0;cursor:pointer}
 .ph-nav button.on{color:var(--cyan)}
 .ph-nav button:focus-visible{outline:2px solid var(--cyan)}
@@ -136,6 +137,28 @@ canvas#game{position:fixed;inset:0;width:100%;height:100%;display:block;backgrou
 .arch p.en{color:var(--dim);font-size:12px;margin-top:4px}
 .arch.locked{opacity:.45}
 .ph-empty{color:var(--dim);font-size:13px;padding:8px 4px}
+/* garage, camera */
+#garage{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(4,6,10,.72);pointer-events:auto;padding:16px}
+.gcard{width:min(460px,100%);background:#0c0f16;border:1px solid rgba(41,231,255,.45);box-shadow:0 0 40px rgba(41,231,255,.15);padding:16px 18px;display:flex;flex-direction:column;gap:10px}
+.gcard h3{margin:0;font-family:var(--display);font-weight:400;font-size:28px;color:var(--cyan)}
+.gcard h3 small{display:block;font-family:var(--mono);font-size:11px;color:var(--dim);letter-spacing:.2em}
+.gopt{width:100%;display:flex;justify-content:space-between;align-items:center;gap:12px;background:#121826;border:1px solid var(--line);color:var(--ink);padding:10px 12px;font-family:var(--body);font-size:14px;text-align:left;cursor:pointer}
+.gopt:hover:not(:disabled),.gopt:focus-visible{border-color:var(--cyan);outline:none}
+.gopt:disabled{opacity:.4;cursor:default}
+.gopt span small{display:block;font-size:12px;color:var(--dim);margin-top:2px}
+.gopt b{font-family:var(--mono);color:var(--green);white-space:nowrap}
+.gnote{font-size:12px;color:var(--dim);font-family:var(--mono)}
+#camUI{position:fixed;inset:6vh 6vw;pointer-events:none;border:1px solid rgba(255,255,255,.18)}
+#camUI i{position:absolute;width:34px;height:34px;border:3px solid #fff}
+#camUI i:nth-child(1){left:-2px;top:-2px;border-right:0;border-bottom:0}#camUI i:nth-child(2){right:-2px;top:-2px;border-left:0;border-bottom:0}
+#camUI i:nth-child(3){left:-2px;bottom:-2px;border-right:0;border-top:0}#camUI i:nth-child(4){right:-2px;bottom:-2px;border-left:0;border-top:0}
+#camUI .rec{position:absolute;left:16px;top:12px;font-family:var(--mono);font-size:13px;color:#ff4d5e;letter-spacing:.2em}
+#camUI .hint{position:absolute;left:50%;bottom:14px;transform:translateX(-50%);font-size:14px;background:rgba(0,0,0,.6);padding:5px 12px;white-space:nowrap}
+#camUI .score{position:absolute;right:16px;top:12px;font-family:var(--mono);font-size:13px;color:var(--cyan)}
+.pimg{width:100%;border-radius:8px;display:block}
+.gig{display:flex;flex-direction:column;gap:8px}
+.gig button{background:#b36bff;border:0;color:#12031f;font-family:var(--display);font-size:20px;padding:10px;cursor:pointer}
+.gig button.ghost{background:transparent;color:var(--ink);border:1px solid var(--line);font-family:var(--body);font-size:13px}
 /* touch */
 #touch{position:fixed;inset:0;pointer-events:none}
 #joy{position:absolute;left:24px;bottom:calc(env(safe-area-inset-bottom,0px) + 28px);width:130px;height:130px;border-radius:50%;border:2px solid rgba(41,231,255,.35);background:rgba(10,10,20,.35);pointer-events:auto}
@@ -202,6 +225,7 @@ body.touch #phone{bottom:calc(env(safe-area-inset-bottom,0px) + 206px)}
       <div class="bar-label"><span>체력</span><span id="carLabel"></span></div>
       <div class="bar hp"><i id="hpBar"></i></div>
       <div class="bar car" id="carBarWrap"><i id="carBar"></i></div>
+      <div class="bar nitro" id="nitroWrap" hidden><i id="nitroBar"></i></div>
       <div class="bar-label"><span>EMP</span><span></span></div>
       <div class="bar emp"><i id="empBar"></i></div>
     </div>
@@ -225,6 +249,8 @@ body.touch #phone{bottom:calc(env(safe-area-inset-bottom,0px) + 206px)}
     <button class="tbtn sw" data-key="Tab">전환</button>
     <button class="tbtn" data-key="KeyX">특수</button>
     <button class="tbtn" data-key="Space">드리프트</button>
+    <button class="tbtn act" data-key="KeyG">사격</button>
+    <button class="tbtn" data-key="ShiftLeft">부스트</button>
   </div>
   <div class="ttop">
     <button data-key="KeyT">폰</button>
@@ -258,12 +284,16 @@ body.touch #phone{bottom:calc(env(safe-area-inset-bottom,0px) + 206px)}
   <div class="ph-nav">
     <button data-app="msg">메시지</button>
     <button data-app="sns">성수그램</button>
+    <button data-app="cam">카메라</button>
+    <button data-app="gig">알바</button>
     <button data-app="map">지도</button>
     <button data-app="bank">은행</button>
     <button data-app="arch">아카이브</button>
   </div>
 </div>
 
+<div id="garage" hidden><div class="gcard"><h3 id="gName">성수 모터스<small>RESPRAY · REPAIR · TUNING</small></h3><div id="gOpts" style="display:flex;flex-direction:column;gap:8px"></div><div class="gnote">숫자 키 1–5로 선택 · Esc로 닫기</div></div></div>
+<div id="camUI" hidden><i></i><i></i><i></i><i></i><div class="rec">● REC · 성수그램</div><div class="score" id="camScore"></div><div class="hint">E · Space · 클릭 — 촬영 &nbsp;·&nbsp; Esc — 닫기</div></div>
 <div class="screen" id="title">
   <div class="card">
     <div class="eyebrow">NEON SEONGSU · 2077 · 서울 성동구 성수동</div>
@@ -286,6 +316,8 @@ body.touch #phone{bottom:calc(env(safe-area-inset-bottom,0px) + 206px)}
       <li><kbd>X</kbd>특수능력</li>
       <li><kbd>Space</kbd>EMP · 운전 중 드리프트</li>
       <li><kbd>Q</kbd>EMP</li>
+      <li><kbd>클릭</kbd>·<kbd>G</kbd>테이저 사격</li>
+      <li><kbd>Shift</kbd>운전 중 니트로</li>
       <li><kbd>T</kbd>휴대폰</li>
       <li><kbd>R</kbd>라디오</li>
       <li><kbd>M</kbd>지도</li>
@@ -396,6 +428,13 @@ for(const r of ROADS){
   for(const g of gaps){if(g[0]-a0>T)ZEB.push({r,a:g[0]-18,b:g[0]-5});if(a1-g[1]>T)ZEB.push({r,a:g[1]+5,b:g[1]+18})}
 }
 
+const XS=[];
+for(const H of ROADS)if(H.hz)for(const V of H.cross)XS.push({H,V,x0:V.x*T,x1:(V.x+V.w)*T,y0:H.y*T,y1:(H.y+H.h)*T,off:(V.x*7+H.y*13)%12});
+function xsOf(a,b){return XS.find(i=>(i.H===a&&i.V===b)||(i.H===b&&i.V===a))||null}
+let simT=0;
+function lightState(I,hz){const t=((simT+I.off)%12+12)%12;return hz?(t<5?'g':t<6?'y':'r'):(t>=6&&t<11?'g':t>=11?'y':'r')}
+const LCOL={g:'#3dff9b',y:'#ffb347',r:'#ff2848'};
+
 /* buildings */
 const B=[];
 const WALLS=['#1a1a31','#1e1a2c','#151e2c','#221a27','#18212c','#1d1d27'];
@@ -469,6 +508,8 @@ const P=(tx,ty)=>({x:(tx+.5)*T,y:(ty+.5)*T});
 const PC=(tx,ty)=>({x:tx*T,y:ty*T});
 function snapWalk(tx,ty){for(let r=0;r<8;r++)for(let dy=-r;dy<=r;dy++)for(let dx=-r;dx<=r;dx++)if(walkT(tileAt(tx+dx,ty+dy)))return P(tx+dx,ty+dy);return P(tx,ty)}
 function nearestRoad(p){const tx=Math.floor(p.x/T),ty=Math.floor(p.y/T);for(let r=0;r<10;r++)for(let dy=-r;dy<=r;dy++)for(let dx=-r;dx<=r;dx++)if(tileAt(tx+dx,ty+dy)===ROAD)return P(tx+dx,ty+dy);return p}
+const GARAGES=[{p:P(111,41),nm:'성수 모터스'},{p:P(46,80),nm:'뚝섬 카센터'}];
+for(const g of GARAGES){const b=buildingNear(Math.floor(g.p.x/T),Math.floor(g.p.y/T),b=>!b.landmark&&!b.store);if(b){b.sign='정비 · 도색';b.signCol='#29e7ff';b.brick=false;setWall(b,'#16202c');b.garage=1}}
 
 /* Seongsu Archive: real history of the place */
 const ARCH=[
@@ -613,16 +654,19 @@ let MS=null,CUT=null,sw=null,spOn=null,flashT=0,nextBolt=25;
 let stationIdx=1,zoneName='',chipsGot=0,phoneApp='msg';
 const ST={stole:0,robs:0,maxW:0,dist:0,boom:0,missions:0,drones:0};
 const MSGS=[],FEED=[],NEWS=[];
+let foes=[],bolts=[],fireCD=0,GIG=null,EVT=null,evtT=40,camMode=false,nitro=100,nitroOn=false,garageOpen=null,camFlash=0;
+const PERK={nitro:0,armor:0,engine:0};
+const mouse={x:0,y:0,has:false};
 function load(){
   try{const s=JSON.parse(localStorage.getItem('neonSeongsu2')||'null');if(!s)return;
     story=s.story|0;money=s.money|0;
     (s.chips||[]).forEach(i=>{if(CHIPS[i]&&!CHIPS[i].got){CHIPS[i].got=true;chipsGot++}});
     (s.arch||[]).forEach(i=>{if(ARCH[i])ARCH[i].got=true});
-    Object.assign(ST,s.st||{});
+    Object.assign(ST,s.st||{});Object.assign(PERK,s.perk||{});
   }catch(e){}
 }
 load();
-function save(){if(manual)return;try{localStorage.setItem('neonSeongsu2',JSON.stringify({story,money,chips:CHIPS.filter(c=>c.got).map(c=>c.id),arch:ARCH.filter(a=>a.got).map(a=>a.id),st:ST}))}catch(e){}}
+function save(){if(manual)return;try{localStorage.setItem('neonSeongsu2',JSON.stringify({story,money,chips:CHIPS.filter(c=>c.got).map(c=>c.id),arch:ARCH.filter(a=>a.got).map(a=>a.id),st:ST,perk:PERK}))}catch(e){}}
 
 /* ================= audio ================= */
 const A={ctx:null};
@@ -719,6 +763,7 @@ const keys={},pressed=new Set();
 let autoAxis=null;
 addEventListener('keydown',e=>{
   if(['ArrowUp','ArrowDown','ArrowLeft','ArrowRight','Space','Tab'].includes(e.code))e.preventDefault();
+  if(garageOpen)return;
   if(!e.repeat)pressed.add(e.code);keys[e.code]=true;
   if(state==='title'&&e.code==='Enter')startGame(false);
   if(CUT&&!e.repeat&&(e.code==='KeyE'||e.code==='Enter'||e.code==='Space'))cutNext();
@@ -743,6 +788,8 @@ if(isTouch){
     b.addEventListener('pointerup',up);b.addEventListener('pointercancel',up);
   });
 }
+cv.addEventListener('pointermove',e=>{if(e.pointerType==='mouse'){mouse.x=e.clientX;mouse.y=e.clientY;mouse.has=true}});
+cv.addEventListener('pointerdown',e=>{if(e.pointerType==='mouse'&&e.button===0){mouse.x=e.clientX;mouse.y=e.clientY;mouse.has=true;pressed.add('Fire')}});
 function axis(){
   if(autoAxis)return autoAxis;
   let x=(keys.KeyD||keys.ArrowRight?1:0)-(keys.KeyA||keys.ArrowLeft?1:0)+joy.x;
@@ -797,14 +844,15 @@ function trafficUpdate(c,dt){
   if(!blocked)for(const p of peds){if(p.state==='down')continue;const dx=p.x-fx,dy=p.y-fy;if(dx*dx+dy*dy<22*22){blocked=true;break}}
   if(blocked){c.waitT+=dt;target=c.waitT>4.5?c.cruise*.4:0;if(c.waitT>2&&Math.random()<.004&&Math.hypot(c.x-player.x,c.y-player.y)<500)SFX.horn()}
   else{c.waitT=0;if(slow)target=Math.min(target,c.cruise*.45)}
+  if(c.cr&&c.cr.I&&c.stun<=0){const dl=(c.cr.entry-(hz?c.x:c.y))*sg-c.len/2;if(dl>-2&&dl<90){const ls=lightState(c.cr.I,hz);if(ls==='r'||(ls==='y'&&dl>22))target=Math.min(target,Math.max(0,(dl-5)*3.2))}}
   c.spd+=clamp(target-c.spd,-560*dt,260*dt);
   c.x+=DX[d]*c.spd*dt;c.y+=DY[d]*c.spd*dt;
   const s=hz?c.x:c.y;
   if(!c.cr){
-    let best=null,bd=1e9;
+    let best=null,bd=1e9,be=0;
     for(const X of r.cross){
       const entry=hz?(sg>0?X.x*T:(X.x+X.w)*T):(sg>0?X.y*T:(X.y+X.h)*T);
-      const dd=(entry-s)*sg;if(dd>-2&&dd<bd){bd=dd;best=X}
+      const dd=(entry-s)*sg;if(dd>-2&&dd<bd){bd=dd;best=X;be=entry}
     }
     if(best){
       const X=best,opts=[];
@@ -821,6 +869,7 @@ function trafficUpdate(c,dt){
       if(c.model==='bus'&&ch>=0&&((ch===0||ch===2)?X.h:X.w)<3)ch=opts.includes(-1)?-1:ch;
       if(ch<0)c.cr={X,ch:-1,at:hz?(sg>0?(X.x+X.w)*T:X.x*T):(sg>0?(X.y+X.h)*T:X.y*T)};
       else c.cr={X,ch,at:lane(X,ch)};
+      c.cr.entry=be;c.cr.I=xsOf(r,X);
     }else{
       const end=sg>0?(hz?(r.x+r.w)*T:(r.y+r.h)*T):(hz?r.x*T:r.y*T);
       if((end-s)*sg<T*.9){c.dir=(d+2)%4;if(hz)c.y=lane(r,c.dir);else c.x=lane(r,c.dir);c.a=DA[c.dir]}
@@ -849,10 +898,12 @@ function carPhys(c,thr,steer,hb,dt){
   const fx=Math.cos(c.a),fy=Math.sin(c.a);
   let vf=c.vx*fx+c.vy*fy,vl=-c.vx*fy+c.vy*fx;
   if(c.stun>0){thr=0;steer*=.3}
-  if(thr>0)vf+=(vf<0?950:c.acc)*thr*dt;
+  const mine=c===player.inCar&&c.kind==='player';
+  if(thr>0)vf+=(vf<0?950:c.acc*(mine&&PERK.engine?1.18:1))*thr*dt;
   else if(thr<0)vf+=(vf>0?-980:-400)*(-thr)*dt;
   const tt=tileAtPx(c.x,c.y);
-  const maxF=c.maxF*(tt===GRASS?.6:1)*(c.hp<25?.75:1);
+  let maxF=c.maxF*(tt===GRASS?.6:1)*(c.hp<25?.75:1);
+  if(mine){if(PERK.engine)maxF*=1.15;if(nitroOn){maxF*=1.35;vf+=700*dt}}
   vf=clamp(vf,-230,maxF);
   vf*=1-(thr===0?.9:.3)*dt;
   if(tt===GRASS)vf*=1-.8*dt;
@@ -922,6 +973,7 @@ function playerDrive(c,dt){
   const ax=axis();
   let thr=-ax.y,steer=ax.x;
   if(joy.id!==null&&isTouch){thr=-joy.y;steer=joy.x}
+  nitroOn=!!(PERK.nitro&&(keys.ShiftLeft||keys.ShiftRight)&&nitro>1&&thr>0&&!manual);
   carPhys(c,thr,steer,!!keys.Space,dt);
 }
 
@@ -1058,9 +1110,12 @@ function emp(){
   parts.push({x:o.x,y:o.y,vx:0,vy:0,life:.5,max:.5,col:big?'#29e7ff':'#ff2e88',sz:R2,add:1,ring:1});
   for(const d of drones)if(!d.dead&&Math.hypot(d.x-o.x,d.y-o.y)<R2+15){d.dead=true;ST.drones++;sparks(d.x,d.y,18,'#29e7ff');parts.push({x:d.x,y:d.y,vx:0,vy:0,life:.3,max:.3,col:'#29e7ff',sz:60,add:1,flash:1})}
   for(const c of cars)if(c!==player.inCar&&!c.dead&&Math.hypot(c.x-o.x,c.y-o.y)<R2){c.stun=c.kind==='police'?2.8:2}
+  for(const f of foes)if(f.hp>0&&Math.hypot(f.x-o.x,f.y-o.y)<R2){downFoe(f)}
+  for(const p of peds)if(p.thief&&p.state!=='down'&&Math.hypot(p.x-o.x,p.y-o.y)<R2){p.state='down';p.t=10}
   scare(o.x,o.y,200);
 }
 function updatePlayer(dt){
+  if(pressed.has('KeyG')||pressed.has('Fire')||(keys.KeyG&&fireCD<=0))fire();
   if(pressed.has('KeyF')){if(player.inCar)exitCar(false);else enterCar()}
   if(pressed.has('KeyQ')||(!player.inCar&&pressed.has('Space')))emp();
   if(pressed.has('KeyH')){SFX.horn();const o=player.inCar||player;scare(o.x,o.y,120)}
@@ -1137,8 +1192,13 @@ function collideCars(){
       const sp=Math.hypot(c.vx,c.vy);if(sp<80)continue;
       const fx=Math.cos(c.a),fy=Math.sin(c.a),lx=dx*fx+dy*fy,ly=-dx*fy+dy*fx;
       if(Math.abs(lx)<c.len/2+4&&Math.abs(ly)<c.wid/2+4){p.state='down';p.t=16;p.vx=c.vx*.8;p.vy=c.vy*.8;sparks(p.x,p.y,6,'#ff4d5e');
-        if(c===player.inCar){SFX.hit(.3);crime(1,wanted<1?.8:.35)}scare(p.x,p.y,150)}
+        if(c===player.inCar&&!p.thief){SFX.hit(.3);crime(1,wanted<1?.8:.35)}scare(p.x,p.y,150)}
     }
+  }
+  for(const f of foes){if(f.hp<=0)continue;
+    for(const c of cars){const dx=f.x-c.x,dy=f.y-c.y;if(dx*dx+dy*dy>45*45)continue;const sp=Math.hypot(c.vx,c.vy);if(sp<110)continue;
+      const fx=Math.cos(c.a),fy=Math.sin(c.a),lx=dx*fx+dy*fy,ly=-dx*fy+dy*fx;
+      if(Math.abs(lx)<c.len/2+5&&Math.abs(ly)<c.wid/2+5){downFoe(f);f.vx=c.vx*.7;f.vy=c.vy*.7;sparks(f.x,f.y,8,'#ff4d5e');if(c===player.inCar)SFX.hit(.3)}}
   }
 }
 
@@ -1162,8 +1222,8 @@ let toastT=0;
 function toast(user,text){const el=$('toast');el.innerHTML=`<b>${esc(user==='SYSTEM'?'SYSTEM':'성수그램 '+user)}</b>${esc(text)}`;el.classList.add('show');toastT=user==='SYSTEM'?2.6:4;if(user!=='SYSTEM')SFX.msg()}
 let phoneQ=[],phoneT=0;
 function phone(who,ko,en){phoneQ.push({who,ko,en});MSGS.unshift({who,ko,en,t:gameClock});if(MSGS.length>40)MSGS.pop();if(!$('phoneUI').hidden&&phoneApp==='msg')renderPhone()}
-const APPS={msg:['메시지','MESSAGES'],sns:['성수그램','SEONGSUGRAM'],map:['지도','MAP'],bank:['은행','BANK'],arch:['아카이브','SEONGSU ARCHIVE']};
-function openPhone(app){if(app==='map'){closePhone();openMap();return}phoneApp=app||phoneApp;$('phoneUI').hidden=false;if(!manual)paused=true;renderPhone()}
+const APPS={cam:['카메라','CAMERA'],gig:['성수 딜리버리','DELIVERY GIG'],msg:['메시지','MESSAGES'],sns:['성수그램','SEONGSUGRAM'],map:['지도','MAP'],bank:['은행','BANK'],arch:['아카이브','SEONGSU ARCHIVE']};
+function openPhone(app){if(app==='map'){closePhone();openMap();return}if(app==='cam'){openCam();return}phoneApp=app||phoneApp;$('phoneUI').hidden=false;if(!manual)paused=true;renderPhone()}
 function closePhone(){$('phoneUI').hidden=true;if(!manual&&$('pauseScr').hidden&&$('mapScr').hidden&&$('choice').hidden)paused=false;pressed.clear()}
 const hhmm=t=>`${String(Math.floor(t/60)%24).padStart(2,'0')}:${String(Math.floor(t)%60).padStart(2,'0')}`;
 function renderPhone(){
@@ -1171,13 +1231,15 @@ function renderPhone(){
   document.querySelectorAll('.ph-nav button').forEach(b=>b.classList.toggle('on',b.dataset.app===phoneApp));
   let h='';
   if(phoneApp==='msg'){h=MSGS.length?MSGS.map(m=>`<div class="msg"><img src="${portrait(m.who)}" alt=""><div><div class="n">${esc(WHO[m.who].ko)} · ${hhmm(m.t)}</div><div class="b">${esc(m.ko)}${m.en?`<div class="e">${esc(m.en)}</div>`:''}</div></div></div>`).join(''):'<div class="ph-empty">메시지가 없다.</div>'}
-  else if(phoneApp==='sns'){h=FEED.map(p=>`<div class="post"><div class="u"><span class="av" style="background:${USERS[p.user]||'#888'}">${esc(p.user[1].toUpperCase())}</span>${esc(p.user)} · ${hhmm(p.t)}</div><div class="tx">${esc(p.text)}</div><div class="lk">♥ ${p.likes.toLocaleString()}</div></div>`).join('')}
-  else if(phoneApp==='bank'){const S=[['완료한 미션',`${Math.min(story,MISSIONS.length)} / ${MISSIONS.length}`],['훔친 차',ST.stole],['턴 편의점',ST.robs],['격추한 드론',ST.drones],['폭발시킨 차',ST.boom],['최고 수배 등급','★'.repeat(ST.maxW)||'-'],['주행 거리',(ST.dist/T*3/1000).toFixed(1)+' km'],['데이터 칩',`${chipsGot} / ${CHIPS.length}`],['아카이브',`${ARCH.filter(a=>a.got).length} / ${ARCH.length}`]];
+  else if(phoneApp==='sns'){h=FEED.map(p=>`<div class="post"><div class="u"><span class="av" style="background:${USERS[p.user]||'#888'}">${esc(p.user[1].toUpperCase())}</span>${esc(p.user)} · ${hhmm(p.t)}</div>${p.img?`<img class="pimg" src="${p.img}" alt="">`:''}<div class="tx">${esc(p.text)}</div><div class="lk">♥ ${p.likes.toLocaleString()}</div></div>`).join('')}
+  else if(phoneApp==='gig'){h=`<div class="gig">${GIG?`<div class="stat"><span>진행</span><b>${GIG.stage==='pick'?'픽업하러 가는 중':'배달 중'}</b></div><div class="stat"><span>연속</span><b>${GIG.streak}건</b></div><div class="stat"><span>오늘 번 돈</span><b>$${GIG.earned}</b></div><button class="ghost" id="gigStop">알바 그만하기</button>`:`<p class="ph-empty">식당에서 음식을 받아 고객에게 배달한다. 빠를수록, 연속일수록 더 번다. 차든 스쿠터든 상관없다.</p><button id="gigStart">배달 시작</button>`}</div>`}
+  else if(phoneApp==='bank'){const S=[['완료한 미션',`${Math.min(story,MISSIONS.length)} / ${MISSIONS.length}`],['훔친 차',ST.stole],['제압한 적',ST.foes||0],['올린 사진',ST.photos||0],['턴 편의점',ST.robs],['격추한 드론',ST.drones],['폭발시킨 차',ST.boom],['최고 수배 등급','★'.repeat(ST.maxW)||'-'],['주행 거리',(ST.dist/T*3/1000).toFixed(1)+' km'],['데이터 칩',`${chipsGot} / ${CHIPS.length}`],['아카이브',`${ARCH.filter(a=>a.got).length} / ${ARCH.length}`]];
     h=`<div class="bal">$${money.toLocaleString()}</div>`+S.map(s=>`<div class="stat"><span>${s[0]}</span><b>${s[1]}</b></div>`).join('')}
   else if(phoneApp==='arch'){h=ARCH.map(a=>a.got?`<div class="arch"><h4>${esc(a.t)}</h4><p>${esc(a.ko)}</p><p class="en">${esc(a.en)}</p></div>`:`<div class="arch locked"><h4>??? · 미발견</h4><p>지도에서 오래된 장소를 찾아가라.</p></div>`).join('')}
   $('phBody').innerHTML=h;$('phBody').scrollTop=0;
+  const gs=$('gigStart');if(gs)gs.onclick=()=>{startGig();closePhone()};const gp=$('gigStop');if(gp)gp.onclick=()=>{stopGig('알바 종료');renderPhone()};
 }
-document.querySelectorAll('.ph-nav button').forEach(b=>b.addEventListener('click',()=>{const a=b.dataset.app;if(a==='map'){closePhone();openMap()}else{phoneApp=a;renderPhone()}}));
+document.querySelectorAll('.ph-nav button').forEach(b=>b.addEventListener('click',()=>{const a=b.dataset.app;if(a==='map'){closePhone();openMap()}else if(a==='cam')openCam();else{phoneApp=a;renderPhone()}}));
 let djT=12;
 function djLine(){const st=STATIONS[stationIdx];if(!st.dj)return;const line=NEWS.length?'뉴스 · '+NEWS.shift():rpick(st.dj);$('radioName').textContent=st.name;$('radioSub').textContent=line;const el=$('radio');el.classList.add('show');clearTimeout(el._t);el._t=setTimeout(()=>el.classList.remove('show'),6500)}
 
@@ -1261,10 +1323,10 @@ const MISSIONS=[
  setup(){const s=runner('seojin'),t=runner('taeo');place(s,P(99,64));place(t,P(99,64));parkFor(t,'gt',P(97,62),Math.PI/2);setPlayer(s)},
  intro:[['mira','오늘 밤이야. 코어는 OMNI 타워 로비 아래.','It\'s tonight. The core is under the OMNI Tower lobby.'],['cha','성수는 공장이었습니다. 저는 그걸 상품으로 만들었죠.','Seongsu was a factory. I turned it into a product.'],['taeo','그 상품, 오늘 반품하자.','Then let\'s return that product tonight.'],['seojin','들어가는 방법은 둘. 조용히, 아니면 화끈하게.','Two ways in. Quiet, or loud.']],
  steps:[
-  {type:'choice',pick:(k,m)=>{const s=runner('seojin'),t=runner('taeo');if(k==='loud'){s.ride=t.inCar;setPlayer(t);setWantedMin(3)}else{setPlayer(s);const h=P(105,78);for(let i=0;i<4;i++){const d=spawnDrone(h.x+rnd(-150,150),h.y+rnd(-150,150),'guard',{x:h.x+rnd(-140,140),y:h.y+rnd(-140,140)});d.mission=true;d.onAlert=()=>setWantedMin(3);m.ents.push(d)}}}},
+  {type:'choice',pick:(k,m)=>{const s=runner('seojin'),t=runner('taeo');if(k==='loud'){s.ride=t.inCar;setPlayer(t);setWantedMin(3)}else{setPlayer(s);for(const[x,y]of[[98,70],[112,74],[112,84],[98,86],[104,69]]){const q=P(x,y);spawnFoe(q.x,q.y,'guard',true).onAlert=()=>setWantedMin(3)}const h=P(105,78);for(let i=0;i<4;i++){const d=spawnDrone(h.x+rnd(-150,150),h.y+rnd(-150,150),'guard',{x:h.x+rnd(-140,140),y:h.y+rnd(-140,140)});d.mission=true;d.onAlert=()=>setWantedMin(3);m.ents.push(d)}}}},
   {type:'hack',only:'stealth',char:'seojin',pts:[P(99,73),P(111,78),P(105,85)],dur:2.5,text:'타워 외곽 보안 단말기를 해킹하라'},
   {type:'ram',only:'loud',char:'taeo',at:P(105,70),r:70,speed:280,text:'OMNI 타워 로비 게이트로 돌진하라 (속도를 높여라)'},
-  {type:'cut',only:'loud',start:()=>{const s=runner('seojin');s.ride=null;place(s,P(104,70))},lines:[['seojin','내가 들어간다. 엔진 끄지 마.','I\'m going in. Keep the engine running.'],['baek','로비 침입! 전 드론, 타워로 집결!','Lobby breach! All drones, converge on the tower!']]},
+  {type:'cut',only:'loud',start:()=>{const s=runner('seojin');s.ride=null;place(s,P(104,70));for(const[x,y]of[[99,68],[110,68],[99,74],[111,76]]){const q=P(x,y);spawnFoe(q.x,q.y,'guard',true).alert=true}},lines:[['seojin','내가 들어간다. 엔진 끄지 마.','I\'m going in. Keep the engine running.'],['baek','로비 침입! 전 드론, 타워로 집결!','Lobby breach! All drones, converge on the tower!']]},
   {type:'switch',only:'loud',to:'seojin',auto:true,text:'서진으로 전환 중'},
   {type:'hack',char:'seojin',pts:[P(105,70)],dur:5,text:'TTUK 코어를 추출하라 (E 길게)'},
   {type:'switch',to:'taeo',text:'Tab — 태오로 전환해 서진을 태워라',start:()=>setWantedMin(4),msg:['mira','코어 확보! 전부 몰려온다. 태오, 서진을 태워!','Core secured! Everyone is coming. Tae-o, pick her up!']},
@@ -1301,6 +1363,7 @@ function cleanupMission(){
   if(!MS)return;
   for(const e of MS.ents){if('z' in e)e.dead=true;else if(e!==player.inCar&&e.kind==='target'){e.kind='parked';e.keep=false}}
   for(const d of drones)if(d.mission)d.dead=true;
+  foes=foes.filter(f=>!f.mission);
   for(const r of RUNNERS)if(r.ride)dropRiders(r.ride);
 }
 function passMission(){
@@ -1405,8 +1468,195 @@ function respawn(){
   money=Math.max(0,money-(deadKind==='wasted'?500:800));
   if(player.inCar)exitCar(true);
   player.x=HOSPITAL.x;player.y=HOSPITAL.y;player.hp=100;wanted=0;evadeT=0;
-  cars=cars.filter(c=>c.kind!=='police');drones=drones.filter(d=>d.kind!=='police');
+  cars=cars.filter(c=>c.kind!=='police');drones=drones.filter(d=>d.kind!=='police');foes=[];bolts=[];GIG=null;
   dead=0;timeScale=1;cv.style.filter='';cam.x=player.x;cam.y=player.y;save();
+}
+
+/* ================= combat: taser, police on foot, OMNI guards ================= */
+function spawnFoe(x,y,kind,mission){const f={x,y,a:0,hp:kind==='guard'?3:2,kind,cd:rnd(.8,1.6),down:0,mission:!!mission,ph:rnd(0,6),hitT:0,home:{x,y},alert:kind!=='guard',vx:0,vy:0,leave:false};foes.push(f);return f}
+function downFoe(f){if(f.hp<=0)return;f.hp=0;f.down=9;ST.foes=(ST.foes||0)+1;if(f.kind==='cop')crime(1,.6)}
+function autoAim(){let b=null,bd=420;const o=player;
+  for(const f of foes)if(f.hp>0&&f.alert){const d=Math.hypot(f.x-o.x,f.y-o.y);if(d<bd){bd=d;b=f}}
+  for(const d of drones)if(!d.dead&&d.alert){const dd=Math.hypot(d.x-o.x,d.y-o.y);if(dd<bd){bd=dd;b=d}}
+  for(const p of peds)if(p.thief&&p.state!=='down'){const d=Math.hypot(p.x-o.x,p.y-o.y);if(d<bd){bd=d;b=p}}
+  return b}
+function fire(){
+  if(fireCD>0||player.inCar||dead)return;fireCD=.3;
+  let tx,ty;
+  if(mouse.has&&!isTouch&&!manual){tx=cam.x+(mouse.x-W/2)/cam.z;ty=cam.y+(mouse.y-H/2)/cam.z}
+  else{const t=autoAim();if(t){tx=t.x;ty=t.y}else{tx=player.x+Math.cos(player.a)*300;ty=player.y+Math.sin(player.a)*300}}
+  const a=Math.atan2(ty-player.y,tx-player.x);player.a=a;
+  bolts.push({x:player.x+Math.cos(a)*11,y:player.y+Math.sin(a)*11,vx:Math.cos(a)*980,vy:Math.sin(a)*980,life:.5,own:1,col:WHO[player.id].col});
+  parts.push({x:player.x+Math.cos(a)*12,y:player.y+Math.sin(a)*12,vx:0,vy:0,life:.08,max:.08,col:WHO[player.id].col,sz:26,add:1,flash:1});
+  tone(1500,.07,'square',.05,500);scare(player.x,player.y,160);
+  if(wanted===0&&cars.some(c=>c.kind==='police'&&Math.hypot(c.x-player.x,c.y-player.y)<350))crime(1);
+}
+function updateBolts(dt){
+  for(const b of bolts){
+    for(let k=0;k<3&&b.life>0;k++){
+      b.x+=b.vx*dt/3;b.y+=b.vy*dt/3;
+      if(solidPx(b.x,b.y)){b.life=0;sparks(b.x,b.y,4,b.col);break}
+      if(b.own){
+        for(const f of foes)if(f.hp>0&&Math.hypot(f.x-b.x,f.y-b.y)<12){f.hp--;f.hitT=.2;f.alert=true;if(f.hp<=0){f.hp=1;downFoe(f)}b.life=0;sparks(b.x,b.y,6,'#bff8ff');break}
+        if(b.life<=0)break;
+        for(const d of drones)if(!d.dead&&Math.hypot(d.x-b.x,d.y-b.y)<20){d.hp=(d.hp||2)-1;b.life=0;sparks(d.x,d.y,6,'#29e7ff');if(d.hp<=0){d.dead=true;ST.drones++;parts.push({x:d.x,y:d.y,vx:0,vy:0,life:.3,max:.3,col:'#29e7ff',sz:60,add:1,flash:1})}break}
+        if(b.life<=0)break;
+        for(const p of peds)if(p.state!=='down'&&Math.hypot(p.x-b.x,p.y-b.y)<9){p.state='down';p.t=10;p.vx=b.vx*.05;p.vy=b.vy*.05;b.life=0;scare(p.x,p.y,180);if(!p.thief)crime(1,.4);break}
+        if(b.life<=0)break;
+        for(const c of cars)if(c!==player.inCar&&Math.hypot(c.x-b.x,c.y-b.y)<c.len/2){b.life=0;sparks(b.x,b.y,5,'#ffcf6b');if(c.kind==='target')c.hp-=4;break}
+      }else{
+        const o=player.inCar||player;
+        if(Math.hypot(o.x-b.x,o.y-b.y)<(player.inCar?17:9)&&!ghost()){b.life=0;sparks(b.x,b.y,8,b.col);SFX.zap();if(manual)break;if(player.inCar)player.inCar.hp-=5;else{player.hp-=7;player.hurtT=3}}
+      }
+    }
+    b.life-=dt;
+  }
+  bolts=bolts.filter(b=>b.life>0);
+}
+function updateFoe(f,dt){
+  if(f.hp<=0){f.down-=dt;f.x+=f.vx*dt;f.y+=f.vy*dt;f.vx*=.9;f.vy*=.9;return}
+  if(f.hitT>0)f.hitT-=dt;
+  f.ph+=dt;
+  const o=player.inCar||player,dx=o.x-f.x,dy=o.y-f.y,d=Math.hypot(dx,dy)||1;
+  let mx=0,my=0,sp=0;
+  if(f.leave){mx=-dx/d;my=-dy/d;sp=110}
+  else if(!f.alert){const tx=f.home.x+Math.cos(f.ph*.5)*70,ty=f.home.y+Math.sin(f.ph*.5)*70,m=Math.hypot(tx-f.x,ty-f.y)||1;mx=(tx-f.x)/m;my=(ty-f.y)/m;sp=55;f.a=Math.atan2(my,mx);
+    if(d<210&&!ghost()){f.alert=true;SFX.zap();if(f.onAlert)f.onAlert()}}
+  else if(ghost()){mx=Math.cos(f.ph);my=Math.sin(f.ph);sp=40}
+  else{
+    f.a=Math.atan2(dy,dx);const want=d>210?1:d<110?-.7:0,st=Math.sin(f.ph*1.7);
+    mx=dx/d*want-dy/d*st*.6;my=dy/d*want+dx/d*st*.6;sp=125;
+    f.cd-=dt;
+    if(f.cd<=0&&d<420&&!dead&&lineClear(f.x,f.y,o.x,o.y)){f.cd=rnd(1.1,1.9);const a=f.a+rnd(-.09,.09);bolts.push({x:f.x+Math.cos(a)*10,y:f.y+Math.sin(a)*10,vx:Math.cos(a)*720,vy:Math.sin(a)*720,life:.75,own:0,col:f.kind==='guard'?'#ff2e88':'#ff4d5e'});tone(900,.06,'sawtooth',.03,300)}
+    if(f.kind==='cop'&&!player.inCar&&d<22)player.bustT+=dt*.8;
+  }
+  const nx=f.x+mx*sp*dt,ny=f.y+my*sp*dt;
+  if(!solidPx(nx,f.y))f.x=nx;if(!solidPx(f.x,ny))f.y=ny;
+}
+function drawFoe(f){
+  ctx.save();ctx.translate(f.x,f.y);
+  if(f.hp<=0){ctx.rotate(f.ph);ctx.fillStyle=f.kind==='guard'?'#2a0f24':'#1b2a4a';ctx.beginPath();ctx.ellipse(0,0,10,5,0,0,7);ctx.fill();
+    if(Math.sin(now*14)>0){ctx.strokeStyle='#bff8ff';ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(-6,-3);ctx.lineTo(0,3);ctx.lineTo(6,-3);ctx.stroke()}ctx.restore();return}
+  ctx.rotate(f.a);const fc=f.kind==='guard'?'#ff2e88':'#4d8dff';
+  if(!f.alert||f.kind==='guard'){ctx.globalCompositeOperation='lighter';ctx.globalAlpha=f.alert?.12:.2;ctx.drawImage(cone,4,-22,90,44);ctx.globalAlpha=1;ctx.globalCompositeOperation='source-over'}
+  ctx.fillStyle=f.hitT>0?'#fff':f.kind==='guard'?'#3a1434':'#23407a';ctx.beginPath();ctx.ellipse(0,0,6.5,9.5,0,0,7);ctx.fill();ctx.strokeStyle=fc;ctx.lineWidth=1.6;ctx.stroke();
+  ctx.fillStyle=f.kind==='guard'?'#0c0c12':'#0f1830';ctx.beginPath();ctx.arc(1,0,4.4,0,7);ctx.fill();
+  ctx.fillStyle=f.kind==='guard'?'#ff2e88':'#e8ecf5';ctx.fillRect(3,-3,2,6);
+  if(f.kind==='cop'){ctx.fillStyle='#ffe28a';ctx.fillRect(-2,-8,4,2)}
+  ctx.fillStyle='#33384a';ctx.fillRect(5,3,9,2.5);
+  ctx.restore();
+  if(f.alert){ctx.globalCompositeOperation='lighter';ctx.globalAlpha=.25;ctx.drawImage(glow(f.kind==='guard'?'#ff2e88':'#2a60ff'),f.x-22,f.y-22,44,44);ctx.globalAlpha=1;ctx.globalCompositeOperation='source-over'}
+}
+
+/* ================= garage: respray, repair, tuning ================= */
+const GOPTS=[
+  {k:'respray',ko:'리스프레이',sub:'새 도색. 경찰 시야 밖이면 수배가 풀린다',price:400},
+  {k:'repair',ko:'수리',sub:'차량 내구도 완전 복구',price:200},
+  {k:'nitro',ko:'니트로 키트',sub:'운전 중 Shift로 부스트 (모든 차량)',price:1500,perk:1},
+  {k:'armor',ko:'장갑 보강',sub:'모든 차량 피해 50% 감소',price:2000,perk:1},
+  {k:'engine',ko:'엔진 튜닝',sub:'최고 속도·가속 +15%',price:2500,perk:1},
+];
+const PAINTS=['#8a1c2b','#1f5f5b','#2b3a67','#d9a441','#e8ecf5','#111118','#6b2d5c','#29e7ff','#ff2e88','#3dff9b'];
+function openGarage(g){garageOpen=g;$('gName').innerHTML=`${esc(g.nm)}<small>RESPRAY · REPAIR · TUNING</small>`;renderGarage();$('garage').hidden=false;paused=true}
+function closeGarage(){$('garage').hidden=true;garageOpen=null;paused=false;pressed.clear()}
+function renderGarage(){
+  $('gOpts').innerHTML=GOPTS.map((o,i)=>{const owned=o.perk&&PERK[o.k];const dis=owned||money<o.price;return`<button class="gopt" data-i="${i}" ${dis?'disabled':''}><span>${i+1}. ${o.ko}<small>${o.sub}</small></span><b>${owned?'보유':'$'+o.price.toLocaleString()}</b></button>`}).join('');
+  $('gOpts').querySelectorAll('.gopt').forEach(b=>b.onclick=()=>buyGarage(+b.dataset.i));
+  const f=$('gOpts').querySelector('.gopt:not(:disabled)');if(f)f.focus();
+}
+function buyGarage(i){
+  const o=GOPTS[i],c=player.inCar;if(!o||money<o.price||(o.perk&&PERK[o.k]))return;
+  money-=o.price;SFX.cash();
+  if(o.k==='respray'&&c){c.col=PAINTS[(PAINTS.indexOf(c.col)+1+Math.floor(rnd(0,PAINTS.length-1)))%PAINTS.length];
+    if(wanted>0){if(!seenNow){wanted=0;evadeT=0;toast('SYSTEM','리스프레이 완료 · 수배 해제')}else toast('SYSTEM','경찰이 보고 있었다. 도색만 바뀌었다')}else toast('SYSTEM','리스프레이 완료')}
+  else if(o.k==='repair'&&c){c.hp=c.model==='bus'?220:100;toast('SYSTEM','수리 완료')}
+  else if(o.perk){PERK[o.k]=1;toast('SYSTEM',o.ko+' 장착 완료');post('@seongsu_cctv',rpick(['성수 모터스에서 튜닝한 차 봤음. 소리부터 다름','카센터 사장님이 오늘 밤 제일 바쁨']))}
+  save();renderGarage();
+}
+addEventListener('keydown',e=>{if(!garageOpen)return;
+  const m=/^Digit([1-5])$/.exec(e.code);if(m){buyGarage(+m[1]-1);e.stopImmediatePropagation()}else if(e.code==='Escape'){closeGarage();e.stopImmediatePropagation()}},true);
+$('garage').addEventListener('pointerdown',e=>{if(e.target.id==='garage')closeGarage()});
+
+/* ================= delivery gig ================= */
+const FOOD=/로스터리|카페|COFFEE|베이커리|라멘|치킨|국밥|브런치|와인바|편의점/;
+function gigPoint(near,minD,maxD,food){
+  for(let k=0;k<60;k++){
+    if(food){const cand=B.filter(b=>b.sign&&FOOD.test(b.sign));const b=rpick(cand);const p=snapWalk(b.x+(b.w>>1),b.y+b.h);const d=Math.hypot(p.x-near.x,p.y-near.y);if(d>=minD&&d<=maxD)return p;continue}
+    const a=rnd(0,6.28),d=rnd(minD,maxD),x=near.x+Math.cos(a)*d,y=near.y+Math.sin(a)*d,t=tileAtPx(x,y);
+    if(t===SIDE||t===PLAZA)return{x:(Math.floor(x/T)+.5)*T,y:(Math.floor(y/T)+.5)*T};
+  }
+  return snapWalk(Math.floor(near.x/T)+8,Math.floor(near.y/T));
+}
+function startGig(){if(MS){toast('SYSTEM','미션 중에는 알바를 할 수 없다');return}GIG={stage:'pick',streak:0,earned:0,timer:null,from:gigPoint(player,250,1300,true)};phone('sys','성수 딜리버리: 첫 주문 접수. 픽업하러 가자.','Seongsu Delivery: first order in. Go pick it up.')}
+function stopGig(msg){if(!GIG)return;if(msg)toast('SYSTEM',msg);GIG=null}
+function updateGig(dt){
+  if(!GIG||MS)return;
+  const tg=GIG.stage==='pick'?GIG.from:GIG.to;
+  if(GIG.timer!==null){GIG.timer-=dt;if(GIG.timer<=0){phone('sys',`배달 지연. 연속 ${GIG.streak}건 · 총 $${GIG.earned}`,`Late delivery. Streak ${GIG.streak} · $${GIG.earned} total`);stopGig();return}}
+  if(Math.hypot(tg.x-player.x,tg.y-player.y)<34){
+    if(GIG.stage==='pick'){GIG.stage='drop';GIG.to=gigPoint(player,700,1500,false);GIG.timer=Math.round(Math.hypot(GIG.to.x-player.x,GIG.to.y-player.y)/190)+14;SFX.pick();toast('SYSTEM','픽업 완료 · 고객에게 배달하라')}
+    else{const pay=Math.round((140+GIG.timer*9)*(1+GIG.streak*.15)/10)*10;money+=pay;GIG.earned+=pay;GIG.streak++;SFX.cash();banner('+$'+pay,`배달 완료 · 연속 ${GIG.streak}건`,'cy');
+      if(GIG.streak%3===0)post('@yeonmujang_eats',rpick(['오늘 배달 기사님 미쳤다. 주문 7분 만에 옴','비 오는데 배달이 이렇게 빨리 온다고?']));
+      GIG.stage='pick';GIG.timer=null;GIG.from=gigPoint(player,200,900,true);save()}
+  }
+}
+
+/* ================= phone camera ================= */
+function camScore(){
+  const z=cam.z,vx0=cam.x-W/2/z,vx1=cam.x+W/2/z,vy0=cam.y-H/2/z,vy1=cam.y+H/2/z,inV=(x,y)=>x>vx0&&x<vx1&&y>vy0&&y<vy1;
+  const tags=[];let sc=0;
+  const signs=B.filter(b=>(b.sign||b.holo)&&inV((b.x+b.w/2)*T,(b.y+b.h/2)*T)).length;sc+=Math.min(signs,8)*6;if(signs>=5)tags.push('#성수네온');
+  if(inV((OMNI_B.x+5)*T,(OMNI_B.y+7)*T)){sc+=25;tags.push('#OMNI타워')}
+  const pol=cars.filter(c=>c.kind==='police'&&!c.dead&&inV(c.x,c.y)).length;if(pol){sc+=pol*12;tags.push('#추격전')}
+  const dr=drones.filter(d=>!d.dead&&inV(d.x,d.y)).length;if(dr){sc+=dr*10;tags.push('#드론')}
+  const fire=cars.filter(c=>c.dead&&inV(c.x,c.y)).length;if(fire){sc+=fire*20;tags.push('실화냐')}
+  if(trains.some(t=>inV(t.x,t.y))){sc+=18;tags.push('#2호선')}
+  const other=RUNNERS.find(r=>r!==player);if(inV(other.x,other.y)&&!other.ride){sc+=15;tags.push(other.id==='taeo'?'@taeo_on_wheels':'@seojin.exe')}
+  if(TREES.filter(t=>!t.street&&inV(t.x,t.y)).length>20){sc+=10;tags.push('#서울숲')}
+  if(inV(P(63,98).x,P(63,98).y)){sc+=12;tags.push('#한강')}
+  if(wanted){sc+=wanted*8;tags.push('#수배중')}
+  if(rainK()>.85){sc+=10;tags.push('#폭우')}
+  return{sc,tags};
+}
+function openCam(){closePhone();if(player.inCar&&Math.hypot(player.inCar.vx,player.inCar.vy)>60){toast('SYSTEM','멈춘 상태에서 촬영할 수 있다');return}camMode=true;$('camUI').hidden=false;$('hud').hidden=true}
+function closeCam(){camMode=false;$('camUI').hidden=true;$('hud').hidden=false;pressed.clear()}
+function snap(){
+  const {sc,tags}=camScore();
+  const c=document.createElement('canvas');c.width=320;c.height=180;const g=c.getContext('2d');
+  const sw=Math.min(cv.width,cv.height*16/9)*.88,sh=sw*9/16;g.drawImage(cv,(cv.width-sw)/2,(cv.height-sh)/2,sw,sh,0,0,320,180);
+  const img=c.toDataURL('image/jpeg',.72);
+  const likes=Math.round(sc*rnd(9,22)+rnd(3,60));const pay=Math.min(600,Math.floor(likes/18)*10);
+  const cap=rpick(['오늘 밤 성수.','비 오는 성수는 못 참지','여기가 2077년 성수다','찍고 튄다','OMNI 보고 있냐'])+' '+['#네온성수',...tags].join(' ');
+  const me=player.id==='seojin'?'@seojin.exe':'@taeo_on_wheels';
+  FEED.unshift({user:me,text:cap,likes,img,t:gameClock,mine:1});if(FEED.length>40)FEED.pop();
+  money+=pay;ST.photos=(ST.photos||0)+1;camFlash=.35;noise(.12,.25,5000,'highpass');
+  toast(me,`게시 완료 · ♥ ${likes.toLocaleString()} · 광고 수익 +$${pay}`);save();
+}
+USERS['@seojin.exe']='#29e7ff';USERS['@taeo_on_wheels']='#ffb347';
+
+/* ================= street events ================= */
+function eventSpot(minD,maxD){for(let k=0;k<30;k++){const a=rnd(0,6.28),d=rnd(minD,maxD),x=player.x+Math.cos(a)*d,y=player.y+Math.sin(a)*d,t=tileAtPx(x,y);if(t===SIDE||t===PLAZA)return{x:(Math.floor(x/T)+.5)*T,y:(Math.floor(y/T)+.5)*T}}return null}
+function spawnEvent(){
+  const s=eventSpot(300,620);if(!s)return;
+  if(Math.random()<.6){
+    const v={x:s.x,y:s.y,d:0,spd:0,t:6,state:'walk',col:'#5a4a3a',umb:'#ffb347',ph:0};peds.push(v);
+    const th={x:s.x+14,y:s.y,d:0,spd:0,t:40,state:'flee',fx:s.x,fy:s.y,col:'#111',umb:null,ph:0,thief:1};peds.push(th);
+    bubbles.push({p:v,text:'도둑이야! 누가 좀 잡아줘요!',t:4.5});
+    EVT={type:'thief',p:th,v,t:45};toast('SYSTEM','근처에서 소매치기 발생 · 도둑을 쓰러뜨려라 (테이저 G/클릭, EMP, 차)');
+  }else{EVT={type:'loot',x:s.x,y:s.y,t:50};toast('SYSTEM','OMNI 배송 드론 추락 · 화물을 챙길 수 있다 (수배 주의)')}
+}
+function updateEvent(dt){
+  evtT-=dt;
+  if(!EVT){if(evtT<=0&&!MS&&!GIG&&!manual){evtT=rnd(55,95);spawnEvent()}return}
+  EVT.t-=dt;
+  if(EVT.type==='thief'){const p=EVT.p;
+    if(p.state==='down'){const cash=300;money+=cash;SFX.cash();banner('+$'+cash,'소매치기 제압','cy');post('@seongsu_cctv',rpick(['연무장길 소매치기 제압 영상. 테이저 한 방','도둑 잡은 사람 누구야? 멋있다']));EVT=null;save();return}
+    if(p.state==='flee'){p.t=Math.max(p.t,1);const o=player.inCar||player;if(Math.hypot(o.x-p.x,o.y-p.y)<320){p.fx=o.x;p.fy=o.y}}
+    if(EVT.t<=0||Math.hypot(p.x-player.x,p.y-player.y)>1300){toast('SYSTEM','도둑이 사라졌다');EVT=null}
+  }else if(EVT.type==='loot'){
+    if(Math.hypot(EVT.x-player.x,EVT.y-player.y)<30){money+=450;SFX.cash();banner('+$450','OMNI 화물 확보','cy');addWanted(1);EVT=null;save();return}
+    if(EVT.t<=0){EVT=null}
+  }
 }
 
 /* ================= update ================= */
@@ -1414,6 +1664,7 @@ let flowT=0,gpsT=0,gpsKey='',gpsPath=[],spawnT=0,zoneT=0,archT=0,bubbleT=2,attra
 function focusPt(){return state==='play'?(player.inCar||player):cam}
 const CHAT=['팝업 줄 봤어? 세 시간째래','우산 또 잃어버렸다…','OMNI 드론 또 떴네','여기 원래 구두 공장 골목이었대','비 그친 날 기억나?','블랙 로스터리 커피 미쳤어','우리 할아버지가 여기서 구두 만드셨대','서울숲이 옛날엔 경마장이었다며','OMNI 타워 불빛 좀 꺼줬으면','오늘 강변북로에서 레이스 한대','내 신발 수제화야. 성수산','월세가 또 올랐어','NEON FM 틀어봐','성수 떠나는 사람 너무 많다','2호선은 밤새 다니네','TTUK이 뭔지 아는 사람?','저 사람 방금 차 훔쳤지?'];
 function update(dt){
+  simT+=dt;if(fireCD>0)fireCD-=dt;
   const f=focusPt();
   for(const r of RUNNERS){if(r.ride){r.x=r.ride.x;r.y=r.ride.y}else if(r.inCar&&r!==player){r.x=r.inCar.x;r.y=r.inCar.y}}
   if(state==='title'){
@@ -1423,8 +1674,9 @@ function update(dt){
     promptText='';
     if(CUT){CUT.t+=dt;if(manual&&CUT.t>2.2)cutNext()}
     else if(sw){sw.t+=dt;if(!sw.done&&sw.t>=.75){setPlayer(sw.to);sw.done=true}if(sw.t>=1.6){sw=null;$('switchCard').hidden=true}}
+    else if(camMode){if(pressed.has('KeyE')||pressed.has('Space')||pressed.has('Fire'))snap();if(pressed.has('Escape')||pressed.has('KeyT'))closeCam();pressed.delete('Escape');pressed.delete('KeyT');pressed.delete('KeyM')}
     else if(!dead){
-      updatePlayer(dt);updateMission(dt);
+      updatePlayer(dt);updateMission(dt);updateGig(dt);updateEvent(dt);
       if(pressed.has('Tab')&&!(MS&&curStep()&&(curStep().type==='switch'||curStep().char&&curStep().char!==player.id)))beginSwitch(RUNNERS.find(r=>r!==player),false);
     }
     // special ability
@@ -1439,6 +1691,8 @@ function update(dt){
         break}}
     }
     for(const s of STORES)if(s.cd>0)s.cd-=dt;
+    if(!promptText&&player.inCar&&!CUT&&!camMode)for(const g of GARAGES){if(Math.hypot(g.p.x-player.x,g.p.y-player.y)<48){if(Math.hypot(player.inCar.vx,player.inCar.vy)>70)promptText='정비소 · 속도를 줄여라';else{promptText='<kbd>E</kbd>'+g.nm+' 이용';if(pressed.has('KeyE'))openGarage(g)}break}}
+    if(player.inCar){if(nitroOn){nitro=Math.max(0,nitro-38*dt);const c=player.inCar;for(let i=0;i<2;i++)parts.push({x:c.x-Math.cos(c.a)*c.len/2,y:c.y-Math.sin(c.a)*c.len/2,vx:-Math.cos(c.a)*rnd(80,200)+rnd(-30,30),vy:-Math.sin(c.a)*rnd(80,200)+rnd(-30,30),life:.25,max:.25,col:rpick(['#29e7ff','#ff7a2e','#fff1a8']),sz:rnd(3,6),add:1})}else nitro=Math.min(100,nitro+9*dt)}
     if(pressed.has('KeyR')){stationIdx=(stationIdx+1)%STATIONS.length;showRadio()}
     if(pressed.has('KeyM'))openMap();
     if(pressed.has('KeyT'))openPhone();
@@ -1458,9 +1712,13 @@ function update(dt){
     if(c.hp<25&&Math.random()<.15)smoke(c.x,c.y);
     if(c.hp<=0)explode(c);
   }
+  const armorCar=PERK.armor&&player.inCar,armorHp=armorCar?armorCar.hp:0;
   collideCars();
   for(const p of peds)updatePed(p,dt);
+  for(const fo of foes)updateFoe(fo,dt);
+  updateBolts(dt);
   for(const d of drones)if(!d.dead)updateDrone(d,dt);
+  if(armorCar&&armorCar===player.inCar&&armorCar.hp<armorHp)armorCar.hp=armorHp-(armorHp-armorCar.hp)*.5;
   for(const t of trains){t.x+=t.dir*380*dt;if(t.dir>0&&t.x>MW*T+900)t.x=-900;if(t.dir<0&&t.x<-900)t.x=MW*T+900}
   // weather
   nextBolt-=dt;if(nextBolt<=0){nextBolt=rnd(18,45);flashT=.5;SFX.thunder()}
@@ -1473,7 +1731,12 @@ function update(dt){
     for(const c of cars)if(c.kind==='police'&&!c.dead){const d=Math.hypot(c.x-o.x,c.y-o.y);near=Math.min(near,d);if(d<520&&c.stun<=0)seen=true;
       if(!player.inCar&&d<44&&Math.hypot(c.vx,c.vy)<100&&c.stun<=0&&!ghost()){player.bustT+=dt}}
     for(const d of drones)if(!d.dead&&d.kind==='police'&&Math.hypot(d.x-o.x,d.y-o.y)<420)seen=true;
+    for(const fo of foes)if(fo.hp>0&&fo.kind==='cop'&&Math.hypot(fo.x-o.x,fo.y-o.y)<380)seen=true;
     if(ghost())seen=false;
+    for(const c of cars)if(c.kind==='police'&&!c.dead&&!c.unloaded&&wanted>=2&&!player.inCar&&Math.hypot(c.vx,c.vy)<60&&Math.hypot(c.x-o.x,c.y-o.y)<300){c.unloaded=true;c.kind='parked';c.driver=false;for(const s2 of[1,-1])spawnFoe(c.x-Math.sin(c.a)*20*s2,c.y+Math.cos(c.a)*20*s2,'cop',false)}
+    if(wanted>=4&&Math.random()<.004&&foes.filter(q=>q.kind==='guard'&&q.hp>0&&!q.mission).length<4){const s3=eventSpot(420,650);if(s3)spawnFoe(s3.x,s3.y,'guard',false)}
+    if(wanted===0)for(const fo of foes)if(!fo.mission&&fo.hp>0)fo.leave=true;
+    if(player.inCar&&wanted===0&&crimeCD<=0){const c=player.inCar,sp=Math.hypot(c.vx,c.vy);if(sp>230){const I=XS.find(q=>c.x>q.x0&&c.x<q.x1&&c.y>q.y0&&c.y<q.y1);if(I&&lightState(I,Math.abs(c.vx)>Math.abs(c.vy))==='r'&&cars.some(p=>p.kind==='police'&&Math.hypot(p.x-c.x,p.y-c.y)<450)){crime(1);toast('SYSTEM','신호 위반 · 경찰에게 걸렸다')}}}
     seenNow=seen||wanted===0;
     if(seen){lastSeen={x:o.x,y:o.y};evadeT=0}
     if(player.inCar||near>44)player.bustT=Math.max(0,player.bustT-dt);
@@ -1523,6 +1786,7 @@ function update(dt){
     cars=cars.filter(c=>RUNNERS.some(r=>r.inCar===c||r.ride===c)||c.keep&&!c.dead||Math.hypot(c.x-f.x,c.y-f.y)<(c.kind==='parked'?2200:1700)&&!(c.dead&&c.burn<=0));
     peds=peds.filter(p=>Math.hypot(p.x-f.x,p.y-f.y)<1500&&!(p.state==='down'&&p.t<=0));
     drones=drones.filter(d=>!d.dead&&(d.mission||Math.hypot(d.x-f.x,d.y-f.y)<2000));
+    foes=foes.filter(q=>q.mission?q.hp>0||q.down>0:(q.hp>0?Math.hypot(q.x-f.x,q.y-f.y)<(q.leave?800:1600):q.down>0));
   }
   // camera
   if(state==='play'){
@@ -1543,7 +1807,7 @@ function update(dt){
   pressed.clear();
 }
 const MS_FREE={h:0};
-function navTarget(){if(MS)return stepTarget();if(story<MISSIONS.length){const d=MISSIONS[story];return d.giver}return null}
+function navTarget(){if(MS)return stepTarget();if(GIG)return GIG.stage==='pick'?GIG.from:GIG.to;if(story<MISSIONS.length){const d=MISSIONS[story];return d.giver}return null}
 function rainK(){return .65+.35*Math.sin(playT/37)}
 function showArch(a){$('archN').textContent=`${ARCH.filter(x=>x.got).length}/${ARCH.length}`;$('archT').textContent=a.t;$('archKo').textContent=a.ko;$('archEn').textContent=a.en;$('archCard').classList.add('show');archT=9}
 
@@ -1720,11 +1984,24 @@ function render(){
   for(const l of LAMPS){if(l.x<vx0||l.x>vx1||l.y<vy0||l.y>vy1)continue;ctx.fillStyle='#fff3d6';ctx.fillRect(l.x-1.5,l.y-1.5,3,3)}
   // search zone
   if(state==='play'&&wanted>0&&!seenNow){const Rz=260+wanted*110;ctx.fillStyle='rgba(255,40,72,.06)';ctx.strokeStyle='rgba(255,40,72,.35)';ctx.lineWidth=3;ctx.setLineDash([14,10]);ctx.beginPath();ctx.arc(lastSeen.x,lastSeen.y,Rz,0,7);ctx.fill();ctx.stroke();ctx.setLineDash([])}
+  // traffic lights and stop lines
+  for(const I of XS){if(I.x1<vx0||I.x0>vx1||I.y1<vy0||I.y0>vy1)continue;
+    const hs=lightState(I,true),vs=lightState(I,false),hm=(I.y0+I.y1)/2,vm=(I.x0+I.x1)/2;
+    ctx.fillStyle='rgba(240,240,255,.35)';ctx.fillRect(I.x0-7,hm,3,I.y1-hm);ctx.fillRect(I.x1+4,I.y0,3,hm-I.y0);ctx.fillRect(I.x0,I.y0-7,vm-I.x0,3);ctx.fillRect(vm,I.y1+4,I.x1-vm,3);
+    for(const[x,y,st]of[[I.x0-10,I.y1+10,hs],[I.x1+10,I.y0-10,hs],[I.x0-10,I.y0-10,vs],[I.x1+10,I.y1+10,vs]]){ctx.fillStyle='#0a0b10';ctx.fillRect(x-4,y-4,8,8);ctx.fillStyle=LCOL[st];ctx.beginPath();ctx.arc(x,y,2.6,0,7);ctx.fill()}}
+  ctx.globalCompositeOperation='lighter';ctx.globalAlpha=.35;
+  for(const I of XS){if(I.x1<vx0||I.x0>vx1||I.y1<vy0||I.y0>vy1)continue;const hs=lightState(I,true),vs=lightState(I,false);
+    for(const[x,y,st]of[[I.x0-10,I.y1+10,hs],[I.x1+10,I.y0-10,hs],[I.x0-10,I.y0-10,vs],[I.x1+10,I.y1+10,vs]])ctx.drawImage(glow(LCOL[st]),x-12,y-12,24,24)}
+  ctx.globalAlpha=1;ctx.globalCompositeOperation='source-over';
   const tg=state==='play'?navTarget():null;
   const pulse=(Math.sin(now*4)+1)/2;
   const ring=(p,r,col)=>{ctx.strokeStyle=col;ctx.globalAlpha=.5+pulse*.4;ctx.lineWidth=3;ctx.beginPath();ctx.arc(p.x,p.y,r*(0.85+pulse*.15),0,7);ctx.stroke();ctx.globalAlpha=.12;ctx.fillStyle=col;ctx.fill();ctx.globalAlpha=1};
   if(state==='play'){
     if(!MS&&story<MISSIONS.length&&MISSIONS[story].giver){const d=MISSIONS[story];ring(d.giver,36,GIVER_MARK[d.char][1])}
+    for(const g of GARAGES)if(g.p.x>vx0&&g.p.x<vx1&&g.p.y>vy0&&g.p.y<vy1){ctx.strokeStyle='rgba(41,231,255,.7)';ctx.lineWidth=3;ctx.setLineDash([8,6]);ctx.beginPath();ctx.arc(g.p.x,g.p.y,30,0,7);ctx.stroke();ctx.setLineDash([]);ctx.fillStyle='#29e7ff';ctx.font='bold 12px "IBM Plex Mono",monospace';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText('GARAGE',g.p.x,g.p.y)}
+    if(GIG&&!MS){const gt=GIG.stage==='pick'?GIG.from:GIG.to;ring(gt,30,'#b36bff')}
+    if(EVT&&EVT.type==='thief'&&EVT.p.state!=='down')ring(EVT.p,16,'#ff5b5b');
+    if(EVT&&EVT.type==='loot'){ctx.save();ctx.translate(EVT.x,EVT.y);ctx.rotate(.6);ctx.fillStyle='#2a0f24';ctx.fillRect(-10,-10,20,20);ctx.strokeStyle='#ff2e88';ctx.lineWidth=2;ctx.strokeRect(-10,-10,20,20);ctx.restore();ring(EVT,22,'#ff2e88')}
     for(const s of STORES)if(s.cd<=0&&s.x>vx0&&s.x<vx1&&s.y>vy0&&s.y<vy1){ctx.fillStyle='rgba(61,255,155,.25)';ctx.beginPath();ctx.arc(s.x,s.y,10,0,7);ctx.fill();ctx.fillStyle='#3dff9b';ctx.font='bold 11px "IBM Plex Mono",monospace';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText('$',s.x,s.y)}
     for(const a of ARCH)if(!a.got&&a.p.x>vx0&&a.p.x<vx1&&a.p.y>vy0&&a.p.y<vy1){ctx.strokeStyle='rgba(255,179,71,.6)';ctx.lineWidth=2;ctx.beginPath();ctx.arc(a.p.x,a.p.y,12+pulse*3,0,7);ctx.stroke();ctx.fillStyle='#ffb347';ctx.fillRect(a.p.x-3,a.p.y-6,6,12)}
     if(MS){const s=curStep();
@@ -1738,6 +2015,7 @@ function render(){
     ctx.globalCompositeOperation='lighter';ctx.globalAlpha=.6;ctx.drawImage(glow('#29e7ff'),c.x-22,c.y-22,44,44);ctx.globalAlpha=1;ctx.globalCompositeOperation='source-over';
     ctx.save();ctx.translate(c.x,c.y);ctx.rotate(now*2);ctx.scale(Math.cos(now*3),1);ctx.fillStyle='#bff8ff';ctx.beginPath();ctx.moveTo(0,-8);ctx.lineTo(6,0);ctx.lineTo(0,8);ctx.lineTo(-6,0);ctx.closePath();ctx.fill();ctx.restore()}
   for(const p of peds){if(p.x<vx0||p.x>vx1||p.y<vy0||p.y>vy1)continue;drawPed(p)}
+  for(const fo of foes){if(fo.x<vx0||fo.x>vx1||fo.y<vy0||fo.y>vy1)continue;drawFoe(fo)}
   const pc=player.inCar;
   if(pc&&state==='play'){ctx.globalCompositeOperation='lighter';ctx.globalAlpha=.55;ctx.drawImage(glow(WHO[player.id].col),pc.x-40,pc.y-40,80,80);ctx.globalAlpha=1;ctx.globalCompositeOperation='source-over'}
   for(const c of cars){if(c.x<vx0||c.x>vx1||c.y<vy0||c.y>vy1)continue;drawCar(c)}
@@ -1749,6 +2027,7 @@ function render(){
     ctx.save();ctx.translate(c.x,c.y);ctx.rotate(c.a);ctx.globalAlpha=.22;ctx.drawImage(cone,c.len/2-2,-40*cs,160*cs,80*cs);ctx.globalAlpha=.35;ctx.drawImage(glow('#ff2848'),-c.len/2-14,-14,28,28);ctx.restore();
     if(c.model==='police'){ctx.globalAlpha=.5;ctx.drawImage(glow(Math.floor(now*8)%2?'#ff2848':'#2a60ff'),c.x-50,c.y-50,100,100)}
   }
+  ctx.lineWidth=2.5;for(const b of bolts){ctx.globalAlpha=1;ctx.strokeStyle=b.col;ctx.beginPath();ctx.moveTo(b.x,b.y);ctx.lineTo(b.x-b.vx*.025,b.y-b.vy*.025);ctx.stroke()}
   for(const d of drones){if(d.dead)continue;ctx.globalAlpha=.3;ctx.drawImage(glow(d.kind==='police'?'#2a60ff':'#ff2e88'),d.x-45,d.y-45,90,90)}
   for(const p of parts){
     const a=clamp(p.life/p.max,0,1);
@@ -1811,6 +2090,8 @@ function render(){
   ctx.fillStyle=vignette;ctx.fillRect(0,0,W,H);
   if(spOn==='taeo'){ctx.fillStyle='rgba(255,150,40,.1)';ctx.fillRect(0,0,W,H)}
   if(spOn==='seojin'){ctx.fillStyle='rgba(41,231,255,.08)';ctx.fillRect(0,0,W,H)}
+  if(state==='play'&&!manual&&!player.inCar&&mouse.has&&!isTouch&&!camMode&&!CUT){ctx.strokeStyle=WHO[player.id].col;ctx.lineWidth=1.5;ctx.beginPath();ctx.arc(mouse.x,mouse.y,9,0,7);ctx.moveTo(mouse.x-15,mouse.y);ctx.lineTo(mouse.x-5,mouse.y);ctx.moveTo(mouse.x+5,mouse.y);ctx.lineTo(mouse.x+15,mouse.y);ctx.moveTo(mouse.x,mouse.y-15);ctx.lineTo(mouse.x,mouse.y-5);ctx.moveTo(mouse.x,mouse.y+5);ctx.lineTo(mouse.x,mouse.y+15);ctx.stroke()}
+  if(camFlash>0){ctx.fillStyle=`rgba(255,255,255,${camFlash*2})`;ctx.fillRect(0,0,W,H);camFlash-=.016}
   if(flashT>0){ctx.fillStyle=`rgba(210,220,255,${clamp(flashT*.9,0,.45)*(flashT>.38||flashT<.2?1:.3)})`;ctx.fillRect(0,0,W,H)}
   if(player.hurtT>2.5&&state==='play'){ctx.fillStyle=`rgba(255,40,72,${(player.hurtT-2.5)*.4})`;ctx.fillRect(0,0,W,H)}
 }
@@ -1852,6 +2133,9 @@ function drawMini(){
   if(gpsPath.length>2){g.strokeStyle=MS&&curStep()&&curStep().type==='race'?'#29e7ff':'#ffb347';g.lineWidth=1.3;g.lineJoin='round';g.beginPath();g.moveTo(gpsPath[0]+.5,gpsPath[1]+.5);for(let i=2;i<gpsPath.length;i+=2)g.lineTo(gpsPath[i]+.5,gpsPath[i+1]+.5);g.stroke()}
   const blip=(p,c,r=1.6)=>{g.fillStyle=c;g.beginPath();g.arc(p.x/T,p.y/T,r,0,7);g.fill()};
   for(const s of STORES)if(s.cd<=0)blip(s,'#3dff9b',1);
+  for(const gg of GARAGES)blip(gg.p,'#29e7ff',1.6);
+  for(const fo of foes)if(fo.hp>0&&fo.alert)blip(fo,'#ff4d5e',.9);
+  if(EVT)blip(EVT.type==='thief'?EVT.p:EVT,'#ff5b5b',1.6);
   for(const c of cars)if(c.kind==='police'&&!c.dead)blip(c,Math.floor(now*6)%2?'#ff2848':'#2a60ff',1.4);
   for(const d of drones)if(!d.dead&&(d.kind==='police'||d.mission))blip(d,'#ff2e88',1.2);
   for(const r of RUNNERS)if(r!==player&&!r.ride)blip(r.inCar||r,WHO[r.id].col,1.8);
@@ -1885,7 +2169,7 @@ $('btnFree').onclick=()=>{$('endScr').hidden=true;paused=false};
 addEventListener('keydown',e=>{
   if(!$('mapScr').hidden&&(e.code==='KeyM'||e.code==='Escape')){$('mapScr').hidden=true;paused=false;pressed.clear();e.stopImmediatePropagation()}
   else if(!$('phoneUI').hidden&&(e.code==='KeyT'||e.code==='Escape'||e.code==='Backspace')){closePhone();e.stopImmediatePropagation()}
-  else if(!$('phoneUI').hidden&&/^Digit[1-5]$/.test(e.code)){const a=['msg','sns','map','bank','arch'][+e.code.slice(5)-1];if(a==='map'){closePhone();openMap()}else{phoneApp=a;renderPhone()}e.stopImmediatePropagation()}
+  else if(!$('phoneUI').hidden&&/^Digit[1-7]$/.test(e.code)){const a=['msg','sns','cam','gig','map','bank','arch'][+e.code.slice(5)-1];if(a==='map'){closePhone();openMap()}else if(a==='cam')openCam();else{phoneApp=a;renderPhone()}e.stopImmediatePropagation()}
   else if(!$('pauseScr').hidden&&(e.code==='KeyP'||e.code==='Escape')){setPause(false);e.stopImmediatePropagation()}
 },true);
 function showRadio(){const s=STATIONS[stationIdx];$('radioName').textContent=s.name;$('radioSub').textContent=s.sub;const el=$('radio');el.classList.add('show');clearTimeout(el._t);el._t=setTimeout(()=>el.classList.remove('show'),2600)}
@@ -1901,6 +2185,7 @@ function hud(dt){
   const c=player.inCar;$('carBarWrap').style.visibility=c?'visible':'hidden';setT('carLabel',c?'차량 내구도':'');
   if(c)$('carBar').style.width=clamp(c.hp/(c.model==='bus'?2.2:1),0,100)+'%';
   $('empBar').style.width=(100-clamp(empCD/3.5,0,1)*100)+'%';
+  $('nitroWrap').hidden=!(PERK.nitro&&c);if(PERK.nitro&&c)$('nitroBar').style.width=nitro+'%';
   const w=WHO[player.id];if(cache.who!==player.id){cache.who=player.id;$('who').style.setProperty('--c',w.col);$('whoPic').src=portrait(player.id);$('whoName').textContent=w.ko}
   setT('whoSp',spOn?(player.id==='seojin'?'고스트 작동 중':'포커스 작동 중'):`X · ${player.id==='seojin'?'고스트':'포커스'}`);$('spBar').style.width=player.sp+'%';
   if(MS){const s=curStep();let obj=s?(s.text||''):'';
@@ -1912,6 +2197,7 @@ function hud(dt){
     else if(s&&s.type==='choice')obj='접근 방식을 골라라';
     setT('mTitle',MS.def.title);setT('mObj',obj);
     if(MS.timer!==null){const t=Math.max(0,MS.timer);setT('mTimer',`${Math.floor(t/60)}:${String(Math.floor(t%60)).padStart(2,'0')}`);$('mTimer').classList.toggle('low',t<15)}else setT('mTimer','');
+  }else if(GIG){setT('mTitle',`성수 딜리버리 · 연속 ${GIG.streak}건`);setT('mObj',GIG.stage==='pick'?'보라색 표시의 식당에서 음식을 픽업하라':'고객에게 음식을 배달하라');if(GIG.timer!==null){const t=Math.max(0,GIG.timer);setT('mTimer',`${Math.floor(t/60)}:${String(Math.floor(t%60)).padStart(2,'0')}`);$('mTimer').classList.toggle('low',t<10)}else setT('mTimer','')
   }else if(story<MISSIONS.length){const d=MISSIONS[story];setT('mTitle','다음 의뢰 · '+d.title);setT('mObj',`${d.char==='both'?'서진 또는 태오':WHO[d.char].ko} — 지도의 ${GIVER_MARK[d.char][0]} 표시로 가서 E. 편의점($)과 아카이브(■)도 찾아보자.`);setT('mTimer','')}
   else{setT('mTitle','자유 모드');setT('mObj',`남은 데이터 칩 ${CHIPS.length-chipsGot}개 · 아카이브 ${ARCH.length-ARCH.filter(a=>a.got).length}곳. 성수의 밤을 즐겨라.`);setT('mTimer','')}
   setT('prompt',promptText,true);$('prompt').classList.toggle('show',!!promptText&&!dead&&!CUT);
@@ -1965,11 +2251,12 @@ function autoTick(dt){
   if(o.switchAt&&!a.sw&&a.t>o.switchAt){a.sw=1;beginSwitch(RUNNERS.find(r=>r!==player),true)}
   if(o.phoneAt&&!a.ph&&a.t>o.phoneAt){a.ph=1;openPhone('sns')}
   if(o.ghostAt&&!a.gh&&a.t>o.ghostAt){a.gh=1;player.sp=100;spOn=player.id}
+  if(o.autoFire){pressed.add('KeyG');const t=autoAim();if(t){const dx=t.x-player.x,dy=t.y-player.y,m=Math.hypot(dx,dy)||1,st=Math.sin(a.t*1.3);autoAxis={x:(-dy/m*st+(m>200?dx/m:0))*.6,y:(dx/m*st+(m>200?dy/m:0))*.6}}}
 }
 function setupScene(o){
   manual=true;state='play';paused=false;story=o.story!==undefined?o.story:MISSIONS.length;bannerT=0;$('banner').classList.remove('show');archT=0;$('archCard').classList.remove('show');toastT=0;$('toast').classList.remove('show');
   ['title','pauseScr','mapScr','endScr','cut','choice','switchCard','phoneUI'].forEach(id=>$(id).hidden=true);$('hud').hidden=false;
-  cars=[];peds=[];drones=[];parts=[];skids=[];bubbles=[];MS=null;CUT=null;sw=null;spOn=null;wanted=0;dead=0;timeScale=1;cv.style.filter='';phoneQ=[];
+  cars=[];peds=[];drones=[];parts=[];skids=[];bubbles=[];foes=[];bolts=[];GIG=null;EVT=null;camMode=false;$('camUI').hidden=true;MS=null;CUT=null;sw=null;spOn=null;wanted=0;dead=0;timeScale=1;cv.style.filter='';phoneQ=[];
   for(const k in keys)keys[k]=false;
   for(const r of RUNNERS){r.inCar=null;r.ride=null;r.hp=100;r.sp=100}
   const me=runner(o.who),other=RUNNERS.find(r=>r!==me);player=me;
@@ -1981,6 +2268,7 @@ function setupScene(o){
   const f=me.inCar||me;
   if(o.wanted){wanted=o.wanted;lastSeen={x:f.x,y:f.y};seenNow=true}
   for(let i=0;i<(o.police||0);i++){const a=(o.car?o.car.a:0)+Math.PI+rnd(-.5,.5),d=rnd(160,320);const c=makeCar(f.x+Math.cos(a)*d,f.y+Math.sin(a)*d,o.car?o.car.a:0,'police','police');if(carHits(c,c.x,c.y,c.a)){const p=nearestRoad(c);c.x=p.x;c.y=p.y}}
+  for(let i=0;i<(o.foes||0);i++){const a2=i/(o.foes)*6.28,q=snapWalk(Math.floor((f.x+Math.cos(a2)*230)/T),Math.floor((f.y+Math.sin(a2)*230)/T));spawnFoe(q.x,q.y,o.foeKind||'cop',false)}
   for(let i=0;i<(o.drones||0);i++){const h={x:f.x+rnd(-300,300),y:f.y+rnd(-300,300)};const d=spawnDrone(h.x,h.y,o.guard?'guard':'police',h);d.alert=!o.guard}
   for(let i=0;i<46;i++)spawnTraffic(f,140);
   for(let i=0;i<60;i++)spawnPed(f,60);
@@ -2003,6 +2291,8 @@ const SCENES={
   rob(){const s=nearestStore(P(100,56));return setupScene({who:'seojin',foot:{x:s.x,y:s.y+4},rob:true})},
   heist(){return setupScene({who:'taeo',car:{model:'gt',at:PC(97.5,70),a:Math.PI/2},rider:'seojin',route:[PC(97.5,88.6),PC(70,88.6),PC(63.5,93),PC(63.5,98)],vmax:580,wanted:4,police:4,drones:3})},
   race(){return setupScene({who:'taeo',car:{model:'gt',at:PC(76,88.9),a:0},route:[],vmax:640,mission:4,step:1})},
+  combat(){return setupScene({who:'seojin',foot:P(90,51),wanted:3,foes:4,foeKind:'guard',autoFire:true})},
+  lights(){return setupScene({who:'taeo',car:{model:'sedan',at:PC(66,39),a:0},route:[PC(96,38.9),PC(112,38.9)],vmax:300})},
   forest(){return setupScene({who:'seojin',car:{model:'scooter',at:PC(31.2,20),a:Math.PI/2},route:[PC(31.2,33),PC(24,37),PC(10,37)],vmax:330})},
 };
 window.NS={
