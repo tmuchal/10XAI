@@ -585,6 +585,8 @@
   /* ---------- render ---------- */
   const withSZ = (svg) => svg.replace(/<\/svg>$/, SZ + '</svg>');
   const frames = SHOTS.map((s) => withSZ(Th.scene({ w: W, h: H, st: s.st, draw: s.draw, en: s.en, ko: s.ko, subY: SUBY, hook: s.hook ? s.hook() : '', label: s.id + '. ' + plain(s.en) + ' ' + s.action })));
+  // Clean frames (no safe-zone overlay) for tools/render-reel.cjs, which turns the Reel into an MP4.
+  window.REEL = { shots: SHOTS.map((s) => ({ id: s.id, dur: s.dur, k: s.k, beat: s.beat, en: plain(s.en), ko: s.ko })), frames: SHOTS.map((s) => Th.scene({ w: W, h: H, st: s.st, draw: s.draw, en: s.en, ko: s.ko, subY: SUBY, hook: s.hook ? s.hook() : '', label: s.id })) };
   let t = 0; SHOTS.forEach((s) => { s.t0 = t; t += s.dur; });
   const total = t;
   if (Math.abs(total - 30) > 1e-6) console.warn('Reel runtime is ' + total + ' s, expected 30 s.');
