@@ -70,6 +70,8 @@
     g += `<rect y="${FLOOR}" width="${W}" height="${H - FLOOR}" fill="url(#floor)"/><line x1="0" y1="${FLOOR}" x2="${W}" y2="${FLOOR}" stroke="${INK}" stroke-width="3"/>`;
     for (let i = -12; i <= 12; i++) g += `<line x1="${640 + i * 56}" y1="${FLOOR}" x2="${640 + i * 78}" y2="${H}" stroke="#c07f48" stroke-width="1.6" opacity=".55"/>`;
     g += `<line x1="0" y1="${FLOOR + 38}" x2="${W}" y2="${FLOOR + 38}" stroke="#c07f48" stroke-width="1.4" opacity=".4"/><line x1="0" y1="${FLOOR + 84}" x2="${W}" y2="${FLOOR + 84}" stroke="#c07f48" stroke-width="1.4" opacity=".35"/>`;
+    if (o.tint) g += `<rect width="${W}" height="${H}" fill="${o.tint[0]}" opacity="${o.tint[1]}"/>`;
+    if (o.vignette) g += `<defs><radialGradient id="vig" cx=".5" cy=".5" r=".75"><stop offset=".55" stop-color="#2b1a3a" stop-opacity="0"/><stop offset="1" stop-color="#2b1a3a" stop-opacity=".32"/></radialGradient></defs><rect width="${W}" height="${H}" fill="url(#vig)"/>`;
     if (o.spot) g += `<polygon points="${o.spot - 40},0 ${o.spot + 40},0 ${o.spot + 190},${FLOOR + 20} ${o.spot - 190},${FLOOR + 20}" fill="#fffbe0" opacity=".35"/><ellipse cx="${o.spot}" cy="${FLOOR + 14}" rx="180" ry="18" fill="#fffbe0" opacity=".5"/>`;
     return g;
   }
@@ -260,7 +262,7 @@
     });
     return { svg: g, colX: (i) => x + pad + i * (cw + pad), colW: cw, top: top + 36 };
   }
-  const KCOLS = [['분해 Decomposed', '#5b8def', '#dbe7ff'], ['검증 Verifying', '#f0a92a', '#ffefcc'], ['게이트 Gate', '#e0352b', '#ffd9d3'], ['완료 Verified', '#2fb67a', '#d3f2e3']];
+  const KCOLS = [['분해 Decomposed', '#5b8def', '#dbe7ff'], ['검증 Verifying', '#f0a92a', '#ffefcc'], ['게이트 Gate', '#e0352b', '#ffd9d3'], ['검증완료 Verified', '#2fb67a', '#d3f2e3']];
   function meter(x, y, v, o) {
     o = o || {};
     const Hh = o.H || 190, Wd = 34, bot = y + Hh, hot = v >= 70, fc = hot ? C.red : '#2fb67a', lvl = (Hh - 24) * v / 100;

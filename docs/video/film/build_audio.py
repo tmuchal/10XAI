@@ -183,7 +183,7 @@ def main():
             events.append(("sfx", start - 0.25, sfx("whoosh")))       # curtain swish between scenes
         if sc.get("chapter"):
             events.append(("sfx", start + 0.35, sfx("tada")))         # chapter card
-        t += tm.get("chapterLead", tm["lead"]) if sc.get("chapter") else tm["lead"]
+        t += sc.get("lead", tm.get("chapterLead", tm["lead"]) if sc.get("chapter") else tm["lead"])
         cues = []
         for cue in sc["cues"]:
             v = vos[vi]; vi += 1

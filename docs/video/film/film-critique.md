@@ -91,3 +91,103 @@ Reviewed: `renders/film.mp4` (149.8 s), frames every 2 s, plus frames around eve
 8. **Give Uchu the questions, and break the "quip at the end" formula.** Convert three Noa rhetorical openers into Uchu set-ups: board #1 → Uchu: "So where does all this *live*?" / "그럼 이게 다 어디 사는데?", and Noa answers "On one *Kanban board*." Add ontology #0 as Uchu: "Onto-what? Is that a dinosaur?" / "온톨... 뭐? 공룡이야?", and Noa: "A dictionary your robots can't argue with." / "로봇이 말대꾸 못 하는 사전이에요." Crew: move Uchu's "Can I be on the crew?" before the sandbox line, so the gag lands mid-scene rather than as the scene's last line. Noa's share drops from 28/36 to about 25/38 lines, the rhythm stops being "lecture, then punchline", and the fun spreads across each scene. *(Fun +1, Pacing +1, Hook-to-body carry-over.)*
 
 **Expected result with all 8 applied:** about 7.5/10 (Immersion 6.5, Fun 7, Polish 7, Through-line 8, Character 7.5).
+
+---
+
+# Round 2: film v3 (151.5 s)
+
+Re-reviewed the same way as Round 1:
+- Frames every 2 s: 7 contact sheets.
+- Transitions: 24 frames around every scene start (13.9–16.3, 43.8–46.0, 64.6–66.8, 83.8–86.0, 108.7–111.0, 139.1–141.0).
+- Full-size stills at 5, 40, 50, 62, 74, 78, 96, 104, 126, 128, 136, 149 s, plus quarter-size checks at 0.4, 55, 106.5, 138.6 s.
+- Pacing from the regenerated timeline.js.
+
+**Verdict:** A real step up. The structural faults are gone:
+- Every character now stands above the subtitle bar.
+- Noa is never cropped.
+- The camera never pushes content under the chapter tag or source pill.
+- The glasses-up "Not vibes" gag, the dinosaur line, the crash inside the sandbox dome and the crowned Uchu all read.
+- The fix-once demo finally *shows* consistency.
+
+It is not an 8 yet, for four reasons:
+1. **One story bug undoes the thesis.** The board's hero card is `post · "FREE!!"`, the claim the ontology chapter just stamped CAUGHT / NO EVIDENCE. Uchu then approves it into Verified with a ✓ (78 s).
+2. **The four chapter flats are the same painted sunburst.** They are drawn *over* Noa, so the "host stays on stage" intent is lost.
+3. **Every scene uses the same blocking:** Noa at x=190 on the left, a panel in the center, Uchu at x≈1110 on the right. The same light throughout.
+4. **A handful of small collisions remain.**
+
+## Scorecard, v2 → v3
+
+| Axis | v2 | v3 | Reason (v3) |
+|---|---|---|---|
+| Hook | 5 | **6** | The drapes open on Uchu, background posts rain down, and the stamps now sit on post corners and are readable. It still opens on a question over three static cards; no single striking image in the first 2 s. |
+| Content depth & accuracy | 7 | **7** | The board is now a real board (9 cards, gate wait, live cursors). The crew adds the contained crash, and "gate = 10XAI" is credited. But the FREE!! card, flagged NO EVIDENCE in Ch.2, is approved and marked ✓ Verified in Ch.3, which is a logic error in the core safety contract. The ✓12 / ✗71 verifier chips are unlabeled numbers. |
+| Through-line to automation + consistency | 6 | **7** | Posts become nodes, then board cards, then the reel ("IT SAID FREE"), and the fix-once demo updates all three outputs. That is exactly the through-line. The FREE!! approval breaks it mid-way. |
+| Immersion & cinematic feel ×1.5 | 4 | **5.5** | No more crops. Flats are more theatrical than drapes. Still identical flats ×4, the same backdrop and light in every chapter, and the same left–center–right blocking in 6 of 7 scenes. |
+| Fantastical & fun ×1.5 | 5 | **6.5** | The gags now land visibly. The dinosaur gag is only a text bubble ("공룡?!"), and nothing fantastical *happens*: no transformation, no set piece. |
+| Professional polish ×1.5 | 3 | **6.5** | There are 7 remaining defects, listed under Fix 5. The worst: the GitHub chip sits on Noa's party hat, "LIVE · agents 6 · humans 1" runs past the board edge, and the "5분/12분" badges cover the output titles. |
+| Character (Noa size, Uchu) | 5 | **7** | Noa is right-sized (.78, screen space), always visible, and has the landing squash, the glasses-up gag and the bow. But Noa is parked at x=190 in the same point/idle pose for 5 chapters. Uchu has real agency now: approves, gets crowned, asks the questions. |
+| Style match to reference | 7 | **7.5** | Characters now stand on the hill line as in the reference. Props are still mostly panels and chips next to the reference's hand-drawn object props. |
+| Subtitles (EN+KR) | 6 | **7.5** | Balanced wrap removes the orphans, and the Korean edits landed. Remaining: the `KCOLS` column still reads "완료 Verified" (the script says "검증 완료"). "the tool takes twelve minutes" has no clear referent in either language. |
+| Pacing | 5 | **6.5** | Silent leads are down from 2.0 s to 1.1 s. Automation is now 30.4 s (20 %). Uchu opens 3 chapters. Noa still speaks 26 of 39 lines, mostly with 0.3 s gaps, so the middle of each chapter is still monologue. |
+
+**Overall weighted score: 6.6 / 10** (v2: 5.1)
+(6+7+7+7+7.5+7.5+6.5 = 48.5; (5.5+6.5+6.5)×1.5 = 27.75; 76.25 / 11.5 = 6.63)
+
+## Per-scene, v3
+
+| Scene | v2 → v3 | Remaining problem |
+|---|---|---|
+| cold | 6 → 6.5 | Clean and readable. The open is still a question over static cards; the three hero posts pop in rather than slam in. |
+| harness | 5 → 7 | Layout fixed and seatbelt readable. "Humans steer. Agents execute." at y≈540 is low contrast against the hills. |
+| ontology | 4 → 7 | Posts become nodes, and CAUGHT rides the card. The scan sparkle parks on the Claim node and covers "주장" (62 s). The dinosaur gag is text-only. |
+| board | 4 → 6 | Contradiction: FREE!! is approved into Verified. The LIVE label overflows the board frame. "완료". Noa's raised paw overlaps the board's left edge (x≈250). |
+| crew | 5 → 7 | Good. The unlabeled ✓12 / ✗71 chips confuse; the white mini-cards on the dispatch arcs fly across the orchestrator's face. |
+| auto | 4 → 7 | The demo works. The badges cover "IT SAID FREE" and "공짜라며?". The orange wires are drawn over the reel frame. The outputs are small (104×184) for the film's payoff. "5분" vs. "5 min" mix. |
+| curtain | 7 → 7.5 | The bow and closing drapes work. The GitHub chip (640,400) still sits on Noa's party hat. |
+
+## TOP 6 FIXES (v3 → 8+)
+
+1. **Fix the FREE!! approval.** This is a logic bug in the product's core safety contract. In `S.board`:
+   - Make the hero card that walks the columns the evidence-backed one. Change the seed row `[0, 1, 'post · "$9.99"', …]` to `[0, 1, 'post · "FREE!!"', '#f7b3c8', c[1] + 2.6]`. In the hero `card(...)` call, change the text `'post · "FREE!!"'` → `'post · "$9.99"'` and the stripe → `'#9aa7c2'`.
+   - Then, at `c[2]+1.8`, move the FREE!! seed card from col 0 into Gate row 1 (lerp `cx(0)` → `cx(2)`, `rowY(1)`). Give it `kind:'risk', badge:'NO EVIDENCE'`.
+   - At `c[2]+3.0`, right after Uchu approves $9.99, stamp it with `stampMark(cx(2)+cw/2, rowY(1)+17, 'REJECT', k(lt, c[2]+3.0, .5), -12)`, then drop it off the board: `y += 260*ease(k(lt,c[2]+3.4,.6))`, rotate `+35°`, fade.
+   - Add `["stamp",3.0]` to board cue #3 sfx.
+
+   Result: the human approves the good card *and* blocks the bad one. The gate contract and the ontology callback now agree.
+
+2. **Keep Noa in front of the flats, and make each flat different.** In `frame()`, move `if (res.noa) …noa(...)` to *after* `chapterFlat(...)`, so the host stays on stage while the scenery flies. In `chapterFlat`, take a per-chapter motif and tint:
+   - `const FLAT = { 1: ['#fbe8c9', buckleRow], 2: ['#e6effb', bookPages], 3: ['#e7f6ec', columnStripes], 4: ['#fbe3ea', crewSilhouettes], 5: ['#efe6fb', filmStrip] }`.
+   - Draw the motif at opacity .35 behind the card instead of the 14 identical sun rays. Reuse `icoBuckle`, `icoBoard` and `icoCrew` scaled ×4 for 1, 3 and 4. Draw the pages and the film strip as simple paths.
+   - Put `whoosh` at `lead-.9` for the drop and a soft `pop` when the flat lands.
+
+3. **Break the identical blocking and light: one staging idea per chapter.**
+   - `K.backdrop(t, {tint})`: add a full-frame `rect` overlay. Board: `#2b2f5a` at .16 (the board "glows" at dusk, and the LIVE dot pulses brighter). Crew: `spot: 640` so the orchestrator is under a spotlight, plus an edge vignette. Auto: warm `#ffcf7a` at .10.
+   - Move Noa: ontology `x` lerps 190 → 360 at `c[4]` to point at CAUGHT. Auto `x` 190 → 330 at `c[4]` to "turn the dial" on the claim card (add `pose:'stamp'`).
+   - Uchu entrances: in ontology, Uchu pops up from *behind* the PUBLISH box (y from STAND+80 → STAND, masked by the box) instead of standing at x=1110. In the automation scene, Uchu slides in on the conveyor.
+   - Add a conveyor for the automation scene: a treaded belt `rect` from (560, STAND-6) to (1160, STAND-6), with moving tread lines `x = (lt*120 + i*40) % 600`, carrying the three outputs in at their `t0` instead of popping them.
+
+   This is the biggest remaining lever on Immersion (×1.5).
+
+4. **Make the automation payoff legible and bigger.**
+   - In `output()`, move the `5분/12분` badge from the top-right corner to a tag *under* each frame (`y = h/2 + 22`). Use the claim's unit language in both places: `'5 min'` / `'12 min'`, or change the claim card to `'claim · 설치 시간: 5분'`. Pick one.
+   - Draw all three orange wires in a first loop and the outputs in a second loop, so no wire crosses a frame.
+   - During `c[4] … c[5]`, scale the outputs `1.0 → 1.25` (`lerp(sc, 1.25, ease(k(lt, c[4], .5)))`) and dim the machine to .5, so the three changing frames are the hero of the shot.
+   - Start each green propagation line at the claim card `(470, 204)` and end it at the badge.
+   - script.json auto #4: `"Wait, setup takes *twelve* minutes, not five!"` / `"잠깐, 세팅은 5분이 아니라 *12분*인데?"`.
+
+5. **Polish sweep (7 items):**
+   - (a) Curtain: GitHub chip `popAt(lt, c[1]+1.2, 640, 400, …)` → `(640, 104)`. The gap between the valance and the marquee is free.
+   - (b) Board: LIVE label → `T(1004, 194, 'LIVE · agents 6 · humans 1', 14, { a: 'end', … })`, and the dot at `1004 - tw(label,14) - 14`.
+   - (c) kit.js `KCOLS[3][0]` `'완료 Verified'` → `'검증완료 Verified'`.
+   - (d) Board: shift the kanban from `kanban(260,170,…)` to `kanban(290,170,730,300,…)`, so Noa's paw at x≈250 clears it.
+   - (e) Harness: "Humans steer. Agents execute." → `{ f: '#26386b', stroke: '#fff', sw: 5 }`, size 26.
+   - (f) Ontology: stop the scan sparkle at the Evidence node edge, then hide it (`if (scan >= 1) skip`). Draw it before the nodes, so it passes *under* "주장".
+   - (g) Crew: verifier chips `'✓ 12'` / `'✗ 71'` → `'✓ risk 12'` / `'✗ risk 71'`. Start the dispatch arcs at `O[1]+90` (below the desk), so the mini-cards never cross the orchestrator's face.
+
+6. **Pull more of the explanation out of Noa's mouth and into the cast.**
+   - Crew: give each specialist a hop-synced speech `bubble` when it acts, e.g. decompose `'✂ split!'` at `c[1]+.6`, gapfill `'+ .env!'` at `c[1]+2.4`, Claude `'risk 12'` and Codex `'risk 71!?'` at `c[2]+2.0`. Shorten crew #2 to `"Decompose splits. Gap-fill fills what the author skipped."`, so the visuals carry it.
+   - Ontology: at "Onto-what? Is that a dinosaur?", pop a tiny dino silhouette in a thought bubble over Uchu (`bubble` plus a 6-point path) that Noa's line "pops" (`burst('POP')` at `c[1]+.3`).
+   - Raise `timing.gap` from 0.3 to 0.4, and add `"hold": 0.5` to board #3 and auto #5, so each reveal lands before the next line.
+   - Hook: move the three hero `postCard`s to slam in (scale 1.6 → 1 with a `stamp` sfx) at 0.9 / 1.2 / 1.5 s, *before* Uchu's line starts at 0.6 + 0.9. Set `timing.lead` 0.6 → 1.5 for the cold scene only, so the first image is the chaos, not the question.
+
+**Projected score with all 6 applied:** about 8.0–8.3. Immersion 7, Fun 7.5, Polish 8, Through-line 8.5, Content 8.
