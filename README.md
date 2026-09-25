@@ -142,36 +142,67 @@ Licensed under MIT — free to use, modify, and redistribute.
 
 ---
 
-## Sports module — match video → player ratings → next-match prediction
+## Sports module: scout the opponent, pick the XI, win it from the bench
 
-10XAI also applies its claim-vs-measured approach to sports. It rates every soccer and basketball player on each skill using match events, then predicts the next match. Every rating and prediction reports how well it held up against real results.
+10XAI applies its claim-vs-measured approach to football (soccer) and basketball. It breaks down every player on the opponent's side: what kind of player they are, what they do well and badly, whether they're playing well *right now*, and where they're vulnerable. It then turns that into a game plan: the XI, the formation, and which substitution to make at which minute and score to raise the chance of winning. Every claim carries the number behind it, and the predictions are backtested against real results.
 
 ```bash
-npm run sports -- demo                       # seed a fictional soccer + basketball league
-npm start                                    # then open http://localhost:8080/sports.html
-npm run sports -- players  --sport soccer --top 10
-npm run sports -- predict  --sport basketball --home "Northbay Hawks" --away "Ashdown Kites"
+# real matches: free StatsBomb open data (every pass, shot + xG, duel, sub, location)
+npm run sports -- import-statsbomb --competition 43 --season 106        # FIFA World Cup 2022
+npm start                                                               # → http://localhost:8080/sports.html
+
+npm run sports -- scout    --team France --us Argentina                 # opponent report + ranked recommendations
+npm run sports -- profile  --team France --player "Kylian Mbappé"
+npm run sports -- gameplan --us Argentina --them France --objective win
+npm run sports -- subs     --us Argentina --them France --minute 70 --score 0-1
 npm run sports -- backtest --sport soccer
+npm run sports -- demo                                                  # fictional league with known "true" skills
 ```
 
-**Pipeline**
+**Getting match data**
 
-| Step | How |
-|---|---|
-| **Intake** | Paste a YouTube URL. The official oEmbed endpoint returns the title, then teams, sport, and score are parsed from it. Downloading the video or captions with `yt-dlp` breaks YouTube's ToS without rights, so those steps are created as risk ≥ 70 cards that **stop at the gate**. |
-| **Events** | Three sources share one schema (`t, team, player, type, outcome`): a hand-tagged or tracker-exported event log (CSV/JSON, best quality), commentary from the video transcript (local EN/KR keyword rules or the `claude` CLI via `agents/sports-extract-agent.md`), or computer-vision tracker output mapped onto the same types. |
-| **Player ratings** | Soccer: passing, shooting, dribbling, creativity, defending, goalkeeping, discipline, plus an overall rating from event-value impact per 90. Basketball: scoring, efficiency (TS%), playmaking, rebounding, defense, ball security, plus an overall rating from Game Score per 36. Scale 1–99: 50 is the dataset average and each 15 points is one SD. Small samples are shrunk toward the mean, and recent matches can be weighted more (`halfLife`). |
-| **Prediction** | Team Elo from results (margin-aware, home advantage), shifted by how the named lineup rates against the team's usual roster. Soccer uses Poisson goals to give home/draw/away odds and likely scores. Basketball gives a win probability, a spread, and projected points. Also reports key players and the attribute matchups where the lineups differ most. |
-| **Backtest** | Walk-forward: each match is predicted from earlier data only. Reports Brier, log-loss, and accuracy against a no-skill baseline. |
-
-**Measured on the synthetic league** (112 matches per sport, known true skills, `test/sports.test.cjs`):
-
-| | Model | Baseline |
+| Source | How | Quality |
 |---|---|---|
-| Soccer, 3-way accuracy / Brier | 53.5% / 0.579 | 37.6% / 0.703 |
-| Basketball, accuracy / Brier | 62.7% / 0.428 | 57.8% / 0.503 |
-| Correlation of rating with true skill | passing 0.95 · rebounding 0.86 · efficiency 0.79 · dribbling 0.72 | — |
+| **StatsBomb open data** | `import-statsbomb` or the 📥 Data tab: World Cups, Euros and some league seasons, free for non-commercial use with attribution | Professional event data with xG and locations |
+| **Video tagging** (`/sports-tagger.html`) | Watch the YouTube match in an embedded player (no download). One keypress logs an action at the synced match clock; one click on the pitch adds its location. Handles substitutions. Saves straight into analysis. | As good as the tagger. This is how analysts work from video |
+| Event CSV/JSON | `import`: `t,team,player,type,outcome,x,y,xg` | Output from any tracker or spreadsheet |
+| YouTube commentary | Transcript → events (EN/KR rules, or the `claude` CLI) | Headline actions only |
 
-These numbers come from simulated data. On a real league, run `backtest` on your own imported matches before trusting any pick. Commentary-only input also rates headline actions (goals, shots, threes) far better than routine passing. The coverage report flags this.
+Downloading YouTube video or captions breaks YouTube's ToS without the rights holder's permission, so those steps are risk ≥ 70 cards that **stop at the gate**. The tagger uses the official embed instead.
 
-**Status:** the computer-vision player-tracking step (detecting and following each player in the footage) is not included. The module takes its output as event rows, with approval-gated `yt-dlp` download into `workspace/sports/<id>/`.
+**What you get**
+
+| Layer | What it measures |
+|---|---|
+| **Player profile** | Ratings 1–99 **vs. the same position line**: passing, progression, shooting (xG), creativity, dribbling, defending (possession-adjusted), 1v1 duels, aerial, pressing, goalkeeping (goals prevented vs. xG), discipline. Each strength and weakness shows its stat. Plus: archetype (e.g. *Dribbling winger*, *Deep-lying playmaker*, *Stopper*), per-match ratings (6.5 = an average game), form (last 3 vs. season), pitch zone, late-game fatigue, and **how to play against them**. |
+| **Scouting report** | Style vs. every team in the data (possession, directness, pressing height, shot quality, aerial…); where they attack and **which flank concedes xG** (credited to the build-up flank, not the shot spot); who gets dribbled past; goals by 15-min period; dependency on one player; key threats; weak links; **ranked recommendations**, each with the triggering number. |
+| **Match plan** | Best XI and formation for your objective (league points / knockout win / avoid defeat) against *this* opponent, with an attacking boost toward their leaky flank. Pre-planned subs for 60'/70' × level/behind/ahead. What they are likely to target in you. |
+| **Live subs** | Minute + score + who's on → every single and double change scored on the objective, with the win/loss probability change and the reason (measured fatigue, attack/defence delta, the incoming player's profile). Says "hold" when nothing helps. |
+
+**How it's built**: per-event valuation (xG-based, possession-adjusted) → player attack/defence contributions → lineup-adjusted Poisson on top of results-based Elo → live match state (current score + remaining time). Fatigue is each player's **drop in success rate on passes and duels after 60 minutes on the pitch**, shrunk toward the position average.
+
+**Measured, not claimed**
+
+Real data, FIFA World Cup 2022 (64 matches; 54 predicted walk-forward, each from earlier data only):
+
+| | Accuracy (H/D/A) | Brier |
+|---|---|---|
+| Model | **50.0%** | **0.635** |
+| Same model, lineups ignored | 48.1% | 0.640 |
+| No-skill baseline | 20.4% | 0.691 |
+
+Scouting France *before* the 2022 final, using only their earlier matches, flagged Messi as carrying 37% of Argentina's chance creation, and Argentina as a side that concedes late (50% of goals conceded after 75', vs. 24% for the rest of the tournament). France scored at 80' and 81'. It did **not** foresee Argentina's first-half success down France's right: France's conceded xG was split evenly across flanks.
+
+Synthetic league with hidden "true" skills (`test/sports.test.cjs`):
+
+| Check | Result |
+|---|---|
+| Attribute rating vs. true skill (correlation, 4 leagues) | passing 0.96 · pressing 0.93 · aerial 0.89 · defending 0.87 · dribbling 0.84 · shooting 0.79 · duels 0.70 |
+| Weaker defensive flank identified | 22 / 32 teams (r = 0.56) |
+| Measured fatigue vs. true stamina | r ≈ 0.2–0.3: a real but weak signal, so it's shrunk and capped |
+| Lineup-awareness in the backtest | No gain in simulation, where a rotation shifts true goals by ~7% (undetectable in 112 matches). Small gain on real World Cup data. Lineup effects are therefore damped (±25% max). |
+
+**Limits:**
+- Automatic player tracking from raw video (computer vision) is not included; events come from tagging, StatsBomb, or a tracker's CSV.
+- Recommendations are leads to check on video, not orders. Reports say when a team has too few matches ("low confidence").
+- Basketball has ratings, prediction and backtest, but not the scouting and tactics layer yet.

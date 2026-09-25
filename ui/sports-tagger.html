@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>10XAI Video Tagger</title>
+<style>
+:root{--bg:#fafafa;--s1:#fff;--s2:#f4f4f5;--s3:#e4e4e7;--bd:#e4e4e7;--tx:#18181b;--tx2:#52525b;--tx3:#71717a;--ac:#059669;--acbg:#d1fae5;--bad:#dc2626;--home:#2563eb;--away:#c2410c;--pitch:#e7f3e9;--line:#9fc5a6}
+[data-theme="dark"]{--bg:#0A0F16;--s1:#0E141D;--s2:#141C26;--s3:#1E2935;--bd:#1E2935;--tx:#EAF1E8;--tx2:#AEBBB3;--tx3:#7C8C84;--ac:#79D86C;--acbg:rgba(121,216,108,.13);--bad:#F87171;--home:#7FB5FF;--away:#fb923c;--pitch:#0f2418;--line:#2f5a3c}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--tx);font:13px/1.5 -apple-system,sans-serif}
+.hdr{display:flex;align-items:center;gap:12px;padding:10px 16px;border-bottom:1px solid var(--bd);background:var(--s1);flex-wrap:wrap}
+.hdr b{color:var(--ac)}.hdr a{margin-left:auto;color:var(--tx2);text-decoration:none;font-size:12px}
+main{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(300px,1fr);gap:12px;padding:12px 16px;max-width:1500px;margin:0 auto}
+@media(max-width:980px){main{grid-template-columns:1fr}}
+section{background:var(--s1);border:1px solid var(--bd);border-radius:12px;padding:12px;min-width:0}
+h2{font-size:13px;margin-bottom:6px}.hint{color:var(--tx3);font-size:12px}
+.row{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin-bottom:6px}
+input,select,textarea{background:var(--s2);border:1px solid var(--bd);color:var(--tx);border-radius:7px;padding:6px 9px;font:inherit;max-width:100%}
+textarea{width:100%;font-family:monospace;font-size:12px;min-height:120px}
+button{background:var(--ac);color:#06210b;border:0;border-radius:7px;padding:6px 12px;font-weight:700;cursor:pointer}
+button.ghost{background:transparent;color:var(--tx2);border:1px solid var(--bd)}
+.video{position:relative;width:100%;aspect-ratio:16/9;background:#000;border-radius:10px;overflow:hidden}.video>div,.video iframe{position:absolute;inset:0;width:100%;height:100%}
+.clock{font-family:monospace;font-size:22px;font-weight:700}
+.teams{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.tbtn{padding:8px;border-radius:9px;border:2px solid var(--bd);background:var(--s2);color:var(--tx);cursor:pointer;text-align:center;font-weight:700}
+.tbtn.on.home{border-color:var(--home)}.tbtn.on.away{border-color:var(--away)}
+.players{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:4px;margin-top:6px}
+.pbtn{padding:5px 7px;border-radius:7px;background:var(--s2);border:1px solid var(--bd);color:var(--tx);cursor:pointer;text-align:left;font-size:12px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pbtn.on{background:var(--acbg);border-color:var(--ac)}.pbtn .k{color:var(--tx3);font-family:monospace;margin-right:4px}.pbtn.off{opacity:.4}
+.keys{display:grid;grid-template-columns:repeat(auto-fill,minmax(122px,1fr));gap:4px}
+.key{padding:5px 7px;border-radius:7px;background:var(--s2);border:1px solid var(--bd);cursor:pointer;font-size:12px;color:var(--tx);text-align:left;font-weight:500}
+.key kbd{display:inline-block;min-width:18px;text-align:center;background:var(--s3);border-radius:4px;margin-right:5px;font-family:monospace;font-weight:700}
+svg.pitch{width:100%;cursor:crosshair;display:block;border-radius:8px}
+table{width:100%;border-collapse:collapse;font-size:12px}td{padding:3px 6px;border-bottom:1px solid var(--bd)}
+.log{max-height:260px;overflow:auto}.x{color:var(--bad);cursor:pointer}
+.flash{animation:fl .4s}@keyframes fl{from{background:var(--acbg)}to{background:transparent}}
+</style>
+</head>
+<body>
+<header class="hdr"><div>10X<b>·</b>AI <b>Video tagger</b></div><span class="hint">Watch the match and log each action: a hotkey records it at the current match time.</span><a href="/sports.html">← Sports</a></header>
+<main>
+<div style="display:grid;gap:12px;min-width:0">
+  <section>
+    <div class="row"><input id="url" style="flex:1;min-width:220px" placeholder="YouTube URL or video id"><button onclick="loadVideo()">Load video</button></div>
+    <div class="video"><div id="player"></div></div>
+    <div class="row" style="margin-top:8px">
+      <span class="clock" id="clock">0:00</span><span class="hint" id="clockHint">match clock: set kick-off first</span>
+      <button class="ghost" onclick="setKick(1)">⏱ Kick-off (1st half)</button><button class="ghost" onclick="setKick(2)">⏱ 2nd-half kick-off</button>
+      <label class="hint"><input type="checkbox" id="manual"> manual minute <input id="manMin" type="number" value="0" style="width:64px"></label>
+    </div>
+  </section>
+  <section>
+    <div class="row" style="justify-content:space-between"><h2>Location: click where the action happened</h2>
+      <label class="hint"><input type="checkbox" id="flip"> the selected team attacks ← on screen</label></div>
+    <svg class="pitch" id="pitch" viewBox="0 0 100 64"><rect width="100" height="64" rx="1.5" fill="var(--pitch)"/>
+      <g stroke="var(--line)" stroke-width=".35" fill="none"><rect x="1" y="1" width="98" height="62"/><line x1="50" y1="1" x2="50" y2="63"/><circle cx="50" cy="32" r="7"/><rect x="1" y="18" width="14" height="28"/><rect x="85" y="18" width="14" height="28"/></g>
+      <text x="97" y="6" font-size="3" text-anchor="end" fill="var(--tx3)" id="dirLabel">attacking →</text><g id="marks"></g><circle id="cur" r="1.6" fill="var(--ac)" cx="-10" cy="-10"/></svg>
+    <p class="hint" id="locHint">No location. Events are saved without x/y (fine for ratings; needed for flank analysis).</p>
+  </section>
+</div>
+<div style="display:grid;gap:12px;align-content:start;min-width:0">
+  <section>
+    <h2>Match</h2>
+    <div class="row"><input id="home" placeholder="Home team" style="flex:1"><input id="away" placeholder="Away team" style="flex:1"><input id="date" type="date"></div>
+    <div class="row"><select id="loadTeam"><option value="">load roster from saved team…</option></select><button class="ghost" onclick="loadRoster('home')">→ home</button><button class="ghost" onclick="loadRoster('away')">→ away</button></div>
+    <details><summary class="hint" style="cursor:pointer">Edit rosters (one per line: <code>Name, POS</code>; the first 11 start)</summary>
+      <div class="teams" style="margin-top:6px"><textarea id="rHome" placeholder="Keeper Name, GK&#10;Defender Name, DF&#10;…"></textarea><textarea id="rAway"></textarea></div>
+      <button class="ghost" onclick="applyRosters()">Apply rosters</button></details>
+  </section>
+  <section>
+    <div class="teams"><div class="tbtn home on" id="tHome" onclick="setTeam('home')">Home</div><div class="tbtn away" id="tAway" onclick="setTeam('away')">Away</div></div>
+    <p class="hint" style="margin-top:4px"><kbd>Tab</kbd> switches team · <kbd>1</kbd>–<kbd>9</kbd>, <kbd>0</kbd>, <kbd>-</kbd> pick a player · <kbd>Space</kbd> play/pause · <kbd>←</kbd>/<kbd>→</kbd> ±5 s · <kbd>Ctrl+Z</kbd> undo</p>
+    <div class="players" id="players"></div>
+    <div class="row" style="margin-top:8px"><button class="ghost" onclick="doSub()">⇄ Substitution</button><span class="hint" id="subHint"></span></div>
+  </section>
+  <section><h2>Actions</h2><div class="keys" id="keys"></div></section>
+  <section>
+    <div class="row" style="justify-content:space-between"><h2 id="evCount">Events (0)</h2><div class="row" style="margin:0"><button class="ghost" onclick="exportCsv()">CSV</button><button onclick="save()">💾 Save match</button></div></div>
+    <p class="hint" id="saveMsg"></p>
+    <div class="log"><table id="log"></table></div>
+  </section>
+</div>
+</main>
+<script>
+const $ = (id) => document.getElementById(id);
+const esc = (s) => String(s == null ? "" : s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+const KEYS = [
+  ["p", "pass", "success", "Pass ✓"], ["o", "pass", "fail", "Pass ✗"], ["k", "key_pass", null, "Key pass"], ["a", "assist", null, "Assist"],
+  ["s", "shot", "off_target", "Shot off"], ["t", "shot", "on_target", "Shot on target"], ["b", "shot", "blocked", "Shot blocked"], ["g", "shot", "goal", "GOAL"],
+  ["d", "dribble", "success", "Dribble ✓"], ["e", "dribble", "fail", "Dribble ✗"], ["z", "dribbled_past", null, "Dribbled past"], ["w", "tackle", "success", "Tackle won"],
+  ["l", "tackle", "fail", "Tackle lost"], ["i", "interception", null, "Interception"], ["c", "clearance", null, "Clearance"], ["r", "recovery", null, "Recovery"],
+  ["q", "pressure", null, "Pressure"], ["h", "aerial", "success", "Aerial won"], ["j", "aerial", "fail", "Aerial lost"], ["x", "turnover", null, "Turnover"],
+  ["f", "foul", null, "Foul"], ["y", "card", "yellow", "Yellow"], ["u", "card", "red", "Red"], ["v", "save", null, "Save (GK)"],
+];
+const PKEYS = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "0", "-"];
+let S = { videoId: null, k1: null, k2: null, team: "home", sel: { home: null, away: null }, loc: null,
+  roster: { home: [], away: [] }, events: [], subs: [] };
+let player = null;
+
+// ── persistence (per video) ──
+const keyFor = () => "tagger:" + (S.videoId || "novideo");
+function persist() { try { localStorage.setItem(keyFor(), JSON.stringify({ ...S, meta: { home: $("home").value, away: $("away").value, date: $("date").value } })); } catch {} }
+function restore(id) {
+  try { const j = JSON.parse(localStorage.getItem("tagger:" + id) || "null"); if (!j) return false; S = { ...S, ...j, videoId: id }; $("home").value = j.meta.home || ""; $("away").value = j.meta.away || ""; $("date").value = j.meta.date || ""; return true; } catch { return false; }
+}
+
+// ── video ──
+function parseId(s) { s = String(s || "").trim(); if (/^[\w-]{11}$/.test(s)) return s; try { const u = new URL(s); if (u.hostname.includes("youtu.be")) return u.pathname.slice(1, 12); return u.searchParams.get("v") || (u.pathname.match(/\/(?:shorts|embed|live)\/([\w-]{11})/) || [])[1] || null; } catch { return null; } }
+function loadVideo() {
+  const id = parseId($("url").value); if (!id) { alert("Not a YouTube URL"); return; }
+  S.videoId = id; restore(id); renderAll();
+  if (player && player.loadVideoById) { player.loadVideoById(id); return; }
+  if (!window.YT) { const s = document.createElement("script"); s.src = "https://www.youtube.com/iframe_api"; document.head.appendChild(s); window.onYouTubeIframeAPIReady = () => makePlayer(id); }
+  else makePlayer(id);
+}
+function makePlayer(id) { player = new YT.Player("player", { videoId: id, playerVars: { rel: 0, modestbranding: 1 } }); }
+const vt = () => (player && player.getCurrentTime ? player.getCurrentTime() : 0);
+function setKick(h) { if (h === 1) S.k1 = vt(); else S.k2 = vt(); persist(); tick(); }
+// match time in seconds from video time
+function matchSeconds() {
+  if ($("manual").checked) return Math.round(+$("manMin").value * 60);
+  const t = vt();
+  if (S.k2 != null && t >= S.k2) return Math.round(45 * 60 + (t - S.k2));
+  if (S.k1 != null) return Math.max(0, Math.round(t - S.k1));
+  return null;
+}
+const fmt = (s) => (s == null ? "–" : Math.floor(s / 60) + ":" + String(s % 60).padStart(2, "0"));
+function tick() { const s = matchSeconds(); $("clock").textContent = fmt(s); $("clockHint").textContent = s == null ? "match clock: set kick-off first" : S.k2 != null && vt() >= S.k2 ? "2nd half" : "1st half"; }
+setInterval(tick, 500);
+
+// ── rosters ──
+function parseRoster(text) {
+  return text.split("\n").map((l) => l.trim()).filter(Boolean).map((l, i) => { const [name, pos] = l.split(",").map((x) => x.trim()); return { player: name, position: (pos || "").toUpperCase() || undefined, starter: i < 11 }; });
+}
+function applyRosters() { S.roster.home = parseRoster($("rHome").value); S.roster.away = parseRoster($("rAway").value); S.sel = { home: null, away: null }; persist(); renderAll(); }
+async function loadTeams() {
+  try { const t = await (await fetch("/api/sports/teams?sport=soccer")).json(); $("loadTeam").innerHTML = `<option value="">load roster from saved team…</option>` + t.map((x) => `<option>${esc(x.team)}</option>`).join(""); } catch {}
+}
+async function loadRoster(side) {
+  const team = $("loadTeam").value; if (!team) return;
+  const ps = await (await fetch("/api/sports/profiles?team=" + encodeURIComponent(team))).json();
+  const order = ["GK", "DF", "MF", "FW"];
+  const byMin = ps.sort((a, b) => b.minutes - a.minutes);
+  const gk = byMin.find((p) => p.position === "GK");
+  const xi = [gk, ...byMin.filter((p) => p !== gk && p.position !== "GK")].filter(Boolean).slice(0, 11);
+  const rest = byMin.filter((p) => !xi.includes(p));
+  const lines = [...xi.sort((a, b) => order.indexOf(a.position) - order.indexOf(b.position)), ...rest].map((p) => `${p.player}, ${p.position || ""}`).join("\n");
+  $(side === "home" ? "rHome" : "rAway").value = lines; $(side).value = team; applyRosters();
+}
+function onPitchNow(side) {
+  const t = matchSeconds() || 0;
+  const on = new Set(S.roster[side].filter((p) => p.starter).map((p) => p.player));
+  for (const s of S.subs.filter((x) => x.team === side && x.t <= t)) { on.delete(s.out); on.add(s.in); }
+  return on;
+}
+
+// ── UI ──
+function setTeam(side) { S.team = side; renderPlayers(); $("tHome").classList.toggle("on", side === "home"); $("tAway").classList.toggle("on", side === "away"); updateDir(); }
+function renderPlayers() {
+  $("tHome").textContent = $("home").value || "Home"; $("tAway").textContent = $("away").value || "Away";
+  const r = S.roster[S.team], on = onPitchNow(S.team);
+  const list = [...r.filter((p) => on.has(p.player)), ...r.filter((p) => !on.has(p.player))];
+  $("players").innerHTML = list.length ? list.map((p, i) => `<button class="pbtn ${S.sel[S.team] === p.player ? "on" : ""} ${on.has(p.player) ? "" : "off"}" onclick="pick('${esc(p.player).replace(/'/g, "\\'")}')">${i < PKEYS.length && on.has(p.player) ? `<span class="k">${PKEYS[i]}</span>` : ""}${esc(p.player)} <span class="hint">${esc(p.position || "")}</span></button>`).join("")
+    : `<p class="hint">Add rosters above (or load them from a saved team).</p>`;
+  S._keyed = list.filter((p) => on.has(p.player)).slice(0, PKEYS.length).map((p) => p.player);
+}
+function pick(name) { S.sel[S.team] = name; renderPlayers(); }
+$("keys").innerHTML = KEYS.map(([k, , , label]) => `<button class="key" onclick="tag('${k}')"><kbd>${k.toUpperCase()}</kbd>${label}</button>`).join("");
+function updateDir() { $("dirLabel").textContent = $("flip").checked ? "← attacking (mirrored on save)" : "attacking →"; }
+$("flip").onchange = updateDir;
+$("pitch").addEventListener("click", (ev) => {
+  const svg = $("pitch"), pt = svg.createSVGPoint(); pt.x = ev.clientX; pt.y = ev.clientY;
+  const p = pt.matrixTransform(svg.getScreenCTM().inverse());
+  S.loc = { sx: p.x, sy: p.y };
+  $("cur").setAttribute("cx", p.x); $("cur").setAttribute("cy", p.y);
+  $("locHint").textContent = "Location set: it will be attached to the next action.";
+});
+// screen click → 0–100 pitch from the acting team's perspective (x toward opponent goal, y from its left)
+function locToPitch(loc) {
+  let x = Math.max(0, Math.min(100, loc.sx)), y = Math.max(0, Math.min(100, (loc.sy / 64) * 100));
+  if ($("flip").checked) { x = 100 - x; y = 100 - y; }
+  return { x: Math.round(x), y: Math.round(y) };
+}
+function tag(k) {
+  const def = KEYS.find((d) => d[0] === k); if (!def) return;
+  const who = S.sel[S.team];
+  if (!who) { flashMsg("Pick a player first"); return; }
+  const t = matchSeconds(); if (t == null) { flashMsg("Set kick-off (or tick manual minute) first"); return; }
+  const ev = { t, team: S.team, player: who, type: def[1] };
+  if (def[2]) ev.outcome = def[2];
+  if (S.loc) Object.assign(ev, locToPitch(S.loc));
+  S.events.push(ev); S.loc = null; $("cur").setAttribute("cx", -10); $("locHint").textContent = "No location for the next action yet.";
+  if (def[1] === "shot" && def[2] === "goal") flashMsg(`GOAL: ${who}`);
+  persist(); renderLog();
+}
+function flashMsg(m) { $("saveMsg").textContent = m; $("saveMsg").classList.remove("flash"); void $("saveMsg").offsetWidth; $("saveMsg").classList.add("flash"); }
+function renderLog() {
+  const score = { home: 0, away: 0 }; for (const e of S.events) if (e.type === "shot" && e.outcome === "goal") score[e.team]++;
+  $("evCount").textContent = `Events (${S.events.length}) · ${$("home").value || "Home"} ${score.home}–${score.away} ${$("away").value || "Away"}`;
+  const rows = S.events.map((e, i) => ({ e, i })).reverse().slice(0, 200);
+  $("log").innerHTML = rows.map(({ e, i }) => `<tr><td>${fmt(e.t)}</td><td style="color:var(--${e.team})">${esc(e.player)}</td><td><b>${esc(e.type)}</b> ${esc(e.outcome || "")}${e.x != null ? ` <span class="hint">@${e.x},${e.y}</span>` : ""}</td><td class="x" onclick="del(${i})">✕</td></tr>`).join("")
+    + S.subs.map((s, i) => `<tr><td>${fmt(s.t)}</td><td colspan="2">⇄ ${esc(s.in)} for ${esc(s.out)} (${esc(s.team)})</td><td class="x" onclick="delSub(${i})">✕</td></tr>`).join("");
+  drawMarks();
+}
+function drawMarks() { $("marks").innerHTML = S.events.slice(-25).filter((e) => e.x != null).map((e) => { const x = $("flip").checked ? 100 - e.x : e.x, y = ($("flip").checked ? 100 - e.y : e.y) * 0.64; return `<circle cx="${x}" cy="${y}" r="1" fill="var(--${e.team})" opacity=".6"/>`; }).join(""); }
+function del(i) { S.events.splice(i, 1); persist(); renderLog(); }
+function delSub(i) { S.subs.splice(i, 1); persist(); renderPlayers(); renderLog(); }
+function doSub() {
+  const t = matchSeconds(); if (t == null) { flashMsg("Set kick-off first"); return; }
+  const on = [...onPitchNow(S.team)], off = S.roster[S.team].map((p) => p.player).filter((n) => !on.includes(n));
+  const out = prompt(`Player OFF (${S.team}):\n` + on.map((n, i) => `${i + 1}. ${n}`).join("\n")); if (!out) return;
+  const inn = prompt(`Player ON:\n` + off.map((n, i) => `${i + 1}. ${n}`).join("\n")); if (!inn) return;
+  const o = on[+out - 1] || out, n = off[+inn - 1] || inn;
+  S.subs.push({ t, team: S.team, out: o, in: n }); persist(); renderPlayers(); renderLog(); $("subHint").textContent = `${n} on for ${o} at ${fmt(t)}`;
+}
+function renderAll() { renderPlayers(); renderLog(); tick(); $("rHome").value = S.roster.home.map((p) => `${p.player}${p.position ? ", " + p.position : ""}`).join("\n"); $("rAway").value = S.roster.away.map((p) => `${p.player}${p.position ? ", " + p.position : ""}`).join("\n"); }
+document.addEventListener("keydown", (ev) => {
+  if (["INPUT", "TEXTAREA", "SELECT"].includes(document.activeElement.tagName)) return;
+  const k = ev.key.toLowerCase();
+  if (ev.key === "Tab") { ev.preventDefault(); setTeam(S.team === "home" ? "away" : "home"); return; }
+  if ((ev.ctrlKey || ev.metaKey) && k === "z") { ev.preventDefault(); S.events.pop(); persist(); renderLog(); return; }
+  if (k === " ") { ev.preventDefault(); if (player && player.getPlayerState) player.getPlayerState() === 1 ? player.pauseVideo() : player.playVideo(); return; }
+  if (ev.key === "ArrowLeft" || ev.key === "ArrowRight") { if (player && player.seekTo) player.seekTo(vt() + (ev.key === "ArrowLeft" ? -5 : 5), true); return; }
+  const pi = PKEYS.indexOf(ev.key); if (pi >= 0 && S._keyed && S._keyed[pi]) { pick(S._keyed[pi]); return; }
+  if (KEYS.some((d) => d[0] === k) && !ev.ctrlKey && !ev.metaKey) { ev.preventDefault(); tag(k); }
+});
+$("home").oninput = $("away").oninput = () => { renderPlayers(); persist(); };
+
+// ── save ──
+function buildMatch() {
+  const end = Math.max(90, ...S.events.map((e) => Math.ceil(e.t / 60)));
+  const lineups = {};
+  for (const side of ["home", "away"]) {
+    lineups[side] = S.roster[side].map((p) => {
+      const inSub = S.subs.find((s) => s.team === side && s.in === p.player), outSub = S.subs.find((s) => s.team === side && s.out === p.player);
+      const on = p.starter ? 0 : inSub ? Math.round(inSub.t / 60) : null;
+      if (on == null) return null;
+      return { player: p.player, position: p.position, starter: !!p.starter, on, off: outSub ? Math.round(outSub.t / 60) : end };
+    }).filter(Boolean);
+  }
+  return { sport: "soccer", home: $("home").value.trim(), away: $("away").value.trim(), date: $("date").value || undefined, lineups, events: S.events,
+    id: S.videoId ? "yt-" + S.videoId : undefined, source: { kind: "video-tag", youtube: S.videoId || undefined } };
+}
+async function save() {
+  const m = buildMatch();
+  if (!m.home || !m.away) { flashMsg("Enter both team names."); return; }
+  try {
+    const r = await fetch("/api/sports/matches", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(m) });
+    const j = await r.json(); if (!r.ok) throw new Error(j.error);
+    flashMsg(`Saved ${j.match.id}: ${j.match.events} events${j.warnings.length ? ` (${j.warnings.length} warnings: ${j.warnings.slice(0, 2).join("; ")})` : ""}. It now feeds ratings, scouting and tactics.`);
+  } catch (e) { flashMsg("Save failed: " + e.message); }
+}
+function exportCsv() {
+  const rows = [["t", "team", "player", "type", "outcome", "x", "y"], ...S.events.map((e) => [fmt(e.t), e.team, e.player, e.type, e.outcome || "", e.x ?? "", e.y ?? ""])];
+  const csv = rows.map((r) => r.map((c) => /[",]/.test(String(c)) ? `"${String(c).replace(/"/g, '""')}"` : c).join(",")).join("\n");
+  const a = document.createElement("a"); a.href = URL.createObjectURL(new Blob([csv], { type: "text/csv" })); a.download = `events-${S.videoId || "match"}.csv`; a.click();
+}
+
+// boot: ?v=<id>&home=&away=
+const qs = new URLSearchParams(location.search);
+if (qs.get("home")) $("home").value = qs.get("home"); if (qs.get("away")) $("away").value = qs.get("away");
+if (qs.get("v")) { $("url").value = qs.get("v"); loadVideo(); } else renderAll();
+loadTeams();
+</script>
+</body>
+</html>

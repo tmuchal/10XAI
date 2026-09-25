@@ -18,8 +18,8 @@ Write user-facing responses, instructions, and reports in English.
 | `lib/gate/index.cjs` | The gate that holds risky cards for manual approval. |
 | `lib/config.cjs` | Config loader. Reads `config.js` or `config.example.js`, `.env`, and env overrides. |
 | `lib/model/card.cjs` | Task/card model. |
-| `lib/sports/*` | Sports module: YouTube match intake, commentary → events, per-player skill ratings, Elo + lineup match prediction, walk-forward backtest. REST under `/api/sports/`, UI at `/sports.html`, CLI `npm run sports`. |
-| `examples/sports/generate.cjs` | Synthetic (fictional) league generator with known true player skills. Used by the demo and by `test/sports.test.cjs`. |
+| `lib/sports/*` | Sports module. `events` (schema) · `ratings` (position-relative, xG-based, possession-adjusted) · `profile` (archetype, form, fatigue, counter-advice) · `scout` (opponent report + recommendations) · `lineup-model` / `tactics` (best XI, formations, in-game subs) · `predict` (Elo + lineup Poisson, walk-forward backtest) · `importers/statsbomb` · `youtube` · `commentary`. REST under `/api/sports/`, UI at `/sports.html`, video tagger at `/sports-tagger.html`, CLI `npm run sports`. |
+| `examples/sports/generate.cjs` | Synthetic (fictional) league with hidden true skills, flank weaknesses and stamina. `test/sports.test.cjs` validates ratings, scouting and fatigue against it. |
 | `config.example.js` / `config.js` | Config. Copy the example to `config.js`; `config.js` is gitignored. |
 | `.env.example` / `.env` | Optional tokens (Slack, etc.). Never commit `.env`. |
 
@@ -63,4 +63,5 @@ Risky cards (security / policy / high risk score) stop at the **Gate / Review** 
 3. Do not store plaintext secrets in logs or committed files. Use `.env`.
 4. Do not commit `.env` or `config.js`. Both are gitignored.
 5. Report claims in numbers — claimed vs. measured — not opinions.
-6. Sports: never download YouTube video or captions without explicit human approval. Those steps have risk ≥ 70 and wait at the gate.
+6. Sports: never download YouTube video or captions without explicit human approval. Those steps have risk ≥ 70 and wait at the gate. Tag from the official embed instead.
+7. Sports: never commit StatsBomb data files (import on demand into `data/`), and keep the attribution on any output built from them.

@@ -6,187 +6,489 @@
 <title>10XAI Sports</title>
 <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
 <style>
-:root{--bg:#fafafa;--s1:#fff;--s2:#f4f4f5;--bd:#e4e4e7;--tx:#18181b;--tx2:#52525b;--tx3:#71717a;--ac:#059669;--acbg:#d1fae5;--warn:#b45309;--bad:#dc2626;--home:#2563eb;--draw:#71717a;--away:#c2410c}
-[data-theme="dark"]{--bg:#0A0F16;--s1:#0E141D;--s2:#141C26;--bd:#1E2935;--tx:#EAF1E8;--tx2:#AEBBB3;--tx3:#7C8C84;--ac:#79D86C;--acbg:rgba(121,216,108,.13);--warn:#FBBF24;--bad:#F87171;--home:#7FB5FF;--draw:#9aa8a0;--away:#fb923c}
+:root{--bg:#fafafa;--s1:#fff;--s2:#f4f4f5;--s3:#e4e4e7;--bd:#e4e4e7;--tx:#18181b;--tx2:#52525b;--tx3:#71717a;--ac:#059669;--acbg:#d1fae5;--warn:#b45309;--warnbg:#fef3c7;--bad:#dc2626;--badbg:#fee2e2;--home:#2563eb;--draw:#71717a;--away:#c2410c;--pitch:#e7f3e9;--line:#9fc5a6}
+[data-theme="dark"]{--bg:#0A0F16;--s1:#0E141D;--s2:#141C26;--s3:#1E2935;--bd:#1E2935;--tx:#EAF1E8;--tx2:#AEBBB3;--tx3:#7C8C84;--ac:#79D86C;--acbg:rgba(121,216,108,.13);--warn:#FBBF24;--warnbg:#3A2C08;--bad:#F87171;--badbg:#3A1212;--home:#7FB5FF;--draw:#9aa8a0;--away:#fb923c;--pitch:#0f2418;--line:#2f5a3c}
 *{box-sizing:border-box;margin:0;padding:0}
 body{background:var(--bg);color:var(--tx);font:13px/1.5 -apple-system,'Pretendard Variable',sans-serif}
-.hdr{display:flex;align-items:center;gap:12px;padding:12px 20px;border-bottom:1px solid var(--bd);background:var(--s1)}
+.hdr{display:flex;align-items:center;gap:12px;padding:12px 20px;border-bottom:1px solid var(--bd);background:var(--s1);flex-wrap:wrap}
 .brand{font-weight:700}.brand b{color:var(--ac)}.sub{color:var(--tx3);font-size:12px;border-left:1px solid var(--bd);padding-left:10px}
 .hdr a{margin-left:auto;color:var(--tx2);text-decoration:none;font-size:12px}
-main{max-width:1100px;margin:0 auto;padding:20px 16px;display:grid;gap:16px}
-section{background:var(--s1);border:1px solid var(--bd);border-radius:12px;padding:16px}
-h2{font-size:14px;margin-bottom:4px}.hint{color:var(--tx3);font-size:12px;margin-bottom:12px}
+.tabs{display:flex;gap:2px;padding:0 16px;background:var(--s1);border-bottom:1px solid var(--bd);overflow-x:auto}
+.tab{padding:10px 14px;color:var(--tx2);cursor:pointer;border-bottom:2px solid transparent;white-space:nowrap;background:none;border-radius:0;font-weight:600}
+.tab.on{color:var(--tx);border-bottom-color:var(--ac)}
+main{max-width:1180px;margin:0 auto;padding:18px 16px;display:grid;gap:14px}
+.view{display:none;gap:14px}.view.on{display:grid}
+section{background:var(--s1);border:1px solid var(--bd);border-radius:12px;padding:16px;min-width:0}
+h2{font-size:14px;margin-bottom:4px}h3{font-size:13px;margin:12px 0 6px;color:var(--tx2)}
+.hint{color:var(--tx3);font-size:12px;margin-bottom:10px}
 .row{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:8px}
-input,select,textarea{background:var(--s2);border:1px solid var(--bd);color:var(--tx);border-radius:8px;padding:8px 10px;font:inherit}
-textarea{width:100%;font-family:'JetBrains Mono',monospace;font-size:12px;min-height:110px}
-input.grow{flex:1;min-width:200px}
+input,select,textarea{background:var(--s2);border:1px solid var(--bd);color:var(--tx);border-radius:8px;padding:7px 10px;font:inherit;max-width:100%}
+textarea{width:100%;font-family:'JetBrains Mono',monospace;font-size:12px;min-height:100px}
+input.grow{flex:1;min-width:180px}
 button{background:var(--ac);color:#06210b;border:0;border-radius:8px;padding:8px 16px;font-weight:700;cursor:pointer}
 button.ghost{background:transparent;color:var(--tx2);border:1px solid var(--bd)}
-.grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px}@media(max-width:800px){.grid2{grid-template-columns:1fr}}
-table{width:100%;border-collapse:collapse;font-size:12px}th,td{text-align:left;padding:6px 8px;border-bottom:1px solid var(--bd)}th{color:var(--tx3);font-weight:600}
+button:disabled{opacity:.5;cursor:wait}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px}.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+@media(max-width:860px){.grid2,.grid3{grid-template-columns:1fr}}
+table{width:100%;border-collapse:collapse;font-size:12px}th,td{text-align:left;padding:6px 8px;border-bottom:1px solid var(--bd);vertical-align:top}th{color:var(--tx3);font-weight:600}
+tr.click{cursor:pointer}tr.click:hover td{background:var(--s2)}
 .num{font-family:'JetBrains Mono',monospace;text-align:right}
 .ovr{display:inline-block;min-width:30px;text-align:center;border-radius:6px;padding:1px 6px;font-weight:700;font-family:'JetBrains Mono',monospace}
-.bar{height:6px;border-radius:3px;background:var(--s2);overflow:hidden;min-width:50px}.bar i{display:block;height:100%;background:var(--ac)}
-.attr{display:grid;grid-template-columns:80px 1fr 26px;gap:6px;align-items:center;font-size:11px;color:var(--tx2)}
-.prob{display:flex;height:28px;border-radius:8px;overflow:hidden;margin:10px 0;font-weight:700;font-size:12px}.prob div{display:flex;align-items:center;justify-content:center;color:#0b0b0b;white-space:nowrap}
-.card{background:var(--s2);border-radius:10px;padding:10px 12px}
-.pill{display:inline-block;padding:1px 8px;border-radius:99px;font-size:11px;background:var(--s2);color:var(--tx2);margin:2px}
-.gated{color:var(--bad);font-weight:700}.ok{color:var(--ac)}
+.bar{height:6px;border-radius:3px;background:var(--s3);overflow:hidden;min-width:40px}.bar i{display:block;height:100%;background:var(--ac)}
+.attr{display:grid;grid-template-columns:92px 1fr 28px;gap:8px;align-items:center;font-size:12px;color:var(--tx2);margin:3px 0}
+.prob{display:flex;height:28px;border-radius:8px;overflow:hidden;margin:10px 0;font-weight:700;font-size:12px}.prob div{display:flex;align-items:center;justify-content:center;color:#0b0b0b;white-space:nowrap;overflow:hidden}
+.card{background:var(--s2);border-radius:10px;padding:10px 12px;min-width:0}
+.pill{display:inline-block;padding:1px 8px;border-radius:99px;font-size:11px;background:var(--s3);color:var(--tx2);margin:2px 2px 2px 0}
+.pill.good{background:var(--acbg);color:var(--ac)}.pill.bad{background:var(--badbg);color:var(--bad)}.pill.warn{background:var(--warnbg);color:var(--warn)}
+.rec{display:grid;grid-template-columns:28px 1fr;gap:10px;padding:10px 0;border-bottom:1px solid var(--bd)}.rec:last-child{border-bottom:0}
+.rec .n{width:24px;height:24px;border-radius:50%;background:var(--acbg);color:var(--ac);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:12px}
+.rec b{display:block;margin-bottom:2px}.rec p{color:var(--tx2);font-size:12px}
 .stat{font-family:'JetBrains Mono',monospace;font-size:20px;font-weight:700}
-.err{color:var(--bad);font-size:12px}
-pre{white-space:pre-wrap;font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--tx2);max-height:220px;overflow:auto}
+.err{color:var(--bad);font-size:12px}.ok{color:var(--ac)}.muted{color:var(--tx3)}
+.kv{display:flex;gap:18px;flex-wrap:wrap}.kv div{min-width:90px}.kv small{display:block;color:var(--tx3);font-size:11px}
+ul.tips{padding-left:18px;color:var(--tx2);font-size:12px}ul.tips li{margin:3px 0}
+.pitch{width:100%;max-width:520px;display:block}
+.spark{display:flex;gap:3px;align-items:flex-end;height:36px}.spark i{width:14px;background:var(--ac);border-radius:2px 2px 0 0;opacity:.85}
+.spark i.lo{background:var(--bad)}.spark i.na{background:var(--s3);height:4px}
+.scroll{overflow:auto;max-height:520px}
+.foot{color:var(--tx3);font-size:11px;margin-top:8px}
 </style>
 </head>
 <body>
-<header class="hdr"><div class="brand">10X<b>·</b>AI Sports</div><div class="sub">Match video → player ratings → next-match prediction</div><a href="/">← Board</a></header>
+<header class="hdr"><div class="brand">10X<b>·</b>AI Sports</div><div class="sub">Scout the opponent → pick the XI → win the game from the bench</div>
+  <select id="sport" title="sport"><option value="soccer">⚽ Soccer</option><option value="basketball">🏀 Basketball</option></select>
+  <a href="/sports-tagger.html">🎬 Video tagger</a><a href="/" style="margin-left:14px">← Board</a></header>
+<nav class="tabs" id="tabs"></nav>
 <main>
 
-<section>
-  <h2>1 · YouTube match</h2>
-  <p class="hint">Paste a highlight or full-match URL. Metadata comes from YouTube's official oEmbed endpoint. Downloading the video or captions breaks YouTube's Terms of Service without the rights holder's permission, so those steps are held at the gate for manual approval.</p>
-  <div class="row"><input id="ytUrl" class="grow" placeholder="https://www.youtube.com/watch?v=…"><label><input type="checkbox" id="ytBoard"> add steps to board</label><button onclick="ytIngest()">Analyze</button></div>
-  <div id="ytOut"></div>
-</section>
+<!-- SCOUT -->
+<div class="view" id="v-scout">
+  <section>
+    <h2>Opponent scouting report</h2>
+    <p class="hint">Every trait is measured against the other teams in your data. Every recommendation shows the number behind it.</p>
+    <div class="row"><label>Opponent <select id="scThem" class="teamSel"></select></label><label>My team <select id="scUs" class="teamSel withNone"></select></label><button onclick="runScout()">Scout</button></div>
+    <div id="scOut"></div>
+  </section>
+</div>
 
-<section>
-  <h2>2 · Commentary → events</h2>
-  <p class="hint">Paste the video's transcript (YouTube: ⋯ → Show transcript). Each action is credited to the nearest roster player named before it. Commentary covers headline actions (goals, shots, threes), so passing volume stays thin. For full ratings, import a tagged event log (<code>npm run sports -- import events.csv</code>).</p>
-  <div class="row">
-    <select id="cSport"><option>soccer</option><option>basketball</option></select>
-    <input id="cHome" placeholder="Home team"><input id="cAway" placeholder="Away team">
-    <input id="cDate" type="date"><input id="cScore" placeholder="score e.g. 2-1" style="width:110px">
-    <select id="cEx"><option value="auto">extractor: auto</option><option value="heuristic">heuristic</option><option value="claude">claude CLI</option></select>
-  </div>
-  <div class="grid2">
-    <textarea id="cRoster" placeholder="home: Son Heung-min, James Maddison, …&#10;away: Erling Haaland, Kevin De Bruyne, …"></textarea>
-    <textarea id="cText" placeholder="12:04 Maddison slides it through for Son Heung-min who scores!&#10;30:15 Haaland shoots, but Vicario saves."></textarea>
-  </div>
-  <div class="row" style="margin-top:8px"><button onclick="commentary(false)">Extract</button><button class="ghost" onclick="commentary(true)">Extract &amp; save match</button></div>
-  <div id="cOut"></div>
-</section>
+<!-- PLAYERS -->
+<div class="view" id="v-players">
+  <section>
+    <h2>Player ratings</h2>
+    <p class="hint">Ratings run 1–99: 50 is the average player <b>in the same position line</b> in your data, and every 15 points is one standard deviation. Match ratings run 1–10, where 6.5 is an average game. Soccer: click a player for the full scouting profile.</p>
+    <div class="row"><select id="plTeam" onchange="loadPlayers()"></select><span id="plCount" class="hint" style="margin:0"></span></div>
+    <div class="scroll"><table id="plTable"></table></div>
+  </section>
+  <section id="profile" style="display:none"></section>
+</div>
 
-<section>
-  <div class="row" style="justify-content:space-between"><h2>3 · Player ratings</h2><button class="ghost" onclick="seedDemo()">Load demo league (fictional)</button></div>
-  <p class="hint">Each rating is 1–99: 50 is the average player in your data, and every 15 points is one standard deviation. Small samples are pulled toward average.</p>
-  <div class="row"><select id="pSport" onchange="loadTeams();loadPlayers()"><option>soccer</option><option>basketball</option></select><select id="pTeam" onchange="loadPlayers()"><option value="">all teams</option></select><span id="pCount" class="hint" style="margin:0"></span></div>
-  <div style="overflow:auto;max-height:460px"><table id="pTable"></table></div>
-</section>
+<!-- MATCH PLAN -->
+<div class="view" id="v-plan">
+  <section>
+    <h2>Match plan</h2>
+    <p class="hint">Picks the XI and formation that maximise your objective against this opponent, then pre-plans substitutions for common game states. Effects are damped (±25% max on expected goals), so treat gains under 0.03 as a tie.</p>
+    <div class="row">
+      <label>Us <select id="gpUs" class="teamSel"></select></label><label>vs <select id="gpThem" class="teamSel"></select></label>
+      <select id="gpVenue"><option value="neutral">neutral</option><option value="home">we're at home</option><option value="away">we're away</option></select>
+      <select id="gpObj"><option value="points">league: expected points</option><option value="win">knockout: win (draw = coin flip)</option><option value="avoid_loss">avoid defeat</option></select>
+      <select id="gpForm"><option value="">best formation</option><option>4-3-3</option><option>4-4-2</option><option>4-2-3-1</option><option>3-5-2</option><option>3-4-3</option><option>5-3-2</option></select>
+    </div>
+    <div class="row"><input id="gpOut" class="grow" placeholder="Unavailable players (comma-separated): injured, suspended…"><button onclick="runPlan()">Build plan</button></div>
+    <div id="gpOutEl"></div>
+  </section>
+</div>
 
-<section>
-  <h2>4 · Predict the next match</h2>
-  <p class="hint">Team Elo is built from past results, then shifted by the lineup's player ratings relative to the team's usual roster. Leave the lineups empty to use the usual roster.</p>
-  <div class="row"><select id="fHome"></select><span>vs</span><select id="fAway"></select><label><input type="checkbox" id="fNeutral"> neutral venue</label><button onclick="predict()">Predict</button></div>
-  <div class="grid2"><textarea id="fLH" placeholder="Home lineup (optional) — one player per line" style="min-height:70px"></textarea><textarea id="fLA" placeholder="Away lineup (optional)" style="min-height:70px"></textarea></div>
-  <div id="fOut"></div>
-</section>
+<!-- LIVE SUBS -->
+<div class="view" id="v-subs">
+  <section>
+    <h2>Live substitution planner</h2>
+    <p class="hint">Set the minute and score, and tick who's on the pitch. Every possible change (and pairs of changes) is scored on the same objective. Players tire according to their <b>measured</b> late-game drop in success rate.</p>
+    <div class="row">
+      <label>Us <select id="lsUs" class="teamSel" onchange="fillPitch()"></select></label><label>vs <select id="lsThem" class="teamSel"></select></label>
+      <label>Minute <input id="lsMin" type="number" min="1" max="95" value="60" style="width:70px"></label>
+      <label>Score <input id="lsSu" type="number" min="0" value="0" style="width:56px"> – <input id="lsSt" type="number" min="0" value="0" style="width:56px"></label>
+      <select id="lsObj"><option value="points">expected points</option><option value="win">knockout win</option><option value="avoid_loss">avoid defeat</option></select>
+      <label>Subs left <input id="lsLeft" type="number" min="1" max="5" value="5" style="width:56px"></label>
+    </div>
+    <div class="row"><span class="hint" style="margin:0">On the pitch (tick 11). Anyone unticked counts as available on the bench.</span><button class="ghost" onclick="fillPitch()">Reset to usual XI</button></div>
+    <div id="lsPitch" class="grid3" style="margin-bottom:10px"></div>
+    <button onclick="runSubs()">What should we change?</button>
+    <div id="lsOut"></div>
+  </section>
+</div>
 
-<section>
-  <h2>5 · Does it actually predict? (walk-forward backtest)</h2>
-  <p class="hint">Each past match is predicted using only earlier data, then compared with the real result. The baseline always predicts the historical outcome rates. Lower Brier is better.</p>
-  <button onclick="runBacktest()">Run backtest</button>
-  <div id="bOut"></div>
-</section>
+<!-- PREDICT -->
+<div class="view" id="v-predict">
+  <section>
+    <h2>Predict a match</h2>
+    <p class="hint">Team Elo from past results, adjusted by the lineup's player model when lineups are given (one player per line).</p>
+    <div class="row"><select id="fHome" class="teamSel"></select><span>vs</span><select id="fAway" class="teamSel"></select><label><input type="checkbox" id="fNeutral"> neutral venue</label><button onclick="predict()">Predict</button></div>
+    <div class="grid2"><textarea id="fLH" placeholder="Home lineup (optional)" style="min-height:64px"></textarea><textarea id="fLA" placeholder="Away lineup (optional)" style="min-height:64px"></textarea></div>
+    <div id="fOut"></div>
+  </section>
+  <section>
+    <h2>Does it actually predict? (walk-forward backtest)</h2>
+    <p class="hint">Each past match is predicted from earlier data only, then compared with the real result. Soccer also shows the same run with lineups ignored, so the value of lineup-awareness is measured rather than assumed.</p>
+    <button onclick="runBacktest()">Run backtest</button>
+    <div id="bOut"></div>
+  </section>
+</div>
+
+<!-- DATA -->
+<div class="view" id="v-data">
+  <section>
+    <h2>Import real matches: StatsBomb open data</h2>
+    <p class="hint">Free event data for full competitions (World Cups, Euros, some league seasons): every pass, shot with xG, duel and substitution, with pitch location. Licensed for non-commercial use with attribution. Pick one team to import only its matches, or leave it blank for the whole competition (capped at 80).</p>
+    <div class="row"><select id="sbComp" style="max-width:360px"><option value="">loading competitions…</option></select><input id="sbTeam" placeholder="team (optional, e.g. France)"><button onclick="sbImport()">Import</button></div>
+    <div id="sbOut"></div>
+  </section>
+  <section>
+    <h2>Tag a match from video</h2>
+    <p class="hint">Open the <a href="/sports-tagger.html" style="color:var(--ac)">video tagger</a>: it plays the YouTube video in an embedded player (no download) while you log each action with a hotkey and a click on the pitch. The saved match feeds straight into ratings, scouting and tactics.</p>
+  </section>
+  <section>
+    <h2>YouTube match intake</h2>
+    <p class="hint">Metadata comes from YouTube's official oEmbed endpoint. Downloading video or captions breaks YouTube's Terms of Service without the rights holder's permission, so those steps stop at the gate for manual approval.</p>
+    <div class="row"><input id="ytUrl" class="grow" placeholder="https://www.youtube.com/watch?v=…"><label><input type="checkbox" id="ytBoard"> add steps to board</label><button onclick="ytIngest()">Analyze</button></div>
+    <div id="ytOut"></div>
+  </section>
+  <section>
+    <h2>Commentary → events</h2>
+    <p class="hint">Paste a transcript. Each action is credited to the nearest roster player named before it. Commentary only covers headline actions, so passing and defending stay thin.</p>
+    <div class="row">
+      <input id="cHome" placeholder="Home team"><input id="cAway" placeholder="Away team"><input id="cDate" type="date"><input id="cScore" placeholder="score 2-1" style="width:100px">
+      <select id="cEx"><option value="auto">extractor: auto</option><option value="heuristic">heuristic</option><option value="claude">claude CLI</option></select>
+    </div>
+    <div class="grid2"><textarea id="cRoster" placeholder="home: Name One, Name Two, …&#10;away: Name Three, …"></textarea><textarea id="cText" placeholder="12:04 Maddison slides it through for Son Heung-min who scores!"></textarea></div>
+    <div class="row" style="margin-top:8px"><button onclick="commentary(false)">Extract</button><button class="ghost" onclick="commentary(true)">Extract &amp; save</button></div>
+    <div id="cOut"></div>
+  </section>
+  <section>
+    <div class="row" style="justify-content:space-between;margin:0"><div><h2>Demo data</h2><p class="hint" style="margin:0">A fictional soccer and basketball league with known "true" player skills. Useful for trying the tool.</p></div><button class="ghost" onclick="seedDemo()">Load demo league</button></div>
+    <p id="dataCount" class="foot"></p>
+  </section>
+</div>
 </main>
 <script>
 const $ = (id) => document.getElementById(id);
 const esc = (s) => String(s == null ? "" : s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
-const clock = (t) => (t == null ? "" : typeof t === "number" ? Math.floor(t / 60) + ":" + String(t % 60).padStart(2, "0") : t);
-const pct = (p) => (p * 100).toFixed(1) + "%";
+const pct = (p) => (p == null ? "—" : Math.round(p * 1000) / 10 + "%");
+const sgn = (x) => (x > 0 ? "+" : "") + x;
+const FL = { L: "left", C: "central", R: "right" };
 async function api(method, path, body) {
   const r = await fetch("/api/sports/" + path, { method, headers: { "Content-Type": "application/json" }, body: body ? JSON.stringify(body) : undefined });
   const j = await r.json().catch(() => ({}));
-  if (!r.ok && !j.gated) throw new Error(j.error || r.status);
+  if (!r.ok && !j.gated) throw new Error(j.error || "HTTP " + r.status);
   return j;
 }
-const fail = (el, e) => { $(el).innerHTML = `<p class="err">${esc(e.message || e)}</p>`; };
-function ovrColor(v) { return v >= 75 ? "background:var(--acbg);color:var(--ac)" : v <= 35 ? "color:var(--bad)" : "color:var(--tx)"; }
+const fail = (el, e) => { $(el).innerHTML = `<p class="err" style="margin-top:8px">${esc(e.message || e)}</p>`; };
+async function busy(btn, fn) { const b = btn && btn.tagName === "BUTTON" ? btn : null; if (b) b.disabled = true; try { await fn(); } finally { if (b) b.disabled = false; } }
+const ovrStyle = (v) => v >= 75 ? "background:var(--acbg);color:var(--ac)" : v <= 35 ? "background:var(--badbg);color:var(--bad)" : "background:var(--s3)";
+const ovr = (v) => `<span class="ovr" style="${ovrStyle(v)}">${v ?? "–"}</span>`;
+const formPill = (f) => !f || f.label === "not enough matches" ? `<span class="pill">form: n/a</span>` : `<span class="pill ${f.label === "in form" ? "good" : f.label === "out of form" ? "bad" : ""}">${esc(f.label)} ${f.recent}</span>`;
 
+// ── tabs ──
+const TABS = [["scout", "🔎 Scout"], ["players", "👤 Players"], ["plan", "📋 Match plan"], ["subs", "🔁 Live subs"], ["predict", "📈 Predict"], ["data", "📥 Data"]];
+function showTab(k) {
+  for (const [t] of TABS) { $("v-" + t).classList.toggle("on", t === k); }
+  document.querySelectorAll(".tab").forEach((b) => b.classList.toggle("on", b.dataset.k === k));
+  try { localStorage.setItem("sportsTab", k); } catch {}
+  if (k === "players") loadPlayers();
+}
+$("tabs").innerHTML = TABS.map(([k, l]) => `<button class="tab" data-k="${k}" onclick="showTab('${k}')">${l}</button>`).join("");
+
+// ── teams ──
+let TEAMS = [];
+async function loadTeams() {
+  const sport = $("sport").value;
+  TEAMS = await api("GET", "teams?sport=" + sport);
+  const opts = TEAMS.map((t) => `<option value="${esc(t.team)}">${esc(t.team)} (${t.matches})</option>`).join("");
+  document.querySelectorAll(".teamSel").forEach((s) => { const keep = s.value; s.innerHTML = (s.classList.contains("withNone") ? `<option value="">— none —</option>` : "") + opts; if (keep && TEAMS.some((t) => t.team === keep)) s.value = keep; });
+  $("plTeam").innerHTML = `<option value="">all teams</option>` + opts;
+  if (TEAMS[1]) { for (const id of ["scThem", "gpThem", "lsThem", "fAway"]) if (!$(id).value || $(id).value === $(id.replace(/Them|Away/, (m) => m === "Away" ? "Home" : "Us")).value) $(id).value = TEAMS[1].team; }
+  $("dataCount").textContent = `${TEAMS.length} ${sport} teams in store`;
+  const soccerOnly = sport !== "soccer";
+  for (const k of ["scout", "plan", "subs"]) document.querySelector(`.tab[data-k="${k}"]`).style.display = soccerOnly ? "none" : "";
+  if (soccerOnly && ["scout", "plan", "subs"].some((k) => $("v-" + k).classList.contains("on"))) showTab("players");
+  if (!TEAMS.length) { $("plTable").innerHTML = `<tr><td class="hint">No matches yet. Go to 📥 Data to import real matches, tag a video, or load the demo league.</td></tr>`; }
+}
+$("sport").onchange = () => { loadTeams().then(() => { if ($("v-players").classList.contains("on")) loadPlayers(); }); $("profile").style.display = "none"; };
+
+// ── pitch drawing ──
+function pitchSVG(inner, h = 300) {
+  return `<svg class="pitch" viewBox="0 0 100 ${h / 5}" preserveAspectRatio="xMidYMid meet"><rect x="0" y="0" width="100" height="${h / 5}" rx="1.5" fill="var(--pitch)"/>
+  <g stroke="var(--line)" stroke-width=".35" fill="none"><rect x="1" y="1" width="98" height="${h / 5 - 2}"/><line x1="50" y1="1" x2="50" y2="${h / 5 - 1}"/><circle cx="50" cy="${h / 10}" r="7"/>
+  <rect x="1" y="${h / 10 - 12}" width="14" height="24"/><rect x="85" y="${h / 10 - 12}" width="14" height="24"/></g>${inner}</svg>`;
+}
+// flank share diagram: defending team's perspective, attacking toward the right edge = their own goal on the left
+function flankDiagram(share, title) {
+  if (!share) return `<p class="hint">Not enough located shots to split by flank.</p>`;
+  const H = 60, rows = [["L", 2], ["C", 21], ["R", 40]];
+  const inner = rows.map(([k, y]) => { const v = share[k]; const hot = v >= 0.4; return `<rect x="2" y="${y}" width="${Math.max(2, v * 140)}" height="17" fill="${hot ? "var(--bad)" : "var(--ac)"}" opacity=".35"/><text x="4" y="${y + 11}" font-size="5" fill="var(--tx)">${FL[k]} ${Math.round(v * 100)}%</text>`; }).join("");
+  return `<div class="hint" style="margin:0 0 4px">${esc(title)}</div>` + pitchSVG(inner, H * 5);
+}
+function zoneDot(zone) {
+  if (!zone) return "";
+  // x along the pitch (0 own goal → 100 attacking), y top = left touchline
+  const inner = `<circle cx="${zone.x}" cy="${zone.y * 0.6}" r="3.2" fill="var(--ac)" opacity=".9"/><circle cx="${zone.x}" cy="${zone.y * 0.6}" r="8" fill="var(--ac)" opacity=".18"/>
+    <text x="3" y="57" font-size="3.6" fill="var(--tx3)">attacking →</text>`;
+  return pitchSVG(inner, 300);
+}
+function xiDiagram(xi) {
+  const byLine = { GK: [], DF: [], MF: [], FW: [] };
+  for (const p of xi) (byLine[p.position] || byLine.MF).push(p);
+  const X = { GK: 7, DF: 26, MF: 50, FW: 78 };
+  const order = (arr) => arr.sort((a, b) => ({ L: 0, C: 1, R: 2 }[a.channel] ?? 1) - ({ L: 0, C: 1, R: 2 }[b.channel] ?? 1));
+  const short = (n) => { const t = n.split(" "); return (t.length > 1 ? t.slice(1).join(" ") : n).slice(0, 14); };
+  let inner = "";
+  const put = (p, x, y) => { inner += `<circle cx="${x}" cy="${y}" r="2.4" fill="var(--home)"/><text x="${x}" y="${y + 5.6}" font-size="3" text-anchor="middle" fill="var(--tx)">${esc(short(p.player))}</text>`; };
+  for (const [line, arr] of Object.entries(byLine)) {
+    order(arr);
+    if (line === "MF" && arr.length >= 4) {
+      // big midfields: the two/three most defensive sit deeper, the rest higher, zig-zagged so labels don't collide
+      const deep = arr.filter((_, i) => i % 2 === 1), high = arr.filter((_, i) => i % 2 === 0);
+      deep.forEach((p, i) => put(p, 42, ((i + 1) / (deep.length + 1)) * 60));
+      high.forEach((p, i) => put(p, 58, ((i + 1) / (high.length + 1)) * 60));
+      continue;
+    }
+    arr.forEach((p, i) => put(p, X[line], ((i + 1) / (arr.length + 1)) * 60));
+  }
+  return pitchSVG(inner, 300);
+}
+
+// ── SCOUT ──
+async function runScout(btn) {
+  const them = $("scThem").value, us = $("scUs").value;
+  if (!them) return;
+  $("scOut").innerHTML = `<p class="hint" style="margin-top:8px">Scouting ${esc(them)}…</p>`;
+  try {
+    const R = await api("GET", `scout?team=${encodeURIComponent(them)}${us && us !== them ? "&us=" + encodeURIComponent(us) : ""}`);
+    const m = R.metrics;
+    const metricRow = (k) => { const x = m[k]; if (!x || x.value == null) return ""; const z = x.z; return `<tr><td>${esc(x.label)}</td><td class="num">${esc(x.display)}</td><td class="num muted">${esc(x.leagueDisplay)}</td><td>${z == null ? "" : `<span class="pill ${z >= 0.8 ? "warn" : z <= -0.8 ? "warn" : ""}">${sgn(z)} σ</span>`}</td></tr>`; };
+    const tl = R.timing;
+    const maxBin = Math.max(1, ...tl.goalsFor, ...tl.goalsAgainst);
+    const timing = tl.bins.map((b, i) => `<div style="display:grid;grid-template-columns:52px 1fr 1fr;gap:6px;align-items:center;font-size:11px;margin:2px 0"><span class="muted">${b}'</span>
+      <div class="bar" style="direction:rtl"><i style="width:${tl.goalsFor[i] / maxBin * 100}%;background:var(--home)"></i></div><div class="bar"><i style="width:${tl.goalsAgainst[i] / maxBin * 100}%;background:var(--bad)"></i></div></div>`).join("");
+    $("scOut").innerHTML = `
+      <div class="card" style="margin-top:10px"><div class="kv">
+        <div><small>record</small><b>${R.record.W}W ${R.record.D}D ${R.record.L}L</b></div>
+        <div><small>goals / match</small><b>${R.perMatch.goalsFor} – ${R.perMatch.goalsAgainst}</b></div>
+        <div><small>xG / match</small><b>${R.perMatch.xgFor} – ${R.perMatch.xgAgainst}</b></div>
+        <div><small>usual shape</small><b>${R.formation ? esc(R.formation.shape) : "—"}</b></div>
+        <div><small>confidence</small><b class="${R.confidence === "ok" ? "ok" : "err"}">${esc(R.confidence)} (${R.matches} matches)</b></div>
+      </div><div style="margin-top:8px">${R.style.map((s) => `<span class="pill warn">${esc(s.trait)}</span>`).join("") || `<span class="muted">No stand-out style traits vs. this dataset.</span>`}</div></div>
+      <h3>Game plan: recommendations, most important first</h3>
+      <div>${R.recommendations.map((r, i) => `<div class="rec"><div class="n">${i + 1}</div><div><b>${esc(r.title)}</b><p>${esc(r.detail)}</p></div></div>`).join("") || `<p class="hint">No strong patterns found. Check the metrics below.</p>`}</div>
+      <div class="grid2" style="margin-top:12px">
+        <div><h3>Where they concede (xG by build-up flank)</h3>${flankDiagram(R.defense.concededByFlank, "their own left / centre / right")}
+          ${R.defense.beaten.length ? `<h3>Most often dribbled past</h3><table>${R.defense.beaten.map((b) => `<tr><td>${esc(b.player)}</td><td>${esc(b.position)} ${b.channel ? esc(FL[b.channel]) : ""}</td><td class="num">${b.dribbledPastPer90}/90</td></tr>`).join("")}</table>` : ""}</div>
+        <div><h3>Where they attack (their xG by flank)</h3>${flankDiagram(R.attack.channels, "their left / centre / right")}
+          <h3>Goals by period <span class="muted" style="font-weight:400">(<span style="color:var(--home)">■</span> scored · <span style="color:var(--bad)">■</span> conceded)</span></h3>${timing}</div>
+      </div>
+      <h3>Key threats</h3><div class="grid3">${R.keyThreats.map((k) => `<div class="card">${ovr(k.overall)} <b>${esc(k.player)}</b> <span class="muted">${esc(k.position)}</span>
+        <div style="margin:4px 0">${k.archetypes.map((a) => `<span class="pill">${esc(a)}</span>`).join("")}${formPill(k.form)}</div>
+        ${k.zone ? `<div class="hint" style="margin:0">${esc(k.zone)}</div>` : ""}
+        <ul class="tips">${k.strengths.map((s) => `<li><b>${esc(s.attribute)} ${s.value}</b>: ${esc(s.evidence)}</li>`).join("")}</ul>
+        ${k.howToPlayAgainst.length ? `<p style="font-size:12px;margin-top:6px">▸ ${esc(k.howToPlayAgainst[0])}</p>` : ""}</div>`).join("")}</div>
+      <h3>Weak links</h3>${R.weakLinks.length ? `<table>${R.weakLinks.map((w) => `<tr class="click" onclick="openProfile('${esc(w.player).replace(/'/g, "\\'")}')"><td><b>${esc(w.player)}</b><br><span class="muted">${esc(w.position)}${w.zone ? " · " + esc(w.zone) : ""}</span></td><td>${w.reasons.map((r) => `<span class="pill bad">${esc(r.what)}</span> <span class="muted">${esc(r.evidence)}</span>`).join("<br>")}</td></tr>`).join("")}</table>` : `<p class="hint">No regular starter stands out as weak.</p>`}
+      <h3>Style metrics vs. every team in your data</h3><table><tr><th>metric</th><th class="num">${esc(R.team)}</th><th class="num">avg</th><th></th></tr>${Object.keys(m).map(metricRow).join("")}</table>
+      ${R.attribution ? `<p class="foot">${esc(R.attribution)}</p>` : ""}`;
+  } catch (e) { fail("scOut", e); }
+}
+
+// ── PLAYERS ──
+async function loadPlayers() {
+  const sport = $("sport").value, team = $("plTeam").value;
+  if (!TEAMS.length) return;
+  try {
+    if (sport === "soccer") {
+      const rows = await api("GET", "profiles" + (team ? "?team=" + encodeURIComponent(team) : ""));
+      rows.sort((a, b) => b.overall - a.overall);
+      $("plCount").textContent = `${rows.length} players`;
+      $("plTable").innerHTML = `<tr><th>OVR</th><th>Player</th><th>Pos</th><th>Team</th><th class="num">Min</th><th>Type</th><th>Form</th><th>Last 5</th></tr>` + rows.map((r) =>
+        `<tr class="click" onclick="openProfile('${esc(r.player).replace(/'/g, "\\'")}')"><td>${ovr(r.overall)}</td><td>${esc(r.player)}${r.sample === "small" ? ' <span class="pill">small sample</span>' : ""}</td><td>${esc(r.position || "")}</td><td>${esc(r.team)}</td><td class="num">${r.minutes}</td>
+        <td>${r.archetypes.map((a) => `<span class="pill">${esc(a)}</span>`).join("")}</td><td>${formPill(r.form)}</td><td>${spark(r.matchRatings.slice(-5))}</td></tr>`).join("");
+    } else {
+      const rows = await api("GET", `players?sport=${sport}${team ? "&team=" + encodeURIComponent(team) : ""}`);
+      $("plCount").textContent = `${rows.length} players`;
+      if (!rows.length) { $("plTable").innerHTML = ""; return; }
+      const keys = Object.keys(rows[0].attributes);
+      $("plTable").innerHTML = `<tr><th>OVR</th><th>Player</th><th>Team</th><th class="num">Min</th>${keys.map((k) => `<th>${esc(k)}</th>`).join("")}</tr>` +
+        rows.map((r) => `<tr><td>${ovr(r.overall)}</td><td>${esc(r.player)}</td><td>${esc(r.team)}</td><td class="num">${r.minutes}</td>${keys.map((k) => `<td class="num">${r.attributes[k] ?? ""}</td>`).join("")}</tr>`).join("");
+    }
+  } catch (e) { fail("plTable", e); }
+}
+function spark(ms) {
+  return `<div class="spark">${ms.map((m) => m.rating == null ? `<i class="na" title="${esc(m.opponent)}: under 20 min"></i>` : `<i class="${m.rating < 6 ? "lo" : ""}" style="height:${(m.rating - 3) / 7 * 100}%" title="${esc(m.date || "")} vs ${esc(m.opponent)}: ${m.rating}"></i>`).join("")}</div>`;
+}
+async function openProfile(name) {
+  showTab("players");
+  const el = $("profile"); el.style.display = ""; el.innerHTML = `<p class="hint">Loading ${esc(name)}…</p>`;
+  try {
+    const [p] = await api("GET", "profiles?player=" + encodeURIComponent(name));
+    if (!p) { el.innerHTML = `<p class="err">No profile for ${esc(name)}.</p>`; return; }
+    const attrs = Object.entries(p.attributes).filter(([, v]) => v != null);
+    el.innerHTML = `<div class="row" style="justify-content:space-between"><div>${ovr(p.overall)} <b style="font-size:16px">${esc(p.player)}</b> <span class="muted">${esc(p.position || "")} · ${esc(p.team)} · ${p.minutes}' in ${p.matches} matches (${p.starts} starts)</span></div><button class="ghost" onclick="$('profile').style.display='none'">close</button></div>
+      <p style="margin:4px 0 10px">${esc(p.verdict)}</p>
+      <div class="grid2"><div>
+        ${attrs.map(([k, v]) => `<div class="attr"><span>${esc(k)}</span><div class="bar"><i style="width:${v}%;background:${v >= 62 ? "var(--ac)" : v <= 38 ? "var(--bad)" : "var(--tx3)"}"></i></div><span class="num">${v}</span></div>`).join("")}
+        <h3>Strengths</h3>${p.strengths.length ? `<ul class="tips">${p.strengths.map((s) => `<li><b>${esc(s.attribute)} ${s.value}</b>: ${esc(s.evidence)}</li>`).join("")}</ul>` : `<p class="hint">Nothing ≥ 62 vs. the position.</p>`}
+        <h3>Weaknesses</h3>${p.weaknesses.length ? `<ul class="tips">${p.weaknesses.map((s) => `<li><b>${esc(s.attribute)} ${s.value}</b>: ${esc(s.evidence)}</li>`).join("")}</ul>` : `<p class="hint">Nothing ≤ 38 vs. the position.</p>`}
+      </div><div>
+        <h3 style="margin-top:0">Where they play</h3>${p.zone ? zoneDot(p.zone) + `<p class="hint">${esc(p.zone.summary)} (${p.zone.events} located actions)</p>` : `<p class="hint">No located events.</p>`}
+        <h3>Form: match ratings</h3>${spark(p.matchRatings.slice(-10))}<p class="hint">${p.form.label === "not enough matches" ? "Not enough matches to judge form." : `Last 3: ${p.form.recent}/10 · season ${p.form.season}/10 → ${esc(p.form.label)}`}</p>
+        ${p.fatigue ? `<h3>Late game</h3><p style="font-size:12px"><span class="pill ${p.fatigue.label === "fades late" ? "bad" : p.fatigue.label === "stronger late" ? "good" : ""}">${esc(p.fatigue.label)}</span> ${esc(p.fatigue.summary)}</p>` : ""}
+        <h3>How to play against them</h3>${p.howToPlayAgainst.length ? `<ul class="tips">${p.howToPlayAgainst.map((t) => `<li>${esc(t)}</li>`).join("")}</ul>` : `<p class="hint">No specific counter found.</p>`}
+      </div></div>
+      <h3>Match log</h3><div class="scroll" style="max-height:220px"><table><tr><th>date</th><th>opponent</th><th>result</th><th class="num">min</th><th class="num">rating</th><th class="num">G</th><th class="num">A</th><th class="num">xG</th></tr>
+      ${p.matchRatings.slice().reverse().map((m) => `<tr><td>${esc(m.date || "")}</td><td>${esc(m.opponent)}</td><td>${esc(m.result || "")}</td><td class="num">${m.minutes}${m.starter === false ? "*" : ""}</td><td class="num">${m.rating ?? "–"}</td><td class="num">${m.goals}</td><td class="num">${m.assists}</td><td class="num">${m.xg}</td></tr>`).join("")}</table></div>`;
+    el.scrollIntoView({ behavior: "smooth", block: "start" });
+  } catch (e) { el.innerHTML = `<p class="err">${esc(e.message)}</p>`; }
+}
+
+// ── MATCH PLAN ──
+const evalLine = (e) => `W <b>${pct(e.win)}</b> · D ${pct(e.draw)} · L ${pct(e.loss)} · xG ${e.xgFor}–${e.xgAgainst}`;
+function probBar(e, us, them) {
+  const seg = (v, c, l) => v > 0.001 ? `<div style="width:${v * 100}%;background:var(${c})">${v > 0.09 ? esc(l) + " " + pct(v) : ""}</div>` : "";
+  return `<div class="prob">${seg(e.win, "--home", us)}${seg(e.draw, "--draw", "Draw")}${seg(e.loss, "--away", them)}</div>`;
+}
+async function runPlan() {
+  const us = $("gpUs").value, them = $("gpThem").value;
+  $("gpOutEl").innerHTML = `<p class="hint" style="margin-top:8px">Building the plan…</p>`;
+  try {
+    const G = await api("POST", "gameplan", { us, them, venue: $("gpVenue").value, objective: $("gpObj").value, formation: $("gpForm").value || undefined,
+      unavailable: $("gpOut").value.split(",").map((s) => s.trim()).filter(Boolean) });
+    const L = G.lineup;
+    $("gpOutEl").innerHTML = `
+      <div class="grid2" style="margin-top:10px"><div>
+        <h3 style="margin-top:0">Recommended XI: ${esc(L.recommended.formation)}</h3>${xiDiagram(L.recommended.xi)}
+        ${probBar(L.recommended.eval, us, them)}<p style="font-size:12px">${evalLine(L.recommended.eval)}</p>
+        <p class="hint">Usual XI: ${evalLine(L.usual.eval)} · change in objective <b>${sgn(L.gain)}</b></p>
+        ${L.changesFromUsual.in.length ? `<p style="font-size:12px">In: <b>${L.changesFromUsual.in.map(esc).join(", ")}</b> · Out: ${L.changesFromUsual.out.map(esc).join(", ")}</p>` : `<p class="hint">Same players as the usual XI.</p>`}
+        <h3>Other formations</h3><table>${L.alternatives.map((a) => `<tr><td>${esc(a.formation)}</td><td>${evalLine(a.eval)}</td><td class="num">${a.eval.value}</td></tr>`).join("")}</table>
+        ${L.notes.map((n) => `<p class="foot">${esc(n)}</p>`).join("")}
+      </div><div>
+        <h3 style="margin-top:0">Substitution plan</h3>
+        <table><tr><th>when</th><th>state</th><th>change</th><th class="num">gain</th></tr>${G.substitutionPlan.map((s) => `<tr><td>${s.minute}'</td><td>${esc(s.state)}</td><td>${s.sub ? `<b>${esc(s.sub.in)}</b> for ${esc(s.sub.out)}<br><span class="muted">${esc(s.sub.why)}</span>` : `<span class="muted">hold</span>`}</td><td class="num">${s.gain ? sgn(s.gain) : ""}</td></tr>`).join("")}</table>
+        <h3>What they may target in you</h3>${G.ourVulnerabilities.length ? `<ul class="tips">${G.ourVulnerabilities.map((v) => `<li><b>${esc(v.title)}</b>: ${esc(v.detail)}</li>`).join("")}</ul>` : `<p class="hint">No stand-out weaknesses found.</p>`}
+      </div></div>
+      <h3>How to beat ${esc(them)}</h3>${G.recommendations.map((r, i) => `<div class="rec"><div class="n">${i + 1}</div><div><b>${esc(r.title)}</b><p>${esc(r.detail)}</p></div></div>`).join("")}
+      ${G.attribution ? `<p class="foot">${esc(G.attribution)}</p>` : ""}`;
+    LAST_XI = { us, xi: L.recommended.xi.map((p) => p.player) };
+  } catch (e) { fail("gpOutEl", e); }
+}
+
+// ── LIVE SUBS ──
+let SQUAD = [], LAST_XI = null;
+async function fillPitch() {
+  const us = $("lsUs").value; if (!us) return;
+  const ps = await api("GET", "profiles?team=" + encodeURIComponent(us));
+  SQUAD = ps.sort((a, b) => ["GK", "DF", "MF", "FW"].indexOf(a.position) - ["GK", "DF", "MF", "FW"].indexOf(b.position) || b.minutes - a.minutes);
+  // default: the plan's XI if built for this team, else the 11 most-used (1 GK)
+  let xi = LAST_XI && LAST_XI.us === us ? LAST_XI.xi : null;
+  if (!xi) { const bym = [...ps].sort((a, b) => b.minutes - a.minutes); const gk = bym.find((p) => p.position === "GK"); xi = [gk, ...bym.filter((p) => p !== gk && p.position !== "GK")].filter(Boolean).slice(0, 11).map((p) => p.player); }
+  $("lsPitch").innerHTML = ["GK", "DF", "MF", "FW"].map((line) => `<div class="card"><b>${line}</b>${SQUAD.filter((p) => (p.position || "MF") === line).map((p) =>
+    `<label style="display:block;font-size:12px;margin:3px 0"><input type="checkbox" class="onp" value="${esc(p.player)}" ${xi.includes(p.player) ? "checked" : ""}> ${esc(p.player)} <span class="muted">${p.overall}${p.fatigue && p.fatigue.label === "fades late" ? " · fades" : ""}</span></label>`).join("")}</div>`).join("");
+}
+async function runSubs() {
+  const onPitch = [...document.querySelectorAll(".onp:checked")].map((c) => ({ player: c.value, on: 0 }));
+  const bench = [...document.querySelectorAll(".onp:not(:checked)")].map((c) => c.value);
+  if (onPitch.length !== 11) { $("lsOut").innerHTML = `<p class="err" style="margin-top:8px">Tick exactly 11 players (currently ${onPitch.length}).</p>`; return; }
+  $("lsOut").innerHTML = `<p class="hint" style="margin-top:8px">Scoring every change…</p>`;
+  try {
+    const us = $("lsUs").value, them = $("lsThem").value;
+    const P = await api("POST", "subs", { us, them, minute: +$("lsMin").value, score: { us: +$("lsSu").value, them: +$("lsSt").value }, onPitch, bench, subsLeft: +$("lsLeft").value, objective: $("lsObj").value });
+    const opt = (o) => `<tr><td class="num"><b>${sgn(o.gain)}</b></td><td>${o.subs.map((s) => `<b>${esc(s.in)}</b> for ${esc(s.out)}<br><span class="muted">${esc(s.why)}</span>`).join("<br>")}</td><td class="num">${sgn(Math.round(o.winProbChange * 1000) / 10)}%</td><td class="num">${sgn(Math.round(o.lossProbChange * 1000) / 10)}%</td></tr>`;
+    $("lsOut").innerHTML = `<div style="margin-top:12px">${probBar(P.current, us, them)}</div>
+      <div class="card" style="border-left:3px solid ${P.recommendation ? "var(--ac)" : "var(--tx3)"}"><b>${esc(P.advice)}</b><p class="hint" style="margin:4px 0 0">${esc(P.posture.note)}</p></div>
+      <div class="grid2" style="margin-top:10px"><div><h3>Best options</h3><table><tr><th class="num">gain</th><th>change</th><th class="num">win</th><th class="num">loss</th></tr>${P.options.map(opt).join("")}</table></div>
+      <div><h3>Most tired right now</h3>${P.fatigue.map((f) => `<div class="attr"><span>${esc(f.player.split(" ").slice(-1)[0])}</span><div class="bar"><i style="width:${f.condition * 100}%;background:${f.condition < 0.9 ? "var(--bad)" : "var(--ac)"}"></i></div><span class="num">${Math.round(f.condition * 100)}</span></div>`).join("")}
+        <h3>If you want to…</h3><p style="font-size:12px"><b>chase a goal:</b> ${P.posture.attack ? P.posture.attack.subs.map((s) => `${esc(s.in)} for ${esc(s.out)}`).join(", ") + ` (xG for ${P.posture.attack.eval.xgFor})` : "—"}<br><b>shut up shop:</b> ${P.posture.defend ? P.posture.defend.subs.map((s) => `${esc(s.in)} for ${esc(s.out)}`).join(", ") + ` (xG against ${P.posture.defend.eval.xgAgainst})` : "—"}</p></div></div>`;
+  } catch (e) { fail("lsOut", e); }
+}
+
+// ── PREDICT / BACKTEST ──
+const lines = (id) => $(id).value.split("\n").map((s) => s.trim()).filter(Boolean);
+async function predict() {
+  try {
+    const sport = $("sport").value, lineups = {};
+    if (lines("fLH").length) lineups.home = lines("fLH"); if (lines("fLA").length) lineups.away = lines("fLA");
+    const p = await api("POST", "predict", { sport, home: $("fHome").value, away: $("fAway").value, neutral: $("fNeutral").checked, lineups });
+    const pr = p.probabilities;
+    $("fOut").innerHTML = probBar({ win: pr.home, draw: pr.draw || 0, loss: pr.away }, p.home, p.away) +
+      `<p>${p.expectedGoals ? `Expected goals <b>${p.expectedGoals.home} – ${p.expectedGoals.away}</b> · likely scores ${p.likelyScores.map((s) => `<span class="pill">${s.score} ${pct(s.p)}</span>`).join("")}` : `Spread <b>${esc(p.spread > 0 ? p.home : p.away)} by ${Math.abs(p.spread)}</b> · projected <b>${p.expectedPoints.home} – ${p.expectedPoints.away}</b>`}</p>
+      <div class="grid2" style="margin-top:10px">${["home", "away"].map((s) => `<div class="card"><b>${esc(p.teams[s].team)}</b> <span class="pill">Elo ${p.teams[s].elo}</span><span class="pill">${p.teams[s].matchesPlayed} results</span>${p.teams[s].keyPlayers.map((k) => `<div style="margin-top:6px">${ovr(k.overall)} ${esc(k.player)}</div>`).join("")}</div>`).join("")}</div>
+      ${p.lineupEffect ? `<p class="hint" style="margin-top:8px">Lineup effect on expected goals: home ×${p.lineupEffect.homeGoalsMult}, away ×${p.lineupEffect.awayGoalsMult}</p>` : ""}
+      ${p.notes.map((n) => `<p class="hint">⚠ ${esc(n)}</p>`).join("")}`;
+  } catch (e) { fail("fOut", e); }
+}
+async function runBacktest() {
+  $("bOut").innerHTML = `<p class="hint" style="margin-top:8px">Running…</p>`;
+  try {
+    const sport = $("sport").value;
+    const b = await api("GET", "backtest?sport=" + sport);
+    if (!b.n) { $("bOut").innerHTML = `<p class="hint">${esc(b.note)}</p>`; return; }
+    const cell = (label, m, bl, fmt, lower) => `<div class="card"><div class="hint" style="margin:0">${label}</div><div class="stat">${fmt(m)}</div><div class="hint" style="margin:0">baseline ${fmt(bl)} ${(lower ? m < bl : m > bl) ? '<b class="ok">▲ better</b>' : '<b class="err">▼ worse</b>'}</div></div>`;
+    $("bOut").innerHTML = `<p class="hint" style="margin-top:8px">${esc(sport)} · ${b.n} matches predicted walk-forward (first ${b.warmup} used as warmup)</p>
+      <div class="grid3">${cell("Accuracy", b.model.accuracy, b.baseline.accuracy, pct, false)}${cell("Brier score", b.model.brier, b.baseline.brier, (x) => x.toFixed(3), true)}${cell("Log loss", b.model.logLoss, b.baseline.logLoss, (x) => x.toFixed(3), true)}</div>
+      ${b.lineupBlind ? `<p class="hint" style="margin-top:8px">Same run with lineups ignored: accuracy ${pct(b.lineupBlind.accuracy)}, Brier ${b.lineupBlind.brier}. Lineup-awareness is ${b.model.brier < b.lineupBlind.brier ? "<b class='ok'>helping</b>" : "<b class='err'>not helping</b>"} on this data.</p>` : ""}`;
+  } catch (e) { fail("bOut", e); }
+}
+
+// ── DATA ──
+async function loadCompetitions() {
+  try {
+    const cs = await api("GET", "statsbomb/competitions");
+    $("sbComp").innerHTML = cs.filter((c) => c.gender === "male" || c.gender === "female").map((c) => `<option value="${c.competitionId}:${c.seasonId}">${esc(c.name)} ${esc(c.season)}${c.gender === "female" ? " (W)" : ""}</option>`).join("");
+  } catch (e) { $("sbComp").innerHTML = `<option value="">unavailable offline</option>`; }
+}
+async function sbImport() {
+  const [competitionId, seasonId] = $("sbComp").value.split(":").map(Number);
+  if (!$("sbComp").value) return;
+  $("sbOut").innerHTML = `<p class="hint">Downloading and converting… (≈3 MB per match)</p>`;
+  try {
+    const r = await api("POST", "statsbomb/import", { competitionId, seasonId, team: $("sbTeam").value.trim() || undefined });
+    $("sbOut").innerHTML = `<p class="ok" style="margin-top:6px">Imported ${r.imported} matches.</p><p class="foot">${esc(r.attribution)}</p>`;
+    $("sport").value = "soccer"; await loadTeams();
+  } catch (e) { fail("sbOut", e); }
+}
 async function ytIngest() {
   try {
     const j = await api("POST", "youtube", { url: $("ytUrl").value, board: $("ytBoard").checked });
     const g = j.guess || {};
     if (g.home) { $("cHome").value = g.home; $("cAway").value = g.away || ""; }
-    if (g.sport) $("cSport").value = g.sport;
     if (g.score) $("cScore").value = g.score.home + "-" + g.score.away;
     $("ytOut").innerHTML = `<div class="card"><b>${esc(j.metadata ? j.metadata.title : j.videoId)}</b> <span class="hint">${esc(j.metadata ? j.metadata.channel : "(metadata unavailable)")}</span><br>
       Detected: <span class="pill">${esc(g.sport || "sport ?")}</span> <span class="pill">${esc(g.home || "?")} vs ${esc(g.away || "?")}</span>${g.score ? `<span class="pill">${g.score.home}-${g.score.away}</span>` : ""}
+      <a href="/sports-tagger.html?v=${encodeURIComponent(j.videoId)}${g.home ? "&home=" + encodeURIComponent(g.home) + "&away=" + encodeURIComponent(g.away || "") : ""}" style="color:var(--ac);margin-left:8px">🎬 tag this video →</a>
       ${j.cards.length ? `<span class="pill">${j.cards.length} cards added to the board</span>` : ""}</div>
-      <table style="margin-top:8px">${j.plan.map((s) => `<tr><td class="${s.risk.score >= 70 ? "gated" : "ok"}">${s.risk.score >= 70 ? "⛔ gated" : "✓ safe"}</td><td class="num">${s.risk.score}</td><td><b>${esc(s.subject)}</b><br><span class="hint">${esc(s.description)}${s.risk.flags.length ? " — " + esc(s.risk.flags.join("; ")) : ""}</span></td></tr>`).join("")}</table>`;
+      <table style="margin-top:8px">${j.plan.map((s) => `<tr><td class="${s.risk.score >= 70 ? "err" : "ok"}">${s.risk.score >= 70 ? "⛔ gated" : "✓ safe"}</td><td class="num">${s.risk.score}</td><td><b>${esc(s.subject)}</b><br><span class="hint">${esc(s.description)}</span></td></tr>`).join("")}</table>`;
   } catch (e) { fail("ytOut", e); }
 }
-
-function parseRoster(text) {
-  const r = { home: [], away: [] };
-  for (const line of text.split("\n")) { const m = line.match(/^\s*(home|away)\s*:\s*(.+)$/i); if (m) r[m[1].toLowerCase()] = m[2].split(",").map((s) => s.trim()).filter(Boolean); }
-  return r;
-}
+function parseRoster(text) { const r = { home: [], away: [] }; for (const line of text.split("\n")) { const m = line.match(/^\s*(home|away)\s*:\s*(.+)$/i); if (m) r[m[1].toLowerCase()] = m[2].split(",").map((s) => s.trim()).filter(Boolean); } return r; }
+const clock = (t) => (t == null ? "" : typeof t === "number" ? Math.floor(t / 60) + ":" + String(t % 60).padStart(2, "0") : t);
 async function commentary(save) {
   try {
     const sc = $("cScore").value.match(/(\d+)\s*[-:]\s*(\d+)/);
-    const j = await api("POST", "commentary", { sport: $("cSport").value, home: $("cHome").value, away: $("cAway").value, date: $("cDate").value || undefined,
+    const j = await api("POST", "commentary", { sport: $("sport").value, home: $("cHome").value, away: $("cAway").value, date: $("cDate").value || undefined,
       score: sc ? { home: +sc[1], away: +sc[2] } : undefined, roster: parseRoster($("cRoster").value), text: $("cText").value, extractor: $("cEx").value, url: $("ytUrl").value || undefined, save });
-    const c = j.coverage || {};
-    const events = j.match.events || [];
-    $("cOut").innerHTML = `<p class="hint" style="margin-top:8px">extractor <b>${esc(j.extractor)}</b> · ${c.events} events from ${c.sentences} sentences · ${Object.entries(c.byType || {}).map(([k, v]) => `${esc(k)} ${v}`).join(", ")} ${j.saved ? "· <b class='ok'>saved</b>" : ""}</p>
-      ${(c.notes || []).map((n) => `<p class="hint">⚠ ${esc(n)}</p>`).join("")}${(j.warnings || []).length ? `<p class="hint">warnings: ${esc(j.warnings.slice(0, 5).join("; "))}</p>` : ""}
+    const c = j.coverage || {}, events = j.match.events || [];
+    $("cOut").innerHTML = `<p class="hint" style="margin-top:8px">extractor <b>${esc(j.extractor)}</b> · ${c.events} events from ${c.sentences} sentences ${j.saved ? "· <b class='ok'>saved</b>" : ""}</p>${(c.notes || []).map((n) => `<p class="hint">⚠ ${esc(n)}</p>`).join("")}
       ${events.length ? `<table>${events.map((e) => `<tr><td class="num">${esc(clock(e.t))}</td><td>${esc(e.player)}</td><td>${esc(e.team)}</td><td><b>${esc(e.type)}</b> ${esc(e.outcome || "")}</td></tr>`).join("")}</table>` : ""}`;
-    if (save) { loadTeams(); loadPlayers(); }
+    if (save) loadTeams();
   } catch (e) { fail("cOut", e); }
 }
+async function seedDemo() { await api("POST", "demo"); await loadTeams(); }
 
-async function seedDemo() { await api("POST", "demo"); await loadTeams(); loadPlayers(); }
-async function loadTeams() {
-  const sport = $("pSport").value;
-  const ms = await api("GET", "matches?sport=" + sport);
-  const teams = [...new Set(ms.flatMap((m) => [m.home, m.away]))].sort();
-  const opts = teams.map((t) => `<option>${esc(t)}</option>`).join("");
-  $("pTeam").innerHTML = `<option value="">all teams</option>` + opts;
-  $("fHome").innerHTML = opts; $("fAway").innerHTML = opts; if (teams[1]) $("fAway").value = teams[1];
-  $("pCount").textContent = `${ms.length} matches stored`;
-}
-async function loadPlayers() {
-  const sport = $("pSport").value, team = $("pTeam").value;
-  const rows = await api("GET", `players?sport=${sport}${team ? "&team=" + encodeURIComponent(team) : ""}`);
-  if (!rows.length) { $("pTable").innerHTML = `<tr><td class="hint">No matches yet — import events, save a commentary, or load the demo league.</td></tr>`; return; }
-  const keys = Object.keys(rows[0].attributes);
-  $("pTable").innerHTML = `<tr><th>OVR</th><th>Player</th><th>Team</th><th class="num">Min</th>${keys.map((k) => `<th>${esc(k)}</th>`).join("")}<th class="num">${esc(rows[0].impact.label)}</th></tr>` +
-    rows.map((r) => `<tr><td><span class="ovr" style="${ovrColor(r.overall)}">${r.overall}</span></td><td>${esc(r.player)}${r.sample === "small" ? ' <span class="pill">small sample</span>' : ""}</td><td>${esc(r.team)}</td><td class="num">${r.minutes}</td>` +
-      keys.map((k) => r.attributes[k] == null ? "<td></td>" : `<td><div class="attr" style="grid-template-columns:1fr 24px"><div class="bar"><i style="width:${r.attributes[k]}%"></i></div><span class="num">${r.attributes[k]}</span></div></td>`).join("") +
-      `<td class="num">${r.impact.per90 != null ? r.impact.per90 : r.impact.per36}</td></tr>`).join("");
-}
-
-const lines = (id) => $(id).value.split("\n").map((s) => s.trim()).filter(Boolean);
-async function predict() {
-  try {
-    const sport = $("pSport").value;
-    const lineups = {}; if (lines("fLH").length) lineups.home = lines("fLH"); if (lines("fLA").length) lineups.away = lines("fLA");
-    const p = await api("POST", "predict", { sport, home: $("fHome").value, away: $("fAway").value, neutral: $("fNeutral").checked, lineups });
-    const pr = p.probabilities;
-    const seg = (k, color, label) => pr[k] > 0.001 ? `<div style="width:${pr[k] * 100}%;background:var(${color})">${pr[k] > 0.08 ? esc(label) + " " + pct(pr[k]) : ""}</div>` : "";
-    const team = (t) => `<div class="card"><b>${esc(t.team)}</b> <span class="pill">Elo ${t.elo}</span>${t.lineupAdj ? `<span class="pill">lineup ${t.lineupAdj > 0 ? "+" : ""}${t.lineupAdj} Elo</span>` : ""}<span class="pill">${t.matchesPlayed} results</span>
-      ${t.keyPlayers.map((k) => `<div style="margin-top:6px"><span class="ovr" style="${ovrColor(k.overall)}">${k.overall}</span> ${esc(k.player)}</div>`).join("")}</div>`;
-    $("fOut").innerHTML = `<div class="prob">${seg("home", "--home", p.home)}${seg("draw", "--draw", "Draw")}${seg("away", "--away", p.away)}</div>
-      <p>${p.expectedGoals ? `Expected goals <b>${p.expectedGoals.home} – ${p.expectedGoals.away}</b> · most likely scores ${p.likelyScores.map((s) => `<span class="pill">${s.score} ${pct(s.p)}</span>`).join("")}` :
-        `Spread <b>${esc(p.spread > 0 ? p.home : p.away)} by ${Math.abs(p.spread)}</b> · projected <b>${p.expectedPoints.home} – ${p.expectedPoints.away}</b>`}</p>
-      <div class="grid2" style="margin-top:10px">${team(p.teams.home)}${team(p.teams.away)}</div>
-      <p class="hint" style="margin-top:10px">Where the lineups differ most (lineup average, home − away):</p>
-      ${p.matchups.map((m) => `<div class="attr" style="grid-template-columns:100px 40px 1fr 40px;max-width:520px"><span>${esc(m.attribute)}</span><span class="num">${m.home}</span><div class="bar"><i style="width:${50 + m.edge}%;background:var(${m.edge >= 0 ? "--home" : "--away"})"></i></div><span class="num">${m.away}</span></div>`).join("")}
-      ${p.notes.map((n) => `<p class="hint">⚠ ${esc(n)}</p>`).join("")}`;
-  } catch (e) { fail("fOut", e); }
-}
-
-async function runBacktest() {
-  try {
-    const sport = $("pSport").value;
-    const b = await api("GET", "backtest?sport=" + sport);
-    if (!b.n) { $("bOut").innerHTML = `<p class="hint">${esc(b.note)}</p>`; return; }
-    const cell = (label, m, bl, fmt, lower) => `<div class="card"><div class="hint" style="margin:0">${label}</div><div class="stat">${fmt(m)}</div><div class="hint" style="margin:0">baseline ${fmt(bl)} ${(lower ? m < bl : m > bl) ? '<b class="ok">▲ better</b>' : '<b class="err">▼ worse</b>'}</div></div>`;
-    $("bOut").innerHTML = `<p class="hint" style="margin-top:8px">${esc(sport)} · ${b.n} matches predicted walk-forward (first ${b.warmup} used as warmup)</p>
-      <div class="grid2" style="grid-template-columns:repeat(3,1fr)">${cell("Accuracy", b.model.accuracy, b.baseline.accuracy, pct, false)}${cell("Brier score", b.model.brier, b.baseline.brier, (x) => x.toFixed(3), true)}${cell("Log loss", b.model.logLoss, b.baseline.logLoss, (x) => x.toFixed(3), true)}</div>`;
-  } catch (e) { fail("bOut", e); }
-}
-$("pSport").onchange = () => { loadTeams(); loadPlayers(); $("fOut").innerHTML = ""; $("bOut").innerHTML = ""; };
-loadTeams().then(loadPlayers).catch(() => {});
+// boot
+(async () => {
+  let tab = "scout"; try { tab = localStorage.getItem("sportsTab") || tab; } catch {}
+  await loadTeams().catch(() => {});
+  if (!TEAMS.length) tab = "data";
+  showTab(TABS.some(([k]) => k === tab) ? tab : "scout");
+  if (TEAMS.length && $("sport").value === "soccer") fillPitch().catch(() => {});
+  loadCompetitions();
+})();
 </script>
 </body>
 </html>
