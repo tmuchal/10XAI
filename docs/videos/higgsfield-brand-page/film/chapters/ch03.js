@@ -190,7 +190,7 @@ scene(72, 106, (R, s) => {
   const MACH = [["Kling 3.0", "#9fd3f0", 600, "park"], ["Seedance 2.0", "#f7b6c8", 1030, "sunset"]].map(([nm, col, x, pal], i) => {
     const m = c03_box(R, x, 236, 360, 580, col, "overflow:visible");
     m.innerHTML = `<div style="position:absolute;left:120px;top:-22px;width:120px;height:26px;border:4px solid ${c03_INK};border-radius:8px;background:#fffaf0"></div>
-      <div style="position:absolute;left:24px;top:22px;font-size:40px;color:${c03_INK}">${nm}</div>
+      <div style="position:absolute;left:20px;top:24px;font-size:34px;color:${c03_INK};white-space:nowrap">${nm}</div>
       <div style="position:absolute;left:24px;top:72px;font-size:28px;color:#4b3f3a">영상 생성 모델</div>
       <svg class="gear" style="position:absolute;right:18px;top:26px" width="70" height="70" viewBox="-35 -35 70 70"><g class="g">
         ${Array.from({ length: 8 }, (_, k) => `<rect x="-7" y="-33" width="14" height="14" rx="3" fill="#f7d774" stroke="${c03_INK}" stroke-width="3" transform="rotate(${k * 45})"/>`).join("")}
