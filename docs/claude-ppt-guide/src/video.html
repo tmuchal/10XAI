@@ -1,0 +1,441 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<title>Claude PPT Guide</title>
+<!--
+  Frame-accurate animated video scenes. Nothing animates on its own:
+  render-video.cjs calls window.seek(t) for every frame and screenshots it.
+  Slide images are read from slides/slide-N.png (rendered from the sample deck).
+-->
+<style>
+  :root { --bg:#0E1628; --card:#1B2745; --card2:#22305A; --teal:#0F7B8A; --tealLt:#9FD3D9; --accent:#FF6B35; --navy:#16213E; --muted:#94A3B8; --text:#F8FAFC; --good:#34C38F; --bad:#EF5B5B; }
+  * { box-sizing: border-box; }
+  body { margin:0; width:1920px; height:1080px; overflow:hidden; background:var(--bg); color:var(--text);
+         font-family:'Noto Sans CJK KR','Noto Sans KR',sans-serif; }
+  .scene { position:absolute; inset:0; display:none; }
+  .abs { position:absolute; }
+  .kicker { font-size:24px; font-weight:700; letter-spacing:.12em; color:var(--tealLt); }
+  .stitle { position:absolute; left:120px; top:118px; font-size:54px; font-weight:800; letter-spacing:-.01em; }
+  .step { position:absolute; left:120px; top:62px; font-size:24px; font-weight:700; color:var(--tealLt); letter-spacing:.06em; }
+  .card { background:var(--card); border-radius:24px; }
+  .cap { position:absolute; left:50%; bottom:46px; transform:translateX(-50%); background:rgba(6,10,22,.82);
+         padding:14px 36px; border-radius:14px; font-size:34px; font-weight:500; white-space:nowrap; }
+  .brand { position:absolute; right:60px; top:52px; font-size:20px; color:#64748B; font-weight:600; }
+  .progress { position:absolute; left:0; top:0; height:6px; background:var(--accent); }
+  .chip { display:inline-flex; align-items:center; gap:14px; background:var(--card2); border-radius:14px; padding:14px 22px; font-size:26px; }
+  .tag { font-size:16px; font-weight:800; padding:4px 10px; border-radius:6px; color:#fff; }
+  .caret { display:inline-block; width:3px; height:1.05em; background:var(--tealLt); vertical-align:-3px; margin-left:2px; }
+  .typed { white-space:pre-wrap; }
+  .num { font-weight:800; }
+  svg text { font-family:'Noto Sans CJK KR',sans-serif; }
+  .gy { transform-box: fill-box; transform-origin: 50% 100%; }
+</style>
+</head>
+<body>
+<div class="progress" id="progress"></div>
+<div class="brand">Claude × PowerPoint</div>
+
+<!-- S1 INTRO -->
+<section class="scene" data-dur="7">
+  <div class="abs" style="left:-300px;top:740px;width:720px;height:720px;border-radius:50%;background:var(--teal);opacity:.35" data-a="0 1.2 scale"></div>
+  <div class="abs" style="left:120px;top:300px" data-a="0.2 .8 up"><span class="kicker">COMPANY PPT WITH CLAUDE</span></div>
+  <div class="abs" style="left:120px;top:350px;font-size:92px;font-weight:800;line-height:1.15" data-a="0.4 .9 up">Claude로 회사용<br>파워포인트 만들기</div>
+  <div class="abs" style="left:124px;top:600px;font-size:34px;color:#CBD5E1" data-a="0.9 .9 up">내용 · 도표 · 그래프까지 — Claude의 강점을 살리는 5단계</div>
+  <img class="abs" src="slides/slide-3.png" style="left:1040px;top:170px;width:760px;border-radius:12px;box-shadow:0 30px 60px rgba(0,0,0,.45);--r:-4deg" data-a="1.2 1 popr">
+  <img class="abs" src="slides/slide-5.png" style="left:1110px;top:470px;width:700px;border-radius:12px;box-shadow:0 30px 60px rgba(0,0,0,.45);--r:3deg" data-a="1.7 1 popr">
+  <script type="text/x-cap">[[0.6,"보고서 PPT, 이제 Claude와 함께 만들어 보세요."],[3.8,"자료만 넣으면 스토리·차트·디자인까지 — 5단계로 보여 드립니다."]]</script>
+</section>
+
+<!-- S2 WHY CLAUDE -->
+<section class="scene" data-dur="12">
+  <div class="stitle" data-a="0 .7 up">Claude가 PPT에 강한 4가지 이유</div>
+  <div class="abs card" style="left:120px;top:280px;width:390px;height:520px;padding:40px" data-a="0.6 .8 up">
+    <svg width="84" height="84" viewBox="0 0 84 84"><rect x="18" y="8" width="46" height="60" rx="6" fill="#22305A" stroke="#9FD3D9" stroke-width="3"/><rect x="10" y="16" width="46" height="60" rx="6" fill="#1B2745" stroke="#9FD3D9" stroke-width="3"/><path d="M20 34h26M20 44h26M20 54h16" stroke="#FF6B35" stroke-width="4" stroke-linecap="round"/></svg>
+    <div style="font-size:34px;font-weight:800;margin:26px 0 16px">긴 자료를<br>한 번에 이해</div>
+    <div style="font-size:24px;color:#CBD5E1;line-height:1.55">보고서·PDF·엑셀·회의록을 통째로 읽고 핵심만 추립니다</div>
+  </div>
+  <div class="abs card" style="left:540px;top:280px;width:390px;height:520px;padding:40px" data-a="1.1 .8 up">
+    <svg width="84" height="84" viewBox="0 0 84 84"><rect x="27" y="6" width="30" height="18" rx="4" fill="#FF6B35"/><rect x="4" y="56" width="22" height="18" rx="4" fill="#9FD3D9"/><rect x="31" y="56" width="22" height="18" rx="4" fill="#9FD3D9"/><rect x="58" y="56" width="22" height="18" rx="4" fill="#9FD3D9"/><path d="M42 24v14M15 56V40h54v16M42 38v18" stroke="#9FD3D9" stroke-width="3" fill="none"/></svg>
+    <div style="font-size:34px;font-weight:800;margin:26px 0 16px">논리적인<br>스토리라인</div>
+    <div style="font-size:24px;color:#CBD5E1;line-height:1.55">결론 먼저, 근거는 아래로 — 슬라이드마다 메시지 하나</div>
+  </div>
+  <div class="abs card" style="left:960px;top:280px;width:390px;height:520px;padding:40px" data-a="1.6 .8 up">
+    <svg width="84" height="84" viewBox="0 0 84 84"><rect x="8" y="46" width="16" height="30" rx="3" fill="#9FD3D9"/><rect x="34" y="30" width="16" height="46" rx="3" fill="#9FD3D9"/><rect x="60" y="10" width="16" height="66" rx="3" fill="#FF6B35"/></svg>
+    <div style="font-size:34px;font-weight:800;margin:26px 0 16px">데이터 분석<br>→ 차트</div>
+    <div style="font-size:24px;color:#CBD5E1;line-height:1.55">숫자를 직접 계산·검증하고 메시지에 맞는 차트를 고릅니다</div>
+  </div>
+  <div class="abs card" style="left:1380px;top:280px;width:390px;height:520px;padding:40px" data-a="2.1 .8 up">
+    <svg width="84" height="84" viewBox="0 0 84 84"><path d="M16 6h36l18 18v54H16z" fill="#1B2745" stroke="#9FD3D9" stroke-width="3"/><path d="M52 6v18h18" fill="none" stroke="#9FD3D9" stroke-width="3"/><rect x="8" y="42" width="52" height="24" rx="4" fill="#FF6B35"/><text x="34" y="60" text-anchor="middle" font-size="15" font-weight="800" fill="#fff">PPTX</text></svg>
+    <div style="font-size:34px;font-weight:800;margin:26px 0 16px">진짜 .pptx<br>파일 생성</div>
+    <div style="font-size:24px;color:#CBD5E1;line-height:1.55">편집 가능한 차트와 도형, 회사 템플릿까지 적용합니다</div>
+  </div>
+  <script type="text/x-cap">[[0.5,"Claude는 긴 문서를 한 번에 읽고 핵심을 추리는 데 강합니다."],[6,"숫자를 계산해 차트로 바꾸고, 수정 가능한 .pptx 파일까지 만들어 줍니다."]]</script>
+</section>
+
+<!-- S3 WORKFLOW -->
+<section class="scene" data-dur="10">
+  <div class="stitle" data-a="0 .7 up">전체 흐름: 5단계</div>
+  <svg class="abs" style="left:0;top:0" width="1920" height="1080"><path d="M260 480 H1660" stroke="#2F3E66" stroke-width="6"/><path d="M260 480 H1660" stroke="#9FD3D9" stroke-width="6" pathLength="1" data-draw="0.5 3"/></svg>
+  <div id="flow"></div>
+  <script type="text/x-cap">[[0.5,"전체 과정은 다섯 단계입니다."],[4.5,"한 번에 끝내려 하지 말고, 단계마다 확인하며 진행하는 것이 핵심입니다."]]</script>
+</section>
+
+<!-- S4 STEP 1 -->
+<section class="scene" data-dur="13">
+  <div class="step" data-a="0 .5 fade">STEP 1 / 5 · 자료 넣기</div>
+  <div class="stitle" data-a="0 .7 up">자료는 한 번에, 목적은 분명하게</div>
+  <div class="abs" style="left:120px;top:290px;display:flex;flex-direction:column;gap:22px;width:620px">
+    <div class="chip" data-a="1.0 .6 left"><span class="tag" style="background:#1D8A4E">XLSX</span>3분기_매출.xlsx</div>
+    <div class="chip" data-a="1.3 .6 left"><span class="tag" style="background:#D64545">PDF</span>사업계획_v3.pdf</div>
+    <div class="chip" data-a="1.6 .6 left"><span class="tag" style="background:#2F6FD6">DOCX</span>경영회의록_0925.docx</div>
+    <div class="chip" data-a="1.9 .6 left"><span class="tag" style="background:#FF6B35">PPTX</span>회사템플릿.pptx</div>
+  </div>
+  <div class="abs card" style="left:120px;top:700px;width:620px;padding:26px 30px;background:#2A2338;display:flex;gap:20px;align-items:center" data-a="8.5 .7 up">
+    <span class="tag" style="background:var(--accent);font-size:20px">TIP</span>
+    <span style="font-size:26px;line-height:1.45">청중 · 목적 · 분량 · 결정 요청<br>네 가지를 꼭 적으세요</span>
+  </div>
+  <div class="abs card" style="left:820px;top:280px;width:980px;height:560px;overflow:hidden" data-a="0.6 .8 up">
+    <div style="padding:22px 32px;border-bottom:1px solid #2F3E66;font-size:24px;font-weight:700;display:flex;align-items:center;gap:12px"><span style="width:14px;height:14px;border-radius:50%;background:var(--accent);display:inline-block"></span>Claude</div>
+    <div style="padding:26px 32px">
+      <div style="display:flex;gap:10px;margin-bottom:20px" data-a="2.3 .5 fade">
+        <span class="tag" style="background:#1D8A4E">XLSX</span><span class="tag" style="background:#D64545">PDF</span><span class="tag" style="background:#2F6FD6">DOCX</span><span class="tag" style="background:#FF6B35">PPTX</span>
+        <span style="font-size:18px;color:var(--muted);margin-left:6px">파일 4개 첨부됨</span>
+      </div>
+      <div class="typed" style="font-size:30px;line-height:1.6;background:var(--card2);border-radius:18px;padding:24px 30px;min-height:330px" data-type="2.8 30">첨부한 3분기 매출 엑셀과 경영회의록으로
+임원 보고용 PPT를 만들어 줘.
+
+• 청중: 대표이사·임원 (10분 보고)
+• 목적: 실적 공유 + 선급금 12억 승인 요청
+• 분량: 8~10장, 결론 먼저</div>
+    </div>
+  </div>
+  <script type="text/x-cap">[[0.5,"1단계: 관련 자료를 한꺼번에 첨부하세요."],[4.5,"그리고 '누구에게, 왜, 몇 장'인지 분명히 적어 주세요."],[9,"이 네 가지만 적어도 결과물의 수준이 확 달라집니다."]]</script>
+</section>
+
+<!-- S5 STEP 2 -->
+<section class="scene" data-dur="14">
+  <div class="step" data-a="0 .5 fade">STEP 2 / 5 · 스토리라인</div>
+  <div class="stitle" data-a="0 .7 up">먼저 목차와 메시지부터 받으세요</div>
+  <svg class="abs" style="left:0;top:0" width="1920" height="1080">
+    <path d="M530 372 V420 M250 420 H810 M250 420 V460 M530 420 V460 M810 420 V460" stroke="#4B5B85" stroke-width="3" fill="none" pathLength="1" data-draw="1.4 .8"/>
+    <path d="M250 552 V590 M530 552 V590 M810 552 V590" stroke="#4B5B85" stroke-width="3" fill="none" pathLength="1" data-draw="3.0 .6"/>
+  </svg>
+  <div class="abs" style="left:170px;top:280px;width:720px;height:92px;border-radius:18px;background:var(--accent);font-size:28px;font-weight:800;display:flex;align-items:center;justify-content:center" data-a="0.8 .7 pop">결론: 매출 18% 성장 · 선급금 12억 승인 필요</div>
+  <div class="abs card" style="left:120px;top:460px;width:260px;height:92px;display:flex;align-items:center;justify-content:center;font-size:24px;font-weight:700;background:var(--teal)" data-a="2.0 .6 pop">온라인이 성장 견인</div>
+  <div class="abs card" style="left:400px;top:460px;width:260px;height:92px;display:flex;align-items:center;justify-content:center;font-size:24px;font-weight:700;background:var(--teal)" data-a="2.2 .6 pop">원가 절감 → 이익 개선</div>
+  <div class="abs card" style="left:680px;top:460px;width:260px;height:92px;display:flex;align-items:center;justify-content:center;font-size:24px;font-weight:700;background:var(--teal)" data-a="2.4 .6 pop">리스크 대응 준비 완료</div>
+  <div class="abs" style="left:120px;top:590px;width:820px;display:flex;gap:20px">
+    <div class="card" style="width:260px;padding:16px;text-align:center;font-size:21px;color:#CBD5E1" data-a="3.4 .5 up">채널별 매출 차트</div>
+    <div class="card" style="width:260px;padding:16px;text-align:center;font-size:21px;color:#CBD5E1" data-a="3.6 .5 up">영업이익 워터폴</div>
+    <div class="card" style="width:260px;padding:16px;text-align:center;font-size:21px;color:#CBD5E1" data-a="3.8 .5 up">리스크 대응 표</div>
+  </div>
+  <div class="abs" style="left:120px;top:720px;width:820px;font-size:24px;color:var(--tealLt);line-height:1.5" data-a="4.4 .6 up">프롬프트: “슬라이드별 제목과 핵심 메시지를<br>목차로 먼저 보여 줘. 확인 후 만들어 줘.”</div>
+  <div class="abs" style="left:1020px;top:280px;width:780px">
+    <div style="font-size:30px;font-weight:800;margin-bottom:26px" data-a="5.5 .6 up">제목은 ‘주제’가 아니라 ‘결론’으로</div>
+    <div class="card" style="padding:26px 30px;margin-bottom:22px" data-a="6.2 .6 up">
+      <div style="font-size:24px;color:#7C8AA5;text-decoration:line-through">✗ 3분기 매출 현황</div>
+      <div style="font-size:30px;font-weight:700;margin-top:10px"><span style="color:var(--good)">✓</span> 3분기 매출 482억, 전년 대비 18% 성장</div>
+    </div>
+    <div class="card" style="padding:26px 30px;margin-bottom:22px" data-a="7.6 .6 up">
+      <div style="font-size:24px;color:#7C8AA5;text-decoration:line-through">✗ 채널별 분석</div>
+      <div style="font-size:30px;font-weight:700;margin-top:10px"><span style="color:var(--good)">✓</span> 온라인 비중 31%로 확대, 성장 견인</div>
+    </div>
+    <div class="card" style="padding:26px 30px" data-a="9.0 .6 up">
+      <div style="font-size:24px;color:#7C8AA5;text-decoration:line-through">✗ 향후 계획</div>
+      <div style="font-size:30px;font-weight:700;margin-top:10px"><span style="color:var(--good)">✓</span> 빠른 성과 과제 2건, 10월 즉시 착수</div>
+    </div>
+  </div>
+  <script type="text/x-cap">[[0.5,"2단계: 바로 슬라이드를 만들지 말고, 목차부터 받아 확인하세요."],[5.5,"제목은 '주제'가 아니라 '결론'으로 씁니다."],[10,"제목만 이어 읽어도 보고가 끝나도록 — 임원 보고의 기본입니다."]]</script>
+</section>
+
+<!-- S6 STEP 3: chart choice -->
+<section class="scene" data-dur="13">
+  <div class="step" data-a="0 .5 fade">STEP 3 / 5 · 차트 고르기</div>
+  <div class="stitle" data-a="0 .7 up">메시지에 맞는 차트를 고르세요</div>
+  <div id="chartGuide"></div>
+  <script type="text/x-cap">[[0.5,"3단계: 슬라이드의 메시지에 맞는 차트를 고릅니다."],[5.5,"비교는 막대, 추이는 선, 증감 원인은 워터폴."],[9.5,"헷갈리면 “이 메시지에 맞는 차트를 추천해 줘”라고 물어보세요."]]</script>
+</section>
+
+<!-- S7 STEP 3: chart demo -->
+<section class="scene" data-dur="14">
+  <div class="step" data-a="0 .5 fade">STEP 3 / 5 · 그래프 만들기</div>
+  <div class="stitle" data-a="0 .7 up">강조할 곳까지 말하면, 차트가 완성됩니다</div>
+  <div class="abs card" style="left:120px;top:280px;width:700px;padding:30px 34px" data-a="0.4 .7 up">
+    <div style="font-size:20px;color:var(--muted);font-weight:700;margin-bottom:14px">내 요청</div>
+    <div class="typed" style="font-size:29px;line-height:1.6;min-height:190px" data-type="0.9 30">'분기매출' 시트로 전년 대비
+막대그래프를 만들어 줘.
+3분기만 강조색, 값 라벨 표시,
+격자선은 빼 줘.</div>
+  </div>
+  <div class="abs card" style="left:120px;top:600px;width:700px;padding:28px 34px;background:#173A45" data-a="7.2 .7 up">
+    <div style="font-size:20px;color:var(--tealLt);font-weight:700;margin-bottom:12px">Claude의 계산 확인</div>
+    <div style="font-size:27px;line-height:1.65">482 ÷ 408 = 1.181 → <b style="color:var(--accent)">+18.1%</b><br>1~3분기 누적 1,341억 = 목표의 <b>74.5%</b></div>
+  </div>
+  <div class="abs" style="left:880px;top:280px;width:920px;height:580px;background:#fff;border-radius:18px;box-shadow:0 30px 60px rgba(0,0,0,.4);color:#16213E" data-a="3.4 .7 scale">
+    <div style="position:absolute;left:44px;top:34px;font-size:32px;font-weight:800" data-a="4.0 .6 up">3분기 매출 482억, 전년 대비 18% 성장</div>
+    <div style="position:absolute;left:46px;top:88px;font-size:18px;color:#6B7280;display:flex;gap:22px" data-a="4.2 .6 fade"><span><span style="display:inline-block;width:14px;height:14px;background:#9FD3D9;margin-right:6px"></span>2025년</span><span><span style="display:inline-block;width:14px;height:14px;background:#0F7B8A;margin-right:6px"></span>2026년</span></div>
+    <div id="demoBars"></div>
+    <div style="position:absolute;left:60px;right:60px;top:506px;height:2px;background:#E5E7EB"></div>
+  </div>
+  <script type="text/x-cap">[[0.5,"차트를 요청할 때는 무엇을 강조할지까지 말해 주세요."],[6.5,"Claude는 원본 숫자로 증감률을 직접 계산해 제목과 라벨에 넣습니다."],[10.5,"계산 과정을 보여 달라고 하면 검수도 훨씬 쉬워집니다."]]</script>
+</section>
+
+<!-- S8 STEP 3: diagrams -->
+<section class="scene" data-dur="13">
+  <div class="step" data-a="0 .5 fade">STEP 3 / 5 · 도표 만들기</div>
+  <div class="stitle" data-a="0 .7 up">도표도 문장으로 설명하면 그려 줍니다</div>
+  <div id="diagrams"></div>
+  <div class="abs" style="left:50%;top:812px;transform:translateX(-50%)" data-a="7.5 .7 fade"><div class="chip" style="background:#2A2338;font-size:26px"><span class="tag" style="background:var(--accent);font-size:18px">POINT</span>이미지가 아닌 PowerPoint 도형 → 받은 뒤에도 직접 수정 가능</div></div>
+  <script type="text/x-cap">[[0.5,"프로세스, 워터폴, 매트릭스 같은 도표도 문장으로 요청하면 됩니다."],[7,"이미지가 아니라 PowerPoint 도형이라, 받은 뒤에도 직접 고칠 수 있습니다."]]</script>
+</section>
+
+<!-- S9 STEP 4: template -->
+<section class="scene" data-dur="13">
+  <div class="step" data-a="0 .5 fade">STEP 4 / 5 · 템플릿 적용</div>
+  <div class="stitle" data-a="0 .7 up">회사 템플릿을 주면 색상과 폰트를 따릅니다</div>
+  <div class="abs card" style="left:120px;top:280px;width:620px;padding:30px 34px" data-a="0.6 .7 up">
+    <div style="font-size:22px;color:var(--muted);font-weight:700;margin-bottom:22px"><span class="tag" style="background:#FF6B35;margin-right:10px">PPTX</span>회사템플릿.pptx 에서 추출한 규칙</div>
+    <div style="display:flex;gap:16px;margin-bottom:26px">
+      <div data-a="1.4 .5 pop" style="text-align:center"><div style="width:122px;height:86px;border-radius:12px;background:#16213E;border:2px solid #34446E"></div><div style="font-size:17px;margin-top:8px">메인 16213E</div></div>
+      <div data-a="1.6 .5 pop" style="text-align:center"><div style="width:122px;height:86px;border-radius:12px;background:#0F7B8A"></div><div style="font-size:17px;margin-top:8px">보조 0F7B8A</div></div>
+      <div data-a="1.8 .5 pop" style="text-align:center"><div style="width:122px;height:86px;border-radius:12px;background:#F3F6FA"></div><div style="font-size:17px;margin-top:8px">배경 F3F6FA</div></div>
+      <div data-a="2.0 .5 pop" style="text-align:center"><div style="width:122px;height:86px;border-radius:12px;background:#FF6B35"></div><div style="font-size:17px;margin-top:8px">강조 FF6B35</div></div>
+    </div>
+    <div style="font-size:25px;line-height:1.9" data-a="2.6 .6 up">폰트: 맑은 고딕 · 제목 28pt / 본문 14pt<br>강조색: 슬라이드당 한 곳만<br>출처·페이지 번호: 좌하단 / 우하단</div>
+  </div>
+  <div class="abs" style="left:120px;top:730px;width:620px;font-size:23px;color:var(--tealLt);line-height:1.5" data-a="3.4 .6 up">프롬프트: “첨부한 템플릿의 색상·폰트·로고 위치를<br>그대로 따라 줘. 강조색은 슬라이드당 하나만.”</div>
+  <div class="abs" style="left:820px;top:280px;width:980px;height:551px;border-radius:16px;overflow:hidden;box-shadow:0 30px 60px rgba(0,0,0,.4)" data-a="0.8 .7 scale">
+    <div style="position:absolute;inset:0;background:#fff;color:#000;font-family:'Noto Serif CJK KR',serif">
+      <div style="position:absolute;left:50px;top:36px;font-size:40px">채널별 분석</div>
+      <div style="position:absolute;left:54px;top:120px;font-size:22px;line-height:2">• 온라인 매출 증가<br>• 파트너 소폭 증가<br>• 직접영업 감소<br>• 기타 사항 검토 필요</div>
+      <svg style="position:absolute;left:470px;top:110px" width="460" height="380"><rect x="40" y="120" width="80" height="240" fill="#4472C4"/><rect x="170" y="180" width="80" height="180" fill="#ED7D31"/><rect x="300" y="210" width="80" height="150" fill="#A5A5A5"/><line x1="20" y1="360" x2="440" y2="360" stroke="#999"/><line x1="20" y1="60" x2="440" y2="60" stroke="#ddd"/><line x1="20" y1="160" x2="440" y2="160" stroke="#ddd"/><line x1="20" y1="260" x2="440" y2="260" stroke="#ddd"/></svg>
+    </div>
+    <img src="slides/slide-4.png" style="position:absolute;inset:0;width:100%;height:100%" data-a="6.0 .9 fade">
+  </div>
+  <div class="abs" style="left:820px;top:846px;font-size:24px;font-weight:700;color:#94A3B8" data-a="0.8 .5 fade" data-out="5.8 .4">적용 전 — 기본 서식</div>
+  <div class="abs" style="left:820px;top:846px;font-size:24px;font-weight:700;color:var(--accent)" data-a="6.2 .5 fade">적용 후 — 회사 템플릿 + 결론형 제목</div>
+  <script type="text/x-cap">[[0.5,"4단계: 회사 템플릿 파일을 함께 주면 색상과 폰트를 그대로 따릅니다."],[6.5,"강조색은 한 곳에만 — 그래야 시선이 핵심 숫자로 갑니다."]]</script>
+</section>
+
+<!-- S10 RESULT -->
+<section class="scene" data-dur="17">
+  <div class="step" data-a="0 .5 fade">RESULT</div>
+  <div class="stitle" data-a="0 .7 up">완성본: 9장짜리 임원 보고 자료</div>
+  <div id="grid" data-out="5.0 .6"></div>
+  <div id="spot"></div>
+  <script type="text/x-cap">[[0.5,"이렇게 만든 실제 결과물입니다."],[5.5,"차트는 PowerPoint 기본 차트라, 숫자를 고치면 그래프도 함께 바뀝니다."],[11.5,"제목만 이어 읽어도 흐름이 보입니다 — 결론, 근거, 요청 순서."]]</script>
+</section>
+
+<!-- S11 STEP 5: checklist -->
+<section class="scene" data-dur="13">
+  <div class="step" data-a="0 .5 fade">STEP 5 / 5 · 검수</div>
+  <div class="stitle" data-a="0 .7 up">마지막 검수는 사람이 합니다</div>
+  <div id="checks"></div>
+  <div class="abs card" style="left:1120px;top:270px;width:680px;padding:34px 38px;background:#173A45" data-a="7.0 .7 up">
+    <div style="font-size:22px;color:var(--tealLt);font-weight:700;margin-bottom:16px">검수도 Claude에게 먼저 시키기</div>
+    <div style="font-size:28px;line-height:1.6">“이 PPT를 대표이사 입장에서 검토하고,<br>약한 논리 · 숫자 불일치 · 오탈자를<br>표로 정리해 줘.”</div>
+  </div>
+  <script type="text/x-cap">[[0.5,"5단계: 초안이 나오면 마지막 검수는 사람이 합니다."],[6.5,"숫자는 원본과 대조하고, 기밀 자료는 회사의 AI 사용 규정을 먼저 확인하세요."]]</script>
+</section>
+
+<!-- S12 PROMPT TEMPLATE -->
+<section class="scene" data-dur="14">
+  <div class="stitle" data-a="0 .7 up">그대로 쓰는 프롬프트 템플릿</div>
+  <div class="abs card" style="left:170px;top:260px;width:1580px;height:480px;padding:44px 56px;background:#111C33;border:2px solid #2F3E66" data-a="0.3 .7 scale">
+    <div id="tpl" style="font-size:31px;line-height:1.95"></div>
+  </div>
+  <script type="text/x-cap">[[0.5,"지금까지의 내용을 프롬프트 하나로 정리했습니다."],[7,"화면을 멈추고 복사해 두세요. 함께 드린 가이드 문서에도 들어 있습니다."]]</script>
+</section>
+
+<!-- S13 OUTRO -->
+<section class="scene" data-dur="8">
+  <div class="abs" style="left:1380px;top:-200px;width:760px;height:760px;border-radius:50%;background:var(--teal);opacity:.35" data-a="0 1.2 scale"></div>
+  <div class="abs" style="left:120px;top:300px;font-size:76px;font-weight:800;line-height:1.3" data-a="0.3 .9 up">자료 정리는 Claude에게,<br><span style="color:var(--accent)">판단과 검수는 나에게.</span></div>
+  <div class="abs" style="left:120px;top:590px;display:flex;gap:20px">
+    <div class="chip" data-a="1.6 .5 pop">① 결론 먼저</div>
+    <div class="chip" data-a="1.9 .5 pop">② 메시지당 시각화 1개</div>
+    <div class="chip" data-a="2.2 .5 pop">③ 숫자는 원본 대조</div>
+  </div>
+  <script type="text/x-cap">[[0.5,"자료 정리와 초안은 Claude에게, 판단과 검수는 사람에게."],[4.5,"다음 보고서부터 바로 적용해 보세요."]]</script>
+</section>
+
+<div class="cap" id="cap"></div>
+
+<script>
+// ---------- generated scene content ----------
+const $ = (h) => { const t = document.createElement('template'); t.innerHTML = h.trim(); return t.content; };
+
+// S3 flow nodes
+(() => {
+  const steps = [["자료 넣기","엑셀·PDF·회의록"],["스토리라인","결론 먼저, 목차 확인"],["차트·도표","메시지에 맞는 시각화"],["템플릿 적용","회사 색상·폰트"],["검수","숫자 대조·보안 확인"]];
+  let h = '';
+  steps.forEach(([a,b],i) => {
+    const cx = 260 + i*350, t = 0.5 + i*0.6;
+    h += `<div class="abs" style="left:${cx-75}px;top:405px;width:150px;height:150px;border-radius:50%;background:${i===2?'var(--accent)':'var(--teal)'};display:flex;align-items:center;justify-content:center;font-size:64px;font-weight:800;box-shadow:0 0 0 12px var(--bg)" data-a="${t} .6 pop">${i+1}</div>
+          <div class="abs" style="left:${cx-160}px;top:600px;width:320px;text-align:center" data-a="${t+0.2} .6 up"><div style="font-size:34px;font-weight:800">${a}</div><div style="font-size:23px;color:#CBD5E1;margin-top:10px">${b}</div></div>`;
+  });
+  document.getElementById('flow').append($(h));
+})();
+
+// S6 chart guide cards with mini charts
+(() => {
+  const mini = [
+    `<rect class="gy" x="20" y="70" width="36" height="80" fill="#9FD3D9" data-a="T 0.6 gy"/><rect class="gy" x="76" y="40" width="36" height="110" fill="#9FD3D9" data-a="T+.1 0.6 gy"/><rect class="gy" x="132" y="15" width="36" height="135" fill="#FF6B35" data-a="T+.2 0.6 gy"/>`,
+    `<path d="M15 130 L60 105 L105 115 L150 60 L185 30" fill="none" stroke="#FF6B35" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" pathLength="1" data-draw="T 1"/><line x1="10" y1="150" x2="190" y2="150" stroke="#4B5B85" stroke-width="2"/>`,
+    `<g class="gy" data-a="T 0.6 gy"><rect x="35" y="80" width="50" height="70" fill="#16213E" stroke="#4B5B85"/><rect x="35" y="50" width="50" height="30" fill="#9FD3D9"/><rect x="35" y="30" width="50" height="20" fill="#FF6B35"/></g><g class="gy" data-a="T+.15 0.6 gy"><rect x="115" y="85" width="50" height="65" fill="#16213E" stroke="#4B5B85"/><rect x="115" y="45" width="50" height="40" fill="#9FD3D9"/><rect x="115" y="10" width="50" height="35" fill="#FF6B35"/></g>`,
+    `<rect class="gy" x="10" y="80" width="30" height="70" fill="#9FD3D9" data-a="T 0.5 gy"/><rect x="48" y="55" width="30" height="25" fill="#34C38F" data-a="T+.2 0.5 fade"/><rect x="86" y="35" width="30" height="20" fill="#FF6B35" data-a="T+.4 0.5 fade"/><rect x="124" y="35" width="30" height="12" fill="#EF5B5B" data-a="T+.6 0.5 fade"/><rect class="gy" x="162" y="47" width="30" height="103" fill="#9FD3D9" data-a="T+.8 0.5 gy"/>`,
+    `<rect x="20" y="10" width="78" height="66" fill="#22305A"/><rect x="102" y="10" width="78" height="66" fill="#4A2E2A"/><rect x="20" y="80" width="78" height="66" fill="#22305A"/><rect x="102" y="80" width="78" height="66" fill="#22305A"/><circle cx="130" cy="38" r="11" fill="#FF6B35" data-a="T 0.5 pop"/><circle cx="160" cy="58" r="11" fill="#FF6B35" data-a="T+.15 0.5 pop"/><circle cx="55" cy="45" r="11" fill="#9FD3D9" data-a="T+.3 0.5 pop"/><circle cx="140" cy="115" r="11" fill="#9FD3D9" data-a="T+.45 0.5 pop"/>`,
+    `<path d="M10 55 h40 l18 25 l-18 25 h-40 l18 -25z" fill="#9FD3D9" data-a="T 0.4 fade"/><path d="M72 55 h40 l18 25 l-18 25 h-40 l18 -25z" fill="#0F7B8A" data-a="T+.2 0.4 fade"/><path d="M134 55 h40 l18 25 l-18 25 h-40 l18 -25z" fill="#FF6B35" data-a="T+.4 0.4 fade"/>`,
+  ];
+  const info = [["비교","막대 그래프","항목·기간 간 크기 비교"],["추이","꺾은선 그래프","시간에 따른 변화"],["구성","누적 막대","전체 중 비중 변화"],["증감 원인","워터폴","무엇이 늘리고 줄였나"],["우선순위","2×2 매트릭스","효과 × 난이도"],["단계·일정","프로세스","로드맵, 업무 절차"]];
+  let h = '';
+  info.forEach(([k,n,d],i) => {
+    const x = 120 + (i%3)*570, y = 280 + Math.floor(i/3)*300, t = 0.6 + i*0.35;
+    h += `<div class="abs card" style="left:${x}px;top:${y}px;width:540px;height:270px;display:flex;align-items:center;gap:26px;padding:0 30px" data-a="${t} .6 up">
+      <svg width="200" height="160" viewBox="0 0 200 160" style="flex:none">${mini[i].replace(/T\+?([\d.]*)/g,(m,a)=>String((t+0.4+(+a||0)).toFixed(2)))}</svg>
+      <div><div style="font-size:22px;font-weight:700;color:var(--tealLt)">${k}</div><div style="font-size:34px;font-weight:800;margin:6px 0 10px">${n}</div><div style="font-size:21px;color:#CBD5E1">${d}</div></div></div>`;
+  });
+  document.getElementById('chartGuide').append($(h));
+})();
+
+// S7 demo bars (inside the white canvas, 920x580)
+(() => {
+  const d25 = [368,385,408], d26 = [412,447,482], q = ["1분기","2분기","3분기"];
+  const base = 506, scale = 300/500; let h = '';
+  q.forEach((lab,i) => {
+    const gx = 110 + i*270;
+    [[d25[i],'#9FD3D9',0],[d26[i], i===2?'#FF6B35':'#0F7B8A',1]].forEach(([v,c,j]) => {
+      const bh = v*scale, x = gx + j*96, t = 4.6 + i*0.3 + j*0.12;
+      h += `<div class="abs gy" style="left:${x}px;top:${base-bh}px;width:86px;height:${bh}px;background:${c};border-radius:4px 4px 0 0" data-a="${t} .8 gy"></div>
+            <div class="abs num" style="left:${x-20}px;top:${base-bh-36}px;width:126px;text-align:center;font-size:22px;color:${i===2&&j?'#FF6B35':'#16213E'}" data-a="${t+0.5} .4 fade" data-count="${t} .8 ${v} 0"></div>`;
+    });
+    h += `<div class="abs" style="left:${gx}px;top:${base+14}px;width:182px;text-align:center;font-size:21px;color:#374151" data-a="4.4 .5 fade">${lab}</div>`;
+  });
+  h += `<div class="abs" style="left:700px;top:92px;background:#FF6B35;color:#fff;font-size:28px;font-weight:800;padding:8px 18px;border-radius:12px" data-a="8.0 .6 pop">+18% YoY</div>`;
+  document.getElementById('demoBars').append($(h));
+})();
+
+// S8 diagrams: roadmap, waterfall, matrix
+(() => {
+  let h = '';
+  const panel = (i, q, body) => `<div class="abs card" style="left:${120+i*570}px;top:280px;width:540px;height:500px" data-a="${0.6+i*0.4} .6 up">
+      <div style="padding:28px 30px 0;font-size:23px;color:var(--tealLt);font-weight:600">${q}</div>${body}</div>`;
+  // roadmap
+  let r = ''; const ph = [["준비","10월"],["출시","10–11월"],["확장","11월"],["점검","12월"]], cols = ['#9FD3D9','#0F7B8A','#34446E','#FF6B35'];
+  ph.forEach(([a,b],i) => { const t = 1.4 + i*0.35;
+    r += `<div class="abs" style="left:${30+i*120}px;top:190px;width:124px;height:90px;background:${cols[i]};clip-path:polygon(0 0,84% 0,100% 50%,84% 100%,0 100%,16% 50%);display:flex;align-items:center;justify-content:center;font-size:23px;font-weight:800;color:${i===0?'#16213E':'#fff'}" data-a="${t} .5 left">${a}</div>
+          <div class="abs" style="left:${30+i*120}px;top:300px;width:124px;text-align:center;font-size:19px;color:#CBD5E1" data-a="${t+0.2} .5 fade">${b}</div>`; });
+  h += panel(0, '“4단계 실행 로드맵을 화살표로”', r);
+  // waterfall
+  let w = ''; const wf = [[0,42,'#9FD3D9','42.0'],[42,55.2,'#34C38F','+13.2'],[55.2,63.3,'#FF6B35','+8.1'],[60.7,63.3,'#EF5B5B','−2.6'],[59.8,60.7,'#EF5B5B','−0.9'],[0,59.8,'#9FD3D9','59.8']];
+  const wb = 420, ws = 250/65;
+  wf.forEach(([lo,hi,c,l],i) => { const t = 1.8 + i*0.3, x = 40 + i*78, y = wb - hi*ws, hh = Math.max((hi-lo)*ws,4);
+    w += `<div class="abs gy" style="left:${x}px;top:${y}px;width:58px;height:${hh}px;background:${c}" data-a="${t} .5 gy"></div>
+          <div class="abs" style="left:${x-12}px;top:${y-30}px;width:82px;text-align:center;font-size:17px;font-weight:700;color:${c}" data-a="${t+0.3} .4 fade">${l}</div>`; });
+  w += `<div class="abs" style="left:30px;top:${wb}px;width:480px;height:2px;background:#4B5B85"></div>`;
+  h += panel(1, '“영업이익 증감을 워터폴로”', w);
+  // matrix
+  let m = `<div class="abs" style="left:60px;top:110px;width:210px;height:170px;background:#22305A;border-radius:8px"></div><div class="abs" style="left:276px;top:110px;width:210px;height:170px;background:#4A2E2A;border-radius:8px"></div><div class="abs" style="left:60px;top:286px;width:210px;height:170px;background:#22305A;border-radius:8px"></div><div class="abs" style="left:276px;top:286px;width:210px;height:170px;background:#22305A;border-radius:8px"></div>
+           <div class="abs" style="left:292px;top:120px;font-size:18px;font-weight:800;color:#FF6B35">빠른 성과</div>`;
+  [[320,170,'A','#FF6B35'],[400,225,'B','#FF6B35'],[140,190,'C','#0F7B8A'],[150,360,'D','#0F7B8A'],[360,370,'E','#0F7B8A']].forEach(([x,y,k,c],i) => {
+    m += `<div class="abs" style="left:${x}px;top:${y}px;width:46px;height:46px;border-radius:50%;background:${c};display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:800" data-a="${2.4+i*0.25} .5 pop">${k}</div>`; });
+  h += panel(2, '“과제 5개를 효과×난이도 매트릭스로”', m);
+  document.getElementById('diagrams').append($(h));
+})();
+
+// S10 grid + spotlight
+(() => {
+  let g = '';
+  for (let i = 0; i < 9; i++) {
+    const x = 338 + (i%3)*422, y = 215 + Math.floor(i/3)*247;
+    g += `<img class="abs" src="slides/slide-${i+1}.png" style="left:${x}px;top:${y}px;width:400px;height:225px;border-radius:8px;box-shadow:0 12px 30px rgba(0,0,0,.4)" data-a="${0.6+i*0.18} .5 pop">`;
+  }
+  document.getElementById('grid').append($(g));
+  let s = ''; const seq = [3,5,6,9];
+  seq.forEach((n,i) => { const t0 = 5.5 + i*3;
+    s += `<img class="abs" src="slides/slide-${n}.png" style="left:320px;top:205px;width:1280px;height:720px;border-radius:12px;box-shadow:0 30px 70px rgba(0,0,0,.5)" data-a="${t0} .6 zoom" ${i<seq.length-1?`data-out="${t0+2.7} .4"`:''}>`; });
+  document.getElementById('spot').append($(s));
+})();
+
+// S11 checklist
+(() => {
+  const items = [["숫자는 원본과 대조했나요?","“모든 숫자의 출처 셀을 표로 정리해 줘”라고 요청"],["슬라이드 한 장에 메시지 하나인가요?","두 가지 이야기가 섞이면 슬라이드를 나눕니다"],["제목만 이어 읽어도 이야기가 되나요?","제목 목록만 따로 받아 흐름을 점검"],["출처와 단위를 표기했나요?","단위(억 원·%) 통일, 본문 14pt 이상"],["올려도 되는 자료인가요?","기밀·개인정보는 회사 AI 사용 규정을 먼저 확인"]];
+  let h = '';
+  items.forEach(([a,b],i) => { const t = 1.0 + i*1.1, y = 270 + i*120;
+    h += `<div class="abs" style="left:200px;top:${y}px;width:64px;height:64px;border-radius:14px;border:4px solid #4B5B85" data-a="${t} .4 fade"></div>
+          <div class="abs" style="left:200px;top:${y}px;width:64px;height:64px;border-radius:14px;background:var(--good);display:flex;align-items:center;justify-content:center;font-size:40px;font-weight:800" data-a="${t+0.5} .5 pop">✓</div>
+          <div class="abs" style="left:300px;top:${y-6}px" data-a="${t} .6 up"><div style="font-size:34px;font-weight:800">${a}</div><div style="font-size:23px;color:#CBD5E1;margin-top:4px">${b}</div></div>`; });
+  document.getElementById('checks').append($(h));
+})();
+
+// S12 template lines
+(() => {
+  const L = [["역할","너는 전략기획팀의 보고서 전문가야."],["자료","첨부: 3분기_매출.xlsx, 회의록.docx, 회사템플릿.pptx"],["청중·목적","임원 보고 10분 / 실적 공유 + 선급금 12억 승인"],["구성","8~10장, 결론 먼저, 제목은 결론형 문장"],["시각화","슬라이드마다 차트·도표 1개, 강조색 1곳, 편집 가능한 차트"],["진행","① 목차와 메시지 먼저 → 내 확인 후 ② .pptx 생성"]];
+  document.getElementById('tpl').append($(L.map(([k,v],i) =>
+    `<div data-a="${1.0+i*0.7} .5 up"><span style="color:var(--accent);font-weight:800">[${k}]</span> ${v}</div>`).join('')));
+})();
+
+// ---------- timeline engine ----------
+const scenes = [...document.querySelectorAll('.scene')];
+let acc = 0;
+const timeline = scenes.map(s => { const d = +s.dataset.dur; const e = { s, start: acc, dur: d,
+  caps: JSON.parse(s.querySelector('script[type="text/x-cap"]').textContent) }; acc += d; return e; });
+window.TOTAL = acc;
+
+const clamp = x => Math.min(1, Math.max(0, x));
+const easeOut = x => 1 - Math.pow(1 - clamp(x), 3);
+const easeBack = x => { x = clamp(x); const c1 = 1.70158, c3 = c1 + 1; return 1 + c3*Math.pow(x-1,3) + c1*Math.pow(x-1,2); };
+
+function animate(el, lt) {
+  let op = 1, tf = '';
+  if (el.dataset.a) {
+    const [t0, d, kind] = el.dataset.a.split(' '); const r = (lt - +t0) / +d, p = easeOut(r);
+    switch (kind) {
+      case 'up': op = p; tf = `translateY(${(1-p)*40}px)`; break;
+      case 'fade': op = p; break;
+      case 'left': op = p; tf = `translateX(${(p-1)*60}px)`; break;
+      case 'scale': op = p; tf = `scale(${0.9+0.1*p})`; break;
+      case 'zoom': op = p; tf = `scale(${0.96 + 0.04*p + 0.012*Math.max(0, lt - +t0)})`; break;
+      case 'pop': op = clamp(r*3); tf = `scale(${r <= 0 ? 0.6 : 0.6 + 0.4*easeBack(r)})`; break;
+      case 'popr': op = clamp(r*2); tf = `rotate(${el.style.getPropertyValue('--r')}) translateY(${(1-p)*80}px)`; break;
+      case 'gy': op = r > 0 ? 1 : 0; tf = `scaleY(${p})`; break;
+    }
+  }
+  if (el.dataset.out) { const [o0, od] = el.dataset.out.split(' ').map(Number); op *= 1 - easeOut((lt - o0) / od); }
+  el.style.opacity = op; if (tf) el.style.transform = (el.id === 'cap' ? '' : '') + tf;
+}
+
+function seek(t) {
+  document.getElementById('progress').style.width = (t / TOTAL * 100) + '%';
+  const cur = timeline.find(e => t >= e.start && t < e.start + e.dur) || timeline[timeline.length-1];
+  const lt = t - cur.start;
+  timeline.forEach(e => e.s.style.display = e === cur ? 'block' : 'none');
+  // scene fade in/out (not at the very start/end of the video's first scene)
+  const fin = cur === timeline[0] ? 1 : clamp(lt / 0.35), fout = clamp((cur.dur - lt) / 0.35);
+  cur.s.style.opacity = Math.min(fin, fout);
+  cur.s.querySelectorAll('[data-a],[data-out]').forEach(el => animate(el, lt));
+  cur.s.querySelectorAll('[data-draw]').forEach(el => {
+    const [t0, d] = el.dataset.draw.split(' ').map(Number); const p = easeOut((lt - t0) / d);
+    el.style.strokeDasharray = 1; el.style.strokeDashoffset = 1 - p; });
+  cur.s.querySelectorAll('[data-type]').forEach(el => {
+    if (!el.dataset.full) el.dataset.full = el.textContent;
+    const [t0, cps] = el.dataset.type.split(' ').map(Number); const full = el.dataset.full;
+    const n = Math.max(0, Math.min(full.length, Math.floor((lt - t0) * cps)));
+    const blink = n < full.length || Math.floor(lt * 2) % 2 === 0;
+    el.innerHTML = ''; el.append(document.createTextNode(full.slice(0, n)));
+    if (lt >= t0 - 0.5 && blink) { const c = document.createElement('span'); c.className = 'caret'; el.append(c); } });
+  cur.s.querySelectorAll('[data-count]').forEach(el => {
+    const [t0, d, to, dec] = el.dataset.count.split(' ').map(Number);
+    el.textContent = (to * easeOut((lt - t0) / d)).toFixed(dec); });
+  // captions
+  const cap = document.getElementById('cap');
+  const c = [...cur.caps].reverse().find(([ct]) => lt >= ct);
+  if (c) { cap.textContent = c[1]; const since = lt - c[0]; cap.style.opacity = Math.min(clamp(since / 0.3), fout); }
+  else cap.style.opacity = 0;
+}
+window.seek = seek;
+seek(0);
+</script>
+</body>
+</html>
