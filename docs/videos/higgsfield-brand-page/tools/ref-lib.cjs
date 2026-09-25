@@ -32,8 +32,10 @@ function extractLayout() {
   const hex = c => { const m = String(c).match(/rgba?\(([^)]+)\)/); if (!m) return null;
     const [r, g, b, a = 1] = m[1].split(/[ ,/]+/).filter(Boolean).map(Number); if (a < 0.05) return null;
     return "#" + [r, g, b].map(v => Math.round(v).toString(16).padStart(2, "0")).join("") + (a < 0.99 ? Math.round(a * 255).toString(16).padStart(2, "0") : ""); };
+  // geometry ignores opacity (reveal-on-scroll content may be faded out at scroll 0); the palette does not
   const visible = e => { const s = getComputedStyle(e), r = R(e);
-    return s.display !== "none" && s.visibility !== "hidden" && +s.opacity > 0.02 && r.width > 0 && r.height > 0; };
+    return s.display !== "none" && s.visibility !== "hidden" && r.width > 0 && r.height > 0; };
+  const shown = e => visible(e) && +getComputedStyle(e).opacity > 0.02;
   const sel = e => e.tagName.toLowerCase() + (e.id ? "#" + e.id : "") +
     [...e.classList].filter(c => c.length < 40).slice(0, 5).map(c => "." + c).join("");
   const st = e => { const s = getComputedStyle(e);
@@ -61,7 +63,9 @@ function extractLayout() {
       heading: h && visible(h) ? txt(h) : null, hasH1: !!e.querySelector("h1"), text: txt(e, 600), style: st(e) }; });
 
   const headings = [...document.querySelectorAll("h1, h2, h3")].filter(visible)
-    .map(e => ({ level: +e.tagName[1], text: txt(e), sel: sel(e), box: box(e), style: st(e) }));
+    .map(e => { const rg = document.createRange(); rg.selectNodeContents(e); const r = rg.getBoundingClientRect();   // ink box of the text
+      const tb = r.width > 0 ? [r.left + sx, r.top + sy, r.width, r.height].map(Math.round) : box(e);
+      return { level: +e.tagName[1], text: txt(e), sel: sel(e), box: tb, block: box(e), style: st(e) }; });
 
   const ctas = [...document.querySelectorAll("a[href], button, [role=button], input[type=submit], input[type=button]")]
     .filter(e => visible(e) && R(e).width >= 40 && R(e).height >= 24)
@@ -80,7 +84,7 @@ function extractLayout() {
   const tally = (m, k, w) => { if (k) m[k] = (m[k] || 0) + w; };
   const text = {}, fonts = {}, bgs = {}, btn = {};
   [...document.querySelectorAll("body *")].slice(0, 8000).forEach(e => {
-    if (!visible(e)) return; const s = getComputedStyle(e), r = R(e);
+    if (!shown(e)) return; const s = getComputedStyle(e), r = R(e);
     tally(bgs, hex(s.backgroundColor), r.width * r.height);
     const own = [...e.childNodes].filter(n => n.nodeType === 3).map(n => n.textContent.trim()).join("").length;
     if (own) { tally(text, hex(s.color), own); tally(fonts, s.fontFamily, own); }

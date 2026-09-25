@@ -5,14 +5,15 @@
   {
    "ch": "ch00",
    "at": 0.3,
-   "en": "You have fifty milliseconds. That's how long a visitor takes to judge your page.",
-   "ko": "0.05초. 방문자가 당신의 페이지를 판단하는 시간입니다."
+   "en": "Fifty milliseconds. That's how fast visitors judge your page's looks.",
+   "ko": "0.05초. 방문자가 페이지 겉모습을 판단하는 시간이에요."
   },
   {
    "ch": "ch00",
-   "at": 4.9,
-   "en": "Claude and Higgsfield can win it. Stay to the end: one button pays off.",
-   "ko": "Claude와 Higgsfield면 돼요. 끝까지 보세요, 버튼 하나가 돈이 돼요."
+   "at": 4.2,
+   "en": "Claude writes it. Higgsfield makes it real. Noa's envelope? Opens at the end.",
+   "ko": "Claude가 쓰고 Higgsfield가 현실로. 봉투는 마지막에 열어요.",
+   "say": "Claude writes it. Higgsfield makes it real. Noah's envelope? Opens at the end."
   },
   {
    "ch": "ch01",
@@ -23,147 +24,180 @@
   {
    "ch": "ch01",
    "at": 3.4,
-   "en": "Agency? Your portfolio becomes a living showreel.",
-   "ko": "에이전시라면? 포트폴리오가 살아 있는 쇼릴이 됩니다."
+   "en": "Agency? Your portfolio plays like a showreel, and books the call.",
+   "ko": "에이전시라면? 포트폴리오가 쇼릴처럼 흐르고, 상담 예약까지."
   },
   {
    "ch": "ch01",
    "at": 8.2,
-   "en": "Online shop? Your products spin, shine, and hop into the cart.",
+   "en": "Online shop? Products spin, shine, and hop into the cart.",
    "ko": "쇼핑몰이라면? 제품이 돌고, 빛나고, 장바구니로 쏙."
   },
   {
    "ch": "ch01",
    "at": 13.2,
-   "en": "Local store? From a 'near me' search to your front door, in one tap.",
-   "ko": "매장이라면? ‘내 주변’ 검색에서 가게 문 앞까지, 탭 한 번."
+   "en": "Local store? Hours, directions, booking: one tap from your page.",
+   "ko": "매장이라면? 영업시간, 길 찾기, 예약까지 페이지에서 한 번에."
   },
   {
    "ch": "ch01",
    "at": 18.2,
-   "en": "Influencer? One link becomes your very own storefront.",
-   "ko": "인플루언서라면? 링크 하나가 나만의 매장이 됩니다."
+   "en": "Influencer? Your one link becomes a real shop window.",
+   "ko": "인플루언서라면? 링크 하나가 제대로 된 쇼윈도가 돼요."
   },
   {
    "ch": "ch01",
    "at": 23.2,
-   "en": "Want proof? Here's a real page I built.",
-   "ko": "증거요? 제가 직접 만든 페이지예요."
+   "en": "Proof? Claude wrote it. Higgsfield hosts it.",
+   "ko": "증거요? Claude가 쓰고, Higgsfield가 호스팅해요."
   },
   {
    "ch": "ch01",
-   "at": 25.9,
-   "en": "And meet Noa, your guide. Too cool for eye contact.",
-   "ko": "가이드 노아를 소개합니다. 너무 쿨해서 눈은 안 마주쳐요.",
-   "say": "And meet Noah, your guide. Too cool for eye contact."
+   "at": 26.0,
+   "en": "Noa, your guide. Too cool for eye contact.",
+   "ko": "가이드 노아예요. 너무 쿨해서 눈은 안 마주쳐요.",
+   "say": "Noah, your guide. Too cool for eye contact."
   },
   {
    "ch": "ch02",
    "at": 1.0,
-   "en": "Here's the StoryBrand rule: your customer is the hero. Not your brand.",
-   "ko": "스토리브랜드 원칙: 주인공은 브랜드가 아니라 고객입니다.",
-   "say": "Here's the Story Brand rule: your customer is the hero. Not your brand."
+   "en": "StoryBrand's rule: your customer is the hero. Not your brand.",
+   "ko": "스토리브랜드 원칙: 주인공은 브랜드가 아니라 고객이에요.",
+   "say": "Story Brand's rule: your customer is the hero. Not your brand."
   },
   {
    "ch": "ch02",
    "at": 6.2,
-   "en": "Start with their problem. Be the guide: a three-step plan, one clear button.",
-   "ko": "고객의 문제로 시작하고, 당신은 길잡이로. 3단계 계획과 버튼 하나."
+   "en": "Claude drafts the story: their problem, you as guide, three steps, one button.",
+   "ko": "이야기는 Claude가: 고객의 문제, 길잡이인 나, 3단계, 버튼 하나."
   },
   {
    "ch": "ch02",
    "at": 13.2,
-   "en": "Make every scroll a scene change. Interactive visuals keep people around longer.",
-   "ko": "스크롤할 때마다 장면이 바뀌게. 인터랙티브하면 더 오래 머뭅니다."
+   "en": "Then make every scroll a scene change. Interactive pages hold people longer.",
+   "ko": "스크롤마다 장면이 바뀌게. 인터랙티브 페이지는 더 오래 붙잡아요."
   },
   {
    "ch": "ch02",
    "at": 20.2,
-   "en": "On my page? Hook, then proof, then action.",
-   "ko": "제 페이지에선? 훅, 증거, 그리고 행동."
+   "en": "My page? Hook. Proof. Action.",
+   "ko": "제 페이지는? 훅, 증거, 행동."
   },
   {
    "ch": "ch02",
    "at": 23.3,
-   "en": "Noa just got demoted from hero to guide. The hamster is... coping.",
-   "ko": "주인공에서 길잡이로 강등된 노아. 햄스터는 지금… 추스르는 중.",
-   "say": "Noah just got demoted from hero to guide. The hamster is... coping."
+   "en": "Noa, demoted from hero to guide. He's... coping.",
+   "ko": "주인공에서 길잡이로 강등된 노아. 지금… 추스르는 중.",
+   "say": "Noah, demoted from hero to guide. He's... coping."
   },
   {
    "ch": "ch02",
    "at": 27.6,
-   "en": "Chin up, Noa. Guides get the best lines.",
-   "ko": "힘내, 노아. 명대사는 원래 길잡이 몫이야.",
-   "say": "Chin up, Noah. Guides get the best lines."
+   "en": "Chin up, Noa. Guides just need one face.",
+   "ko": "힘내, 노아. 길잡이는 얼굴 하나면 돼.",
+   "say": "Chin up, Noah. Guides just need one face."
   },
   {
    "ch": "ch03",
    "at": 1.0,
    "en": "Ever generated three shots and gotten three different faces? Noa has.",
-   "ko": "세 컷 뽑았더니 얼굴이 세 개? 노아가 그랬어요.",
+   "ko": "세 컷 뽑았더니 얼굴이 셋? 노아가 그랬어요.",
    "say": "Ever generated three shots and gotten three different faces? Noah has."
   },
   {
    "ch": "ch03",
    "at": 5.9,
    "en": "Blue Noa. Nerdy Noa. Spiky Noa. Who are these hamsters?",
-   "ko": "파란 노아, 범생이 노아, 삐죽머리 노아. 이 햄스터들 누구야?",
+   "ko": "파란 노아, 범생이 노아, 삐죽머리 노아. 너희 누구야?",
    "say": "Blue Noah. Nerdy Noah. Spiky Noah. Who are these hamsters?"
   },
   {
    "ch": "ch03",
    "at": 10.2,
-   "en": "One: a character sheet on grey. Face close-up, full body front and back.",
-   "ko": "하나, 회색 배경 캐릭터 시트. 얼굴 클로즈업, 앞·뒤 전신."
+   "en": "One: a grey character sheet. Face close-up, body front and back.",
+   "ko": "하나, 회색 배경 캐릭터 시트. 얼굴 클로즈업, 전신 앞·뒤."
   },
   {
    "ch": "ch03",
    "at": 14.7,
-   "en": "Two: Soul ID. Twenty-plus photos, three to five minutes, one saved face.",
-   "ko": "둘, Soul ID. 사진 20장 이상, 3~5분이면 얼굴이 저장돼요."
+   "en": "Two: Soul ID, for real faces. Twenty-plus photos, three to five minutes.",
+   "ko": "둘, 실제 인물이면 Soul ID. 사진 20장 이상, 3~5분 학습."
   },
   {
    "ch": "ch03",
    "at": 19.4,
-   "en": "Three: reuse that face in Kling or Seedance with Reference Element.",
-   "ko": "셋, Reference Element로 Kling·Seedance에 재사용.",
-   "say": "Three: reuse that face in Kling or Seed dance with Reference Element."
+   "en": "Three: reuse it in Kling or Seedance via Reference Element.",
+   "ko": "셋, Reference Element로 Kling·Seedance 재사용.",
+   "say": "Three: reuse it in Kling or Seed dance via Reference Element."
   },
   {
    "ch": "ch03",
-   "at": 23.4,
+   "at": 23.7,
    "en": "Four: lock outfit and hair. Five: references beat seeds.",
-   "ko": "넷, 의상과 헤어 고정. 다섯, 시드보다 레퍼런스."
+   "ko": "넷, 의상·헤어 고정. 다섯, 시드보다 레퍼런스."
   },
   {
    "ch": "ch03",
    "at": 27.8,
-   "en": "Same shades, same scarf, same hamster. Anywhere you put him.",
-   "ko": "같은 선글라스, 같은 스카프, 같은 햄스터. 어디에 데려다 놔도."
+   "en": "Same shades, same scarf. Higgsfield keeps the face. Now let's make him move.",
+   "ko": "얼굴은 Higgsfield가 지키고, 이제 움직여 볼 차례!"
+  },
+  {
+   "ch": "ch03s",
+   "at": 1.0,
+   "en": "Attach the sheet to Seedance 2.5. Don't re-describe Noa.",
+   "ko": "시트를 Seedance 2.5에 첨부. 노아를 다시 묘사하지 마세요.",
+   "say": "Attach the sheet to Seed dance two point five. Don't re-describe Noah."
+  },
+  {
+   "ch": "ch03s",
+   "at": 5.7,
+   "en": "Claude writes the shot list: visual rule on top, sound rule last.",
+   "ko": "샷 리스트는 Claude가: 맨 위엔 화면 규칙, 맨 끝엔 사운드 규칙."
+  },
+  {
+   "ch": "ch03s",
+   "at": 10.4,
+   "en": "Each shot: action, framing, end point. Hard cut.",
+   "ko": "샷마다 동작, 구도, 끝나는 지점. 그리고 하드 컷."
+  },
+  {
+   "ch": "ch03s",
+   "at": 13.6,
+   "en": "A few takes later: same Noa, up to thirty seconds, with sound.",
+   "ko": "몇 번 다시 뽑으면: 같은 노아, 최대 30초, 소리까지.",
+   "say": "A few takes later: same Noah, up to thirty seconds, with sound."
   },
   {
    "ch": "ch04",
    "at": 1.0,
-   "en": "Speed first. Past three seconds, Google says 53% of mobile visitors leave.",
-   "ko": "속도가 먼저. 구글: 3초가 넘으면 모바일 방문자 53%가 떠납니다."
+   "en": "Now, speed. Past three seconds, Google says 53% of mobile visits are abandoned.",
+   "ko": "이제 속도. 구글: 3초를 넘기면 모바일 방문의 53%가 이탈해요."
   },
   {
    "ch": "ch04",
    "at": 6.8,
-   "en": "Next, make something move with every scroll. Reward the thumb, it keeps going.",
-   "ko": "스크롤마다 뭔가 움직이게. 엄지에 보상을 주면 멈추지 않아요."
+   "en": "Then make every scroll move something. Reward the thumb; it keeps going.",
+   "ko": "스크롤마다 뭔가 움직이게. 엄지에 보상을 주면 계속 내려가요."
   },
   {
    "ch": "ch04",
    "at": 13.2,
-   "en": "Put video in your hero. 85% of people say a video convinced them to buy.",
-   "ko": "히어로엔 영상을. 85%가 영상을 보고 구매를 결심한 적이 있대요."
+   "en": "Your Seedance clip? Hero video. 85% tell Wyzowl a video convinced them to buy.",
+   "ko": "히어로엔 Seedance 영상. 85%가 영상 보고 구매 결심(Wyzowl)",
+   "say": "Your Seed dance clip? Hero video. 85% tell Wyzowl a video convinced them to buy."
   },
   {
    "ch": "ch04",
-   "at": 19.2,
-   "en": "Smooth animation? Let Claude Opus code it. How do you think this video moves?",
-   "ko": "부드러운 애니메이션은 Claude Opus 코드로. 이 영상은 어떻게 움직일까요?"
+   "at": 19.8,
+   "en": "Smooth motion? Claude Opus codes it. How do you think this video moves?",
+   "ko": "모션은 Claude Opus가 코드로. 이 영상은 어떻게 움직일까요?"
+  },
+  {
+   "ch": "ch04",
+   "at": 25.0,
+   "en": "Now, earn their trust.",
+   "ko": "이제 신뢰를 얻을 차례예요."
   },
   {
    "ch": "ch05",
@@ -173,40 +207,42 @@
   },
   {
    "ch": "ch05",
-   "at": 3.8,
-   "en": "Show your work. People trust effort they can see.",
-   "ko": "과정을 보여주세요. 사람들은 눈에 보이는 노력을 믿습니다."
+   "at": 4.1,
+   "en": "Show your work; visible effort earns trust.",
+   "ko": "과정을 보여 주세요. 보이는 노력이 신뢰가 돼요."
   },
   {
    "ch": "ch05",
-   "at": 6.6,
-   "en": "Five reviews? Buying gets 270% more likely.",
-   "ko": "후기 5개면? 구매 가능성이 270% 올라갑니다."
+   "at": 6.8,
+   "en": "Five reviews, not zero? Purchase likelihood up 270%.",
+   "ko": "후기 0개보다 5개면? 구매 가능성 270% 상승."
   },
   {
    "ch": "ch05",
-   "at": 9.8,
-   "en": "Humor? 91% prefer funny brands. 72% pick them over rivals.",
-   "ko": "유머는요? 91%가 재밌는 브랜드를 선호, 72%는 그 브랜드를 골라요."
+   "at": 10.9,
+   "en": "Oracle: 91% prefer funny brands; 72% would pick them over rivals.",
+   "ko": "오라클 조사: 91%는 재밌는 브랜드 선호, 72%는 경쟁사 대신 선택."
   },
   {
    "ch": "ch05",
-   "at": 15.2,
-   "en": "One rule: joke about the situation, never the customer.",
-   "ko": "규칙은 하나. 상황은 비틀되, 고객은 놀리지 않기."
+   "at": 16.7,
+   "en": "Rule: joke about the situation, never the customer, Uchal.",
+   "ko": "규칙: 상황은 비틀어도, 고객은 놀리지 않기. 알았지, 우찰?",
+   "say": "Rule: joke about the situation, never the customer, Oo-chal."
   },
   {
    "ch": "ch05",
-   "at": 19.7,
-   "en": "Like this: 'Noa's rendering. Coffee number two.' Progress, plus a smile.",
-   "ko": "이렇게요. ‘노아 렌더링 중… 커피 두 잔째.’ 과정에 미소 한 스푼.",
-   "say": "Like this: Noah's rendering. Coffee number two. Progress, plus a smile."
+   "at": 20.3,
+   "en": "'Noa's rendering, coffee number two.' Claude wrote that. Now, money.",
+   "ko": "‘노아 렌더링 중, 커피 두 잔째.’ Claude 작품. 이제 돈 얘기.",
+   "say": "Noah's rendering, coffee number two. Claude wrote that. Now, money."
   },
   {
    "ch": "ch06",
    "at": 1.0,
-   "en": "Remember that button I promised? Here's how it turns into money.",
-   "ko": "약속한 버튼 기억하죠? 이제 그게 돈이 되는 과정입니다."
+   "en": "Remember Noa's envelope? It all comes down to one button.",
+   "ko": "노아의 봉투 기억나요? 결국 버튼 하나에 달렸어요.",
+   "say": "Remember Noah's envelope? It all comes down to one button."
   },
   {
    "ch": "ch06",
@@ -217,28 +253,28 @@
   {
    "ch": "ch06",
    "at": 10.6,
-   "en": "Add one point of conversion: 2.7 million won becomes 4.5 million.",
-   "ko": "전환율 1%p만 올려도 270만 원이 450만 원으로. (예시)"
+   "en": "Say conversion rises one point: 2.7 million won becomes 4.5.",
+   "ko": "전환율이 1%p 오르면: 270만 원이 450만 원으로. (예시)"
   },
   {
    "ch": "ch06",
-   "at": 15.6,
-   "en": "That's the button: one clear call to action, plus a soft one for maybe-laters.",
-   "ko": "그게 바로 그 버튼. 분명한 CTA 하나, 망설이는 분께는 보조 버튼."
+   "at": 16.1,
+   "en": "That's the button. Tomorrow: Claude writes yours. One main, one 'maybe later.'",
+   "ko": "그게 그 버튼. 내일은 Claude와 써 보세요: 메인 하나, ‘나중에’ 하나."
   },
   {
    "ch": "ch06",
-   "at": 20.4,
+   "at": 21.6,
    "en": "Noa's cheeks? Already full.",
-   "ko": "노아의 볼주머니요? 벌써 꽉 찼어요.",
+   "ko": "노아 볼주머니요? 벌써 꽉 찼어요.",
    "say": "Noah's cheeks? Already full."
   },
   {
    "ch": "ch07",
    "at": 1.0,
-   "en": "The next page's hero? Your brand. Go build it. Noa's got the curtain.",
-   "ko": "다음 페이지의 주인공은 당신의 브랜드. 막은 노아가 열어 둘게요.",
-   "say": "The next page's hero? Your brand. Go build it. Noah's got the curtain."
+   "en": "Next hero: your customer. See Noa's page live, then publish yours on Higgsfield.",
+   "ko": "다음 주인공은 고객. 노아 페이지 보고, 내 것도 Higgsfield로!",
+   "say": "Next hero: your customer. See Noah's page live, then publish yours on Higgsfield."
   }
  ]
 }

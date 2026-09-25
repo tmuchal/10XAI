@@ -54,7 +54,7 @@
     el("div", `position:absolute;left:0;right:0;top:180px;text-align:center;font-size:26px;color:${INK}`, "팔레트 · 색 규칙", palC);
     const SRC = [sheet, stage, palC];
     // A2 · bright Higgsfield panel
-    const P1 = box(A, 880, 228, 870, 600, "#fff7fb", "overflow:visible;background-image:radial-gradient(ellipse at 80% 10%,rgba(247,182,200,.35),transparent 55%),radial-gradient(ellipse at 10% 90%,rgba(199,242,92,.25),transparent 50%)");
+    const P1 = box(A, 880, 228, 870, 540, "#fff7fb", "overflow:visible;background-image:radial-gradient(ellipse at 80% 10%,rgba(247,182,200,.35),transparent 55%),radial-gradient(ellipse at 10% 90%,rgba(199,242,92,.25),transparent 50%)");
     el("div", `position:absolute;left:26px;top:20px;display:flex;align-items:center;gap:14px;font-size:38px;color:${INK};white-space:nowrap`,
       `${HF_MARK(44)}Higgsfield <span style="padding:2px 16px 4px;border:4px solid ${INK};border-radius:14px;background:#f7b6c8;font-size:32px">Seedance 2.5</span>`, P1);
     el("div", `position:absolute;left:30px;top:92px;font-size:28px;color:${MUTE}`, "레퍼런스 이미지", P1);
@@ -70,10 +70,10 @@
     el("div", "position:absolute;inset:0", STAGE(250, 160), slots[1].th);
     slots[2].th.style.background = "#fffaf0";
     el("div", "position:absolute;left:18px;top:24px;display:flex;gap:8px", SWATCH.map(c => `<div style="width:36px;height:108px;border-radius:10px;border:3px solid ${INK};background:${c}"></div>`).join(""), slots[2].th);
-    const cnt = el("div", `position:absolute;left:30px;top:396px;display:flex;align-items:baseline;gap:12px;font-size:36px;color:${INK};white-space:nowrap`,
+    const cnt = el("div", `position:absolute;left:30px;top:336px;display:flex;align-items:baseline;gap:12px;font-size:36px;color:${INK};white-space:nowrap`,
       `레퍼런스 <span class="n" style="display:inline-block;min-width:34px;text-align:center;font-size:52px;color:${RED}">0</span> / 최대 50`, P1);
     const cntN = cnt.querySelector(".n");
-    const field = el("div", `position:absolute;left:30px;top:478px;width:802px;height:92px;border:4px solid ${INK};border-radius:14px;background:#fff;display:flex;align-items:center;gap:12px;padding:0 20px;box-sizing:border-box;font-size:28px;color:#9a8e86;white-space:nowrap`,
+    const field = el("div", `position:absolute;left:30px;top:418px;width:802px;height:92px;border:4px solid ${INK};border-radius:14px;background:#fff;display:flex;align-items:center;gap:12px;padding:0 20px;box-sizing:border-box;font-size:28px;color:#9a8e86;white-space:nowrap`,
       `프롬프트 입력란 · 이제 Claude가 씁니다 ${CLAUDE_MARK(30)}`, P1);
     // flying reference chips
     const CH = ["@노아", "@무대", "@팔레트"].map((nm, i) => {
@@ -81,7 +81,7 @@
       c.className = "abs";
       c.from = [[640, 208], [330, 576], [660, 576]][i];   // chip centre on its source card (top edge)
       c.to = [30 + i * 275 + 125 + 880, 228 + 136 + 160 + 6];   // under its slot
-      c.at = 1.0 + i * .75;
+      c.at = .9 + i * .3;
       return c;
     });
 
@@ -92,7 +92,7 @@
     dock.innerHTML = `${HF_MARK(46)}<div style="line-height:1.1;white-space:nowrap"><div style="font-size:30px;color:${INK}">Higgsfield · Seedance 2.5</div>
       <div class="st" style="font-size:24px;color:${MUTE}">레퍼런스 3 · 프롬프트 기다리는 중…</div></div>`;
     const dockSt = dock.querySelector(".st");
-    const C = box(B, 180, 228, 940, 640, "#fffaf0", "overflow:hidden");
+    const C = box(B, 180, 228, 940, 650, "#fffaf0", "overflow:hidden");
     el("div", `position:absolute;left:0;right:0;top:0;height:70px;background:#fbe9dc;border-bottom:4px solid ${INK}`, "", C);
     el("div", `position:absolute;left:22px;top:14px;display:flex;align-items:center;gap:12px;font-size:34px;color:${INK};white-space:nowrap`, `${CLAUDE_MARK(40)}Claude <span style="font-size:26px;color:${MUTE}">· Seedance 2.5용 샷 리스트</span>`, C);
     const cSt = el("div", `position:absolute;right:20px;top:14px;padding:2px 14px 4px;border:3px solid ${INK};border-radius:12px;background:#fff;font-size:24px;color:${INK};white-space:nowrap`, "작성 중…", C);
@@ -114,10 +114,10 @@
     const segLen = SEGT.map((_, g) => LINES.filter(l => l[0] === g).reduce((a, l) => a + l[1].reduce((b, k) => b + k[0].length, 0), 0));
     let y = 88, prev = 0;
     const LN = LINES.map(([g, toks], i) => {
-      if (i && g !== prev) y += 14; prev = g;
+      if (i && g !== prev) y += 10; prev = g;
       const cont = i && LINES[i - 1][0] === g;
-      const d = el("div", `position:absolute;left:18px;right:18px;top:${y}px;height:40px;padding-left:${cont ? 34 : 14}px;border-radius:8px;font-size:28px;line-height:40px;color:${INK};white-space:nowrap`, "", C);
-      y += 40;
+      const d = el("div", `position:absolute;left:18px;right:18px;top:${y}px;height:42px;padding-left:${cont ? 36 : 14}px;border-radius:8px;font-size:30px;line-height:42px;color:${INK};white-space:nowrap`, "", C);
+      y += 42;
       d.g = g; d.toks = toks; d.len = toks.reduce((a, k) => a + k[0].length, 0);
       d.off = LINES.slice(0, i).filter(l => l[0] === g).reduce((a, l) => a + l[1].reduce((b, k) => b + k[0].length, 0), 0);
       d.last = ""; return d;
@@ -126,10 +126,10 @@
     // call-outs (Korean), aligned with the lines they explain
     const CO = [
       [300, 4.9, "#f7d774", "맨 위: <b>비주얼 규칙 1개</b>", ""],
-      [392, 5.9, "#bfe3a6", "캐릭터 재설명 ✗", "→ “the character from the reference images”"],
-      [512, 6.8, "#9fd3f0", "샷마다 카메라 1개 · 이벤트에 묶기", ""],
-      [596, 7.95, "#fbd9d3", "샷 끝 = <b>Hard cut.</b>", ""],
-      [716, 9.95, "#f7d774", "맨 아래: <b>사운드 규칙 1개</b>", ""],
+      [400, 5.9, "#bfe3a6", "캐릭터 재설명 ✗ →", "“the character from the reference images”"],
+      [520, 6.8, "#9fd3f0", "샷마다 카메라 1개 · 이벤트에 묶기", ""],
+      [606, 7.95, "#fbd9d3", "샷 끝 = <b>Hard cut.</b>", ""],
+      [732, 9.95, "#f7d774", "맨 아래: <b>사운드 규칙 1개</b>", ""],
     ].map(([cy, at, bg, a, b]) => {
       const d = box(B, 1150, cy, 610, b ? 104 : 66, "#fffdf7", `display:flex;flex-direction:column;justify-content:center;padding:0 18px 0 30px;box-sizing:border-box;transform-origin:0 50%;border-left:14px solid ${INK}`);
       d.style.borderLeftColor = bg === "#fbd9d3" ? RED : bg === "#9fd3f0" ? "#3e8fb8" : bg === "#bfe3a6" ? GRN : "#d98c1f";
@@ -137,8 +137,8 @@
         (b ? `<div style="font-size:24px;line-height:1.2;color:${GRN};white-space:nowrap">${b}</div>` : "");
       d.at = at; return d;
     });
-    const arrows = el("div", "left:0;top:0;z-index:36;pointer-events:none", `<svg width="1920" height="1080" overflow="visible">${[[332, 336], [444, 424], [544, 508], [628, 628], [748, 756]].map(([ya, yb], i) =>
-      `<path class="ar" d="M1144 ${ya} Q1128 ${(ya + yb) / 2} 1100 ${yb}" fill="none" stroke="${INK}" stroke-width="4" stroke-linecap="round"/><path class="ah" d="M1100 ${yb} l14 -9 M1100 ${yb} l15 7" stroke="${INK}" stroke-width="4" stroke-linecap="round"/>`).join("")}</svg>`, B);
+    const arrows = el("div", "left:0;top:0;z-index:36;pointer-events:none", `<svg width="1920" height="1080" overflow="visible">${[[332, 337], [452, 431], [552, 515], [638, 609], [764, 755]].map(([ya, yb], i) =>
+      `<path class="ar" d="M1144 ${ya} Q1132 ${(ya + yb) / 2} 1116 ${yb}" fill="none" stroke="${INK}" stroke-width="4" stroke-linecap="round"/><path class="ah" d="M1116 ${yb} l13 -8 M1116 ${yb} l12 9" stroke="${INK}" stroke-width="4" stroke-linecap="round"/>`).join("")}</svg>`, B);
     arrows.className = "abs";
     const AR = [...arrows.querySelectorAll(".ar")], AH = [...arrows.querySelectorAll(".ah")];
     const handoff = el("div", `left:1150px;top:796px;z-index:37;display:flex;align-items:center;gap:10px;padding:6px 18px 8px;border:4px solid ${INK};border-radius:16px;background:#fff;font-size:30px;color:${INK};white-space:nowrap;transform-origin:0 50%`,
@@ -152,7 +152,7 @@
     el("div", `position:absolute;left:24px;top:84px;display:flex;align-items:center;gap:10px;font-size:26px;color:${INK};white-space:nowrap`,
       ["@노아", "@무대", "@팔레트"].map((nm, i) => `<span style="padding:2px 14px 4px;border:3px solid ${INK};border-radius:18px;background:${["#fbe3b0", "#fbd9d3", "#d8eef7"][i]}">${nm}</span>`).join("") +
       `<span style="margin-left:10px;display:flex;align-items:center;gap:8px;padding:2px 16px 4px;border:3px solid ${INK};border-radius:12px;background:#fbe9dc">${CLAUDE_MARK(28)}Claude 프롬프트 · 샷 3개</span>`, P3);
-    const credit = el("div", `position:absolute;right:250px;top:22px;display:flex;align-items:center;gap:8px;padding:4px 16px 6px;border:3px solid ${INK};border-radius:16px;background:#fff4d0;font-size:26px;color:${INK};white-space:nowrap`,
+    const credit = el("div", `position:absolute;right:290px;top:22px;display:flex;align-items:center;gap:8px;padding:4px 16px 6px;border:3px solid ${INK};border-radius:16px;background:#fff4d0;font-size:26px;color:${INK};white-space:nowrap`,
       `<svg width="30" height="30" viewBox="0 0 30 30"><circle cx="15" cy="15" r="12" fill="#f2c14e" stroke="${INK}" stroke-width="3"/><path d="M10 15 H20" stroke="${INK}" stroke-width="3" stroke-linecap="round"/></svg>크레딧 사용`, P3);
     const gen = el("div", `position:absolute;right:24px;top:16px;padding:6px 26px 8px;border:4px solid ${INK};border-radius:18px;background:#c7f25c;font-size:32px;color:${INK};white-space:nowrap;box-shadow:5px 6px 0 rgba(43,35,32,.3)`, "Generate ✦", P3);
     const cursor = el("div", "position:absolute;left:0;top:0;z-index:50", `<svg width="46" height="56" viewBox="0 0 46 56"><path d="M4 4 L4 44 L15 34 L23 52 L31 48 L23 31 L38 31Z" fill="#fff" stroke="${INK}" stroke-width="4" stroke-linejoin="round"/></svg>`, P3);
@@ -175,13 +175,13 @@
       f.play = el("div", "position:absolute;inset:0;z-index:42;display:grid;place-items:center;background:rgba(255,250,240,.55)", `<svg width="70" height="70" viewBox="0 0 70 70"><circle cx="35" cy="35" r="31" fill="#fff" stroke="${INK}" stroke-width="4"/><path d="M28 22 L50 35 L28 48Z" fill="${INK}"/></svg>`, f);
       f.noise = el("div", "position:absolute;inset:0;z-index:43;background:repeating-linear-gradient(0deg,#efe4cc 0 6px,#fffaf0 6px 12px,#e4d6b8 12px 15px)", "", f);
       f.cut = el("div", `position:absolute;inset:0;z-index:44;background:#fff;opacity:0`, "", f);
-      f.st = el("div", `position:absolute;left:${27 + i * (TW + 30) + 150}px;top:${TY + TH - 30}px;z-index:46;padding:2px 16px 4px;border:5px solid ${GRN};border-radius:12px;color:${GRN};background:rgba(255,250,240,.95);font-size:32px;white-space:nowrap`, "✓ 같은 노아", P3);
-      f.a = [13.45, 14.95, 16.3][i]; f.b = [14.95, 16.3, 17.7][i];
+      f.st = el("div", `position:absolute;left:${27 + i * (TW + 30) + 140}px;top:${TY + TH - 26}px;z-index:46;padding:2px 16px 4px;border:5px solid ${GRN};border-radius:12px;color:${GRN};background:rgba(255,250,240,.95);font-size:32px;white-space:nowrap`, "✓ 같은 노아", P3);
+      f.a = [14.35, 15.55, 16.65][i]; f.b = [15.55, 16.65, 17.85][i];
       return f;
     });
-    const badge = el("div", `position:absolute;left:27px;top:${TY + TH + 44}px;display:flex;align-items:center;gap:12px;padding:8px 22px 10px;border:4px solid ${INK};border-radius:16px;background:#f7d774;font-size:32px;color:${INK};white-space:nowrap;box-shadow:${SH};transform-origin:0 50%`,
+    const badge = el("div", `position:absolute;left:27px;top:${TY + TH + 64}px;display:flex;align-items:center;gap:12px;padding:8px 22px 10px;border:4px solid ${INK};border-radius:16px;background:#f7d774;font-size:32px;color:${INK};white-space:nowrap;box-shadow:${SH};transform-origin:0 50%`,
       "Seedance 2.5 · 최대 30초 · 오디오 포함 · 1080p", P3);
-    const refsN = el("div", `position:absolute;right:27px;top:${TY + TH + 50}px;font-size:28px;color:${MUTE};white-space:nowrap`, "레퍼런스 최대 50개 · 지금 3개", P3);
+    const refsN = el("div", `position:absolute;right:27px;top:${TY + TH + 74}px;font-size:28px;color:${MUTE};white-space:nowrap`, "레퍼런스 최대 50개 · 지금 3개", P3);
 
     // ============ D · outro (18–20): Uchal + Noa glint + exit
     const noa = makeNoa(160); R.appendChild(noa);
@@ -286,28 +286,28 @@
       });
       const hIn = back(seg(t, 10.55, 10.95)), hOut = ease(seg(t, 11.8, 12.2));
       handoff.style.opacity = clamp(hIn * 2) * (1 - hOut);
-      handoff.style.transform = `translateY(${-230 * ease(seg(t, 10.95, 11.35))}px) scale(${.6 + .4 * hIn})`;
+      handoff.style.transform = `scale(${(.6 + .4 * hIn) * (1 + .06 * bump(t, 11.1, .4) + .08 * arrive)})`;
 
       // ---- C
       const Cv = t > 11.9;
       P3.style.display = Cv ? "block" : "none";
-      const p3 = back(seg(t, 11.95, 12.45)), shrink = ease(seg(t, 17.8, 18.3));
+      const p3 = back(seg(t, 11.95, 12.45)), shrink = ease(seg(t, 17.9, 18.3));
       P3.style.opacity = clamp(p3 * 2);
-      P3.style.transform = `translate(${lerp(510, 0, out(seg(t, 11.95, 12.4)))}px, ${lerp(-110, 0, out(seg(t, 11.95, 12.4)))}px) scale(${(.4 + .6 * p3) * (1 - .13 * shrink)})`;
-      const cp = ease(seg(t, 12.3, 12.7)), gp = bump(t, 12.72, .22);
-      cursor.style.opacity = t > 12.25 && t < 13.2 ? 1 : 0;
+      P3.style.transform = `translate(${lerp(510, 0, out(seg(t, 11.95, 12.4)))}px, ${lerp(-110, 0, out(seg(t, 11.95, 12.4)))}px) scale(${(.4 + .6 * p3) * (1 - .26 * shrink)})`;
+      const cp = ease(seg(t, 12.9, 13.55)), gp = bump(t, 13.6, .22);
+      cursor.style.opacity = t > 12.8 && t < 14.1 ? 1 : 0;
       cursor.style.transform = `translate(${lerp(1100, 1470, cp)}px, ${lerp(240, 44, cp) + 6 * gp}px) scale(${1 - .12 * gp})`;
       gen.style.transform = `scale(${1 - .1 * gp}) translateY(${5 * gp}px)`;
       gen.style.boxShadow = gp > .3 ? "1px 2px 0 rgba(43,35,32,.3)" : "5px 6px 0 rgba(43,35,32,.3)";
-      const crp = back(seg(t, 12.8, 13.15)); credit.style.opacity = clamp(crp * 2); credit.style.transform = `scale(${.5 + .5 * crp}) rotate(${-4 * (1 - crp)}deg)`;
-      const pg = ease(seg(t, 12.8, 13.4));
-      prog.style.opacity = seg(t, 12.75, 12.9); progF.style.width = 100 * pg + "%";
+      const crp = back(seg(t, 13.65, 14.0)); credit.style.opacity = clamp(crp * 2); credit.style.transform = `scale(${.5 + .5 * crp}) rotate(${-4 * (1 - crp)}deg)`;
+      const pg = ease(seg(t, 13.65, 14.2));
+      prog.style.opacity = seg(t, 13.6, 13.75); progF.style.width = 100 * pg + "%";
       const pt = pg >= 1 ? "완료 · 3샷" : "생성 중…"; if (progT.textContent !== pt) progT.textContent = pt;
       TILES.forEach((f, i) => {
-        const tin = back(seg(t, 12.85 + i * .12, 13.3 + i * .12));
+        const tin = back(seg(t, 12.2 + i * .12, 12.65 + i * .12));
         f.style.opacity = clamp(tin * 2); f.style.transform = `translateY(${60 * (1 - tin)}px)`;
-        f.noise.style.opacity = 1 - seg(t, 13.3 + i * .1, 13.5 + i * .1);
-        f.noise.style.backgroundPosition = `0 ${Math.floor(t * 30) * 7}px`;
+        f.noise.style.opacity = 1 - seg(t, 14.15 + i * .1, 14.35 + i * .1);
+        f.noise.style.backgroundPosition = `0 ${Math.floor(clamp(t, 0, 13.65) * 4 + Math.max(0, t - 13.65) * 30) * 7}px`;
         const on = t >= f.a && t < f.b, lt = clamp(t, f.a, f.b) - f.a, played = t >= f.b;
         f.play.style.opacity = t < f.a ? 1 : 0;
         f.style.borderColor = on ? RED : INK; f.style.outline = on ? `4px solid ${RED}` : "none";
@@ -320,32 +320,32 @@
           f.cam.style.transform = `scale(${1 + .22 * ease(seg(t, land, f.b))})`;
         } else if (i === 1) {   // close-up, camera still: turns to camera, the sunglasses glint
           const turn = ease(seg(lt, .15, .55));
-          poseNoa(f.n, t, { x: 30, y: -150, s: 1, look: lerp(1, 0, turn), blink: false });
+          poseNoa(f.n, t, { x: 30, y: -112, s: 1, look: lerp(1, 0, turn), blink: false });
           const g = seg(t, f.a + .55, f.a + 1.05), gv = g > 0 && g < 1 ? Math.sin(g * Math.PI) : 0;
-          f.gl.style.opacity = gv; f.gl.style.transform = `translate(${148}px, ${76}px) scale(${.4 + gv}) rotate(${90 * g}deg)`;
+          f.gl.style.opacity = gv; f.gl.style.transform = `translate(${250}px, ${50}px) scale(${.4 + gv}) rotate(${90 * g}deg)`;
         } else {   // back view walks toward the curtain; the camera follows only once it starts walking
           const walk = seg(t, f.a + .3, f.b);
           poseNoa(f.n, t, { x: 165 + 20 * Math.sin(walk * 9), y: lerp(108, 60, walk), s: lerp(1, .62, walk), hop: walk > 0 && walk < 1 ? (walk * 5) % 1 * .35 : 0 });
           f.cam.style.transform = `scale(${1 + .16 * ease(walk)}) translateY(${-10 * ease(walk)}px)`;
         }
-        slam(f.st, t, f.b - .3, [-6, 4, -3][i]);
+        slam(f.st, t, f.b - .3, [-4, 3, -2][i]);
       });
-      const bp = back(seg(t, 14.4, 14.85)); badge.style.opacity = clamp(bp * 2); badge.style.transform = `scale(${.5 + .5 * bp}) rotate(${-1.5 * bp}deg)`;
-      refsN.style.opacity = seg(t, 14.7, 15.0);
+      const bp = back(seg(t, 15.0, 15.45)); badge.style.opacity = clamp(bp * 2); badge.style.transform = `scale(${.5 + .5 * bp}) rotate(${-1.5 * bp}deg)`;
+      refsN.style.opacity = seg(t, 15.3, 15.6) * (1 - shrink);
 
       // ---- D
-      const nIn = back(seg(t, 17.95, 18.4)), exit = ease(seg(t, 19.0, 19.9));
-      const nx = lerp(990, 1260, exit);
-      poseNoa(noa, t, { x: nx, y: 700 + 220 * (1 - nIn), s: 1, op: t > 17.9 ? clamp(nIn * 3) * (1 - seg(exit, .85, 1)) : 0,
-        look: t < 18.9 ? -.4 : 1, hop: exit > 0 && exit < 1 ? (exit * 3) % 1 * .45 : 0, wave: t > 18.4 && t < 18.95 });
-      const g2 = seg(t, 18.55, 18.95), gv2 = g2 > 0 && g2 < 1 ? Math.sin(g2 * Math.PI) : 0;
-      nGl.style.opacity = gv2; nGl.style.transform = `translate(${nx + 104 - 40}px, ${700 + 58 - 40}px) scale(${.4 + gv2}) rotate(${90 * g2}deg)`;
+      const nIn = back(seg(t, 17.95, 18.4)), exit = ease(seg(t, 18.95, 19.75));
+      const nx = lerp(960, 150, exit), ny = 690;
+      poseNoa(noa, t, { x: nx, y: ny + 220 * (1 - nIn), s: 1, op: t > 17.9 ? clamp(nIn * 3) * (1 - seg(exit, .85, 1)) : 0, flip: t > 18.9,
+        look: t < 18.9 ? .5 : 0, hop: exit > 0 && exit < 1 ? (exit * 3) % 1 * .45 : 0, wave: t > 18.9 });
+      const g2 = seg(t, 18.5, 18.95), gv2 = g2 > 0 && g2 < 1 ? Math.sin(g2 * Math.PI) : 0;
+      nGl.style.opacity = gv2; nGl.style.transform = `translate(${nx + 104 - 40}px, ${ny + 76 - 40}px) scale(${.4 + gv2}) rotate(${90 * g2}deg)`;
       const uIn = back(seg(t, 18.05, 18.45));
-      poseUchu(uchal, t, { x: 1480, y: 700 + 240 * (1 - uIn), mood: "shock", look: -1, op: t > 18 ? clamp(uIn * 3) : 0, tag: seg(t, 18.35, 18.7),
-        hop: seg(t, 18.5, 18.95) > 0 && t < 18.95 ? seg(t, 18.5, 18.95) : 0 });
-      sayBubble(ub, t, 18.2, 20.2, "30초에 소리까지?!", 1250, 600);
-      burst.fire(t, 18.6, nx + 104, 758, .7);
-      if (t > 18.15 && t < 18.6) shakeCam(t, 18.15, 5, .3);
+      poseUchu(uchal, t, { x: 1250, y: 700 + 240 * (1 - uIn), mood: "shock", look: -1, op: t > 18 ? clamp(uIn * 3) : 0, tag: seg(t, 18.3, 18.65),
+        hop: seg(t, 18.45, 18.9) > 0 && t < 18.9 ? seg(t, 18.45, 18.9) : 0 });
+      sayBubble(ub, t, 18.35, 20.2, "30초에 소리까지?!", 1390, 690);
+      burst.fire(t, 18.55, nx + 104, ny + 76, .6);
+      if (t > 18.1 && t < 18.5) shakeCam(t, 18.1, 5, .3);
     };
   });
 })();

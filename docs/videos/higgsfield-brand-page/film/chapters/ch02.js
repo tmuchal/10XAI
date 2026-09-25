@@ -216,6 +216,7 @@ scene(40, 72, (R, s) => {
     d.className = "abs"; return d; });
   const arrow = el("div", "left:0;top:0;width:1920px;height:1000px;z-index:13", `<svg width="1920" height="1000" overflow="visible"><path class="ar" d="" fill="none" stroke="${INK2}" stroke-width="5" stroke-dasharray="12 10" stroke-linecap="round"/><path class="ah" d="" fill="${INK2}"/></svg>`, cam); arrow.className = "abs";
   const arP = arrow.querySelector(".ar"), arH = arrow.querySelector(".ah");
+  const c02_markTop = bx => 150 + bx.y - 58 >= 196 ? 150 + bx.y - 58 : 150 + bx.y + bx.h + 8;   // window at y 150
   const marks = REF_MARKS.map((m, i) => { const d = el("div", `left:930px;top:0;z-index:16;padding:6px 16px 8px;border:4px solid ${INK2};border-radius:12px;font-size:28px;white-space:nowrap;background:${["#fbe3b0", "#f8d3df", "#d5ecd0"][i]};box-shadow:4px 5px 0 rgba(43,35,32,.25);transform-origin:0 50%`, m[1], cam); d.className = "abs"; return d; });
   const toot = el("div", `left:0;top:0;z-index:36;font-size:38px;color:#c8372d;opacity:0;white-space:nowrap`, "뿌우~!", cam); toot.className = "abs";
 
@@ -387,8 +388,8 @@ scene(40, 72, (R, s) => {
     ref.style.opacity = (fl2 > 0 ? 1 : 0) * (1 - 0.55 * dimK);
     arrow.style.opacity = t > 60.5 ? 1 - dimK : 0;
     marks.forEach((m, i) => {
-      const bx = ref.boxOf(REF_ROLES[i]);   // real page: the label sits on the role's element (vertically centred)
-      const y = bx ? 150 + bx.cy - 24 : 150 + 44 + REF_MARKS[i][0] * H - off + 20;
+      const bx = ref.boxOf(REF_ROLES[i]);   // real page: the label sits just above the role's element (below if clipped)
+      const y = bx ? c02_markTop(bx) : 150 + 44 + REF_MARKS[i][0] * H - off + 20;
       const vis = t > 60.5 && y > 190 && y < 830 ? 1 : 0;
       const pp = back(seg(t, 60.6 + i * 0.15, 60.9 + i * 0.15));
       m.style.opacity = vis * (pp > 0 ? 1 : 0) * (1 - dimK);
@@ -405,7 +406,7 @@ scene(40, 72, (R, s) => {
     });
     {
       const bx = ref.boxOf(REF_ROLES[act]);
-      const my = bx ? 150 + bx.cy : 150 + 44 + REF_MARKS[act][0] * H - off + 40, ny = 236 + act * 176 + 76;
+      const my = bx ? c02_markTop(bx) + 26 : 150 + 44 + REF_MARKS[act][0] * H - off + 40, ny = 236 + act * 176 + 76;
       const tgtY = clamp(my, 210, 850);
       arP.setAttribute("d", `M740 ${ny} C 830 ${ny}, 850 ${tgtY}, 920 ${tgtY}`);
       arH.setAttribute("d", `M926 ${tgtY} l-18 -11 l0 22 z`);

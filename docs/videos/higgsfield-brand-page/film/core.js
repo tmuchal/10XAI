@@ -5,6 +5,7 @@
 //
 // REFERENCE: drop a full-page screenshot of your site at film/ref/page.png
 // (1440px wide works best). Without it, an example mockup is shown. window.READY waits for it.
+// tools/capture-ref.cjs also writes ref/layout.js (+ roles.json) so the beats aim at real elements (film/ref/README.md).
 // REF_MARKS: where the hook / proof / action labels sit (0..1 of page height).
 //
 // ---------------------------------------------------------------- HELPER API

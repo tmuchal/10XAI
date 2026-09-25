@@ -7,7 +7,7 @@
 // 2. scrolls through it slowly (wheel steps, so scroll- and wheel-driven reveals and lazy media fire), back to top
 // 3. freezes animations/transitions/videos, then a full-page screenshot -> page.png. Mode "auto" first counts text
 //    that is still invisible (reveal-on-scroll that re-hides off screen); if it finds some, it switches to "stitch":
-//    one viewport tile per 900 px, each shot after scrolling there, stitched into page.png (fixed/sticky bars are
+//    viewport tiles every 450 px, each shot after scrolling there; the middle band of each is stitched into page.png (fixed/sticky bars are
 //    kept only in the first tile).
 // 4. extracts the DOM layout at scroll 0 -> layout.json; writes roles.json (best guess) if there is none yet;
 //    resolves roles -> layout.js (window.REF_LAYOUT). Optional 390 px wide page-mobile.png.
@@ -64,7 +64,8 @@ const hiddenText = p => p.evaluate(() => [...document.querySelectorAll("h1,h2,h3
 
 async function stitch(p, out) {
   const H = await p.evaluate(() => document.documentElement.scrollHeight), tiles = [];
-  for (let y = 0; y < H; y += VH) {
+  const S = VH / 2;                                                     // overlapping tiles; each keeps its middle band
+  for (let y = 0; y < H - VH + S; y += S) {
     await p.evaluate(y => scrollTo(0, y), y); await p.waitForTimeout(500);
     const sy = await p.evaluate(() => scrollY);                         // last tile: the browser clamps scrollY
     tiles.push({ y: sy, png: (await p.screenshot()).toString("base64") });
@@ -74,7 +75,10 @@ async function stitch(p, out) {
   await p.evaluate(() => [...document.querySelectorAll("body *")].forEach(e => { if (e.style.visibility === "hidden") e.style.visibility = ""; }));
   const b64 = await p.evaluate(async ({ tiles, W, H }) => {
     const c = document.createElement("canvas"); c.width = W; c.height = H; const g = c.getContext("2d");
-    for (const t of tiles) { const i = new Image(); i.src = "data:image/png;base64," + t.png; await i.decode(); g.drawImage(i, 0, t.y); }
+    for (const [n, t] of tiles.entries()) {     // band: [y+VH/4, y+3VH/4) (the first tile from 0, the last to the end)
+      const i = new Image(); i.src = "data:image/png;base64," + t.png; await i.decode();
+      const a = n === 0 ? 0 : i.naturalHeight / 4, b = n === tiles.length - 1 ? i.naturalHeight : i.naturalHeight * 3 / 4;
+      g.drawImage(i, 0, a, W, b - a, 0, t.y + a, W, b - a); }
     return c.toDataURL("image/png").split(",")[1];
   }, { tiles, W: VW, H });
   fs.writeFileSync(out, Buffer.from(b64, "base64"));
