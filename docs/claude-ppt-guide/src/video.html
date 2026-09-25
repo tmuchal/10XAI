@@ -34,7 +34,7 @@
   .bubble { position:absolute; background:#fff; border:5px solid var(--ink); border-radius:30px 26px 32px 24px; padding:14px 24px; font-size:37px; text-align:center; white-space:nowrap; box-shadow:6px 7px 0 rgba(43,33,24,.18); }
   .bubble:after { content:''; position:absolute; bottom:-19px; width:30px; height:30px; background:#fff; border-right:5px solid var(--ink); border-bottom:5px solid var(--ink); transform:rotate(45deg); }
   .bubble.r:after { right:44px; } .bubble.l:after { left:-19px; bottom:auto; top:22px; transform:rotate(135deg); }
-  #cap { position:absolute; left:50%; bottom:34px; font-family:'Jua'; font-size:42px; color:var(--yellow); background:#3B2A20; border:5px solid var(--ink); border-radius:16px; padding:10px 36px; white-space:nowrap; box-shadow:0 6px 0 rgba(0,0,0,.25); }
+  #cap { position:absolute; left:50%; bottom:34px; font-family:'Jua'; font-size:42px; color:var(--yellow); background:#3B2A20; border:5px solid var(--ink); border-radius:16px; padding:10px 36px; width:max-content; max-width:1440px; text-align:center; line-height:1.3; text-wrap:balance; word-break:keep-all; box-shadow:0 6px 0 rgba(0,0,0,.25); }
   .conf { position:absolute; left:0; top:0; width:18px; height:12px; border:2px solid var(--ink); border-radius:3px; }
 </style>
 </head>
@@ -60,8 +60,8 @@
 
   <!-- S1 INTRO -->
   <section class="scene" data-dur="7">
-    <div class="abs jua" style="left:70px;top:96px;font-size:84px;line-height:1.2" data-a="0.3 .8 up">Claude로 회사용<br>PPT 만들기</div>
-    <div class="abs" style="left:76px;top:330px;font-size:46px;color:var(--teal)" data-a="0.9 .8 up">내용 · 도표 · 그래프까지, 5단계로 끝!</div>
+    <div class="abs jua" style="left:70px;top:96px;font-size:84px;line-height:1.2" data-a="0.3 .8 up">밤새던 회사 PPT,<br>이제 5단계로</div>
+    <div class="abs" style="left:76px;top:330px;font-size:46px;color:var(--teal)" data-a="0.9 .8 up">자료·차트·디자인까지 Claude와 함께</div>
     <svg class="abs" style="left:76px;top:392px" width="520" height="30"><path d="M4 16 Q 130 2 260 16 T 516 14" stroke="#E8875B" stroke-width="8" fill="none" stroke-linecap="round" pathLength="1" data-draw="1.5 .8"/></svg>
     <div id="introDots"></div>
     <svg class="abs" style="left:740px;top:80px;filter:url(#wob)" width="330" height="330" viewBox="0 0 330 330">
@@ -72,36 +72,38 @@
       <path d="M70 170 L160 120 L240 50" stroke="#C8322B" stroke-width="8" fill="none" stroke-linecap="round" stroke-linejoin="round" pathLength="1" data-draw="2.3 .8"/>
       <path d="M216 44 L244 46 L238 74" stroke="#C8322B" stroke-width="8" fill="none" stroke-linecap="round" stroke-linejoin="round" data-a="3.0 .3 fade"/>
     </svg>
-    <script type="text/x-cap">[[0.6,"보고서 PPT, 이제 Claude와 함께 만들어 보세요."],[3.8,"자료만 넣으면 스토리·차트·디자인까지 — 5단계로 보여 드립니다."]]</script>
+    <script type="text/x-cap">[[0.6,"자료 모으고, 숫자 옮기고, 차트 그리고… 보고서 PPT는 늘 밤샘 작업이었죠."],[3.8,"그 과정을 Claude와 함께 5단계로 바꿔 보겠습니다."]]</script>
     <script type="text/x-act">{"ev":[[0.8,"worker","q",2.8],[2.2,"kodi","hop"],[2.2,"kodi","happy"],[2.4,"kodi","wave",2.4],[4.4,"worker","happy"],[4.5,"worker","hop"]],
-      "bub":[[0.9,3.8,"worker","PPT 만들기 너무 어려워요…"],[2.5,6.6,"kodi","같이 만들어요!"]]}</script>
+      "bub":[[0.9,3.8,"worker","보고서 PPT 또 야근이에요…"],[2.5,6.6,"kodi","같이 만들어요!"]]}</script>
   </section>
 
-  <!-- S2 WHY -->
+  <!-- S2 BEFORE vs NOW -->
   <section class="scene" data-dur="12">
-    <div class="bt" data-a="0 .6 up">Claude가 PPT에 강한 4가지 이유</div>
-    <div class="note" style="left:50px;top:130px;width:480px;height:230px;background:#FFE9A8;--r:-1.5deg" data-a="0.6 .6 popr">
-      <svg class="abs" style="left:22px;top:26px" width="80" height="80" viewBox="0 0 80 80"><rect x="18" y="6" width="44" height="58" rx="6" fill="#fff" stroke="#2B2118" stroke-width="5"/><rect x="10" y="14" width="44" height="58" rx="6" fill="#fff" stroke="#2B2118" stroke-width="5"/><path d="M20 32h24M20 42h24M20 52h14" stroke="#E8875B" stroke-width="5" stroke-linecap="round"/></svg>
-      <div class="abs jua" style="left:118px;top:26px;font-size:36px">긴 자료도 한 번에</div>
-      <div class="abs" style="left:118px;top:80px;width:340px;font-size:33px;line-height:1.25">보고서·PDF·엑셀·회의록을 통째로 읽고 핵심만 쏙</div>
-    </div>
-    <div class="note" style="left:580px;top:130px;width:480px;height:230px;background:#FFD3CC;--r:1deg" data-a="1.1 .6 popr">
-      <svg class="abs" style="left:22px;top:26px" width="80" height="80" viewBox="0 0 80 80"><rect x="25" y="6" width="30" height="18" rx="4" fill="#E8875B" stroke="#2B2118" stroke-width="4"/><rect x="4" y="54" width="20" height="18" rx="4" fill="#fff" stroke="#2B2118" stroke-width="4"/><rect x="30" y="54" width="20" height="18" rx="4" fill="#fff" stroke="#2B2118" stroke-width="4"/><rect x="56" y="54" width="20" height="18" rx="4" fill="#fff" stroke="#2B2118" stroke-width="4"/><path d="M40 24v14M14 54V38h52v16M40 38v16" stroke="#2B2118" stroke-width="4" fill="none"/></svg>
-      <div class="abs jua" style="left:118px;top:26px;font-size:36px">논리적인 스토리</div>
-      <div class="abs" style="left:118px;top:80px;width:340px;font-size:33px;line-height:1.25">결론 먼저, 근거는 아래로 — 장마다 메시지 하나</div>
-    </div>
-    <div class="note" style="left:50px;top:390px;width:480px;height:230px;background:#CDEBDF;--r:1deg" data-a="1.6 .6 popr">
-      <svg class="abs" style="left:22px;top:26px" width="80" height="80" viewBox="0 0 80 80"><rect x="8" y="44" width="16" height="30" fill="#3E9C95" stroke="#2B2118" stroke-width="4"/><rect x="32" y="28" width="16" height="46" fill="#3E9C95" stroke="#2B2118" stroke-width="4"/><rect x="56" y="8" width="16" height="66" fill="#E8875B" stroke="#2B2118" stroke-width="4"/></svg>
-      <div class="abs jua" style="left:118px;top:26px;font-size:36px">숫자 → 차트</div>
-      <div class="abs" style="left:118px;top:80px;width:340px;font-size:33px;line-height:1.25">직접 계산·검증하고 메시지에 맞는 차트를 골라요</div>
-    </div>
-    <div class="note" style="left:580px;top:390px;width:480px;height:230px;background:#D6E4FF;--r:-1deg" data-a="2.1 .6 popr">
-      <svg class="abs" style="left:22px;top:26px" width="80" height="80" viewBox="0 0 80 80"><path d="M16 6h34l18 18v50H16z" fill="#fff" stroke="#2B2118" stroke-width="5"/><rect x="6" y="40" width="50" height="24" rx="4" fill="#E8875B" stroke="#2B2118" stroke-width="4"/><text x="31" y="58" text-anchor="middle" font-size="15" font-family="Jua" fill="#fff">PPTX</text></svg>
-      <div class="abs jua" style="left:118px;top:26px;font-size:36px">진짜 .pptx 파일</div>
-      <div class="abs" style="left:118px;top:80px;width:340px;font-size:33px;line-height:1.25">고칠 수 있는 차트·도형에 회사 템플릿까지</div>
-    </div>
-    <script type="text/x-cap">[[0.5,"Claude는 긴 문서를 한 번에 읽고 핵심을 추리는 데 강합니다."],[6,"숫자를 계산해 차트로 바꾸고, 수정 가능한 .pptx 파일까지 만들어 줍니다."]]</script>
-    <script type="text/x-act">{"ev":[[0.5,"kodi","point",5],[0.5,"kodi","happy"],[6,"worker","wow"],[8.5,"worker","happy"],[8.6,"worker","hop"]],"bub":[[6.2,9.8,"worker","파일까지 만들어 준다고요?"]]}</script>
+    <div class="bt" data-a="0 .6 up">예전엔 이렇게, 이제는 이렇게</div>
+    <div class="abs jua" style="left:170px;top:112px;width:420px;font-size:30px;color:#C8322B" data-a="0.5 .4 fade">예전엔 (직접, 밤새)</div>
+    <div class="abs jua" style="left:640px;top:112px;width:420px;font-size:30px;color:#3A9A5B" data-a="0.5 .4 fade">이제는 (Claude와 함께)</div>
+    <div class="abs jua" style="left:40px;top:160px;width:112px;height:78px;border-radius:14px;background:#3E9C95;color:#fff;border:5px solid #2B2118;font-size:26px;display:flex;align-items:center;justify-content:center" data-a="0.9 .4 pop">자료</div>
+    <div class="abs sk" style="left:170px;top:160px;width:430px;height:78px;padding:0 18px;display:flex;align-items:center;font-size:28px;color:#8A7A6A;background:#FFF1EE" data-a="0.9 .45 up"><span style="text-decoration:line-through;text-decoration-color:#C8322B;text-decoration-thickness:3px">파일 여러 개 열어 숫자를 하나씩 복사</span></div>
+    <div class="abs jua" style="left:604px;top:174px;width:30px;font-size:34px;color:#2B2118" data-a="1.25 .3 fade">→</div>
+    <div class="abs sk" style="left:640px;top:160px;width:430px;height:78px;padding:0 18px;display:flex;align-items:center;font-size:29px;background:#E6F5EA" data-a="1.25 .45 up">파일을 통째로 첨부, 한 번에 요약</div>
+    <div class="abs jua" style="left:40px;top:254px;width:112px;height:78px;border-radius:14px;background:#3E9C95;color:#fff;border:5px solid #2B2118;font-size:26px;display:flex;align-items:center;justify-content:center" data-a="1.8 .4 pop">스토리</div>
+    <div class="abs sk" style="left:170px;top:254px;width:430px;height:78px;padding:0 18px;display:flex;align-items:center;font-size:28px;color:#8A7A6A;background:#FFF1EE" data-a="1.8 .45 up"><span style="text-decoration:line-through;text-decoration-color:#C8322B;text-decoration-thickness:3px">빈 슬라이드 앞에서 목차 고민</span></div>
+    <div class="abs jua" style="left:604px;top:268px;width:30px;font-size:34px;color:#2B2118" data-a="2.15 .3 fade">→</div>
+    <div class="abs sk" style="left:640px;top:254px;width:430px;height:78px;padding:0 18px;display:flex;align-items:center;font-size:29px;background:#E6F5EA" data-a="2.15 .45 up">결론형 목차 초안부터 받기</div>
+    <div class="abs jua" style="left:40px;top:348px;width:112px;height:78px;border-radius:14px;background:#E8875B;color:#fff;border:5px solid #2B2118;font-size:26px;display:flex;align-items:center;justify-content:center" data-a="2.7 .4 pop">차트</div>
+    <div class="abs sk" style="left:170px;top:348px;width:430px;height:78px;padding:0 18px;display:flex;align-items:center;font-size:28px;color:#8A7A6A;background:#FFF1EE" data-a="2.7 .45 up"><span style="text-decoration:line-through;text-decoration-color:#C8322B;text-decoration-thickness:3px">차트 그려 붙이고 서식 일일이 맞추기</span></div>
+    <div class="abs jua" style="left:604px;top:362px;width:30px;font-size:34px;color:#2B2118" data-a="3.0500000000000003 .3 fade">→</div>
+    <div class="abs sk" style="left:640px;top:348px;width:430px;height:78px;padding:0 18px;display:flex;align-items:center;font-size:29px;background:#E6F5EA" data-a="3.0500000000000003 .45 up">문장으로 요청, 고칠 수 있는 차트</div>
+    <div class="abs jua" style="left:40px;top:442px;width:112px;height:78px;border-radius:14px;background:#3E9C95;color:#fff;border:5px solid #2B2118;font-size:26px;display:flex;align-items:center;justify-content:center" data-a="3.6 .4 pop">디자인</div>
+    <div class="abs sk" style="left:170px;top:442px;width:430px;height:78px;padding:0 18px;display:flex;align-items:center;font-size:28px;color:#8A7A6A;background:#FFF1EE" data-a="3.6 .45 up"><span style="text-decoration:line-through;text-decoration-color:#C8322B;text-decoration-thickness:3px">색·폰트를 한 장씩 수정</span></div>
+    <div class="abs jua" style="left:604px;top:456px;width:30px;font-size:34px;color:#2B2118" data-a="3.95 .3 fade">→</div>
+    <div class="abs sk" style="left:640px;top:442px;width:430px;height:78px;padding:0 18px;display:flex;align-items:center;font-size:29px;background:#E6F5EA" data-a="3.95 .45 up">템플릿 첨부로 한 번에 적용</div>
+    <div class="abs jua" style="left:40px;top:536px;width:112px;height:78px;border-radius:14px;background:#3E9C95;color:#fff;border:5px solid #2B2118;font-size:26px;display:flex;align-items:center;justify-content:center" data-a="4.5 .4 pop">검수</div>
+    <div class="abs sk" style="left:170px;top:536px;width:430px;height:78px;padding:0 18px;display:flex;align-items:center;font-size:28px;color:#8A7A6A;background:#FFF1EE" data-a="4.5 .45 up"><span style="text-decoration:line-through;text-decoration-color:#C8322B;text-decoration-thickness:3px">틀린 숫자를 눈으로 찾기</span></div>
+    <div class="abs jua" style="left:604px;top:550px;width:30px;font-size:34px;color:#2B2118" data-a="4.85 .3 fade">→</div>
+    <div class="abs sk" style="left:640px;top:536px;width:430px;height:78px;padding:0 18px;display:flex;align-items:center;font-size:29px;background:#E6F5EA" data-a="4.85 .45 up">Claude가 먼저 대조표·검토 의견</div>
+    <script type="text/x-cap">[[0.5,"예전엔 보고서 한 번에 이 모든 걸 손으로 했습니다."],[6,"이제는 단계마다 Claude에게 맡기고, 사람은 확인과 판단만 합니다."]]</script>
+    <script type="text/x-act">{"ev":[[0.3,"worker","wow"],[0.8,"kodi","point",6],[6.2,"worker","happy"],[6.3,"worker","hop"],[6.4,"kodi","happy"]],"bub":[]}</script>
   </section>
 
   <!-- S3 FLOW -->
@@ -110,7 +112,7 @@
     <svg class="abs" style="left:0;top:0" width="1110" height="650"><path d="M100 290 C 200 210, 250 370, 330 290 S 470 210, 555 290 S 700 370, 780 290 S 920 210, 1010 290" stroke="#2B2118" stroke-width="7" fill="none" stroke-linecap="round" pathLength="1" data-draw="0.4 2.6"/></svg>
     <div id="flow"></div>
     <div class="note jua" style="left:330px;top:520px;width:450px;height:84px;background:#FFE9A8;font-size:36px;display:flex;align-items:center;justify-content:center;--r:-2deg" data-a="4.6 .6 popr">단계마다 확인하며!</div>
-    <script type="text/x-cap">[[0.5,"전체 과정은 다섯 단계입니다."],[4.5,"한 번에 끝내려 하지 말고, 단계마다 확인하며 진행하는 것이 핵심입니다."]]</script>
+    <script type="text/x-cap">[[0.5,"손으로 하던 다섯 가지 일이 이렇게 바뀝니다."],[4.5,"한 번에 끝내려 하지 말고, 단계마다 확인하며 진행하는 것이 핵심입니다."]]</script>
     <script type="text/x-act">{"ev":[[0.5,"kodi","wave",2.2],[4.6,"worker","hop"],[4.6,"worker","happy"],[4.8,"kodi","point",4]],"bub":[]}</script>
   </section>
 
@@ -133,8 +135,8 @@
 • 목적: 실적 공유 + 선급금 12억 승인
 • 분량: 8~10장, 결론 먼저</div>
     </div>
-    <script type="text/x-cap">[[0.5,"1단계: 관련 자료를 한꺼번에 첨부하세요."],[4.5,"그리고 '누구에게, 왜, 몇 장'인지 분명히 적어 주세요."],[9,"이 네 가지만 적어도 결과물의 수준이 확 달라집니다."]]</script>
-    <script type="text/x-act">{"ev":[[0.6,"worker","point",2.6],[5,"kodi","point",4],[9.4,"worker","happy"],[9.5,"worker","hop"]],"bub":[[5,9.2,"kodi","누구에게? 왜? 몇 장?"]],"meter":[0,20,8.4,1.4]}</script>
+    <script type="text/x-cap">[[0.5,"예전엔 숫자를 하나씩 옮겨 적었죠. 이제는 파일째 첨부합니다."],[4.5,"그리고 '누구에게, 왜, 몇 장'인지 분명히 적어 주세요."],[9,"이 네 가지만 적어도 결과물의 수준이 확 달라집니다."]]</script>
+    <script type="text/x-act">{"ev":[[0.6,"worker","point",2.6],[5,"kodi","point",4],[9.4,"worker","happy"],[9.5,"worker","hop"]],"bub":[[0.6,4.2,"worker","예전엔 복붙만 반나절…"],[5,9.2,"kodi","누구에게? 왜? 몇 장?"]],"meter":[0,20,8.4,1.4]}</script>
   </section>
 
   <!-- S5 STEP 2 -->
@@ -156,16 +158,16 @@
     <div class="abs sk" style="left:650px;top:172px;width:420px;height:136px;padding:10px 18px" data-a="6.0 .5 up"><div style="font-size:26px;color:#9A8B7A;text-decoration:line-through">✗ 3분기 매출 현황</div><div class="jua" style="font-size:29px;line-height:1.2"><span style="color:#3A9A5B">✓</span> 3분기 매출 482억,<br>전년 대비 18% 성장</div></div>
     <div class="abs sk" style="left:650px;top:322px;width:420px;height:136px;padding:10px 18px" data-a="7.4 .5 up"><div style="font-size:26px;color:#9A8B7A;text-decoration:line-through">✗ 채널별 분석</div><div class="jua" style="font-size:29px;line-height:1.2"><span style="color:#3A9A5B">✓</span> 온라인 비중 31%로 확대,<br>성장 견인</div></div>
     <div class="abs sk" style="left:650px;top:472px;width:420px;height:136px;padding:10px 18px" data-a="8.8 .5 up"><div style="font-size:26px;color:#9A8B7A;text-decoration:line-through">✗ 향후 계획</div><div class="jua" style="font-size:29px;line-height:1.2"><span style="color:#3A9A5B">✓</span> 빠른 성과 과제 2건,<br>10월 즉시 착수</div></div>
-    <script type="text/x-cap">[[0.5,"2단계: 바로 슬라이드를 만들지 말고, 목차부터 받아 확인하세요."],[5.5,"제목은 '주제'가 아니라 '결론'으로 씁니다."],[10,"제목만 이어 읽어도 보고가 끝나도록 — 임원 보고의 기본입니다."]]</script>
-    <script type="text/x-act">{"ev":[[0.8,"kodi","point",4],[6.2,"worker","wow"],[10.5,"worker","happy"],[10.6,"worker","hop"]],"bub":[[6.4,10.4,"worker","제목만 봐도 결론이네!"]],"meter":[20,40,9.2,1.4]}</script>
+    <script type="text/x-cap">[[0.5,"예전엔 빈 슬라이드 앞에서 막혔죠. 이제는 목차 초안부터 받습니다."],[5.5,"제목은 '주제'가 아니라 '결론'으로 씁니다."],[10,"제목만 이어 읽어도 보고가 끝나도록 — 임원 보고의 기본입니다."]]</script>
+    <script type="text/x-act">{"ev":[[0.8,"kodi","point",4],[6.2,"worker","wow"],[10.5,"worker","happy"],[10.6,"worker","hop"]],"bub":[[0.6,4.0,"worker","빈 슬라이드만 한 시간…"],[6.4,10.4,"worker","제목만 봐도 결론이네!"]],"meter":[20,40,9.2,1.4]}</script>
   </section>
 
   <!-- S6 STEP 3 chart guide -->
   <section class="scene" data-dur="13">
     <div class="bt" style="font-size:44px" data-a="0 .6 up"><span class="step">STEP 3</span>메시지에 맞는 차트 고르기</div>
     <div id="chartGuide"></div>
-    <script type="text/x-cap">[[0.5,"3단계: 슬라이드의 메시지에 맞는 차트를 고릅니다."],[5.5,"비교는 막대, 추이는 선, 증감 원인은 워터폴."],[9.5,"헷갈리면 “이 메시지에 맞는 차트를 추천해 줘”라고 물어보세요."]]</script>
-    <script type="text/x-act">{"ev":[[0.5,"worker","q",4.6],[1,"kodi","point",4],[9.4,"kodi","happy"],[9.5,"kodi","wave",2.6]],"bub":[[9.5,12.8,"kodi","모르면 추천해 달래요!"]],"meter":[40,55,8,1.2]}</script>
+    <script type="text/x-cap">[[0.5,"예전엔 차트 서식 맞추다 하루가 갔죠. 이제는 메시지만 정하세요."],[5.5,"비교는 막대, 추이는 선, 증감 원인은 워터폴."],[9.5,"헷갈리면 “이 메시지에 맞는 차트를 추천해 줘”라고 물어보세요."]]</script>
+    <script type="text/x-act">{"ev":[[0.5,"worker","q",4.6],[1,"kodi","point",4],[9.4,"kodi","happy"],[9.5,"kodi","wave",2.6]],"bub":[[0.6,4.4,"worker","차트 서식 맞추다 퇴근 못 했죠"],[9.5,12.8,"kodi","모르면 추천해 달래요!"]],"meter":[40,55,8,1.2]}</script>
   </section>
 
   <!-- S7 STEP 3 chart demo -->
@@ -215,8 +217,8 @@
     </div>
     <div class="abs jua" style="left:540px;top:442px;font-size:30px;color:#8A7A6A" data-a="0.8 .4 fade" data-out="5.8 .3">적용 전 — 기본 서식</div>
     <div class="abs jua" style="left:540px;top:442px;font-size:30px;color:var(--orangeD)" data-a="6.2 .4 fade">적용 후 — 회사 템플릿 + 결론형 제목</div>
-    <script type="text/x-cap">[[0.5,"4단계: 회사 템플릿 파일을 함께 주면 색상과 폰트를 그대로 따릅니다."],[6.5,"강조색은 한 곳에만 — 그래야 시선이 핵심 숫자로 갑니다."]]</script>
-    <script type="text/x-act">{"ev":[[0.6,"kodi","point",4.5],[6.0,"kodi","hop"],[6.0,"kodi","happy"],[6.3,"worker","wow"],[10.6,"worker","happy"]],"bub":[[6.5,10.5,"worker","우리 회사 느낌 그대로!"]],"meter":[80,90,7,1.2]}</script>
+    <script type="text/x-cap">[[0.5,"예전엔 색·폰트를 한 장씩 고쳤죠. 이제는 템플릿만 첨부하세요."],[6.5,"강조색은 한 곳에만 — 그래야 시선이 핵심 숫자로 갑니다."]]</script>
+    <script type="text/x-act">{"ev":[[0.6,"kodi","point",4.5],[6.0,"kodi","hop"],[6.0,"kodi","happy"],[6.3,"worker","wow"],[10.6,"worker","happy"]],"bub":[[0.6,4.2,"worker","한 장씩 색 바꾸던 그 시절…"],[6.5,10.5,"worker","우리 회사 느낌 그대로!"]],"meter":[80,90,7,1.2]}</script>
   </section>
 
   <!-- S10 RESULT -->
@@ -237,8 +239,8 @@
       <div style="font-size:33px;line-height:1.35;margin-top:10px">“이 PPT를 대표이사 입장에서 검토하고, 약한 논리·숫자 불일치·오탈자를 표로 정리해 줘.”</div>
     </div>
     <div class="abs jua" style="left:760px;top:455px;width:230px;height:130px;border:8px solid var(--red);border-radius:18px;color:var(--red);font-size:72px;display:flex;align-items:center;justify-content:center;--r:-10deg" data-a="10.3 .45 stamp">승인</div>
-    <script type="text/x-cap">[[0.5,"5단계: 초안이 나오면 마지막 검수는 사람이 합니다."],[6.5,"숫자는 원본과 대조하고, 기밀 자료는 회사의 AI 사용 규정을 먼저 확인하세요."]]</script>
-    <script type="text/x-act">{"ev":[[0.5,"worker","point",3.5],[6.8,"kodi","point",3.2],[10.2,"boss","happy"],[10.3,"worker","happy"],[10.3,"kodi","happy"],[10.4,"worker","hop"],[10.5,"kodi","hop"]],"bub":[[10.4,12.9,"boss","좋아, 승인!"]],"meter":[95,100,9.8,1.0],"confetti":10.4}</script>
+    <script type="text/x-cap">[[0.5,"예전엔 틀린 숫자를 눈으로 찾았죠. 이제는 Claude가 먼저 대조합니다."],[6.5,"숫자는 원본과 대조하고, 기밀 자료는 회사의 AI 사용 규정을 먼저 확인하세요."]]</script>
+    <script type="text/x-act">{"ev":[[0.5,"worker","point",3.5],[6.8,"kodi","point",3.2],[10.2,"boss","happy"],[10.3,"worker","happy"],[10.3,"kodi","happy"],[10.4,"worker","hop"],[10.5,"kodi","hop"]],"bub":[[0.6,4.0,"worker","숫자 틀려서 다시 뽑았던 날…"],[10.4,12.9,"boss","좋아, 승인!"]],"meter":[95,100,9.8,1.0],"confetti":10.4}</script>
   </section>
 
   <!-- S12 TEMPLATE PROMPT -->
@@ -258,8 +260,8 @@
     <div class="note jua" style="left:70px;top:410px;width:260px;height:96px;background:#FFE9A8;font-size:34px;display:flex;align-items:center;justify-content:center;--r:-3deg" data-a="1.5 .5 popr">① 결론 먼저</div>
     <div class="note jua" style="left:360px;top:410px;width:380px;height:96px;background:#CDEBDF;font-size:34px;display:flex;align-items:center;justify-content:center;--r:2deg" data-a="1.8 .5 popr">② 메시지당 시각화 1개</div>
     <div class="note jua" style="left:770px;top:410px;width:290px;height:96px;background:#FFD3CC;font-size:34px;display:flex;align-items:center;justify-content:center;--r:-2deg" data-a="2.1 .5 popr">③ 숫자는 원본 대조</div>
-    <script type="text/x-cap">[[0.5,"자료 정리와 초안은 Claude에게, 판단과 검수는 사람에게."],[4.5,"다음 보고서부터 바로 적용해 보세요."]]</script>
-    <script type="text/x-act">{"ev":[[0.4,"worker","happy"],[0.4,"kodi","happy"],[1.0,"worker","hop"],[1.15,"kodi","hop"],[1.3,"kodi","wave",4.5],[3.2,"worker","hop"],[3.35,"kodi","hop"]],"bub":[[2.0,6.8,"kodi","다음 보고서도 같이 해요!"]],"confetti":0.8}</script>
+    <script type="text/x-cap">[[0.5,"밤새던 작업은 Claude에게, 판단과 검수는 사람에게."],[4.5,"다음 보고서는 야근 없이 시작해 보세요."]]</script>
+    <script type="text/x-act">{"ev":[[0.4,"worker","happy"],[0.4,"kodi","happy"],[1.0,"worker","hop"],[1.15,"kodi","hop"],[1.3,"kodi","wave",4.5],[3.2,"worker","hop"],[3.35,"kodi","hop"]],"bub":[[2.0,6.8,"kodi","다음 보고서도 같이 해요!"],[3.6,6.8,"worker","오늘은 칼퇴!"]],"confetti":0.8}</script>
   </section>
 </div>
 
