@@ -89,7 +89,7 @@ scene(72, 106, (R, s) => {
   const gag = el("div", "left:0;top:0;width:1920px;height:1080px;transform-origin:960px 560px", "", R); gag.className = "abs";
   const GAG = [["beach", { body: "#9fd3f0" }], ["park", { glasses: true, scarf: "#6fb3d9", beret: "#3f8f7a" }], ["lilac", { spiky: true, body: "#f7c6d4", scarf: null }]];
   const board = c03_box(gag, 120, 262, 1680, 372, "#e8c48f", "background-image:radial-gradient(rgba(120,70,30,.18) 2px,transparent 2.5px);background-size:22px 22px");
-  const wanted = el("div", `left:760px;top:596px;z-index:37;padding:4px 22px 6px;border:4px solid ${c03_INK};border-radius:10px;background:#fffaf0;font-size:30px;color:#c8372d;white-space:nowrap`, "WANTED · 진짜 노아는?", gag); wanted.className = "abs";
+  const wanted = el("div", `left:760px;top:574px;z-index:37;padding:4px 22px 6px;border:4px solid ${c03_INK};border-radius:10px;background:#fffaf0;font-size:30px;color:#c8372d;white-space:nowrap`, "WANTED · 진짜 노아는?", gag); wanted.className = "abs";
   const shots = GAG.map(([pal, v], i) => {
     const f = c03_frame(gag, 150 + i * 560, 300, 500, 290, c03_PAL[pal], `AI SHOT ${i + 1}`, v);
     f.st = c03_stamp(gag, 150 + i * 560 + 250, 528, "✗ 다른 얼굴", "#c8372d", -10 + i * 5);
@@ -97,10 +97,10 @@ scene(72, 106, (R, s) => {
     el("div", `position:absolute;right:12px;top:10px;z-index:35;padding:0 12px;border:3px solid ${c03_INK};border-radius:8px;background:#fbd9d3;font-size:22px;color:${c03_INK}`, ["털 색 ✗", "안경 ✗", "머리·털 ✗"][i], f);
     return f;
   });
-  const yarn = el("div", "left:0;top:0;z-index:36;pointer-events:none", `<svg width="1920" height="700" overflow="visible"><path class="y" d="M400 318 Q680 400 960 318 Q1240 400 1520 318 M400 318 Q640 520 960 612 M1520 318 Q1280 520 960 612" fill="none" stroke="#c8372d" stroke-width="5" stroke-linecap="round" stroke-dasharray="2000" stroke-dashoffset="2000"/></svg>`, gag); yarn.className = "abs";
+  const yarn = el("div", "left:0;top:0;z-index:36;pointer-events:none", `<svg width="1920" height="700" overflow="visible"><path class="y" d="M400 318 Q680 400 960 318 Q1240 400 1520 318 M400 318 Q640 500 960 590 M1520 318 Q1280 500 960 590" fill="none" stroke="#c8372d" stroke-width="5" stroke-linecap="round" stroke-dasharray="2000" stroke-dashoffset="2000"/></svg>`, gag); yarn.className = "abs";
   const yarnP = yarn.querySelector(".y");
   const real = makeNoa(200); gag.appendChild(real);
-  const qm = [0, 1, 2].map(i => { const q = el("div", `left:${780 - i * 46}px;top:${690 - i * 20}px;font-size:${64 - i * 8}px;color:#c8372d;z-index:31`, "?", gag); q.className = "abs"; return q; });
+  const qm = [0, 1, 2].map(i => { const q = el("div", `left:${780 - i * 46}px;top:${720 - i * 20}px;font-size:${64 - i * 8}px;color:#c8372d;z-index:31`, "?", gag); q.className = "abs"; return q; });
   const sweat = el("div", "left:1050px;top:650px;z-index:32", `<svg width="30" height="40"><path d="M15 2 Q28 22 24 30 A10 10 0 0 1 6 30 Q2 22 15 2Z" fill="#9fd3f0" stroke="${c03_INK}" stroke-width="3"/></svg>`, gag); sweat.className = "abs";
   const whoB = makeBubble(gag), meB = [0, 1, 2].map(() => makeBubble(gag));
 
@@ -286,7 +286,7 @@ scene(72, 106, (R, s) => {
     });
     const rp = back(seg(t, 74.4, 75.0));
     const jump = seg(t, 75.0, 75.5), recoil = seg(t, 77.6, 78.1);
-    poseNoa(real, t, { x: 860, y: 640 + 260 * (1 - rp) + 30 * gagOut, s: .95, mood: t > 75 && t < 81 ? "shock" : "happy", talk: t > 75.3 && t < 76.8,
+    poseNoa(real, t, { x: 860, y: 672 + 260 * (1 - rp) + 30 * gagOut, s: .95, mood: t > 75 && t < 81 ? "shock" : "happy", talk: t > 75.3 && t < 76.8,
       hop: jump > 0 && jump < 1 ? jump : recoil > 0 && recoil < 1 ? recoil * .6 : 0, look: Math.sin(t * 2.2) * (t > 75.6 && t < 77.2 ? 1 : 0), op: clamp(rp * 4) * (1 - gagOut) });
     real.style.transform += ` translateX(${-40 * out(recoil) * (1 - gagOut)}px)`;
     qm.forEach((q, i) => {
@@ -296,7 +296,7 @@ scene(72, 106, (R, s) => {
     });
     const sw = seg(t, 78.2, 79.8);
     sweat.style.opacity = sw > 0 && sw < 1 ? 1 : 0; sweat.style.transform = `translateY(${60 * sw}px)`;
-    sayBubble(whoB, t, 75.3, 77.3, "…누구세요?", 1080, 660);
+    sayBubble(whoB, t, 75.3, 77.3, "…누구세요?", 1080, 690);
 
     const bd = back(seg(t, 72.3, 72.8));
     board.style.opacity = clamp(bd * 2) * (1 - gagOut); board.style.transform = `scaleY(${.6 + .4 * bd})`;

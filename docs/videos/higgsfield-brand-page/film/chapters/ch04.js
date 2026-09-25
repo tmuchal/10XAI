@@ -120,9 +120,9 @@ scene(106, 134, (R, s) => {
     return d;
   });
   const stat32 = c04_box(BA, 150, 670, 600, 170, "#fff4d0", "display:flex;align-items:center;gap:20px;padding:0 26px");
-  stat32.innerHTML = `<div class="sp" style="position:absolute;left:0;top:-20px;width:250px;height:210px"></div><div class="n" style="position:relative;width:210px;text-align:center;font-size:84px;color:#c8372d;line-height:1">+32%</div><div style="font-size:28px;line-height:1.25;color:${c04_INK}">로딩 1초 → 3초<br><span style="color:#6b5d52;font-size:24px">이탈 확률 증가</span></div>`;
+  stat32.innerHTML = `<div class="sp" style="position:absolute;left:10px;top:-20px;width:270px;height:210px"></div><div class="n" style="position:relative;flex:none;width:260px;text-align:center;font-size:80px;color:#c8372d;line-height:1">+32%</div><div style="font-size:28px;line-height:1.25;color:${c04_INK}">로딩 1초 → 3초<br><span style="color:#6b5d52;font-size:24px">이탈 확률 증가</span></div>`;
   const stat53 = c04_box(BA, 790, 670, 640, 170, "#fff4d0", "display:flex;align-items:center;gap:20px;padding:0 26px");
-  stat53.innerHTML = `<div class="sp" style="position:absolute;left:0;top:-20px;width:230px;height:210px"></div><div class="n" style="position:relative;width:180px;text-align:center;font-size:84px;color:#c8372d;line-height:1">53%</div><div style="font-size:28px;line-height:1.25;color:${c04_INK}">3초 넘으면 떠나는<br><span style="color:#6b5d52;font-size:24px">모바일 방문자 · Google</span></div>`;
+  stat53.innerHTML = `<div class="sp" style="position:absolute;left:10px;top:-20px;width:220px;height:210px"></div><div class="n" style="position:relative;flex:none;width:200px;text-align:center;font-size:80px;color:#c8372d;line-height:1">53%</div><div style="font-size:28px;line-height:1.25;color:${c04_INK}">3초 넘으면 떠나는<br><span style="color:#6b5d52;font-size:24px">모바일 방문자 · Google</span></div>`;
   [stat32, stat53].forEach(c => { c.sp = c.querySelector(".sp"); c.sp.innerHTML = c04_SPLASH("#fbd35a"); c.n = c.querySelector(".n"); });
   // hamster wheel: Noa powers the loading, sunglasses fly off at 5 s
   const wheel = el("div", "left:1500px;top:600px;width:280px;height:280px", `<svg width="280" height="280" viewBox="-140 -140 280 280" overflow="visible">

@@ -94,8 +94,8 @@ scene(0, 10, (R, s) => {
     const d = el("div", `left:0;top:0;width:${6 * z}px;height:${6 * z}px;border-radius:50%;background:#fff6d0;box-shadow:0 0 ${8 * z}px #fff3b0;z-index:36;opacity:0`, "", R); d.className = "abs"; d.z = z; return d; });
   // ink-stroke wipe (outside the camera so it sweeps the whole frame)
   const wipe = el("div", "left:-100px;top:-120px;width:2200px;height:1200px;z-index:45;pointer-events:none", `<svg width="2200" height="1200" overflow="visible">
-    <path class="w0" d="M-200 700 C 400 520, 700 900, 1100 560 S 1900 380, 2400 520" stroke="${INK0}" stroke-width="760" fill="none" stroke-linecap="round" stroke-dasharray="3200" stroke-dashoffset="3200"/>
-    <path class="w1" d="M-200 700 C 400 520, 700 900, 1100 560 S 1900 380, 2400 520" stroke="#f7d774" stroke-width="730" fill="none" stroke-linecap="round" stroke-dasharray="3200" stroke-dashoffset="3200"/>
+    <path class="w0" d="M-200 700 C 400 520, 700 900, 1100 560 S 1900 380, 2400 520" stroke="${INK0}" stroke-width="1060" fill="none" stroke-linecap="round" stroke-dasharray="3200" stroke-dashoffset="3200"/>
+    <path class="w1" d="M-200 700 C 400 520, 700 900, 1100 560 S 1900 380, 2400 520" stroke="#f7d774" stroke-width="1030" fill="none" stroke-linecap="round" stroke-dasharray="3200" stroke-dashoffset="3200"/>
     <path class="w2" d="M-200 700 C 400 520, 700 900, 1100 560 S 1900 380, 2400 520" stroke="#e8894f" stroke-width="160" fill="none" stroke-linecap="round" stroke-dasharray="3200" stroke-dashoffset="3200" opacity=".7"/></svg>`, R); wipe.className = "abs";
   const wP = [".w0", ".w1", ".w2"].map(c => wipe.querySelector(c));
 
@@ -211,7 +211,7 @@ scene(0, 10, (R, s) => {
       else { talk = t > 8.1 && t < 8.9; look = 0.4; mood = t > 9.0 && t < 9.35 ? "shock" : "happy"; }
     }
     const land = !PH && t > 4.8 ? c00_settle(t - 4.8, 2.5, 5) : PH ? 0.6 * c00_settle(t - 9.35, 2.5, 5) : 0;
-    poseNoa(noa, t, { x: nx, y: ny, s: 1, mood, hop, flip, look, wave, talk, op: t > 3.55 ? 1 : 0 });
+    poseNoa(noa, t, { x: nx, y: ny, s: 1, mood, hop, flip, look, wave, talk, op: t > 3.55 && (PH || t < 4.9) ? 1 - (PH ? 0 : seg(t, 4.8, 4.9)) : 0 });
     noa.style.transform += ` rotate(${nrot}deg) scale(${1 + 0.12 * land}, ${1 - 0.12 * land})`;
     noa.style.transformOrigin = !PH && t > 4.25 && t < 4.8 ? "50% 60%" : "50% 100%";
     if (arm !== null) noa.P.ar.setAttribute("transform", `rotate(${arm} 154 117)`);

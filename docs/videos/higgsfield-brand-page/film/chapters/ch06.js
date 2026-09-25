@@ -37,10 +37,14 @@ scene(160, 184, (R, s) => {
       <path d="M${CX - WT[0] / 2 - 14} ${Y0 - 4} H${CX + WT[0] / 2 + 14}" stroke="${INK}" stroke-width="8" stroke-linecap="round"/>
       <rect x="${CX - 46}" y="${SPY}" width="92" height="50" fill="#c98a4a" stroke="${INK}" stroke-width="4"/>
       <rect x="${CX - 58}" y="${SPY + 44}" width="116" height="16" rx="6" fill="#e6ac66" stroke="${INK}" stroke-width="4"/>
-      <g class="gear" transform="translate(${CX + 150} ${SPY + 20})"><circle r="26" fill="#f2c14e" stroke="${INK}" stroke-width="4"/>
-        ${[0, 1, 2, 3, 4, 5].map(k => `<rect x="-6" y="-38" width="12" height="14" fill="#f2c14e" stroke="${INK}" stroke-width="3" transform="rotate(${k * 60})"/>`).join("")}<circle r="8" fill="${INK}"/></g>
+      <path d="M${CX - 58} ${SPY + 52} L${CX - 150} ${SPY + 20}" stroke="${INK}" stroke-width="5" stroke-linecap="round"/>
+      <path d="M${CX - 205} ${SPY + 140} L${CX - 160} ${SPY + 40} L${CX - 115} ${SPY + 140}" fill="none" stroke="${INK}" stroke-width="6" stroke-linejoin="round"/>
+      <g transform="translate(${CX - 160} ${SPY + 40})"><circle r="66" fill="rgba(255,250,240,.6)" stroke="${INK}" stroke-width="5"/>
+        <g class="gear">${[0, 1, 2, 3, 4, 5, 6, 7].map(k => `<path d="M0 0 L0 -62" stroke="#c98a4a" stroke-width="4" transform="rotate(${k * 45})"/>`).join("")}
+        <circle r="62" fill="none" stroke="#f2c14e" stroke-width="6" stroke-dasharray="10 12"/></g><circle r="8" fill="${INK}"/></g>
     </g></svg>`;
   const gear = fun.querySelector(".gear");
+  const runner = makeNoa(84, { party: true, scarf: null }); fun.appendChild(runner);
   const dotsL = c06_abs("left:0;top:0;width:1100px;height:1000px", "", fun);
   const labels = FL.map((f, i) => c06_abs(`left:${CX - 110}px;top:${Y0 + i * BH + 18}px;width:220px;text-align:center;white-space:nowrap;z-index:2`,
     `<span style="display:inline-block;padding:2px 12px 4px;border-radius:12px;background:rgba(255,250,240,.9);border:2px solid ${INK}"><span style="font-size:34px">${f[0]}</span> <span style="font-size:22px;color:#6b5d52">${f[1]}</span></span>`, fun));
@@ -67,11 +71,24 @@ scene(160, 184, (R, s) => {
       <span class="cc" style="font-size:120px;line-height:1;display:inline-block;transform-origin:50% 70%">0</span><span style="font-size:40px">코인</span></div>
     <div style="font-size:32px;margin-top:10px">방문자 <span class="vv" style="color:#2f6f94">0</span>명 → 끝까지 온 사람 <span class="kk" style="color:#2f7a3a">0</span>명</div>
     <div style="font-size:24px;color:#6b5d52;margin-top:4px">대부분은 중간에 떠난다 — 남는 사람을 늘리는 게 핵심</div>`, R);
+  const liveSub = [...live.children].slice(2);
   const liveC = live.querySelector(".cc"), liveV = live.querySelector(".vv"), liveK = live.querySelector(".kk");
   const basket = c06_abs("left:0;top:0;width:120px;height:70px;z-index:34", `<svg width="120" height="70" overflow="visible">
     <g class="pile"></g><path d="M6 14 H114 L100 62 H20 Z" fill="#d9a06a" stroke="${INK}" stroke-width="4" stroke-linejoin="round"/>
     <path d="M14 30 H106 M18 46 H102" stroke="${INK}" stroke-width="3" opacity=".5"/></svg>`, R);
   const pile = basket.querySelector(".pile");
+  const env = c06_abs("left:0;top:0;width:240px;height:150px;z-index:36;transform-origin:50% 50%", `
+    <svg width="240" height="150" style="position:absolute;left:0;top:0;overflow:visible"><rect x="2" y="2" width="236" height="146" rx="10" fill="#f3d9a4" stroke="${INK}" stroke-width="4"/></svg>
+    <div class="cd" style="position:absolute;left:14px;top:12px;width:212px;height:124px;border:3px solid ${INK};border-radius:8px;text-align:center;white-space:nowrap">
+      <div style="font-size:22px;color:#6b5d52;margin-top:6px">노아의 예측</div><div style="font-size:34px;line-height:1.1">₩4,500,000<span class="q" style="color:#c8372d">?</span></div>
+      <div class="ck" style="font-size:26px;color:#2f7a3a;opacity:0">✓ 적중! MATCH</div></div>
+    <svg width="240" height="150" style="position:absolute;left:0;top:0;overflow:visible"><path d="M2 60 L120 110 L238 60 V140 Q238 148 230 148 H10 Q2 148 2 140 Z" fill="#f7e2b6" stroke="${INK}" stroke-width="4" stroke-linejoin="round"/></svg>
+    <div class="fl" style="position:absolute;left:0;top:0;width:240px;height:100px;transform-origin:50% 2px">
+      <svg width="240" height="100" style="overflow:visible"><path d="M2 4 L120 86 L238 4 Z" fill="#efcf8f" stroke="${INK}" stroke-width="4" stroke-linejoin="round"/></svg>
+      <div class="sl" style="position:absolute;left:100px;top:56px;width:40px;height:40px;border-radius:50%;background:#c8372d;border:3px solid ${INK};color:#fff;font-size:26px;text-align:center;line-height:34px">?</div></div>`, R);
+  const eCard = env.querySelector(".cd"), eFlap = env.querySelector(".fl"), eSeal = env.querySelector(".sl"), eQ = env.querySelector(".q"), eChk = env.querySelector(".ck");
+  const eLab = c06_abs(`left:0;top:0;padding:4px 14px 6px;${c06_card("#fff3c4", 10)};font-size:26px;white-space:nowrap;z-index:37;transform-origin:0 100%`, "봉인된 예측 · sealed guess", R);
+  const burst = Array.from({ length: 18 }, (_, i) => c06_abs(`left:0;top:0;width:16px;height:12px;border:2px solid ${INK};border-radius:3px;background:${["#f2c14e", "#f08aa0", "#7cc3e0", "#9bd48a"][i % 4]};z-index:37;opacity:0`, "", R));
 
   // ================= formula
   const form = c06_abs("left:1010px;top:230px;width:780px;height:560px", "", R);
@@ -130,7 +147,8 @@ scene(160, 184, (R, s) => {
     fun.style.opacity = clamp(fin * 2) * (1 - X1);
     fun.style.transform = `translate(${-200 * X1}px, ${60 * (1 - clamp(fin))}px) scale(${0.9 + 0.1 * fin})`; fun.style.transformOrigin = "540px 700px";
     labels.forEach((l, i) => { const p = back(seg(t, 160.7 + i * .18, 161.1 + i * .18)); l.style.opacity = clamp(p * 2); l.style.transform = `scale(${0.4 + 0.6 * p})`; });
-    gear.setAttribute("transform", `translate(${CX + 150} ${SPY + 20}) rotate(${t * 90})`);
+    gear.setAttribute("transform", `rotate(${t * 260})`);
+    poseNoa(runner, t * 2.2, { x: CX - 160 - 42, y: SPY + 40 + 58 - 84, s: 1, flip: true, hop: (t * 3.4) % 1, op: fun.style.opacity });
     vis.forEach(v => {
       const tau = t - v.t0;
       if (tau < 0 || X1 >= 1) { v.e.style.opacity = 0; return; }
@@ -149,25 +167,52 @@ scene(160, 184, (R, s) => {
       v.e.style.transform = `translate(${x - 15}px, ${yy - 15}px) scale(${sc}) rotate(${y >= dy ? v.side * (y - dy) * 1.5 : 0}deg)`;
     });
     // catcher + coins
-    const bx = 790 + 36 * Math.sin(t * 1.4);
-    let caught = 0, lastCatch = -9;
-    coins.forEach(c => {
+    const bx = 760 + 30 * Math.sin(t * 1.4);
+    let caught = 0, lastCatch = -9, inBasket = 0, inCheek = 0;
+    coins.forEach((c, k) => { if (t > c.te + .75) { if (k % 2) inCheek++; else inBasket++; } });
+    coins.forEach((c, k) => {
       const p = seg(t, c.te, c.te + .75);
       if (t < c.te || t > c.te + .75 || X1 > 0) { c.e.style.opacity = 0; if (t > c.te + .75) { caught++; lastCatch = Math.max(lastCatch, c.te + .75); } return; }
-      const tx = 790 + 36 * Math.sin((c.te + .75) * 1.4);
-      const x = lerp(CX, tx, p), y = lerp(SPY + 50, 706, p) - 200 * 4 * p * (1 - p);
+      const tx = 760 + 30 * Math.sin((c.te + .75) * 1.4) + (k % 2 ? 22 : 0);
+      const x = lerp(CX, tx, p), y = lerp(SPY + 50, k % 2 ? 826 : 706, p) - 200 * 4 * p * (1 - p);
       c.e.style.opacity = 1; c.e.style.transform = `translate(${x - 20}px, ${y - 20}px) scale(${Math.abs(Math.cos(t * 9)) * .7 + .3}, 1)`;
     });
-    const cOp = seg(t, 162.2, 162.6) * (1 - X1);
+    const cOp = seg(t, 162.2, 162.6) * (1 - X1), nOp = seg(t, 160.4, 160.8) * (1 - X1);
     const bump = c06_kick(t - lastCatch, 7, 18);
-    poseNoa(catcher, t, { x: bx - 80, y: 722 + 6 * bump, s: 1, look: -.6, mood: "happy", hop: 0, op: cOp });
-    catcher.P.al.setAttribute("transform", `rotate(72 56 160)`); catcher.P.ar.setAttribute("transform", `rotate(-72 144 160)`);
-    basket.style.opacity = cOp; basket.style.transform = `translate(${bx - 60}px, ${688 + 8 * bump}px)`;
-    const lp = back(seg(t, 161.2, 161.7)), lx = ease(seg(t, 166.5, 166.95));
-    live.style.opacity = clamp(lp * 2) * (1 - lx); live.style.transform = `translateY(${-50 * lx}px) scale(${(0.6 + 0.4 * lp) * (1 - .2 * lx)}) rotate(${1.5 - 1.5 * lx}deg)`;
+    const popOut = t > 170 && t < 170.5, cheer = t > 171.9 && t < 172.7;
+    poseNoa(catcher, t, { x: bx - 80, y: 722 + 6 * bump, s: 1, look: t < 162 ? .4 : -.6, mood: popOut ? "shock" : "happy", talk: t > 160.6 && t < 161.2,
+      hop: cheer ? (t - 171.9) / .8 : 0, arms: t > 162.1 ? "up" : undefined, op: nOp });
+    // cheek pouches: the sealed envelope (left) + gobbled coins (both)
+    const envIn = seg(t, 161.35, 161.8), envOut = seg(t, 170.0, 170.25);
+    const puffL = 1 + .55 * envIn * (1 - envOut) + Math.min(.4, inCheek * .06) + .15 * c06_kick(t - 161.8, 6, 16);
+    const puffR = 1 + Math.min(.4, inCheek * .06) + .12 * c06_kick(t - lastCatch, 6, 16) * (inCheek > 0 ? 1 : 0);
+    catcher.P.ckl.setAttribute("transform", `translate(50 128) scale(${puffL.toFixed(3)}) translate(-50 -128)`);
+    catcher.P.ckr.setAttribute("transform", `translate(150 128) scale(${puffR.toFixed(3)}) translate(-150 -128)`);
+    basket.style.opacity = cOp * (1 - seg(t, 171.8, 172)); basket.style.transform = `translate(${bx - 60}px, ${688 + 8 * bump}px)`;
+    // envelope: shown, stuffed into the cheek (161.3), popped out (170), opened, matched (171.85)
+    const eShow = back(seg(t, 160.6, 161.0));
+    let ex, ey, es;
+    if (t < 170) { ex = lerp(bx + 60, bx - 38, ease(envIn)); ey = lerp(760, 830, ease(envIn)); es = (0.3 + 0.4 * eShow) * (1 - .92 * ease(envIn)); }
+    else { const f = back(seg(t, 170.0, 170.45)); ex = lerp(bx - 38, 880, clamp(f)); ey = lerp(830, 560, clamp(f)) - 120 * Math.sin(clamp(f) * Math.PI); es = 0.1 + 0.9 * f; }
+    env.style.opacity = t < 160.6 || (t > 161.8 && t < 170) ? 0 : 1 - X1;
+    const match = t > 171.85;
+    env.style.transform = `translate(${ex - 120}px, ${ey - 75}px) scale(${es * (1 + .12 * c06_kick(t - 171.85, 5, 16))}) rotate(${t < 170 ? -8 : -4 + 4 * c06_kick(t - 170.45, 4, 12)}deg)`;
+    const fo = seg(t, 170.45, 170.75);
+    eFlap.style.transform = `scaleY(${1 - 2 * fo})`; eSeal.style.opacity = fo < .5 ? 1 : 0;
+    eCard.style.transform = `translateY(${-96 * ease(seg(t, 170.75, 171.2))}px)`;
+    eQ.style.display = match ? "none" : ""; eChk.style.opacity = match ? 1 : 0;
+    eCard.style.background = match ? "#d8f0cf" : "#fffaf0";
+    const lb = back(seg(t, 160.75, 161.1)); eLab.style.opacity = clamp(lb * 2) * (1 - seg(t, 161.3, 161.5)); eLab.style.transform = `translate(${bx - 10}px, 640px) rotate(-4deg) scale(${lb})`;
+    burst.forEach((b, i) => { const tau = t - 171.85, a = i / burst.length * 6.283 + .3 * c06_h(i, 2), d = (120 + 90 * c06_h(i, 3)) * out(seg(tau, 0, .6));
+      b.style.opacity = tau > 0 && X1 < 1 ? 1 - seg(tau, .5, .9) : 0;
+      b.style.transform = `translate(${880 + Math.cos(a) * d - 8}px, ${470 + Math.sin(a) * d * .8 + 120 * tau * tau - 8}px) rotate(${tau * 500 + i * 40}deg)`; });
+    const lp = back(seg(t, 161.2, 161.7)), lx = ease(seg(t, 166.5, 166.95)), lk = ease(seg(t, 162.7, 163.2));
+    live.style.opacity = clamp(lp * 2) * (1 - lx); live.style.transformOrigin = "100% 0";
+    live.style.transform = `translateY(${-50 * lx - 70 * lk}px) scale(${(0.6 + 0.4 * lp) * (1 - .45 * lk)}) rotate(${1.5 - 1.5 * lx}deg)`;
+    liveSub.forEach(e => e.style.opacity = 1 - lk);
     liveC.textContent = caught; liveC.style.transform = `scale(${1 + .25 * c06_kick(t - lastCatch, 6, 16)})`;
     liveV.textContent = vis.filter(v => t > v.t0).length; liveK.textContent = caught;
-    const nPile = Math.min(9, caught);
+    const nPile = Math.min(9, inBasket);
     if (pile.childElementCount !== nPile) pile.innerHTML = Array.from({ length: nPile }, (_, k) =>
       `<circle cx="${22 + (k % 5) * 19 + (k >= 5 ? 9 : 0)}" cy="${k >= 5 ? 0 : 12}" r="11" fill="#f7c843" stroke="${INK}" stroke-width="2.5"/>`).join("");
     // formula
@@ -236,8 +281,7 @@ scene(160, 184, (R, s) => {
     hl.style.opacity = ref.real ? 0 : (t > 181.6 ? 1 : 0);
     const ap = back(seg(t, 182.1, 182.5)); act.style.opacity = clamp(ap * 2); act.style.transform = `translateX(${30 * (1 - ap)}px)`;
     const nIn = out(seg(t, 178.4, 178.9)), tadaArms = t > 178.6 && t < 179.8;
-    poseNoa(noa, t, { x: 1470 + 200 * (1 - nIn), y: 520, s: 1, talk: t > 179.6 && t < 181.4, look: -1, hop: t > 178.6 && t < 179.3 ? (t - 178.6) / .7 : 0, op: nIn, wave: t > 182 && t < 183 });
-    if (tadaArms) { noa.P.al.setAttribute("transform", "rotate(60 56 160)"); noa.P.ar.setAttribute("transform", "rotate(-60 144 160)"); }
+    poseNoa(noa, t, { x: 1470 + 200 * (1 - nIn), y: 520, s: 1, talk: t > 179.6 && t < 181.4, look: -1, hop: t > 178.6 && t < 179.3 ? (t - 178.6) / .7 : 0, op: nIn, wave: t > 182 && t < 183, arms: tadaArms ? "up" : undefined });
     sayBubble(bub, t, 179.6, 183.4, "마지막은 늘 버튼 하나!", 1400, 410);
     head.style.opacity = 1 - seg(t, 177.6, 178);
     wipeA(t, 172.55, .8); wipeB(t, 177.45, .8);
