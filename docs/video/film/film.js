@@ -63,9 +63,9 @@
   function output(kind, x, y, s, cap, flash, p) {
     if (p <= 0) return '';
     let inner = '', w, h, label;
-    if (kind === 'reel') { w = 104; h = 184; label = 'Reel · 30s'; inner = miniStage(w, h) + noa(0, h / 2 - 34, .36, { mood: 'flat' }) + T(0, -h / 2 + 34, 'IT SAID FREE', 13, { f: C.red, stroke: '#fff', sw: 3 }); }
+    if (kind === 'reel') { w = 104; h = 184; label = 'Reel · 30s'; inner = miniStage(w, h) + noa(0, h / 2 - 34, .36, { mood: 'flat' }) + T(0, -h / 2 + 34, 'IT SAID FREE', 13, { f: C.red, stroke: '#fff', sw: 3 }) + `<line x1="-44" y1="${-h / 2 + 29}" x2="44" y2="${-h / 2 + 29}" stroke="${C.red}" stroke-width="3"/><rect x="-36" y="${-h / 2 + 42}" width="72" height="20" rx="10" fill="#2fb67a" stroke="${INK}" stroke-width="1.6"/>` + T(0, -h / 2 + 57, '✓ evidence', 12, { f: '#fff' }); }
     else if (kind === 'long') { w = 208; h = 117; label = 'Long-form'; inner = miniStage(w, h) + noa(-34, h / 2 - 22, .28, { mood: 'smile' }) + uchu(34, h / 2 - 22, .28, { mood: 'shock' }); }
-    else { w = 112; h = 140; label = 'Card news'; inner = `<rect x="${-w / 2}" y="${-h / 2}" width="${w}" height="${h}" fill="#fff8e8"/>` + T(0, -h / 2 + 26, '공짜라며?', 16) + noa(0, h / 2 - 22, .3, { mood: 'flat' }); }
+    else { w = 112; h = 140; label = 'Card news'; inner = `<rect x="${-w / 2}" y="${-h / 2}" width="${w}" height="${h}" fill="#fff8e8"/>` + T(0, -h / 2 + 26, '공짜? 근거 확인 ✓', 13) + noa(0, h / 2 - 22, .3, { mood: 'flat' }); }
     const body = `<rect x="${-w / 2 + 5}" y="${-h / 2 + 6}" width="${w}" height="${h}" rx="10" fill="${INK}" opacity=".18"/><clipPath id="cp-${kind}"><rect x="${-w / 2}" y="${-h / 2}" width="${w}" height="${h}" rx="8"/></clipPath><g clip-path="url(#cp-${kind})">${inner}</g><rect x="${-w / 2}" y="${-h / 2}" width="${w}" height="${h}" rx="8" fill="none" stroke="${INK}" stroke-width="3"/>` + sticker(0, h / 2 + 20, cap, flash) + chip(0, h / 2 + 52, label, '#26386b', { z: 13 });
     return g(x, y, s * pop(p), body);
   }
@@ -80,7 +80,7 @@
     if (scatter < 1) for (let i = 0; i < 6; i++) { const y = -120 + ((lt * 110 + i * 117) % 760), x = 190 + i * 180; s += g(x, y, .34, `<g transform="rotate(${-10 + i * 5})">${postCard(POSTS[i % 3])}</g>`, .35 * (1 - scatter) * k(lt, c[0], .5)); }
     const P = [[340, 250, -8], [640, 200, 3], [940, 250, 7]];
     P.forEach(([px, py, r], i) => {
-      const a = k(lt, .9 + i * .3, .25);
+      const a = k(lt, .3 + i * .3, .25);
       if (a <= 0 || scatter >= 1) return;
       const st = k(lt, c[2] + [.2, 1.0, 1.9][i], .5);
       const x = px + (i - 1) * 700 * scatter, y = py - 260 * scatter + bob(lt + i, .4, 6);
@@ -191,6 +191,7 @@
     let s = '';
     const kb = kanban(300, 170, 720, 300, KCOLS, { head: '10XAI · BOARD', glow: lt > c[2] + 1.8 && lt < c[2] + 3.2 ? 2 : undefined });
     const bp = k(lt, c[1] + .2, .5);
+    if (bp > 0) s += `<ellipse cx="640" cy="330" rx="${n(460 * ease(bp))}" ry="${n(220 * ease(bp))}" fill="#bcd3ff" opacity=".35"/>`;
     if (bp > 0) s += g(640, 320, pop(bp), `<g transform="translate(-640,-320)">${kb.svg}</g>`);
     if (bp >= 1) { const lab = 'LIVE · agents 6 · humans 1'; s += `<circle cx="${n(1004 - K.tw(lab, 14) - 12)}" cy="188" r="${n(6 + 2 * Math.sin(lt * 6))}" fill="#ff5a4a"/>` + T(1004, 194, lab, 14, { a: 'end', f: '#e0352b' }); }
     const cw = kb.colW - 16, cx = (i) => kb.colX(i) + 8, rowY = (r) => kb.top + 6 + r * 44;
@@ -204,10 +205,12 @@
     // FREE!! (no evidence, caught in chapter 2) heads for the gate and is rejected
     const fp = k(lt, c[1] + 2.6, .3);
     if (fp > 0) {
-      const mv = ease(k(lt, c[2] + 1.8, .6)), drop = ease(k(lt, c[2] + 3.4, .7));
-      const x = lerp(cx(0), cx(2), mv), y = rowY(1) - (mv > 0 && mv < 1 ? Math.sin(mv * Math.PI) * 40 : 0) + 280 * drop;
-      if (drop < 1) s += `<g opacity="${n(1 - drop)}">` + g(x + cw / 2, y + 17, pop(fp), `<g transform="rotate(${n(35 * drop)})">` + card(-cw / 2, -17, cw, 34, 'post · "FREE!!"', { stripe: '#f7b3c8', z: 13, kind: mv >= 1 ? 'risk' : 'orig', badge: mv >= 1 ? 'NO EVIDENCE' : null }) + `</g>`) + `</g>`;
-      s += stampMark(cx(2) + cw / 2, rowY(1) + 17 + 280 * drop, 'REJECT', k(lt, c[2] + 3.0, .5) * (1 - drop), -12);
+      const mv = ease(k(lt, c[2] + 1.8, .6)), dq = k(lt, c[2] + 4.4, .9), drop = dq * dq;
+      const x = lerp(cx(0), cx(2), mv), y = lerp(rowY(1), rowY(2), mv) - (mv > 0 && mv < 1 ? Math.sin(mv * Math.PI) * 40 : 0) + 420 * drop;
+      if (dq < 1) s += `<g opacity="${n(1 - k(dq, .7, .3))}">` + g(x + cw / 2, y + 17, pop(fp), `<g transform="rotate(${n(35 * drop)})">` + card(-cw / 2, -17, cw, 34, 'post · "FREE!!"', { stripe: '#f7b3c8', z: 13, kind: mv >= 1 ? 'risk' : 'orig', badge: mv >= 1 ? 'NO EVIDENCE' : null }) + `</g>`) + `</g>`;
+      s += stampMark(cx(2) + cw / 2, rowY(2) + 17 + 420 * drop, 'REJECT', k(lt, c[2] + 3.9, .5) * (1 - k(dq, .6, .4)), -12);
+      if (dq > 0 && dq < 1) s += burst(cx(2) + cw / 2, rowY(2) + 60, 30, 'NOPE', { z: 13, fill: '#ffd0c8' });
+      if (lt > c[2] + 3.9 && lt < c[2] + 5.1) s += popAt(lt, c[2] + 3.9, cx(1) + cw / 2, rowY(4) + 10, chip(0, 0, '근거 없음 → 발행 불가', '#e0352b', { z: 14 }));
     }
     // the hero card walks every column, and waits at the gate
     const hp = k(lt, c[1] + 2.6, .3);
@@ -231,9 +234,11 @@
       for (let r = 0; r < 3; r++) { const q = ((lt - c[3]) * .7 + r / 3) % 1; s += `<rect x="${n(300 - 26 * q)}" y="${n(170 - 26 * q)}" width="${n(720 + 52 * q)}" height="${n(300 + 52 * q)}" rx="${n(12 + 20 * q)}" fill="none" stroke="#5b8def" stroke-width="3" opacity="${n(.5 * (1 - q) * wp)}"/>`; }
       // two tiny crew cursors keep dragging cards: the board is alive
       [[1, 1, 3, .0], [0, 2, 1, .5]].forEach(([from, row, to, ph], i) => { const q = ((lt - c[3]) * .35 + ph) % 1, x = lerp(cx(from), cx(to), ease(q)); s += card(x, rowY(row) + 2, cw * .8, 28, i ? 'post · "$0.40"' : 'script · reel', { z: 12, stripe: i ? '#ffd84d' : '#f0a92a' }) + member(i ? 'decompose' : 'runner', x + cw * .8, rowY(row) + 44, .3, { eyes: 'focus', label: null }); });
-      s += popAt(lt, c[3] + 2.8, 640, 150, chip(0, 0, 'One source of truth · 진실의 원천은 하나', '#26386b', { z: 19 }));
+      s += popAt(lt, c[3] + 2.8, 640, 506, chip(0, 0, 'One source of truth · 진실의 원천은 하나', '#26386b', { z: 19 }));
     }
-    return { s, cam: lt > c[2] && lt < c[3] ? [1.04, 660, 330] : [1.02, 650, 330], tint: ['#2b2f5a', .14], noa: { x: 190, pose: lt > c[1] ? 'point' : 'idle', mood: 'smile' }, react: lt > c[2] + 3.2 && lt < c[2] + 4.4 ? 'cheer' : null };
+    const peek = c[3] + 2.4;
+    if (lt > peek - .15 && lt < peek + .35) s += burst(190, STAND - 70, 26, 'zip!', { z: 12, fill: '#e3ecff' });
+    return { s, cam: lt > c[2] && lt < c[3] ? [1.04, 660, 330] : [1.02, 650, 330], tint: ['#2b2f5a', .30], noa: lt > c[3] + 2.4 ? { x: 640, y: lerp(430, 196, pop(k(lt, c[3] + 2.4, .45))), behind: true, pose: 'cheer', mood: 'grin' } : { x: 190, pose: lt > c[1] ? 'point' : 'idle', mood: 'smile' }, react: lt > c[2] + 3.2 && lt < c[2] + 4.4 ? 'cheer' : null };
   };
 
   S.crew = (lt, c) => {
@@ -242,14 +247,14 @@
     const team = [['decompose', 330], ['gapfill', 445], ['claude', 560], ['codex', 675], ['runner', 800], ['runner2', 925]];
     const op = k(lt, c[0] + .3, .5);
     if (op > 0) {
-      s += `<polygon points="${O[0] - 60},${O[1] + 70} ${O[0] + 60},${O[1] + 70} ${O[0] - 100},${STAND} ${O[0] + 100},${STAND}" fill="#fff4dc" opacity=".35"/>`;
+      s += `<polygon points="${O[0] - 60},${O[1] + 70} ${O[0] + 60},${O[1] + 70} ${O[0] - 100},${STAND} ${O[0] + 100},${STAND}" fill="#fff4dc" opacity=".55"/>`;
       s += g(O[0], O[1] + 70, pop(op), `<rect x="-70" y="0" width="140" height="26" rx="6" fill="#8f5b3a" stroke="${INK}" stroke-width="2.6"/>` + member('orchestrator', 0, 0, .95, { eyes: 'happy', label: null }));
     }
     const crashAt = c[6] + 2.4;
     team.forEach(([role, x], i) => {
       const p = k(lt, c[0] + .6 + i * .1, .4);
       if (p <= 0) return;
-      if (lt > c[0] + 1) { const f = ((lt - c[0] - 1) * .6 + i * .17) % 1, px = lerp(O[0], x, f), py = lerp(O[1] + 100, STAND - 120, f) - Math.sin(f * Math.PI) * 30; s += `<path d="M${O[0]},${O[1] + 100} Q${(O[0] + x) / 2},${O[1] + 60} ${x},${STAND - 120}" fill="none" stroke="${CREW[role][0]}" stroke-width="2.4" stroke-dasharray="5 7" opacity=".55"/><rect x="${n(px - 9)}" y="${n(py - 6)}" width="18" height="12" rx="2" fill="#fff" stroke="${INK}" stroke-width="1.6"/>`; }
+      if (lt > c[0] + 1) { const f = ((lt - c[0] - 1) * .6 + i * .17) % 1, y0 = O[1] + 130, px = lerp(O[0], x, f), py = lerp(y0, STAND - 120, f) - Math.sin(f * Math.PI) * 20, dim = lt > c[2] + 1.8 && lt < c[3] ? .25 : 1; s += `<g opacity="${dim}"><path d="M${O[0]},${y0} Q${(O[0] + x) / 2},${y0 - 20} ${x},${STAND - 120}" fill="none" stroke="${CREW[role][0]}" stroke-width="2.4" stroke-dasharray="5 7" opacity=".55"/><rect x="${n(px - 9)}" y="${n(py - 6)}" width="18" height="12" rx="2" fill="#fff" stroke="${INK}" stroke-width="1.6"/></g>`; }
       let h = 0;
       if (role === 'decompose') h = hop(lt, c[1] + .6);
       if (role === 'gapfill') h = hop(lt, c[1] + 2.4);
@@ -294,28 +299,28 @@
       ['#dbe7ff', '#ffefcc', '#ffd9d3', '#d3f2e3'].forEach((col, i) => { m += `<rect x="${-88 + i * 45}" y="-68" width="40" height="84" rx="4" fill="${col}" stroke="${INK}" stroke-width="1.2"/><rect x="${-84 + i * 45}" y="${-60 + ((Math.floor(lt * 2) + i) % 3) * 22}" width="32" height="14" rx="2" fill="#fff" stroke="${INK}" stroke-width="1"/>`; });
       m += T(0, 60, 'ontology + harness', 16, { f: '#2f4f8f' });
       for (const [gx, sign] of [[-120, 1], [120, -1]]) m += `<g transform="translate(${gx},80) rotate(${n(sign * lt * 60)})">${[0, 60, 120].map((a) => `<rect x="-5" y="-30" width="10" height="60" fill="${C.yellow}" stroke="${INK}" stroke-width="1.6" transform="rotate(${a})"/>`).join('')}<circle r="22" fill="${C.yellow}" stroke="${INK}" stroke-width="2.4"/><circle r="8" fill="#fff" stroke="${INK}" stroke-width="2"/></g>`;
-      // the one fact that gets fixed
-      if (lt > c[3]) {
-        const fix = k(lt, c[4] + 1.2, .4);
-        m += g(0, -126, pop(k(lt, c[3], .35)), card(-86, -18, 172, 36, 'claim · setup: ' + (fix > .5 ? '12 min' : '5 min'), { kind: fix > .5 ? 'ok' : 'risk', z: 15 }) + (fix > 0 && fix < 1 ? `<line x1="-70" y1="0" x2="${n(-70 + 140 * fix)}" y2="0" stroke="${C.red}" stroke-width="4"/>` : ''));
-      }
       s += g(470, 330, pop(mp), m, mOut * (1 - .5 * big));
+      // the one fact that gets fixed stays lit while the machine dims
+      if (lt > c[3]) {
+        const fix = k(lt, c[4] + 1.2, .4), ring = big > 0 ? `<rect x="-96" y="-28" width="192" height="56" rx="16" fill="none" stroke="#2fb67a" stroke-width="5" opacity="${n(big * (.5 + .5 * Math.sin(lt * 8)))}"/>` : '';
+        s += g(470, 204, pop(k(lt, c[3], .35)), ring + card(-86, -18, 172, 36, 'claim · setup: ' + (fix > .5 ? '12 min' : '5 min'), { kind: fix > .5 ? 'ok' : 'risk', z: 15 }) + (fix > 0 && fix < 1 ? `<line x1="-70" y1="0" x2="${n(-70 + 140 * fix)}" y2="0" stroke="${C.red}" stroke-width="4"/>` : ''), mOut);
+      }
     }
     const ip = k(lt, c[0] + 1.0, 1);
     if (ip < 1 && ip > 0) { const bx = lerp(200, 440, ease(ip)), by = lerp(250, 300, ease(ip)) - Math.sin(ip * Math.PI) * 60; s += g(bx, by, 1 - .6 * ip, `<circle r="${n(40 + 5 * Math.sin(lt * 8))}" fill="#fff6c8" opacity=".6"/><path d="M-22,-10 A26,26 0 1 1 22,-10 Q14,4 12,18 L-12,18 Q-14,4 -22,-10 Z" fill="${C.yellow}" stroke="${INK}" stroke-width="2.6"/><rect x="-12" y="18" width="24" height="12" rx="3" fill="#9aa0ad" stroke="${INK}" stroke-width="2"/>` + T(0, 60, 'one idea', 17)); }
     // three outputs drawn with this cast; the fixed fact flows into all of them
     const row = ease(critic);
-    const O = [['reel', 745, 300, 1.0, 830, 216, c[1] + 1.4, c[4] + 2.0], ['long', 965, 212, 1.0, 975, 216, c[1] + 2.4, c[4] + 2.3], ['card', 1040, 440, 1.0, 1110, 216, c[1] + 3.4, c[4] + 2.6]];
+    const O = [['reel', 745, 300, 1.0, 830, 216, c[1] + 1.4, c[4] + 2.0], ['long', 965, 212, 1.0, 975, 216, c[1] + 2.4, c[4] + 2.3], ['card', 1010, 452, 1.0, 1080, 216, c[1] + 3.4, c[4] + 2.6]];
     // conveyor belt that carries the outputs in
     if (mOut > 0 && lt > c[1]) { let belt = `<rect x="600" y="${STAND - 18}" width="560" height="22" rx="11" fill="#6d6f86" stroke="${INK}" stroke-width="2.4"/>`; for (let i = 0; i < 14; i++) { const x = 606 + ((lt * 120 + i * 40) % 548); belt += `<line x1="${n(x)}" y1="${STAND - 14}" x2="${n(x + 10)}" y2="${STAND}" stroke="#a9abc0" stroke-width="3"/>`; } s += fade(k(lt, c[1], .4) * mOut, belt); }
     O.forEach(([kind, x, y, sc, x2, y2, t0]) => { const p = k(lt, t0, .45); if (p > 0 && mOut > .5) s += `<path d="M590,330 Q${(590 + x) / 2},${y - 90} ${x},${y}" fill="none" stroke="#f0a92a" stroke-width="3" stroke-dasharray="${n(500 * p)} 999" opacity="${n(.8 * mOut)}"/>`; });
-    O.forEach(([kind, x, y, sc, x2, y2, t0, tFix]) => { if (lt > tFix - .4 && lt < tFix + .6) s += `<path d="M470,204 Q${(470 + x) / 2},${y - 170} ${x},${y + 80}" fill="none" stroke="#2fb67a" stroke-width="4" stroke-dasharray="${n(700 * k(lt, tFix - .4, .4))} 999"/>`; });
+    O.forEach(([kind, x, y, sc, x2, y2, t0, tFix]) => { if (lt > tFix - .4 && lt < tFix + .6) s += `<path d="M470,204 Q${(470 + x) / 2},${y - 170} ${x},${n(y + (kind === 'reel' ? 112 : kind === 'long' ? 78 : 90) * (1 + .2 * big))}" fill="none" stroke="#2fb67a" stroke-width="4" stroke-dasharray="${n(700 * k(lt, tFix - .4, .4))} 999"/>`; });
     O.forEach(([kind, x, y, sc, x2, y2, t0, tFix]) => {
       const p = k(lt, t0, .45), slide = 1 - ease(k(lt, t0, .6));
       const fixed = lt > tFix;
-      s += output(kind, lerp(x, x2, row) + 360 * slide, lerp(y, y2, row), lerp(sc, .62, row) * (1 + .1 * big), fixed ? '12 min' : '5 min', fixed ? k(lt, tFix, .6) : 0, p);
+      s += output(kind, lerp(x, x2, row) + 360 * slide, lerp(y, y2, row), lerp(sc, .62, row) * (1 + .2 * big), fixed ? '12 min' : '5 min', fixed ? k(lt, tFix, .6) : 0, p);
     });
-    [['same facts', '같은 사실'], ['same voice', '같은 목소리'], ['same cast', '같은 캐릭터']].forEach(([en, ko], i) => { const p = k(lt, c[2] + .3 + i * .7, .35); if (p > 0 && mOut > 0) s += g(470, 470 + i * 36, pop(p), chip(0, 0, '✓ ' + en + ' · ' + ko, '#2fb67a', { z: 14 }), mOut); });
+    [['same facts', '같은 사실'], ['same voice', '같은 목소리'], ['same cast', '같은 캐릭터']].forEach(([en, ko], i) => { const p = k(lt, c[2] + .3 + i * .7, .35); if (p > 0 && mOut > 0) s += g(500, 470 + i * 36, pop(p), chip(0, 0, '✓ ' + en + ' · ' + ko, '#2fb67a', { z: 14 }), mOut); });
     // the critic's scoreboard
     if (critic > 0) {
       let b = panel(-190, -120, 380, 240, { head: 'CRITIC AGENT · 비평 에이전트', headFill: '#ffe3ef' });
@@ -323,17 +328,23 @@
       [['R1', 5.4], ['R2', 7.5], ['R3', 8.1]].forEach(([r, v], i) => { const q = ease(k(lt, c[5] + 1.4 + i * .7, .5)), h = 12 * v * q; b += `<rect x="${-120 + i * 90}" y="${n(96 - h)}" width="60" height="${n(h)}" rx="6" fill="${['#f0a92a', '#5b8def', '#2fb67a'][i]}" stroke="${INK}" stroke-width="2"/>` + (q > .1 ? T(-90 + i * 90, n(88 - h), v.toFixed(1), 20) : '') + T(-90 + i * 90, 114, r, 14, { f: '#6b4a36' }); });
       s += g(470, 340, pop(critic), b) + stampMark(620, 240, 'B+', k(lt, c[5] + 3.4, .5), 12);
     }
-    if (lt > c[3] - .1) s += uchu(1160, STAND, .78, { mood: lt < c[4] ? 'squint' : lt > c[6] - .1 && lt < c[7] ? 'shock' : 'smile', arms: lt > c[6] - .1 && lt < c[7] + .6 ? 'cheeks' : 'down', bang: lt > c[6] && lt < c[7], sweat: lt > c[6] });
+    if (lt > c[3] - .1) s += uchu(1120, STAND, .78, { mood: lt < c[4] ? 'squint' : lt > c[6] - .1 && lt < c[7] ? 'shock' : 'smile', arms: lt > c[6] - .1 && lt < c[7] + .6 ? 'cheeks' : 'down', bang: lt > c[6] && lt < c[7], sweat: lt > c[6] });
     let cam = [1.03, 520, 330];
     if (lt > c[1] && lt < c[5]) cam = [1.02, 720, 340];
     else if (lt >= c[5]) cam = [1.02, 640, 330];
-    return { s, cam, tint: ['#ffcf7a', .1], noa: { x: lerp(190, 300, ease(k(lt, c[4], .6)) * (1 - ease(k(lt, c[5], .6)))), pose: lt > c[4] && lt < c[5] ? 'stamp' : lt > c[1] && lt < c[3] ? 'point' : 'idle', mood: lt > c[7] ? 'flat' : 'smile', glasses: lt > c[7] + .2 ? 'up' : true }, react: lt > c[5] + 3.4 && lt < c[6] ? 'cheer' : lt > c[6] ? 'laugh' : lt > c[4] + 2 && lt < c[5] ? 'cheer' : null };
+    return { s, cam, tint: ['#ffcf7a', .18], noa: { x: lerp(190, 250, ease(k(lt, c[4], .6)) * (1 - ease(k(lt, c[5], .6)))), pose: lt > c[4] && lt < c[5] ? 'stamp' : lt > c[1] && lt < c[3] ? 'point' : 'idle', mood: lt > c[7] ? 'flat' : 'smile', glasses: lt > c[7] + .2 ? 'up' : true }, react: lt > c[5] + 3.4 && lt < c[6] ? 'cheer' : lt > c[6] ? 'laugh' : lt > c[4] + 2 && lt < c[5] ? 'cheer' : null };
   };
 
   S.curtain = (lt, c) => {
     let s = '';
     const bow = lt > c[2] + .3 && lt < c[2] + .9 ? .82 : 1;
-    [[420, icoBuckle, 'Harness', '규칙 · rules', '#ffd08a'], [640, icoBoard, 'Board', '진실 · truth', '#bcd3ff'], [860, icoCrew, 'Crew', '속도 · speed', '#bfe8c8']].forEach(([x, ico, en, ko, col], i) => { s += popAt(lt, c[0] + [.3, 1.5, 2.8][i], x, 240, medallion(ico(), en, ko, col, true), .45); });
+    [[420, icoBuckle, 'Harness', '규칙 · rules', '#ffd08a'], [640, icoBoard, 'Board', '진실 · truth', '#bcd3ff'], [860, icoCrew, 'Crew', '속도 · speed', '#bfe8c8']].forEach(([x, ico, en, ko, col], i) => {
+      // on "Encore!" the medallions fly down, orbit Noa once, and come home in a burst of confetti
+      const fly = ease(k(lt, c[2], .35)) * (1 - ease(k(lt, c[2] + 1.2, .45))), a = 2 * Math.PI * k(lt, c[2], 1.2) + i * 2.09;
+      const mx = lerp(x, 640 + 150 * Math.cos(a), fly), my = lerp(240, STAND - 170 + 40 * Math.sin(a), fly);
+      s += popAt(lt, c[0] + [.3, 1.5, 2.8][i], mx, my, g(0, 0, 1 - .45 * fly, medallion(ico(), en, ko, col, true)), .45);
+    });
+    s += confetti(lt, c[2] + 1.2, 60, 3, [440, 260, 840, 520]);
     const mq = k(lt, c[1] + .3, .4);
     if (mq > 0) {
       let m = `<rect x="-230" y="-26" width="460" height="52" rx="12" fill="#fff8e8" stroke="${C.red}" stroke-width="9"/>`;
@@ -350,7 +361,7 @@
   /* ---------- chrome ---------- */
   // Chapter entrances: a painted scenery flat drops in with the chapter card, then flies out.
   function chapterFlat(ch, lt, lead) {
-    const down = ease(k(lt, 0, .35)), up = ease(k(lt, lead - .35, .35));
+    const down = ease(k(lt, -.35, .35)), up = ease(k(lt, lead - .35, .35));
     if (up >= 1) return '';
     const y = -H * (1 - down) - H * up;
     const FLAT = { 1: ['#fbe8c9', (x, y) => g(x, y, 3.2, icoBuckle())], 2: ['#e6effb', (x, y) => g(x, y, 1, `<path d="M0,-80 Q-100,-110 -210,-80 L-210,90 Q-100,62 0,90 Q100,62 210,90 L210,-80 Q100,-110 0,-80 Z" fill="#fff" stroke="${INK}" stroke-width="4"/><line x1="0" y1="-80" x2="0" y2="90" stroke="${INK}" stroke-width="3"/>`)], 3: ['#e7f6ec', (x, y) => g(x, y, 4, icoBoard())], 4: ['#fbe3ea', (x, y) => g(x, y, 4, icoCrew())], 5: ['#efe6fb', (x, y) => g(x, y, 1, [0, 1, 2, 3, 4].map((i) => `<rect x="${-250 + i * 104}" y="-60" width="92" height="120" rx="6" fill="#2c2e47" stroke="${INK}" stroke-width="3"/><rect x="${-240 + i * 104}" y="-46" width="72" height="92" fill="#fff7e0"/>`).join(''))] };
@@ -404,9 +415,12 @@
     const res = S[sc.id](lt, c, sc);
     const [z, cx, cy] = camAt(sc, lt, c);
     let s = K.backdrop(t, { spot: res.spot || (sc.id === 'cold' || sc.id === 'curtain' ? 640 : null), tint: res.tint, vignette: res.vignette });
+    if (res.noa && res.noa.behind) { const o = res.noa; s += noa(o.x, o.y, o.scale || NOA, o); }   // peeks over the board, which is drawn on top
     s += `<g transform="translate(640,360) scale(${n(z * 1000) / 1000}) translate(${n(-cx)},${n(-cy)})">${res.s}</g>`;
     if (sc.chapter) { s += chapterFlat(sc.chapter, lt, lead); if (lt > lead - .35) s += K.chapterTag(sc.chapter[0], sc.chapter[1], k(lt, lead - .2, .45)); }
-    if (res.noa) { const o = res.noa; s += noa(o.x, STAND, o.scale || NOA, o); }
+    const nx = scenes[i + 1];
+    if (nx && nx.chapter && lt > sc.dur - .35) s += chapterFlat(nx.chapter, lt - sc.dur, 1e9);   // the next flat drops over the cut
+    if (res.noa && !res.noa.behind) { const o = res.noa; s += noa(o.x, STAND, o.scale || NOA, o); }
     if (sc.source) s += K.source(sc.source, k(lt, lead, .5));
     s += audience(t, res.react) + K.curtains(t);
     // the drapes open the show, frame the finale, and close it

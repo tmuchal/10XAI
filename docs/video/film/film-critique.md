@@ -191,3 +191,105 @@ It is not an 8 yet, for four reasons:
    - Hook: move the three hero `postCard`s to slam in (scale 1.6 → 1 with a `stamp` sfx) at 0.9 / 1.2 / 1.5 s, *before* Uchu's line starts at 0.6 + 0.9. Set `timing.lead` 0.6 → 1.5 for the cold scene only, so the first image is the chaos, not the question.
 
 **Projected score with all 6 applied:** about 8.0–8.3. Immersion 7, Fun 7.5, Polish 8, Through-line 8.5, Content 8.
+
+---
+
+# Round 3: film v4 (155.6 s)
+
+Reviewed the same way as before:
+- Frames every 2 s: 7 contact sheets.
+- Transitions: 18 frames at each scene boundary −0.5 / 0 / +0.5 s (15.6–16.7, 46.3–47.3, 67.7–68.7, 87.2–88.2, 112.3–113.4, 143.4–144.5).
+- The board's reject beat frame by frame: 79.5, 79.9, 80.2, 80.5, 80.8, 81.0 s.
+- Full-size stills at 1.2, 48, 78, 79.5, 81, 91, 108, 123, 131, 141 s.
+- Pacing from the regenerated timeline.js.
+
+**Verdict:** The film has crossed from "illustrated lecture" to "a show". The story logic is now sound:
+- FREE!! is caught in Ch.2 and rejected at the gate in Ch.3, while "$9.99" is approved.
+- The fix-once demo updates all three outputs.
+
+The chapter flats each have their own motif, and Noa stays on stage in front of them. The dino thought bubble, the crew speech bubbles and the "posts slam in first" open all read.
+
+It is still not an 8. Several of the round 2 fixes landed *technically* but at such low strength that they barely register on screen:
+- **Dusk tint on the board:** alpha .14 reads as a slight grey cast, not a lighting change.
+- **Crew spotlight:** barely visible against the pastel sky.
+- **Output enlargement:** it is `1 + .1*big`, not the 1.25 asked for, so the three outputs look the same size at 123 s and 131 s.
+- **REJECT beat:** it lasts about 0.5 s on screen, fires at the same moment "$9.99" jumps to Verified, and FREE!! sits on top of `asset · card` (hiding it) while it waits.
+
+There are also new collisions. Noa's automation walk puts Noa into the gear and the "same facts" chip (131 s), and Uchu at x=1160 is half behind the right curtain (141 s). Every chapter change still hard-cuts to an empty stage for a few frames before the flat drops (46.3, 67.7, 112.3 s).
+
+## Scorecard, v3 → v4
+
+| Axis | v3 | v4 | Reason (v4) |
+|---|---|---|---|
+| Hook | 6 | **6.5** | FREE!! slams in on an empty stage before any words, which is better. But one post at 1.2 s is not yet "chaos". The strongest image (three clashing posts plus stamps) arrives at 7–9 s. |
+| Content depth & accuracy | 7 | **8** | The gate contract now reads correctly: evidence-less claim rejected, good card approved, `risk 12 / 71` labelled. The citations are right. |
+| Through-line to automation + consistency | 7 | **8** | FREE!! is traceable from cold open → node → CAUGHT → REJECT, and "IT SAID FREE" still ends up in the Ch.5 reel. Minor issue: the reel still carries "IT SAID FREE" after the pipeline rejected FREE!!. See Fix 5. |
+| Immersion & cinematic feel ×1.5 | 5.5 | **6.5** | The flats with motifs and continuous Noa are a real gain. The lighting changes are too faint to register. There is a hard cut before every flat. The blocking is still left–center–right in 5 of 7 scenes. |
+| Fantastical & fun ×1.5 | 6.5 | **7** | Dino bubble, crew barks ("✂ split!", "risk 71?!"), the crash in the dome, and glasses-up all land. Nothing *transforms*, and the finale is a static line-up. |
+| Professional polish ×1.5 | 6.5 | **7** | The round 2 sweep items are fixed. New issues: Noa collides with the gear and chips (131 s); Uchu is cropped by the curtain (141 s); FREE!! covers `asset · card` (79.5 s). The dispatch mini-cards still pile up on the orchestrator's desk and on DISAGREE (108 s). The green fix line in auto is a short stub that ends in empty air (131 s). |
+| Character (Noa size, Uchu) | 7 | **7.5** | Noa's size is right and stays consistent, and Noa moves in ontology and auto. Uchu pops up from behind PUBLISH, approves, and is crowned. Noa's automation walk lands badly. |
+| Style match to reference | 7.5 | **7.5** | Unchanged: faithful theater, pastel, tag, pill, navy bar. |
+| Subtitles (EN+KR) | 7.5 | **7.5** | Clean and balanced. "setup" fixes the referent. No new issues. |
+| Pacing | 6.5 | **7** | The 0.4 s gap helps, and posts now come before words. The reject beat is buried under a simultaneous move. Noa's 26/39 share is unchanged. |
+
+**Overall weighted score: 7.2 / 10** (v2 5.1 → v3 6.6 → v4 7.2)
+(6.5+8+8+7.5+7.5+7.5+7 = 52; (6.5+7+7)×1.5 = 30.75; 82.75 / 11.5 = 7.20)
+
+Under 8, so here are the Top fixes. None of them is structural; they are all about strength and timing.
+
+## TOP 6 FIXES (v4 → 8+)
+
+1. **Cover the scene cut with the incoming flat** (removes the empty-stage pop at every chapter change). In `frame()`, after computing `sc` and `lt`:
+   ```js
+   const nx = scenes[i + 1];
+   if (nx && nx.chapter && lt > sc.dur - .35) s += chapterFlat(nx.chapter, lt - sc.dur, 1e9);  // pre-drop
+   ```
+   In `chapterFlat`, change `down = ease(k(lt, 0, .35))` → `down = ease(k(lt, -.35, .35))`, so the flat is already fully down at the new scene's `lt=0`. Passing `lead=1e9` keeps `up=0` during the pre-drop. Draw it *before* the `noa(...)` call so Noa stays in front. Add `["whoosh", -0.35]` for the drop, or move the existing whoosh 0.35 s earlier.
+
+2. **Give the REJECT its own beat and stop it hiding `asset · card`.** In `S.board`:
+   - FREE!! waits in Gate row 2, not row 1: `rowY(1)` → `rowY(2)` in both the card `y` and the `stampMark` `y`.
+   - Retime so the reject lands *after* the approval: stamp at `c[2]+3.9` (was 3.0), drop at `c[2]+4.4` over `.9` s (was 3.4 over .7). While it falls, add `burst(cx(2)+cw/2, rowY(2)+60, 30, 'NOPE', {z:13, fill:'#ffd0c8'})`, and pop a chip `'근거 없음 → 발행 불가'` at `(cx(2)+cw/2, rowY(2)+90)` for 1.2 s.
+   - The fall must leave the board visibly: let `y` go to `+420` and keep `opacity` at 1 until `drop>.7`.
+   - In script.json board #3, append the sfx `["stamp",3.9],["boing",4.4]`, and set `"hold": 0.8` so the beat has room before board #4.
+
+3. **Make the lighting changes actually visible.** kit.js `backdrop`:
+   - Board: tint `['#2b2f5a', .14]` → `['#2b2f5a', .30]`, plus a soft blue glow behind the board: `<ellipse cx="640" cy="330" rx="460" ry="220" fill="#bcd3ff" opacity=".35"/>` drawn under the kanban.
+   - Crew: vignette outer stop `.32` → `.5`. Spotlight polygon `opacity .35` → `.55`, and add a floor pool `<ellipse cx="640" cy="${STAND+8}" rx="140" ry="16" fill="#fffbe0" opacity=".7"/>`.
+   - Auto: `['#ffcf7a', .1]` → `['#ffcf7a', .18]`.
+
+   Each chapter should read as a different lighting cue at thumbnail size.
+
+4. **Fix the automation-scene collisions and make the fix read.**
+   - (a) Noa's walk: `lerp(190, 300, …)` → `lerp(190, 250, …)`, and move the chips to `g(500, 470 + i*36, …)`, so Noa (right edge ≈ 290 with the 'stamp' paw) clears the gear at x≈350 and the chips.
+   - (b) Uchu: `uchu(1160, STAND, .78, …)` → `uchu(1120, STAND, .78, …)`, and nudge the card-news output `x2` from 1110 → 1080 so the two don't touch.
+   - (c) Draw the claim card *outside* the dimmed machine group: move the `if (lt > c[3]) { … card('claim · setup…') … }` block out of `m`, emit it as `s += g(470, 204, …)` after the machine, and give it a pulsing green ring while `fix` runs. The one fact being fixed must not be dimmed.
+   - (d) Enlarge: `lerp(sc, .62, row) * (1 + .1 * big)` → `* (1 + .3 * big)`.
+   - (e) Green propagation paths: end at the badge, not in empty air. Use `${lerp(x, x2, row) + 360*slide},${y + (kind === 'reel' ? 110 : kind === 'long' ? 80 : 90)}`, which matches each output's badge y.
+
+5. **Close the FREE!! loop in the outputs.** The reel says "IT SAID FREE" after the pipeline rejected FREE!!. Make that a feature: in `output('reel')`, render the caption as `'IT SAID FREE'` with a red strike-through line, plus a small green `'✓ evidence'` tag under it. Card news: `'공짜라며?'` → `'공짜? 근거 확인 ✓'`. It is one line each, and it turns a continuity nit into the payoff of the FREE!! thread.
+
+6. **Declutter the crew dispatch and add one fantastical moment.**
+   - Dispatch: while `c[2]+1.8 < lt < c[3]` (the DISAGREE beat), draw the mini-card loop at opacity `.25`. Start the arcs at `O[1] + 130` (below the desk front) instead of `+100`, so they never overlap DISAGREE or the verifier chips.
+   - Finale (`S.curtain`): on "Encore!" (`c[2]`), the three medallions fly down and orbit Noa once (`x = 640 + 150*cos(a)`, `y = STAND - 170 + 40*sin(a)`, `a = 2π*k(lt, c[2], 1.2) + i*2.09`), then burst into confetti. It costs about 12 lines and gives the film a closing image instead of a static line-up.
+
+**Projected score with all 6 applied:**
+
+| Axis | Projected |
+|---|---|
+| Immersion | 7.5 |
+| Fun | 7.5 |
+| Polish | 8.5 |
+| Pacing | 7.5 |
+| Hook | 6.5 |
+| Content | 8.5 |
+| Through-line | 8.5 |
+| Character | 8 |
+| Style | 7.5 |
+| Subtitles | 7.5 |
+
+That gives 89.25 / 11.5 = **about 7.8 on its own**. Fixes 1–6 alone do not reach 8. Two more changes are needed:
+
+- **Hook +1:** in `S.cold`, let all three hero posts slam in at 0.3 / 0.6 / 0.9 s with their stamps, before Uchu's line (`timing.lead` 1.5 for cold is enough room). Hook 6.5 → 7.5.
+- **Immersion +0.5:** break the left–center–right blocking in at least one chapter. In `S.board`, put Noa *behind* the board at x=640, popping up over its top edge (return `noa: { x: 640, behind: true, … }`; in `frame()`, when `res.noa.behind` is set, draw `noa(o.x, 190, …)` *before* the camera group, so the board, which is inside the camera group, covers Noa's lower body) on "One source of truth". Immersion 7.5 → 8.
+
+With both, the total is 91.75 / 11.5 = **about 8.0**. Apply Fixes 1–6 and these two changes as one batch.

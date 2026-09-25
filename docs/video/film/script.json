@@ -30,15 +30,15 @@
      "sfx": [
       [
        "stamp",
+       -1.2
+      ],
+      [
+       "stamp",
+       -0.9
+      ],
+      [
+       "stamp",
        -0.6
-      ],
-      [
-       "stamp",
-       -0.3
-      ],
-      [
-       "stamp",
-       0.0
       ]
      ]
     },
@@ -354,21 +354,29 @@
        2.8
       ],
       [
-       "stamp",
-       3.0
-      ],
-      [
        "tada",
        3.3
+      ],
+      [
+       "stamp",
+       3.9
+      ],
+      [
+       "boing",
+       4.4
       ]
      ],
-     "hold": 0.6
+     "hold": 0.8
     },
     {
      "spk": "noa",
      "en": "Agents and humans watch the same board, live. *One source of truth*.",
      "ko": "에이전트와 사람이 같은 보드를 실시간으로. *진실의 원천은 하나*.",
      "sfx": [
+      [
+       "pop",
+       2.8
+      ],
       [
        "ding",
        3.0

@@ -180,7 +180,7 @@ def main():
     for sc in script["scenes"]:
         start = t
         if scenes:
-            events.append(("sfx", start - 0.25, sfx("whoosh")))       # curtain swish between scenes
+            events.append(("sfx", start - (0.4 if sc.get("chapter") else 0.25), sfx("whoosh")))  # swish between scenes (earlier under a dropping flat)
         if sc.get("chapter"):
             events.append(("sfx", start + 0.35, sfx("tada")))         # chapter card
         t += sc.get("lead", tm.get("chapterLead", tm["lead"]) if sc.get("chapter") else tm["lead"])
