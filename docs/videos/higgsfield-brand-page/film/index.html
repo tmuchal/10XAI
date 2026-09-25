@@ -1,0 +1,127 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<title>Brand Page Theater</title>
+<style>
+  :root {
+    --bg: #f3e2bd; --panel: #fffaf0; --panel2: #fdf0d5; --line: #2b2320; --text: #2b2320; --muted: #6b5d52;
+    --cream: #f2ebe0; --ink: #17140f; --terra: #d4623a; --forest: #1e3a33; --gold: #d98c1f; --sky: #3e8fb8; --pink: #e0607e;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { width: 1920px; height: 1080px; overflow: hidden; background: var(--bg); color: var(--text);
+    font-family: "Noto Sans CJK KR", system-ui, sans-serif; }
+  .serif { font-family: "Noto Serif CJK KR", serif; }
+  .mono { font-family: "DejaVu Sans Mono", monospace; }
+  #stage { position: relative; width: 1920px; height: 1080px; overflow: hidden;
+    background: radial-gradient(1400px 800px at 50% 0%, #1c1b24 0%, transparent 70%), var(--bg); }
+  .scene { position: absolute; inset: 0; opacity: 0; display: none; }
+  .abs { position: absolute; }
+  .chap { position: absolute; left: 96px; top: 64px; }
+  .chap .k { font-size: 20px; letter-spacing: 5px; color: var(--gold); }
+  .chap .t { font-size: 46px; font-weight: 800; margin-top: 4px; }
+  .scrim { position: absolute; left: 0; right: 0; bottom: 0; height: 260px;
+    background: linear-gradient(to top, rgba(8,8,10,.94), rgba(8,8,10,0)); }
+  #cap { position: absolute; left: 0; right: 0; bottom: 54px; text-align: center; z-index: 50; }
+  #cap .ko { font-size: 42px; font-weight: 700; letter-spacing: -.5px; }
+  #cap .en { font-size: 22px; color: var(--muted); margin-top: 8px; }
+  #cite { position: absolute; right: 40px; bottom: 16px; font-size: 16px; color: #77736b; z-index: 50; }
+  .win { position: absolute; background: #fff; border-radius: 16px; overflow: hidden;
+    box-shadow: 0 40px 120px rgba(0,0,0,.6), 0 0 0 1px rgba(255,255,255,.06); }
+  .bar { height: 44px; background: #1e1e25; display: flex; align-items: center; gap: 9px; padding: 0 18px; }
+  .dot { width: 12px; height: 12px; border-radius: 50%; }
+  .addr { margin-left: 14px; flex: 1; height: 28px; border-radius: 8px; background: #111116; color: #d9d6cf;
+    font-size: 16px; display: flex; align-items: center; padding: 0 14px; }
+  .view { position: relative; overflow: hidden; background: var(--cream); }
+  .page { position: absolute; left: 0; top: 0; width: 1440px; transform-origin: 0 0; background: var(--cream); color: var(--ink); }
+  .film { position: absolute; inset: 0; overflow: hidden; }
+  .film svg { width: 100%; height: 100%; display: block; }
+  .card { position: absolute; background: var(--panel); border: 1px solid var(--line); border-radius: 20px; overflow: hidden; }
+  .chip { display: inline-block; padding: 8px 16px; border-radius: 999px; border: 2px solid var(--line); font-size: 20px; }
+  .btn { display: inline-grid; place-items: center; padding: 12px 22px; border-radius: 999px; font-weight: 800; font-size: 18px; }
+  .bubble { position: absolute; background: #fff; color: var(--ink); border-radius: 22px; padding: 16px 22px; font-size: 26px;
+    font-weight: 700; box-shadow: 0 16px 40px rgba(0,0,0,.4); white-space: nowrap; z-index: 40; }
+  .bubble::after { content: ""; position: absolute; left: 34px; bottom: -14px; border: 14px solid transparent; border-bottom: 0; border-top-color: #fff; }
+  .noa { position: absolute; left: 0; top: 0; z-index: 30; }
+  .reftag { position: absolute; padding: 8px 16px; border-radius: 10px; background: var(--gold); color: #1a1406; font-weight: 800; font-size: 20px; letter-spacing: 1px; z-index: 5; }
+  .stat { font-size: 64px; font-weight: 900; color: var(--gold); line-height: 1; }
+  .progress { position: absolute; left: 0; bottom: 0; height: 4px; background: var(--gold); z-index: 60; }
+
+  /* ===== Stage theme: watercolor paper, ink lines, puppet theater ===== */
+  @font-face { font-family: "GaeguKo"; src: url(../fonts/gaegu-korean-400-normal.woff2) format("woff2"); font-weight: 400; size-adjust: 120%; }
+  @font-face { font-family: "GaeguKo"; src: url(../fonts/gaegu-korean-700-normal.woff2) format("woff2"); font-weight: 700 900; size-adjust: 120%; }
+  @font-face { font-family: "GaeguLat"; src: url(../fonts/gaegu-latin-400-normal.woff2) format("woff2"); font-weight: 400; size-adjust: 120%; }
+  @font-face { font-family: "GaeguLat"; src: url(../fonts/gaegu-latin-700-normal.woff2) format("woff2"); font-weight: 700 900; size-adjust: 120%; }
+  html, body { font-family: "GaeguLat", "GaeguKo", "Noto Sans CJK KR", sans-serif; font-weight: 700; }
+  #stage { background:
+      repeating-conic-gradient(from 0deg at 50% 42%, rgba(255,255,255,.16) 0 5deg, rgba(255,255,255,0) 5deg 13deg),
+      radial-gradient(700px 480px at 50% 40%, rgba(255,215,90,.75), rgba(255,215,90,0) 70%),
+      radial-gradient(520px 420px at 22% 30%, rgba(240,140,130,.38), rgba(240,140,130,0) 70%),
+      radial-gradient(560px 420px at 80% 62%, rgba(255,160,80,.35), rgba(255,160,80,0) 70%),
+      radial-gradient(420px 300px at 65% 12%, rgba(250,190,150,.45), rgba(250,190,150,0) 70%),
+      #f5e3bd; }
+  #scenes { position: absolute; inset: 0; z-index: 2; transform-origin: 960px 320px; transform: scale(.82); }
+  .scrim { display: none; }
+  .chap { background: #fbe3b0; border: 3px solid #2b2320; border-radius: 12px; padding: 10px 24px 12px; box-shadow: 6px 7px 0 rgba(43,35,32,.22); transform: rotate(-1.5deg); }
+  .chap .k { color: #c8372d; } .chap .t { font-size: 50px; }
+  .card { border: 3px solid #2b2320; box-shadow: 7px 8px 0 rgba(43,35,32,.22); }
+  .win { border: 3px solid #2b2320; box-shadow: 9px 11px 0 rgba(43,35,32,.25); }
+  .bar { background: #f6d9a0; border-bottom: 3px solid #2b2320; }
+  .addr { background: #fffaf0; color: #2b2320; border: 2px solid #2b2320; }
+  .chip { border: 3px solid #2b2320; background: #fffaf0; }
+  .stat { color: #c8372d; }
+  .reftag { border: 3px solid #2b2320; background: #f7d774; color: #2b2320; }
+  .bubble { border: 3px solid #2b2320; font-size: 30px; padding: 12px 22px; box-shadow: 5px 6px 0 rgba(43,35,32,.25); }
+  .bubble::before { content: ""; position: absolute; left: 30px; bottom: -19px; border: 17px solid transparent; border-bottom: 0; border-top-color: #2b2320; }
+  #cap { bottom: 30px; }
+  #cap .box { display: inline-block; background: #2c3e57; border: 3px solid #2b2320; border-radius: 14px; padding: 8px 30px 10px; box-shadow: 5px 6px 0 rgba(43,35,32,.35); }
+  #cap .ko { font-size: 38px; color: #f7d774; letter-spacing: 0; }
+  #cap .en { font-size: 22px; color: #f4ead5; margin-top: 0; }
+  #cite { color: #fbe9c9; bottom: 10px; font-size: 18px; }
+  .progress { display: none; }
+  #floor { position: absolute; left: 0; right: 0; bottom: 0; height: 190px; z-index: 1; }
+  .curt { position: absolute; top: 0; bottom: 0; z-index: 40;
+    background: linear-gradient(90deg, rgba(0,0,0,.18), rgba(0,0,0,0) 30%, rgba(255,255,255,.08) 60%, rgba(0,0,0,.15)),
+                repeating-linear-gradient(90deg, #a92a22 0 12px, #c8372d 12px 44px, #db5443 44px 56px, #c8372d 56px 78px); }
+  #curtL { left: 0; border-right: 5px solid #2b2320; border-bottom-right-radius: 40px; }
+  #curtR { right: 0; border-left: 5px solid #2b2320; border-bottom-left-radius: 40px; }
+  .tie { position: absolute; top: 470px; width: 70px; height: 30px; border-radius: 15px; background: #f2c14e; border: 4px solid #2b2320; }
+  #valance { position: absolute; left: 0; top: 0; width: 1920px; height: 60px; z-index: 41; }
+  #grain { position: absolute; inset: 0; z-index: 44; pointer-events: none; mix-blend-mode: multiply; opacity: .5;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='600' height='600'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.012' numOctaves='3' seed='4'/><feColorMatrix values='0 0 0 0 .75  0 0 0 0 .55  0 0 0 0 .35  0 0 0 .22 0'/></filter><rect width='600' height='600' filter='url(%23n)'/></svg>"),
+      url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='300' height='300'><filter id='g'><feTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 .4  0 0 0 0 .3  0 0 0 0 .2  0 0 0 .28 0'/></filter><rect width='300' height='300' filter='url(%23g)'/></svg>"); }
+  #sign { position: absolute; left: 50%; top: 380px; z-index: 43; transform: translateX(-50%) rotate(-2deg); background: #fbe3b0; border: 4px solid #2b2320;
+    border-radius: 14px; padding: 16px 44px 20px; text-align: center; box-shadow: 8px 9px 0 rgba(43,35,32,.3); white-space: nowrap; }
+  #sign .k { font-size: 26px; color: #c8372d; letter-spacing: 4px; } #sign .t { font-size: 64px; color: #2b2320; }
+</style>
+</head>
+<body>
+<div id="stage">
+  <svg width="0" height="0" style="position:absolute"><defs id="fx"></defs></svg>
+  <div id="floor"></div>
+  <div id="scenes"></div>
+  <div class="curt" id="curtL"><div class="tie" style="right:-40px"></div></div>
+  <div class="curt" id="curtR"><div class="tie" style="left:-40px"></div></div>
+  <div id="valance"></div>
+  <div id="sign"><div class="k"></div><div class="t"></div></div>
+  <div id="extras"></div>
+  <div id="grain"></div>
+  <div id="cap"><div class="box"><div class="en"></div><div class="ko"></div></div></div>
+  <div id="cite"></div>
+  <div class="progress" id="prog"></div>
+</div>
+
+<script src="core.js"></script>
+<script src="chapters/ch00.js"></script>
+<script src="chapters/ch01.js"></script>
+<script src="chapters/ch02.js"></script>
+<script src="chapters/ch03.js"></script>
+<script src="chapters/ch04.js"></script>
+<script src="chapters/ch05.js"></script>
+<script src="chapters/ch06.js"></script>
+<script src="chapters/ch07.js"></script>
+<script src="captions.js"></script>
+<script src="boot.js"></script>
+
+</body>
+</html>
