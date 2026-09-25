@@ -11,6 +11,8 @@
 const INK2 = "#2b2320";
 const c02_rnd = i => { const x = Math.sin(i * 127.1 + 311.7) * 43758.5453; return x - Math.floor(x); };
 const c02_settle = (t, f = 2.2, k = 5) => t <= 0 ? 0 : Math.exp(-k * t) * Math.sin(2 * Math.PI * f * t);
+const C02_CLAUDE = `<svg width="24" height="24" viewBox="-20 -20 40 40" style="flex:none">${Array.from({ length: 8 }, (_, k) =>
+  `<path d="M0 -3 L-3 -17 Q0 -20 3 -17Z" fill="#d97757" stroke="${INK2}" stroke-width="1.8" stroke-linejoin="round" transform="rotate(${k * 45})"/>`).join("")}<circle r="4.5" fill="#d97757" stroke="${INK2}" stroke-width="1.8"/></svg>`;
 const C02_COL = ["#f7d774", "#f2a7a0", "#9fd3a8", "#bcdcf0", "#e8894f", "#d7b8f0"];
 
 // Catmull-Rom through points → SVG path + arc-length lookup
@@ -76,10 +78,10 @@ function c02_posePerson(p, t, { x, y, s = 1, walk = 0, moving = false, flip = fa
 
 scene(40, 72, (R, s) => {
   s.caps = [[40.2, "흐름의 핵심: 주인공은 브랜드가 아니라 고객", "The customer is the hero, not the brand"],
-            [46, "고객의 문제 → 길잡이인 우리 → 3단계 계획 → 분명한 버튼", "Problem → you as the guide → a 3-step plan → a clear button"],
+            [46, "이야기는 Claude가: 고객의 문제 → 길잡이인 우리 → 3단계 → 버튼 하나", "Claude drafts the story: problem → you as guide → 3 steps → one button"],
             [53, "스크롤이 곧 장면 전환: 인터랙티브 비주얼은 체류시간을 늘린다", "Scroll as scene change: interactive visuals raise dwell time"],
             [60, "제 페이지에 흐름을 대입하면", "Mapped onto my page"]];
-  s.cite = [[40, "StoryBrand SB7 · Donald Miller"], [53, "Infogram × DC Thomson, 2015 (인용)"]];
+  s.cite = [[40, "StoryBrand SB7 · Donald Miller"], [53, "Infogram × DC Thomson 2015 · via scrollytelling.ai (재인용)"]];
   const cam = el("div", "position:absolute;inset:0", "", R);
   chapter(cam, "CHAPTER 02", "전체 흐름 잡기");
 
@@ -136,6 +138,7 @@ scene(40, 72, (R, s) => {
     <text x="58" y="46" text-anchor="middle" font-size="30" fill="#fffaf0" font-family="GaeguLat">★</text></svg>`, cam); flag.className = "abs";
   const flagCloth = flag.querySelector(".fl"), flagSvg = flag.querySelector("svg");
   const mapProp = el("div", `left:0;top:0;z-index:34;opacity:0`, `<svg width="56" height="44" viewBox="0 0 56 44"><path d="M3 6 L19 2 L37 8 L53 3 L53 38 L37 42 L19 36 L3 41 Z" fill="#fffaf0" stroke="${INK2}" stroke-width="3.5" stroke-linejoin="round"/><path d="M12 30 Q24 12 30 24 T46 12" fill="none" stroke="#c8372d" stroke-width="3" stroke-dasharray="4 4"/></svg>`, cam); mapProp.className = "abs";
+  el("div", "position:absolute;left:38px;top:-14px", C02_CLAUDE, mapProp);   // the map Noa hands over was drafted by Claude
   const COLS = ["#f7d774", "#e0607e", "#3e8fb8", "#9fd3a8", "#e8894f"];
   const conf = Array.from({ length: 36 }, (_, i) => { const d = el("div", `left:0;top:0;width:${12 + c02_rnd(i) * 10}px;height:${8 + c02_rnd(i + 50) * 9}px;background:${COLS[i % 5]};border:2px solid ${INK2};border-radius:2px;z-index:35;opacity:0`, "", cam); d.className = "abs"; return d; });
   const burst = (t, T0, ox, oy, seed, from = 0, to = conf.length) => conf.slice(from, to).forEach((d, j) => {
@@ -165,9 +168,10 @@ scene(40, 72, (R, s) => {
   });
   // one big section card at a time (40.5–53), plus a pill strip that assembles the page
   const sec = el("div", `left:1000px;top:200px;width:760px;height:400px;z-index:9;background:#fffaf0;border:5px solid ${INK2};border-radius:22px;overflow:hidden;box-shadow:10px 12px 0 rgba(43,35,32,.22);word-break:keep-all`, `
-    <div style="height:56px;background:#f6d9a0;border-bottom:4px solid ${INK2};display:flex;align-items:center;padding:0 20px;font-size:28px">내 페이지 설계도 · <span class="sn" style="margin-left:8px;color:#c8372d">섹션 1/6</span></div>
+    <div style="height:56px;background:#f6d9a0;border-bottom:4px solid ${INK2};display:flex;align-items:center;padding:0 20px;font-size:28px">내 페이지 설계도 · <span class="sn" style="margin-left:8px;color:#c8372d">섹션 1/6</span>
+      <span class="cl" style="margin-left:auto;display:flex;align-items:center;gap:6px;padding:0 14px 2px 8px;border:3px solid ${INK2};border-radius:999px;background:#fbd0bd;font-size:24px;opacity:0;transform-origin:100% 50%">${C02_CLAUDE} Claude 초안</span></div>
     <div class="panes" style="position:absolute;left:0;right:0;top:60px;bottom:0"></div>`, cam); sec.className = "abs";
-  const secN = sec.querySelector(".sn");
+  const secN = sec.querySelector(".sn"), c02_cl = sec.querySelector(".cl");
   const panes = SECT.map((r, i) => {
     let ex = `<div style="font-size:50px;line-height:1.2">${r[2]}</div>`;
     if (i === 0) ex = `<div class="h1" style="font-size:50px;position:relative;white-space:nowrap;display:inline-block">우리 회사는 업계 최고!<svg class="strike" width="520" height="40" style="position:absolute;left:-10px;top:24px" overflow="visible"><path d="M0 18 Q130 4 260 16 T520 10" stroke="#c8372d" stroke-width="10" fill="none" stroke-linecap="round" stroke-dasharray="560" stroke-dashoffset="560"/></svg></div><div class="h2" style="font-size:54px;color:#c8372d;white-space:nowrap"></div>`;
@@ -315,6 +319,8 @@ scene(40, 72, (R, s) => {
     sec.style.transformOrigin = "50% 50%";
     sec.style.transform = `translate(${60 * col}px, ${-40 * (1 - secIn) + 200 * col * col}px) scale(${(0.6 + 0.4 * secIn) * (1 - 0.8 * col)}, ${flipY * (0.6 + 0.4 * secIn) * (1 - 0.8 * col)}) rotate(${-1 + 1.2 * c02_settle(t - Math.max(...SW.filter(w => w <= t), 40.95), 1.4, 3.5)}deg)`;
     secN.textContent = `섹션 ${cur + 1}/6`;
+    const c02_cp = back(seg(t, 46.3, 46.7));   // "Claude drafts the story" (46.2)
+    c02_cl.style.opacity = clamp(c02_cp * 2); c02_cl.style.transform = `scale(${(.5 + .5 * c02_cp) * (1 + .12 * wobble(t, 46.7, 1, 14, 5))}) rotate(${-3 * c02_cp}deg)`;
     panes.forEach((pn, i) => {
       pn.style.display = i === cur ? "block" : "none";
       if (i !== cur) return;
@@ -477,10 +483,10 @@ scene(40, 72, (R, s) => {
         // "demoted from hero to guide… coping": shuffles to centre stage, sulks, then perks up on "Chin up"
         const c = ease(seg(t, 63.1, 63.8)); nx = lerp(700, 800, c); c02_s = lerp(1, 1.75, c);
         hop = c > 0 && c < 1 ? ((t - 63.1) * 3) % 1 * 0.35 : 0;
-        if (t < 69.3) { mood = t > 63.7 ? "pout" : "happy"; look = -0.3 + 0.15 * Math.sin(t * 1.3); sq = t > 63.8 ? 0.05 + 0.02 * Math.sin(t * 1.6) : 0;
+        if (t < 69.8) { mood = t > 63.7 ? "pout" : "happy"; look = -0.3 + 0.15 * Math.sin(t * 1.3); sq = t > 63.8 ? 0.05 + 0.02 * Math.sin(t * 1.6) : 0;
           if (t > 65.6 && t < 66.1) sq += 0.08 * Math.sin(seg(t, 65.6, 66.1) * Math.PI); }   // big sigh
-        else { mood = "happy"; look = 0.4; const hp = seg(t, 69.45, 70.15); hop = hp > 0 && hp < 1 ? hp : 0; wave = t > 70.15; talk = t > 69.6 && t < 70.9;
-          sq = 0.12 * c02_settle(t - 70.15, 2.6, 5); c02_gl = seg(t, 70.3, 70.45) * (1 - seg(t, 70.6, 70.8)); }
+        else { mood = "happy"; look = 0.4; const hp = seg(t, 69.95, 70.6); hop = hp > 0 && hp < 1 ? hp : 0; wave = t > 70.6; talk = t > 70.2 && t < 71.2;
+          sq = 0.12 * c02_settle(t - 70.6, 2.6, 5); c02_gl = seg(t, 70.7, 70.85) * (1 - seg(t, 71.0, 71.2)); }
       }
       nop = 1;
     }
@@ -489,24 +495,25 @@ scene(40, 72, (R, s) => {
     noa.style.transformOrigin = rot ? "50% 60%" : "50% 100%";
     if (arm !== null) noa.P.ar.setAttribute("transform", `rotate(${arm} 154 118)`);
     // sulk cloud
-    const cl = seg(t, 43.2, 43.5) * (1 - seg(t, 45.0, 45.3)), cl2 = seg(t, 63.7, 64.1) * (1 - seg(t, 69.3, 69.7));
+    const cl = seg(t, 43.2, 43.5) * (1 - seg(t, 45.0, 45.3)), cl2 = seg(t, 63.7, 64.1) * (1 - seg(t, 69.8, 70.2));
     cloud.style.opacity = t > 60 ? cl2 : cl;
-    cloud.style.transform = t > 60 ? `translate(${nx + 5 + 8 * Math.sin(t * 2)}px, ${870 - NS * c02_s - 120 - 30 * (1 - out(seg(t, 63.7, 64.1))) - 140 * ease(seg(t, 69.3, 69.7))}px)`
+    cloud.style.transform = t > 60 ? `translate(${nx + 5 + 8 * Math.sin(t * 2)}px, ${870 - NS * c02_s - 120 - 30 * (1 - out(seg(t, 63.7, 64.1))) - 140 * ease(seg(t, 69.8, 70.2))}px)`
       : `translate(${nx + 5 + 6 * Math.sin(t * 2)}px, ${ny - 90 - 20 * seg(t, 45.0, 45.3)}px)`;
     c02_glint.setAttribute("opacity", c02_gl);
     c02_glint.setAttribute("transform", `translate(128 98) scale(${0.3 + 1.1 * c02_gl}) rotate(${(t * 200) % 360})`);
     // coping meter
-    const mIn = back(seg(t, 64.0, 64.4)), fixd = seg(t, 69.3, 69.55);
-    const pct = t < 69.3 ? 3 + 9 * ease(seg(t, 64.4, 66.6)) - 2 * seg(t, 66.6, 67.4) : lerp(10, 100, out(fixd));
+    // the meter snaps to 100% on "…need one face" (70.05)
+    const mIn = back(seg(t, 64.0, 64.4)), fixd = seg(t, 69.8, 70.05);
+    const pct = t < 69.8 ? 3 + 9 * ease(seg(t, 64.4, 66.6)) - 2 * seg(t, 66.6, 67.4) : lerp(10, 100, out(fixd));
     c02_meter.style.opacity = clamp(mIn * 2) * (1 - seg(t, 71.0, 71.3));
-    c02_meter.style.transform = `scale(${(0.6 + 0.4 * mIn) * (1 + 0.1 * c02_settle(t - 69.55, 2.4, 5))}) rotate(${-2 + wobble(t, 69.55, 4, 12, 4)}deg)`;
+    c02_meter.style.transform = `scale(${(0.6 + 0.4 * mIn) * (1 + 0.1 * c02_settle(t - 70.05, 2.4, 5))}) rotate(${-2 + wobble(t, 70.05, 4, 12, 4)}deg)`;
     c02_mFill.style.width = pct.toFixed(1) + "%";
-    c02_mFill.style.background = t > 69.5 ? "repeating-linear-gradient(-45deg,#9fd3a8 0 16px,#7fc08c 16px 32px)" : "repeating-linear-gradient(-45deg,#9fd3f0 0 16px,#7cbfe6 16px 32px)";
+    c02_mFill.style.background = t > 70.0 ? "repeating-linear-gradient(-45deg,#9fd3a8 0 16px,#7fc08c 16px 32px)" : "repeating-linear-gradient(-45deg,#9fd3f0 0 16px,#7cbfe6 16px 32px)";
     const pcT = Math.round(pct) + "%"; if (c02_mPc.textContent !== pcT) c02_mPc.textContent = pcT;
-    const lbT = t > 69.5 ? "회복 완료! 😎" : t > 66.6 && t < 67.6 ? "멘탈 회복 중… (역주행)" : "멘탈 회복 중…";
+    const lbT = t > 70.0 ? "회복 완료! 😎" : t > 66.6 && t < 67.6 ? "멘탈 회복 중… (역주행)" : "멘탈 회복 중…";
     if (c02_mLb.textContent !== lbT) c02_mLb.textContent = lbT;
-    c02_burst.fire(t, 69.55, 1120, 400, 0.8);
-    shakeCam(t, 69.55, 7, 0.35);
+    c02_burst.fire(t, 70.05, 1120, 400, 0.8);
+    shakeCam(t, 70.05, 7, 0.35);
     drops.forEach((d, i) => d.setAttribute("transform", `translate(0 ${((t * 1.8 + i * 0.3) % 1) * 40})`));
     // GUIDE badge flies onto Noa and stays with him on the road
     const bIn = seg(t, 44.9, 45.3);
@@ -520,7 +527,7 @@ scene(40, 72, (R, s) => {
     sayBubble(bub, t, 43.3, 45.1, "주인공은 내가 아니라… 손님이래 😤", 620, 470);
     sayBubble(bubN, t, 47.9, 48.9, "지도 받아!", nx + 110, ny - 70);
     if (t > 64.5 && t < 67.4) sayBubble(bubN, t, 64.6, 67.4, "괜찮아… 길잡이도 멋져… 😢", 990, 560);
-    if (t > 69.5) sayBubble(bubN, t, 69.6, 71.6, "명대사는 내 몫! 😎", 990, 560);
+    if (t > 70.1) sayBubble(bubN, t, 70.2, 71.6, "얼굴 하나는 자신 있지 😎", 990, 560);
     if (t > 57.9 && t < 59.3) sayBubble(bubN, t, 57.9, 59.3, "317%… 어지러워", nx + 120, ny - 70);
     dizzy.style.opacity = t > 56.6 && t < 57.9 ? 1 : 0;
     dizzy.style.transform = `translate(${nx + 30 + 30 * Math.cos(t * 9)}px, ${ny + 10 + 8 * Math.sin(t * 9)}px)`;
@@ -541,7 +548,7 @@ scene(40, 72, (R, s) => {
     if (!u) { u = makeUchu(150); s.root.appendChild(u); ub = makeBubble(s.root); }
     // A · 42.8–46.1: pops in at the far left, fan-cheers the customer with the crown
     const aIn = seg(t, 42.8, 43.2), aOut = seg(t, 45.7, 46.2);
-    // B · 67.3–72: slides in beside Noa, "Chin up, Noa!" (lip-syncs the narration), pats his back
+    // B · 67.3–72: slides in beside Noa, lip-syncs "Chin up, Noa. Guides just need one face." (67.6–70.3), pats his back
     const bIn = seg(t, 67.3, 67.8);
     if (t < 50) {
       const x = lerp(60, 230, out(aIn)) - 300 * ease(aOut), y = 700 - 150 * Math.sin(aOut * Math.PI) + 300 * (1 - out(aIn));
@@ -550,10 +557,11 @@ scene(40, 72, (R, s) => {
       sayBubble(ub, t, 43.55, 45.5, "손님 최고! 👑", 200, 520);
     } else {
       const x = lerp(180, 610, out(bIn)), y = 690 - 110 * Math.sin(bIn * Math.PI);
-      const pat = t > 69.0 && t < 70.6;
-      poseUchu(u, t, { x, y, mood: t < 67.8 ? "shock" : "happy", look: 1, talk: t > 67.7 && t < 68.9, arms: pat ? "point" : undefined, hop: t > 70.8 && t < 71.4 ? seg(t, 70.8, 71.4) : 0, op: bIn > 0 ? 1 : 0 });
+      const pat = t > 69.0 && t < 70.9;
+      poseUchu(u, t, { x, y, mood: t < 67.8 ? "shock" : "happy", look: 1, talk: t > 67.7 && t < 70.25 && !(t > 68.75 && t < 69.05), arms: pat ? "point" : undefined, hop: t > 70.9 && t < 71.4 ? seg(t, 70.9, 71.4) : 0, op: bIn > 0 ? 1 : 0 });
       if (pat) u.P.ar.setAttribute("transform", `translate(138 160) rotate(${(-95 + 18 * Math.abs(Math.sin(t * 9))).toFixed(1)})`);
-      sayBubble(ub, t, 67.7, 69.5, "힘내, 노아! 🙌", 470, 520);
+      if (t < 68.95) sayBubble(ub, t, 67.7, 68.95, "힘내, 노아! 🙌", 470, 520);
+      else sayBubble(ub, t, 69.0, 70.6, "길잡이는 얼굴 하나면 돼!", 470, 520);
     }
   });
 })();

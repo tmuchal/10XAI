@@ -20,8 +20,8 @@ scene(134, 160, (R, s) => {
   s.caps = [[134.2, "전문성은 본문, 유머는 양념", "Expertise is the meal, humor is the seasoning"],
             [137, "전문성: 과정을 보여주고, 숫자와 후기로 증명", "Expertise: show the work, prove it with numbers and reviews"],
             [143, "유머: 사람들은 재밌는 브랜드를 기억하고 고른다", "Humor: people remember and choose funny brands"],
-            [149, "규칙 — 상황은 비틀되, 고객은 놀리지 않는다", "Rule: poke fun at the situation, never the customer"],
-            [153.5, "둘을 한 화면에: 과정 공개 + 유머 로딩", "Both at once: show the process, with a joke"]];
+            [150.5, "규칙 — 상황은 비틀되, 고객은 놀리지 않는다", "Rule: poke fun at the situation, never the customer"],
+            [154.85, "둘을 한 화면에: 과정 공개 + 유머 로딩", "Both at once: show the process, with a joke"]];
   s.cite = [[137, "Buell & Norton 2011 · Spiegel Research Center"], [143, "Oracle Happiness Report"], [149, "McGraw & Warren 2010, Benign Violations"]];
   const head = chapter(R, "CHAPTER 05", "전문성과 유머 코드"); head.style.zIndex = 20;
   const INK = C05_INK; R.style.wordBreak = "keep-all";
@@ -133,10 +133,11 @@ scene(134, 160, (R, s) => {
       <div class="lc" style="font-size:32px;color:#c0405f;margin-top:4px;height:40px"></div>
       <div style="display:flex;align-items:center;gap:16px;margin-top:18px">
         <div style="flex:1;height:38px;border:3px solid ${INK};border-radius:19px;background:#f1e4cc;overflow:hidden"><div class="lb" style="height:100%;width:0;border-right:3px solid ${INK};background:repeating-linear-gradient(45deg,#d4623a 0 18px,#ec8a5c 18px 36px)"></div></div>
-        <div class="lp" style="font-size:40px;width:90px;text-align:right">0%</div></div>
+        <div class="lp" style="flex:none;font-size:40px;width:120px;text-align:right;white-space:nowrap">0%</div></div>
       <div class="ls" style="margin-top:18px"></div>
     </div>`, R);
-  const STEPS = [["대본 확정", "Claude", 155.0], ["스틸 4장 생성", "Higgsfield", 156.0], ["5초 영상 렌더링", "Higgsfield", 159.4], ["페이지에 배치", "", 999]];
+  // step 4 = the publish step (V-14): Higgsfield hosts the page, live at once on its .higgsfield.app address
+  const STEPS = [["대본 확정", "Claude", 155.9], ["스틸 4장 생성", "Higgsfield", 156.6], ["5초 영상 렌더링", "Higgsfield", 158.6], ["Higgsfield에 게시", "바로 .higgsfield.app 주소로 공개", 159.15]];
   const stepRows = STEPS.map(x => c05_abs("position:relative;display:flex;align-items:center;gap:16px;height:52px;font-size:32px",
     `<svg width="36" height="36" viewBox="0 0 36 36" style="flex:none"><circle cx="18" cy="18" r="15" fill="#fff" stroke="${INK}" stroke-width="3"/>
        <path class="ck" d="M9 18 L16 25 L28 11" stroke="#2f7a3a" stroke-width="5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
@@ -161,7 +162,7 @@ scene(134, 160, (R, s) => {
       ${cupSvg("#c8372d")}<text x="0" y="-12" text-anchor="middle" font-size="16" fill="#fff" font-family="GaeguLat">NOA</text></g></svg>`, R);
   const steams = [mug.querySelector(".st0"), mug.querySelector(".st1")];
   const cnt = c05_abs(`left:1560px;top:430px;padding:6px 18px 8px;${c05_card("#fff3c4", 30)};font-size:44px;z-index:33;transform-origin:50% 50%`, "", R);
-  const noteA = c05_abs(`left:720px;top:720px;padding:8px 18px 10px;${c05_card("#e3f2f8", 12)};font-size:32px;color:#2f6f94;z-index:34`, "← 과정 공개 = 전문성", R);
+  const noteA = c05_abs(`left:740px;top:762px;padding:8px 18px 10px;${c05_card("#e3f2f8", 12)};font-size:32px;color:#2f6f94;z-index:34`, "← 과정 공개 = 전문성", R);
   const noteB = c05_abs(`left:1180px;top:500px;padding:8px 18px 10px;${c05_card("#fde6ec", 12)};font-size:32px;color:#c0405f;z-index:34`, "커피 = 유머 ↓", R);
 
   const wipe = c05_strips(R, ["#f08aa0", "#f7d774"]);
@@ -202,10 +203,10 @@ scene(134, 160, (R, s) => {
   };
   return t => {
     cookU(t);
-    head.style.opacity = seg(t, 137.7, 138.1) * (1 - seg(t, 153.6, 153.95));
-    wipe(t, 153.5, .8);
+    head.style.opacity = seg(t, 137.7, 138.1) * (1 - seg(t, 154.5, 154.85));
+    wipe(t, 154.4, .8);
     // ================= scale (137.6–150)
-    const exit = ease(seg(t, 149.5, 150.0));
+    const exit = ease(seg(t, 150.0, 150.5));
     SG.style.opacity = seg(t, 137.6, 137.75) * (1 - exit);
     SG.style.transform = `translateY(${80 * exit}px) scale(${1 - 0.08 * exit})`; SG.style.transformOrigin = "960px 600px";
     // post grows out of the floor, the beam unfolds from the pivot (no fly-in over the chapter plate)
@@ -276,36 +277,38 @@ scene(134, 160, (R, s) => {
       noa.P.al.setAttribute("transform", `rotate(${(cheer ? 55 : 0) + flap - th * 2} 56 160)`);
       noa.P.ar.setAttribute("transform", `rotate(${(cheer ? -55 : 0) + flap - th * 2} 144 160)`);
     }
-    // ================= rule stamp (149–153.5)
-    const sl = seg(t, 150.1, 150.42), impact = t - 150.42;
-    const ro = t < 150.1 ? 0 : clamp(sl * 5) * (1 - seg(t, 153.6, 153.95));
+    // ================= rule stamp (150.5–154.85)
+    // cued to the spoken rule (171.02 film): "Rule:" 150.9 · "the situation" 152.1 · "never" 153.0 · "…Uchal." 154.2
+    const sl = seg(t, 150.55, 150.87), impact = t - 150.87;
+    const ro = t < 150.55 ? 0 : clamp(sl * 5) * (1 - seg(t, 154.5, 154.85));
     rule.style.opacity = ro;
     const ringR = impact > 0 ? 0.05 * Math.exp(-7 * impact) * Math.cos(22 * impact) : 0;
-    rule.style.transform = `translateY(${-160 * seg(t, 153.6, 153.95)}px) scale(${(impact < 0 ? 2.3 - 1.3 * sl * sl : 1) * (1 + ringR)}) rotate(-2deg)`;
+    rule.style.transform = `translateY(${-160 * seg(t, 154.5, 154.85)}px) scale(${(impact < 0 ? 2.3 - 1.3 * sl * sl : 1) * (1 + ringR)}) rotate(-2deg)`;
     const shake = impact > 0 ? Math.exp(-6 * impact) * Math.sin(48 * impact) : 0;
-    const st2 = t - 153.1, shake2 = st2 > 0 ? .6 * Math.exp(-7 * st2) * Math.sin(50 * st2) : 0;
+    const st2 = t - 153.75, shake2 = st2 > 0 ? .6 * Math.exp(-7 * st2) * Math.sin(50 * st2) : 0;
     W.style.transform = `translate(${14 * (shake + shake2)}px, ${9 * Math.abs(shake + shake2)}px)`;
-    pop(rOk, t, 151.1, .45, 20); pop(rNo, t, 152.3, .45, 20);
-    rNo.style.transform += ` rotate(${1.5 * c05_kick(t - 152.6, 3, 14)}deg)`;
-    pop(rBv, t, 151.6, .5, 12);
-    const sp = seg(t, 152.8, 153.1);
-    stamp.style.opacity = t < 152.8 ? 0 : clamp(sp * 4) * (1 - seg(t, 153.6, 153.95));
-    stamp.style.transform = `translateY(${-160 * seg(t, 153.6, 153.95)}px) rotate(-14deg) scale(${st2 < 0 ? 3 - 2 * sp * sp : 1 + 0.08 * c05_kick(st2, 6, 20)})`;
-    const rn = seg(t, 150.5, 151.1);
-    poseNoa(ruleNoa, t, { x: 1540, y: 620 + 200 * (1 - out(rn)), s: 1.2, mood: t > 152.3 && t < 152.85 ? "shock" : "happy",
-      look: -1, hop: t > 153.1 && t < 153.6 ? (t - 153.1) / .5 : 0, op: out(rn) * (1 - seg(t, 153.6, 153.9)) });
-    // ================= loading screen (153.5–160)
-    const L = back(seg(t, 153.95, 154.5));
+    pop(rOk, t, 151.9, .45, 20); pop(rNo, t, 153.0, .45, 20);
+    rNo.style.transform += ` rotate(${1.5 * c05_kick(t - 153.3, 3, 14)}deg)`;
+    pop(rBv, t, 152.4, .5, 12);
+    const sp = seg(t, 153.45, 153.75);
+    stamp.style.opacity = t < 153.45 ? 0 : clamp(sp * 4) * (1 - seg(t, 154.5, 154.85));
+    stamp.style.transform = `translateY(${-160 * seg(t, 154.5, 154.85)}px) rotate(-14deg) scale(${st2 < 0 ? 3 - 2 * sp * sp : 1 + 0.08 * c05_kick(st2, 6, 20)})`;
+    const rn = seg(t, 150.95, 151.5);
+    poseNoa(ruleNoa, t, { x: 1540, y: 620 + 200 * (1 - out(rn)), s: 1.2, mood: t > 153.0 && t < 153.5 ? "shock" : "happy",
+      look: -1, hop: t > 153.75 && t < 154.25 ? (t - 153.75) / .5 : 0, op: out(rn) * (1 - seg(t, 154.5, 154.8)) });
+    // ================= loading screen (154.85–160): "'Noa's rendering, coffee number two.' Claude wrote that." (155.0)
+    const L = back(seg(t, 154.85, 155.35));
     ld.style.opacity = clamp(L * 3); ld.style.transform = `translateY(${120 * (1 - L)}px) rotate(${-1.2 * (1 - L)}deg)`;
-    lt.textContent = type("노아가 브랜드 필름을 렌더링하는 중…", seg(t, 154.15, 155.2));
+    lt.textContent = type("노아가 브랜드 필름을 렌더링하는 중…", seg(t, 155.0, 155.9));
     const third = t > 158.3;
-    lc.textContent = t < 155.35 ? "" : third ? "(커피 3잔째… 거의 다 됐어요 ☕)" : "(커피 2잔째 ☕)";
+    lc.textContent = t < 156.0 ? "" : third ? "(커피 3잔째… 거의 다 됐어요 ☕)" : "(커피 2잔째 ☕)";
     lc.style.transform = `scale(${third ? 1 + 0.12 * c05_kick(t - 158.3, 5, 14) : 1})`; lc.style.transformOrigin = "0 50%";
-    const prog = t < 154.45 ? 0 : t < 155.0 ? .25 * ease(seg(t, 154.45, 155.0)) : t < 156.0 ? .25 + .25 * ease(seg(t, 155.2, 156.0)) : .5 + .38 * ease(seg(t, 156.2, 159.4));
+    const prog = t < 155.35 ? 0 : t < 155.9 ? .25 * ease(seg(t, 155.35, 155.9)) : t < 156.6 ? .25 + .25 * ease(seg(t, 155.95, 156.6)) :
+      t < 158.6 ? .5 + .35 * ease(seg(t, 156.8, 158.6)) : .85 + .15 * ease(seg(t, 158.7, 159.15));
     lb.style.width = (100 * prog) + "%"; lb.style.backgroundPosition = `${t * 70}px 0`;
     lp.textContent = Math.round(prog * 100) + "%";
     stepRows.forEach((r, i) => {
-      const [, , done] = STEPS[i], appear = 154.45 + i * .3, active = t > (i ? STEPS[i - 1][2] : 154.45) && t < done;
+      const [, , done] = STEPS[i], appear = 155.3 + i * .25, active = t > (i ? STEPS[i - 1][2] : 155.35) && t < done;
       const p = back(seg(t, appear, appear + .4));
       r.style.opacity = clamp(p * 2); r.style.transform = `translateX(${-30 * (1 - clamp(p))}px)`;
       const ck = r.querySelector(".ck"), spn = r.querySelector(".sp");
@@ -315,9 +318,9 @@ scene(134, 160, (R, s) => {
       r.querySelector(".nm").style.color = t > done ? "#2f7a3a" : active ? "#d4623a" : "#9a8f80";
     });
     // desk scene
-    const D = out(seg(t, 154.1, 154.7));
+    const D = out(seg(t, 154.9, 155.5));
     desk.style.opacity = D; desk.style.transform = `translateX(${200 * (1 - D)}px)`;
-    const sipPh = ((t - 154.8) % 2.6 + 2.6) % 2.6, sip = t < 154.8 ? 0 : ease(seg(sipPh, .2, .6)) * (1 - ease(seg(sipPh, 1.3, 1.7)));
+    const sipPh = ((t - 155.5) % 2.6 + 2.6) % 2.6, sip = t < 155.5 ? 0 : ease(seg(sipPh, .2, .6)) * (1 - ease(seg(sipPh, 1.3, 1.7)));
     poseNoa(deskNoa, t, { x: 1400 + 200 * (1 - D), y: 575, s: 1, look: sip > .5 ? 0 : -1, mood: sip > .6 ? "pout" : "happy", op: D });
     deskNoa.P.ar.setAttribute("transform", `rotate(${-70 * sip} 144 160)`);
     const mx = lerp(1690, 1548, sip), my = lerp(790, 762, sip);
@@ -329,9 +332,9 @@ scene(134, 160, (R, s) => {
       c.setAttribute("transform", `translate(${90 + i * 62} ${222 - 260 * (1 - ap * ap)}) scale(${1 + bb} ${1 - bb})`);
       c.setAttribute("opacity", i < 2 ? 1 : ap > 0 ? 1 : 0); });
     cnt.textContent = third ? "☕ × 3" : "☕ × 2";
-    const cp = back(seg(t, 155.35, 155.85));
+    const cp = back(seg(t, 156.0, 156.5));
     cnt.style.opacity = D * clamp(cp * 2); cnt.style.transform = `rotate(6deg) scale(${(0.6 + 0.4 * cp) * (third ? 1 + 0.35 * c05_kick(t - 158.3, 4, 12) : 1)})`;
-    [[noteA, 156.9], [noteB, 157.5]].forEach(([n, a]) => { const p = back(seg(t, a, a + .45));
+    [[noteA, 157.0], [noteB, 157.6]].forEach(([n, a]) => { const p = back(seg(t, a, a + .45));
       n.style.opacity = clamp(p * 2); n.style.transform = `scale(${0.5 + 0.5 * p}) rotate(${n === noteA ? -3 : 3}deg)`; });
   };
 });
@@ -360,17 +363,17 @@ scene(134, 160, (R, s) => {
       sayBubble(ub, t, 137.3, 138.0, "매콤달콤?!", 330, 540);
     } else {
       spoon.style.opacity = 0;
-      // rule stamp (149.7–153.3): starts a customer joke, the ✗ lands, the SAFE stamp slams → pout, then agrees
-      // starts a customer joke right before "never the customer" (152.4) → the ✗ lands → SAFE stamp → pout → agrees
-      const inP = seg(t, 150.5, 150.9), outP = seg(t, 153.6, 153.95);
+      // rule stamp (151–154.95): starts a customer joke right before "never"
+      // V-18: the ✗ on "never" (153.0) → SAFE stamp → pout through "…the customer, Uchal." → agrees after his name (154.3)
+      const inP = seg(t, 150.95, 151.35), outP = seg(t, 154.6, 154.95);
       let mood = "happy", talk = false, hop = 0, look = .6, arms;
-      if (t < 152.3) { talk = t > 151.6; arms = t > 151.6 ? "hips" : undefined; }
-      else if (t < 152.85) { mood = "shock"; }
-      else if (t < 153.2) { mood = "pout"; }
-      else { mood = "happy"; hop = seg(t, 153.2, 153.65); }
+      if (t < 153.0) { talk = t > 152.0; arms = t > 152.0 ? "hips" : undefined; }
+      else if (t < 153.5) { mood = "shock"; }
+      else if (t < 154.3) { mood = "pout"; }
+      else { mood = "happy"; hop = seg(t, 154.3, 154.7); }
       poseUchu(u, t, { x: 190, y: lerp(1040, 700, back(inP)) + 320 * ease(outP), s: 150 / 160, mood, talk, hop, look, arms, op: inP > 0 && outP < 1 ? 1 : 0 });
-      if (t < 152.6) sayBubble(ub, t, 151.6, 152.35, "근데 그 손님 말이야~", 110, 560);
-      else sayBubble(ub, t, 153.15, 153.9, "넵… 상황만!", 110, 560);
+      if (t < 153.3) sayBubble(ub, t, 152.0, 153.05, "근데 그 손님 말이야~", 110, 560);
+      else sayBubble(ub, t, 154.3, 154.95, "넵… 상황만!", 110, 560);
     }
   });
 })();

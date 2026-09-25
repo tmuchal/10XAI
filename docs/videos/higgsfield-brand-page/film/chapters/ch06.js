@@ -3,6 +3,9 @@
 // coins that Noa catches. Then the revenue formula rolls up, four businesses get one clear
 // button each (pressed by a cursor), and the reference page's closing CTA is revealed.
 const C06_INK = "#2b2320";
+// Claude mark for the "Claude writes your button copy" micro-badges on the CTA board (177.3: "Tomorrow: Claude writes yours")
+const C06_CLAUDE = `<svg width="22" height="22" viewBox="-20 -20 40 40" style="flex:none">${Array.from({ length: 8 }, (_, k) =>
+  `<path d="M0 -3 L-3 -17 Q0 -20 3 -17Z" fill="#d97757" stroke="${C06_INK}" stroke-width="2" stroke-linejoin="round" transform="rotate(${k * 45})"/>`).join("")}<circle r="4.5" fill="#d97757" stroke="${C06_INK}" stroke-width="2"/></svg>`;
 const c06_card = (bg = "#fffaf0", r = 16) => `background:${bg};border:3px solid ${C06_INK};border-radius:${r}px;box-shadow:6px 7px 0 rgba(43,35,32,.22)`;
 const c06_abs = (css, html, parent) => el("div", "position:absolute;" + css, html, parent);
 const c06_h = (i, k) => { const x = Math.sin(i * 12.9898 + k * 78.233) * 43758.5453; return x - Math.floor(x); };
@@ -134,13 +137,14 @@ scene(160, 184, (R, s) => {
       <div class="pb" style="position:absolute;left:24px;right:24px;top:132px;height:84px;border-radius:42px;background:#d4623a;border:3px solid ${INK};box-shadow:0 7px 0 ${INK};color:#fff;font-size:38px;display:flex;align-items:center;justify-content:center;gap:10px">${c[3]} <span class="ok" style="opacity:0">✓</span></div>
       <div style="position:absolute;left:0;right:0;top:236px;text-align:center;font-size:24px;color:#6b5d52">${c[4]}</div>
       <div class="sb" style="position:absolute;left:54px;right:54px;top:292px;height:60px;border-radius:30px;border:3px dashed ${INK};background:rgba(255,255,255,.55);font-size:28px;color:#6b5d52;display:flex;align-items:center;justify-content:center">${c[5]}</div>
+      <div class="cl" style="position:absolute;right:8px;top:106px;z-index:3;display:flex;align-items:center;gap:5px;padding:1px 12px 3px 6px;border:3px solid ${INK};border-radius:999px;background:#fbd0bd;font-size:22px;opacity:0;transform-origin:100% 100%">${C06_CLAUDE}Claude 문구</div>
       <div class="rp" style="position:absolute;left:190px;top:174px;width:0;height:0"><div style="position:absolute;left:-60px;top:-60px;width:120px;height:120px;border-radius:50%;border:5px solid #f2c14e"></div></div>`, R);
     return e;
   });
   const softNote = c06_abs(`left:560px;top:770px;padding:8px 22px 10px;${c06_card("#fffaf0", 14)};font-size:30px;white-space:nowrap`, "↑ 점선 = 보조 CTA · 망설이는 사람을 위한 부드러운 선택지", R);
   const cursor = c06_abs("left:0;top:0;width:60px;height:70px;z-index:45", `<svg width="60" height="70" viewBox="0 0 60 70" overflow="visible">
     <path d="M4 2 L4 52 L17 40 L27 62 L37 57 L27 36 L45 36 Z" fill="#fff" stroke="${INK}" stroke-width="4" stroke-linejoin="round"/></svg>`, R);
-  const PRESS = [177.0, 177.45, 177.9, 178.35];
+  const PRESS = [177.3, 177.75, 178.2, 178.65];
 
   // ================= reference page reveal
   const stars = [[330, 200], [1470, 170], [300, 640], [1500, 600], [760, 150], [1160, 760]].map(([x, y], i) => c06_abs(`left:${x}px;top:${y}px;width:70px;height:70px;z-index:6`,
@@ -154,10 +158,11 @@ scene(160, 184, (R, s) => {
   const wipeA = c06_strips(R, ["#f7d774", "#f08aa0"]), wipeB = c06_strips(R, ["#7cc3e0", "#f7d774"]);
 
   // Beats cued to the narration: button 161.0 · formula 167.0 · +1%p 170.9 · "4.5 million" 172.4 ·
-  // "That's the button" 176.15 · "Noa's cheeks? Already full." 181.0
+  // Re-cued to the spoken lines (film 190.86 / 196.24): "one point" 172.0 · "becomes 4.5" 175.4 · "That's the button" 176.3 ·
+  // "Tomorrow: Claude writes yours" 177.3 · "Noa's cheeks? Already full." 181.0
   return t => {
-    // ---------- funnel + formula phase (160.2–176.1)
-    const M = seg(t, 160.2, 160.8), X1 = ease(seg(t, 175.55, 176.1));
+    // ---------- funnel + formula phase (160.2–176.35)
+    const M = seg(t, 160.2, 160.8), X1 = ease(seg(t, 175.95, 176.35));
     const fin = back(seg(t, 160.3, 161.0));
     fun.style.opacity = clamp(fin * 2) * (1 - X1);
     fun.style.transform = `translate(${-200 * X1}px, ${60 * (1 - clamp(fin))}px) scale(${0.9 + 0.1 * fin})`; fun.style.transformOrigin = "540px 700px";
@@ -200,13 +205,13 @@ scene(160, 184, (R, s) => {
       cx = lerp(1780, 1450, m); cy = lerp(760, 420, m) - 40 * Math.sin(Math.PI * m);
       if (t > 162.1) { const e = ease(seg(t, 162.1, 162.6)); cx += 260 * e; cy += 300 * e; }
       cop = seg(t, 161.25, 161.4) * (1 - seg(t, 162.35, 162.6));
-    } else if (t >= 176.6) {
+    } else if (t >= 176.9) {
       let k = 0; while (k < 3 && t > PRESS[k] + .25) k++;
       const from = k === 0 ? [1000, 980] : bxy(k - 1), to = bxy(k);
-      const m = ease(seg(t, k === 0 ? 176.6 : PRESS[k - 1] + .25, PRESS[k] - .05));
+      const m = ease(seg(t, k === 0 ? 176.9 : PRESS[k - 1] + .25, PRESS[k] - .05));
       cx = lerp(from[0], to[0], m); cy = lerp(from[1], to[1], m) - 40 * Math.sin(m * Math.PI);
-      if (t > PRESS[3] + .25) { const e = ease(seg(t, PRESS[3] + .3, 179.2)); cx = lerp(to[0], 1850, e); cy = lerp(to[1], 900, e); }
-      cop = seg(t, 176.6, 176.8) * (1 - seg(t, 178.9, 179.2));
+      if (t > PRESS[3] + .25) { const e = ease(seg(t, PRESS[3] + .3, 179.3)); cx = lerp(to[0], 1850, e); cy = lerp(to[1], 900, e); }
+      cop = seg(t, 176.9, 177.1) * (1 - seg(t, 179.0, 179.3));
     }
     const cpr = [161.95, ...PRESS].some(p => t > p - .04 && t < p + .16);
     cursor.style.opacity = cop;
@@ -224,16 +229,16 @@ scene(160, 184, (R, s) => {
     });
     const cOp = seg(t, 162.2, 162.6) * (1 - X1), nOp = seg(t, 160.4, 160.8) * (1 - X1);
     const bump = c06_kick(t - lastCatch, 7, 18);
-    const cheer = t > 173.8 && t < 174.6;
+    const cheer = t > 175.4 && t < 176.2;
     poseNoa(catcher, t, { x: bx - 80, y: 722 + 6 * bump, s: 1, look: t < 162 ? .4 : -.6, mood: "happy",
-      hop: cheer ? (t - 173.8) / .8 : 0, arms: t > 162.1 ? "up" : undefined, op: nOp });
+      hop: cheer ? (t - 175.4) / .8 : 0, arms: t > 162.1 ? "up" : undefined, op: nOp });
     // cheek pouches fill up with every other coin (pays off at 181: "Noa's cheeks? Already full.")
     const puffC = 1 + Math.min(.45, inCheek * .07) + .12 * c06_kick(t - lastCatch, 6, 16) * (inCheek > 0 ? 1 : 0);
     catcher.P.ckl.setAttribute("transform", `translate(50 128) scale(${puffC.toFixed(3)}) translate(-50 -128)`);
     catcher.P.ckr.setAttribute("transform", `translate(150 128) scale(${puffC.toFixed(3)}) translate(-150 -128)`);
-    basket.style.opacity = cOp * (1 - seg(t, 175.4, 175.6)); basket.style.transform = `translate(${bx - 60}px, ${688 + 8 * bump}px)`;
+    basket.style.opacity = cOp * (1 - seg(t, 175.9, 176.1)); basket.style.transform = `translate(${bx - 60}px, ${688 + 8 * bump}px)`;
     env.style.opacity = 0; eLab.style.opacity = 0;
-    burst.forEach((b, i) => { const tau = t - 173.8, a = i / burst.length * 6.283 + .3 * c06_h(i, 2), d = (120 + 90 * c06_h(i, 3)) * out(seg(tau, 0, .6));
+    burst.forEach((b, i) => { const tau = t - 175.4, a = i / burst.length * 6.283 + .3 * c06_h(i, 2), d = (120 + 90 * c06_h(i, 3)) * out(seg(tau, 0, .6));
       b.style.opacity = tau > 0 && X1 < 1 ? 1 - seg(tau, .5, .9) : 0;
       b.style.transform = `translate(${1400 + Math.cos(a) * d * 1.4 - 8}px, ${590 + Math.sin(a) * d * .7 + 120 * tau * tau - 8}px) rotate(${tau * 500 + i * 40}deg)`; });
     // compact live counter (top right, clear of the 3D insert at 163–166)
@@ -256,12 +261,12 @@ scene(160, 184, (R, s) => {
     ops.forEach((e, i) => { const p = back(seg(t, TT[i + 1] - .2, TT[i + 1] + .1)); e.style.opacity = clamp(p * 2); e.style.transform = `scale(${p})`; });
     const rp = back(seg(t, 169.9, 170.3));
     res.style.opacity = clamp(rp * 2); res.style.transform = `scale(${0.7 + 0.3 * rp})`;
-    const FL0 = 171.15;                                                  // "+1 point of conversion"
+    const FL0 = 172.0;                                                   // "Say conversion rises one point"
     const flip = t < FL0 ? 1 : t < FL0 + .2 ? 1 - seg(t, FL0, FL0 + .2) : back(seg(t, FL0 + .2, FL0 + .5));
     tiles[1].style.transform += ` scaleY(${Math.max(.02, flip)})`;
     tiles[1].style.background = t > FL0 + .2 ? "#d8f0cf" : "#fffaf0";
     crV.textContent = t > FL0 + .2 ? "2.5%" : "1.5%"; crV.style.color = t > FL0 + .2 ? "#2f7a3a" : INK;
-    const R1 = 172.35, R2 = 173.75;
+    const R1 = 174.6, R2 = 175.4;                                        // "…becomes 4.5"
     const roll = t < R1 ? 2700000 * out(seg(t, 169.95, 170.75)) : lerp(2700000, 4500000, ease(seg(t, R1, R2)));
     rv.textContent = "₩" + fmt(Math.round(roll / 1000) * 1000);
     rv.style.color = t > R1 ? "#2f7a3a" : INK;
@@ -271,10 +276,10 @@ scene(160, 184, (R, s) => {
     const dp = back(seg(t, R2, R2 + .4)); delta.style.opacity = clamp(dp * 2); delta.style.transform = `rotate(-6deg) scale(${1.6 - 0.6 * dp})`;
     // ---------- CTA board (176.05–181): "That's the button: one clear call to action, plus a soft one for maybe-laters."
     const X2 = ease(seg(t, 180.55, 181.0));
-    const hh = back(seg(t, 176.05, 176.5));
+    const hh = back(seg(t, 176.3, 176.75));
     ctaH.style.opacity = clamp(hh * 2) * (1 - X2); ctaH.style.transform = `translateY(${-30 * (1 - hh) - 60 * X2}px)`;
     cards.forEach((c, i) => {
-      const p = back(seg(t, 176.15 + i * .12, 176.6 + i * .12));
+      const p = back(seg(t, 176.4 + i * .12, 176.85 + i * .12));
       const tp2 = t - PRESS[i], pressed = tp2 > 0 && tp2 < .22;
       c.style.opacity = clamp(p * 2) * (1 - X2);
       c.style.transform = `translateY(${120 * (1 - p) + 200 * X2}px) rotate(${(i % 2 ? 1 : -1) * (1 - p) * 6 + (i % 2 ? .8 : -.8)}deg) scale(${1 + 0.04 * c06_kick(tp2, 6, 14)})`;
@@ -284,8 +289,10 @@ scene(160, 184, (R, s) => {
       pb.querySelector(".ok").style.opacity = seg(tp2, .15, .35);
       const rpp = seg(tp2, 0, .55), rr = c.querySelector(".rp > div");
       rr.style.opacity = tp2 > 0 ? 1 - rpp : 0; rr.style.transform = `scale(${0.3 + 2.4 * out(rpp)})`;
-      const sb = c.querySelector(".sb"), sp = back(seg(t, 176.55 + i * .12, 176.95 + i * .12));
-      sb.style.opacity = clamp(sp * 2) * (t > 178.85 ? 1 : .75); sb.style.transform = `scale(${(0.6 + 0.4 * sp) * (1 + .1 * c06_kick(t - 178.9 - i * .1, 5, 14))})`;
+      const clp = back(seg(t, 177.35 + i * .1, 177.7 + i * .1)), cl = c.querySelector(".cl");
+      cl.style.opacity = clamp(clp * 2); cl.style.transform = `scale(${.4 + .6 * clp}) rotate(${4 - 2 * clp}deg)`;
+      const sb = c.querySelector(".sb"), sp = back(seg(t, 176.8 + i * .12, 177.2 + i * .12));
+      sb.style.opacity = clamp(sp * 2) * (t > 179.0 ? 1 : .75); sb.style.transform = `scale(${(0.6 + 0.4 * sp) * (1 + .1 * c06_kick(t - 179.05 - i * .1, 5, 14))})`;
     });
     const sn = back(seg(t, 179.0, 179.4)); softNote.style.opacity = clamp(sn * 2) * (1 - X2); softNote.style.transform = `translateY(${20 * (1 - sn)}px)`;
     // ---------- finale (181–184): "Noa's cheeks? Already full."
@@ -311,7 +318,7 @@ scene(160, 184, (R, s) => {
     stars.forEach((e, i) => { const p = back(seg(t, 181.05 + i * .07, 181.4 + i * .07));
       e.style.opacity = clamp(p * 2); e.style.transform = `scale(${p * (0.85 + 0.2 * Math.sin(t * 5 + i))}) rotate(${t * 40 + i * 30}deg)`; });
     head.style.opacity = 1 - seg(t, 180.5, 180.9);
-    wipeA(t, 175.45, .8); wipeB(t, 180.45, .8);
+    wipeA(t, 175.9, .8); wipeB(t, 180.45, .8);
   };
 });
 
@@ -325,7 +332,7 @@ scene(160, 184, (R, s) => {
       coin = el("div", "position:absolute;left:0;top:0;z-index:33;width:44px;height:44px", `<svg width="44" height="44" viewBox="0 0 40 40"><circle cx="20" cy="20" r="17" fill="#f7c843" stroke="${INK}" stroke-width="3"/>
         <circle cx="20" cy="20" r="11" fill="none" stroke="#c98a1a" stroke-width="2"/><text x="20" y="27" text-anchor="middle" font-size="19" font-family="GaeguLat" fill="#8a5a12">₩</text></svg>`, s.root);
     }
-    const inP = seg(t, 162.7, 163.15), X1 = ease(seg(t, 175.55, 176.1));
+    const inP = seg(t, 162.7, 163.15), X1 = ease(seg(t, 175.95, 176.35));
     const x = 905 + 12 * Math.sin(t * 2.2) * (t < 165.8 ? 1 : 0), y = lerp(1060, 668, back(inP));
     let mood = "happy", hop = 0, arms = "up", look = -1, talk = false;
     if (t < 165.8) hop = ((t - 163.1) * 1.7) % 1 * .55;                 // jumping for coins, catching nothing
@@ -334,8 +341,8 @@ scene(160, 184, (R, s) => {
     const cf = seg(t, 166.0, 166.55), bonk = t > 166.55 && t < 167.0;
     if (bonk) { mood = "shock"; arms = undefined; }
     if (t >= 167.0 && t < 170.3) { mood = "happy"; arms = undefined; hop = t < 167.6 ? seg(t, 167.0, 167.6) : 0; look = -.4; }
-    if (t >= 170.3 && t < 173.75) { mood = "happy"; look = .8; arms = "hips"; }
-    if (t >= 173.75) { mood = "shock"; look = .6; }                     // ₩4,500,000!
+    if (t >= 170.3 && t < 175.4) { mood = "happy"; look = .8; arms = "hips"; }
+    if (t >= 175.4) { mood = "shock"; look = .6; }                      // ₩4,500,000! (on the spoken "4.5")
     poseUchu(u, t, { x: x + 700 * X1, y: y - 120 * Math.sin(X1 * Math.PI), mood, hop, arms, look, talk, op: inP > 0 && X1 < 1 ? 1 : 0 });
     // coin path: Noa's head (≈780,720) → arc → Uchu's head, bounce up, into his mitten
     let cx, cy, cop = 1, cr = t * 600;

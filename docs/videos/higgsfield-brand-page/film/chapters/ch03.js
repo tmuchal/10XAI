@@ -41,6 +41,19 @@ function c03_scape(p) {
   e.update(0);
   return e;
 }
+// a real person (shop owner) for the Soul ID beat: Soul ID is trained on 20+ photos of a REAL face, not on a mascot.
+// look -1..1 turns the face; smile 0/1. Returns an SVG string (viewBox 0 0 100 110).
+const c03_person = (look = 0, smile = 1) => { const L = 7 * look;
+  return `<svg viewBox="0 0 100 110" width="100%" height="100%" style="display:block" overflow="visible">
+    <path d="M10 112 Q12 80 50 76 Q88 80 90 112Z" fill="#6fb3d9" stroke="${c03_INK}" stroke-width="3.5" stroke-linejoin="round"/>
+    <path d="M33 112 V88 Q50 82 67 88 V112Z" fill="#f7d774" stroke="${c03_INK}" stroke-width="3"/>
+    <rect x="43" y="62" width="14" height="18" rx="5" fill="#f1c29a" stroke="${c03_INK}" stroke-width="3"/>
+    <ellipse cx="${50 + L * .3}" cy="40" rx="27" ry="29" fill="#3b2a24" stroke="${c03_INK}" stroke-width="3.5"/>
+    <ellipse cx="${50 + L * .6}" cy="44" rx="20" ry="22" fill="#f6cfa9" stroke="${c03_INK}" stroke-width="3.5"/>
+    <path d="M${30 + L * .6} 40 Q${34 + L} 16 ${52 + L} 17 Q${70 + L} 18 ${71 + L * .6} 40 Q${60 + L} 29 ${45 + L} 30 Q${37 + L} 32 ${30 + L * .6} 40Z" fill="#3b2a24"/>
+    <circle cx="${42 + L}" cy="46" r="2.8" fill="${c03_INK}"/><circle cx="${58 + L}" cy="46" r="2.8" fill="${c03_INK}"/>
+    <circle cx="${38 + L}" cy="54" r="4" fill="#f2a7a0" opacity=".7"/><circle cx="${62 + L}" cy="54" r="4" fill="#f2a7a0" opacity=".7"/>
+    <path d="M${45 + L} 56 Q${50 + L} ${56 + 5 * smile} ${55 + L} 56" stroke="${c03_INK}" stroke-width="2.6" fill="none" stroke-linecap="round"/></svg>`; };
 function c03_box(parent, x, y, w, h, bg, extra = "") {
   const b = el("div", `left:${x}px;top:${y}px;width:${w}px;height:${h}px;background:${bg};border:4px solid ${c03_INK};border-radius:18px;box-shadow:${c03_SH};${extra}`, "", parent);
   b.className = "abs"; return b;
@@ -78,7 +91,7 @@ const c03_PENCIL = `<svg width="150" height="150" viewBox="0 0 150 150" overflow
 scene(72, 106, (R, s) => {
   s.caps = [[72.2, "컷마다 얼굴이 바뀌면, 몰입이 깨집니다", "If the face changes every shot, immersion breaks"],
             [82, "① 캐릭터 시트: 회색 배경 · 얼굴 클로즈업 + 앞 · 뒤 전신", "1. Character sheet on grey: headshot + full body front & back"],
-            [86.5, "② Soul ID: 같은 사람 사진 20장+ → 3~5분 학습 → 저장", "2. Soul ID: 20+ photos, ~3–5 min training, saved identity"],
+            [86.5, "② Soul ID는 실제 인물용: 같은 사람 사진 20장+ → 3~5분 학습 · 마스코트는 시트 + 레퍼런스", "2. Soul ID is for real faces: 20+ photos, ~3–5 min; a mascot uses the sheet + references"],
             [91, "③ Reference Element로 Kling · Seedance 영상에 재사용", "3. Reuse it in Kling / Seedance via Reference Element"],
             [95, "④ 의상·헤어 고정 + 네거티브 프롬프트  ⑤ 시드보다 레퍼런스", "4. Lock outfit & hair  5. References beat seeds"],
             [99.5, "배경과 앵글이 달라도, 같은 사람", "Different scenes and angles, same person"]];
@@ -106,7 +119,7 @@ scene(72, 106, (R, s) => {
   const whoB = makeBubble(gag), meB = [0, 1, 2].map(() => makeBubble(gag));
 
   // ============ step rail (82–99.5)
-  const RAIL = [["1", "캐릭터 시트", "얼굴 + 앞 · 뒤 전신", 82, 86.5], ["2", "Soul ID", "사진 20장+ 학습", 86.5, 91],
+  const RAIL = [["1", "캐릭터 시트", "얼굴 + 앞 · 뒤 전신", 82, 86.5], ["2", "Soul ID", "실제 인물 전용", 86.5, 91],
                 ["3", "레퍼런스", "Kling · Seedance 2.0", 91, 95], ["4", "의상·헤어 고정", "+ 네거티브", 95, 96.7], ["5", "시드 < 레퍼런스", "레퍼런스가 이김", 96.7, 99.5]];
   const rail = RAIL.map((r, i) => {
     const n = c03_box(R, 1430, 228 + i * 122, 360, 104, "#fffaf0", "display:flex;align-items:center;gap:14px;padding:0 16px;transform-origin:0 50%");
@@ -158,7 +171,14 @@ scene(72, 106, (R, s) => {
     <text x="150" y="50" text-anchor="middle" font-size="36" font-family="GaeguLat, GaeguKo" font-weight="700" fill="${c03_INK}">SOUL ID</text>
     <g class="rays" stroke="${c03_INK}" stroke-width="4" stroke-linecap="round">${[-60, -20, 20, 60].map(a => `<path d="M0 -34 L0 -54" transform="translate(217 418) rotate(${a})"/>`).join("")}</g>
   </svg>`, R); booth.className = "abs";
-  const bNoa = makeNoa(150); booth.appendChild(bNoa);
+  const bP = el("div", "position:absolute;left:46px;top:128px;width:170px;height:218px;overflow:hidden;z-index:31", "", booth);
+  const bPv = [-1, -.5, 0, .5, 1].map((lk, i) => el("div", `position:absolute;left:12px;top:26px;width:150px;height:190px;display:${i === 2 ? "block" : "none"}`, c03_person(lk, i % 2 ? 0 : 1), bP));
+  const bTag = el("div", `position:absolute;left:52px;top:-44px;padding:2px 14px 4px;border:4px solid ${c03_INK};border-radius:12px;background:#fffaf0;font-size:28px;color:#c8372d;white-space:nowrap;transform:rotate(-3deg)`, "실제 인물용", booth);
+  // the 3D insert (right) is Noa in a photo booth: for a mascot that's shooting reference cuts, not Soul ID
+  const c03_noaTag = c03_box(R, 770, 610, 400, 150, "#fffaf0", "display:flex;flex-direction:column;justify-content:center;padding:0 22px;white-space:nowrap;transform-origin:100% 50%");
+  c03_noaTag.innerHTML = `<div style="font-size:28px;line-height:1.2;color:${c03_INK}">노아(마스코트)는</div>
+    <div style="font-size:36px;line-height:1.2;color:#c8372d">레퍼런스 컷 촬영 →</div>
+    <div style="font-size:23px;line-height:1.3;color:#6b5d52">① 시트 + ③ 레퍼런스로 고정</div>`;
   const curtain = el("div", `position:absolute;left:180px;top:104px;width:84px;height:244px;z-index:32;border-left:4px solid ${c03_INK};border-radius:0 10px 10px 0;background:repeating-linear-gradient(90deg,#c8372d 0 14px,#db5443 14px 24px)`, "", booth);
   const flash = el("div", "position:absolute;left:38px;top:104px;width:224px;height:242px;border-radius:10px;background:#fff;z-index:33;opacity:0", "", booth);
   const bRays = booth.querySelector(".rays"), bulb = booth.querySelector(".bulb");
@@ -166,7 +186,7 @@ scene(72, 106, (R, s) => {
     const c = i % 5, r = Math.floor(i / 5);
     const d = el("div", `left:0;top:0;width:118px;height:138px;background:#fff;border:3px solid ${c03_INK};border-radius:6px;box-shadow:4px 5px 0 rgba(43,35,32,.2)`, "", R); d.className = "abs";
     const img = el("div", `position:absolute;left:7px;top:7px;width:98px;height:92px;overflow:hidden;border:2px solid ${c03_INK};background:${["#d8eef7", "#fbe3b0", "#e4f2d6", "#fbd9d3", "#e2dbff"][(i * 3) % 5]}`, "", d);
-    d.n = makeNoa(76); img.appendChild(d.n);
+    el("div", "position:absolute;left:14px;top:10px;width:70px;height:84px", c03_person([-1, -.5, 0, .5, 1][i % 5], (i >> 1) % 2), img);
     el("div", `position:absolute;left:0;right:0;bottom:4px;text-align:center;font-size:22px;color:${c03_INK}`, `#${i + 1}`, d);
     d.tx = 476 + (i % 3) * 44 + (c03_hash(i, 1) - .5) * 30; d.ty = 236 + Math.floor(i / 3) * 62 + (c03_hash(i, 2) - .5) * 20; d.rot = (c03_hash(i, 3) - .5) * 34;
     d.at = 86.8 + i * .09; d.look = [-1, -.5, 0, .5, 1][i % 5]; d.flip = c03_hash(i, 4) > .6; d.ns = .9 + .25 * c03_hash(i, 5);
@@ -179,16 +199,24 @@ scene(72, 106, (R, s) => {
   const clock = el("div", "position:absolute;left:14px;top:5px", `<svg width="54" height="54"><circle cx="27" cy="27" r="22" fill="#fff" stroke="${c03_INK}" stroke-width="4"/><path class="hd" d="M27 27 V11" stroke="${c03_INK}" stroke-width="4" stroke-linecap="round"/><path class="hd2" d="M27 27 H38" stroke="#c8372d" stroke-width="4" stroke-linecap="round"/></svg>`, train);
   const hands = [clock.querySelector(".hd"), clock.querySelector(".hd2")];
   // the Soul ID card (later becomes the Reference Element)
+  // front: the Soul ID of a real person · flips (90.75–91.15) to the back: Noa's Reference Element, built from the character sheet
   const card = c03_box(R, 720, 290, 500, 336, "#fff4d0", "transform-origin:0 0;overflow:visible");
   card.innerHTML = `<div style="position:absolute;left:0;right:0;top:0;height:18px;border-radius:14px 14px 0 0;background:linear-gradient(90deg,#f2a7a0,#f7d774,#bfe3a6,#9fd3f0,#cdbff3);border-bottom:3px solid ${c03_INK}"></div>
-    <div class="ph" style="position:absolute;left:24px;top:44px;width:170px;height:200px;border:4px solid ${c03_INK};border-radius:12px;background:#fbe3b0;overflow:hidden"></div>
+    <div class="fr" style="position:absolute;inset:0">
+    <div style="position:absolute;left:24px;top:44px;width:170px;height:200px;border:4px solid ${c03_INK};border-radius:12px;background:#d8eef7;overflow:hidden"><div style="position:absolute;left:14px;top:26px;width:142px;height:176px">${c03_person(0, 1)}</div></div>
     <div style="position:absolute;left:220px;top:36px;font-size:28px;letter-spacing:3px;color:#c8372d">SOUL ID</div>
+    <div style="position:absolute;left:218px;top:70px;font-size:66px;line-height:1;color:${c03_INK}">사장님</div>
+    <div style="position:absolute;left:220px;top:152px;font-size:24px;line-height:1.4;color:#6b5d52;white-space:nowrap">실제 인물 · 20장+<br>3~5분 학습 → 저장</div>
+    <div style="position:absolute;left:24px;top:290px;font-size:22px;color:#c8372d;white-space:nowrap">사람 얼굴 전용 · 마스코트는 뒷면 ↻</div></div>
+    <div class="bk" style="position:absolute;inset:0;display:none">
+    <div class="ph" style="position:absolute;left:24px;top:44px;width:170px;height:200px;border:4px solid ${c03_INK};border-radius:12px;background:#cfcfcf;overflow:hidden"></div>
+    <div style="position:absolute;left:220px;top:40px;font-size:20px;letter-spacing:1px;color:#3e8fb8;white-space:nowrap">REFERENCE ELEMENT</div>
     <div style="position:absolute;left:218px;top:66px;font-size:78px;line-height:1;color:${c03_INK}">NOA</div>
-    <div style="position:absolute;left:220px;top:160px;font-size:24px;line-height:1.4;color:#6b5d52">사진 20장+ 학습<br>3~5분 → 이름 저장</div>
-    <div style="position:absolute;left:24px;top:290px;font-size:22px;color:#c8372d;white-space:nowrap">고정: 선글라스 · 스카프 · 주황 털</div>
+    <div style="position:absolute;left:220px;top:160px;font-size:23px;line-height:1.4;color:#6b5d52;white-space:nowrap">① 캐릭터 시트로 저장<br>→ Kling · Seedance</div>
+    <div style="position:absolute;left:24px;top:290px;font-size:22px;color:#c8372d;white-space:nowrap">고정: 선글라스 · 스카프 · 주황 털</div></div>
     <div class="rt" style="position:absolute;left:150px;top:-34px;padding:4px 18px;border:4px solid ${c03_INK};border-radius:12px;background:#9fd3f0;font-size:28px;color:${c03_INK};white-space:nowrap;opacity:0">Reference Element</div>`;
   const cNoa = makeNoa(150); card.querySelector(".ph").appendChild(cNoa);
-  const cardRt = card.querySelector(".rt");
+  const cardRt = card.querySelector(".rt"), cardF = card.querySelector(".fr"), cardB = card.querySelector(".bk");
   const saved = c03_stamp(card, 10, 206, "저장 완료 ✓", "#2f9e5a", -8);
 
   // ============ D · Reference Element → Kling / Seedance (91–95)
@@ -265,7 +293,7 @@ scene(72, 106, (R, s) => {
   });
   const idBadge = c03_box(res, 150, 640, 420, 110, "#fff4d0", "display:flex;align-items:center;gap:16px;padding:0 20px");
   idBadge.innerHTML = `<div style="width:66px;height:66px;border-radius:50%;border:4px solid ${c03_INK};background:#bfe3a6;display:grid;place-items:center;font-size:40px">✓</div>
-    <div style="line-height:1.15"><div style="font-size:24px;letter-spacing:2px;color:#c8372d">SOUL ID · NOA</div><div style="font-size:30px;color:${c03_INK}">3개 장면, 1개 얼굴</div></div>`;
+    <div style="line-height:1.15"><div style="font-size:24px;letter-spacing:2px;color:#c8372d">레퍼런스 · NOA</div><div style="font-size:30px;color:${c03_INK}">3개 장면, 1개 얼굴</div></div>`;
   const before = c03_box(res, 1300, 712, 450, 130, "#fffaf0", "overflow:hidden");
   el("div", `position:absolute;left:14px;top:6px;font-size:22px;color:#6b5d52;z-index:40`, "이전 결과", before);
   const bNoas = GAG.map(([, v], i) => { const n = makeNoa(88, v); before.appendChild(n); return n; });
@@ -372,7 +400,12 @@ scene(72, 106, (R, s) => {
     const fl = inFl ? Math.pow(1 - (ft % 1), 2) : 0;
     flash.style.opacity = fl * .9; bRays.style.opacity = fl; bulb.setAttribute("fill", fl > .4 ? "#fff" : "#fff7c2");
     const k = Math.floor(ft);
-    poseNoa(bNoa, t, { x: 50, y: 160, s: 1, look: inFl ? [-1, 0, 1, .5, -.5][k % 5] : 0, wave: inFl && k % 3 === 1, mood: inFl && k % 4 === 3 ? "pout" : "happy" });
+    const c03_bv = inFl ? [0, 2, 4, 3, 1][k % 5] : 2;
+    bPv.forEach((v, i) => { const d = i === c03_bv ? "block" : "none"; if (v.style.display !== d) v.style.display = d; });
+    const ntp = back(seg(t, 87.0, 87.4)), nto = ease(seg(t, 89.2, 89.5));
+    c03_noaTag.style.display = Cv ? "flex" : "none";
+    c03_noaTag.style.opacity = clamp(ntp * 2) * (1 - nto);
+    c03_noaTag.style.transform = `translateY(${-30 * (1 - ntp) + 40 * nto}px) scale(${.6 + .4 * ntp}) rotate(-1.5deg)`;
     booth.style.transform += ` translateX(${inFl ? 2 * Math.sin(t * 60) : 0}px)`;
     const conv = ease(seg(t, 89.6, 90.15));
     let shot = 0;
@@ -385,7 +418,6 @@ scene(72, 106, (R, s) => {
       x = lerp(x, 910, conv); y = lerp(y, 370, conv);
       d.style.opacity = (t >= d.at ? 1 : 0) * (1 - seg(conv, .8, 1));
       d.style.transform = `translate(${x}px, ${y}px) rotate(${lerp(-30, d.rot, p) * (1 - conv)}deg) scale(${(.35 + .65 * p) * (1 - .7 * conv)})`;
-      poseNoa(d.n, t, { x: 1, y: 8, s: d.ns, look: d.look, flip: d.flip });
     });
     cnt.innerHTML = `사진 <span style="color:#c8372d;font-size:40px">&nbsp;${Math.min(20, shot)}</span>장${shot >= 20 ? "+" : ""}`;
     const cIn = back(seg(t, 86.8, 87.2));
@@ -401,9 +433,12 @@ scene(72, 106, (R, s) => {
     card.style.display = t > 89.9 && t < 95.1 ? "block" : "none";
     card.style.opacity = clamp(cp * 2) * (1 - cOut);
     const cs = lerp(1, .85, dock) * (.4 + .6 * cp);
-    card.style.transform = `translate(${lerp(0, -560, dock) + 250 * (1 - cs / lerp(1, .85, dock)) }px, ${lerp(0, 120, dock) + 150 * (1 - cp)}px) scale(${cs}) rotate(${lerp(-2, 2, dock)}deg)`;
-    poseNoa(cNoa, t, { x: 10, y: 34, s: 1, wave: t > 90.4 && t < 91.2 });
-    c03_slam(saved, t, 90.45); saved.style.opacity = +saved.style.opacity * (1 - dock);
+    const c03_fl = seg(t, 90.75, 91.15), c03_fk = Math.max(.02, Math.abs(Math.cos(c03_fl * Math.PI)));
+    card.style.transform = `translate(${lerp(0, -560, dock) + 250 * (1 - cs / lerp(1, .85, dock)) }px, ${lerp(0, 120, dock) + 150 * (1 - cp)}px) scale(${cs}) rotate(${lerp(-2, 2, dock)}deg) translateX(250px) scaleX(${c03_fk.toFixed(3)}) translateX(-250px)`;
+    cardF.style.display = c03_fl < .5 ? "block" : "none"; cardB.style.display = c03_fl < .5 ? "none" : "block";
+    card.style.background = c03_fl < .5 ? "#fff4d0" : "#e3f2f8";
+    poseNoa(cNoa, t, { x: 10, y: 34, s: 1, wave: t > 91.1 && t < 91.9 });
+    c03_slam(saved, t, 90.45); saved.style.opacity = +saved.style.opacity * (1 - dock) * (c03_fl < .5 ? 1 : 0);
     const rtp = back(seg(t, 91.3, 91.7)); cardRt.style.opacity = clamp(rtp * 2); cardRt.style.transform = `scale(${rtp})`;
 
     // ---- D: machines

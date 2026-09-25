@@ -62,7 +62,7 @@ function c04_splat(node, t, a) { const p = back(seg(t, a, a + .3)); node.style.o
 scene(106, 134, (R, s) => {
   s.caps = [[106.2, "① 3초 안에 떠야 한다", "1. Load in under 3 seconds"],
             [112.5, "② 스크롤할 때마다 무언가 움직인다", "2. Something moves with every scroll"],
-            [119, "③ 히어로엔 영상", "3. Put video in the hero"],
+            [119, "③ 히어로엔 영상 (Seedance 클립)", "3. Your Seedance clip as the hero video"],
             [125, "④ 부드러운 애니메이션은 Opus에게 코드로", "4. Ask Opus to write the animation code"]];
   s.cite = [[106, "Google mobile speed research"], [119, "Wyzowl Video Marketing Statistics 2026"], [125, "Anthropic · Introducing Claude Opus 5"]];
   chapter(R, "CHAPTER 04", "몰입감 만들기");
@@ -198,6 +198,9 @@ scene(106, 134, (R, s) => {
     `<svg width="60" height="70" viewBox="0 0 60 70"><path d="M10 6 L56 35 L10 64Z" fill="#fff" stroke="${c04_INK}" stroke-width="4" stroke-linejoin="round"/></svg>`, vwrap);
   const pbar = el("div", `position:absolute;left:28px;right:28px;bottom:22px;height:22px;border-radius:11px;border:3px solid ${c04_INK};background:#fffaf0;z-index:35;overflow:hidden`, `<div class="pb" style="height:100%;width:0;background:#c8372d"></div>`, vwrap);
   const pb = pbar.querySelector(".pb");
+  // the hero video is the Seedance clip from the previous chapter (V-12)
+  const c04_sdTag = el("div", `left:640px;top:786px;display:flex;align-items:center;gap:10px;padding:3px 16px 5px 8px;border:3px solid ${c04_INK};border-radius:12px;background:#fff7fb;font-size:28px;color:${c04_INK};z-index:35;white-space:nowrap;transform-origin:100% 100%;opacity:0`,
+    `<svg width="30" height="30" viewBox="0 0 40 40" style="flex:none"><rect x="2" y="2" width="36" height="36" rx="10" fill="#c7f25c" stroke="${c04_INK}" stroke-width="3.5"/><path d="M13 11 V29 M27 11 V29 M13 20 H27" stroke="${c04_INK}" stroke-width="4.5" stroke-linecap="round"/></svg>Seedance 2.5 · Higgsfield`, BC); c04_sdTag.className = "abs";
   const rec = el("div", `position:absolute;left:30px;bottom:60px;padding:2px 14px;border:3px solid ${c04_INK};border-radius:10px;background:#fff;font-size:30px;color:#c8372d;z-index:35`, "● 재생 중", vwrap);
   const cursor = el("div", "left:0;top:0;z-index:46", `<svg width="60" height="70" viewBox="0 0 60 70"><path d="M6 4 L6 56 L20 44 L30 66 L40 61 L30 40 L48 40Z" fill="#fff" stroke="${c04_INK}" stroke-width="4" stroke-linejoin="round"/></svg>`, BC); cursor.className = "abs";
     const ring = el("div", "left:1180px;top:230px;width:320px;height:320px", `<svg width="320" height="320" viewBox="0 0 320 320" style="position:relative">
@@ -415,6 +418,8 @@ scene(106, 134, (R, s) => {
       ring.style.transform = `translate(${lerp(-380, 0, home)}px, ${lerp(20, 0, home)}px) scale(${(.4 + .6 * rIn) * lerp(1.5, 1, home)}) rotate(${-20 * (1 - rIn)}deg)`;
       ring.style.zIndex = 40;
       vid.style.opacity = +vid.style.opacity * (1 - .6 * ease(seg(t, 120.85, 121.15)) * (1 - home));
+      const c04_sp = back(seg(t, 119.4, 119.8)); c04_sdTag.style.opacity = clamp(c04_sp * 2) * +vid.style.opacity;
+      c04_sdTag.style.transform = `${vid.style.transform} scale(${.5 + .5 * c04_sp}) rotate(${-2 * c04_sp}deg)`;
       const cp = ease(seg(t, 121.0, 121.8)), n = Math.round(85 * cp);
       arc.setAttribute("stroke-dashoffset", 691 * (1 - .85 * cp));
       ringN.textContent = n + "%";

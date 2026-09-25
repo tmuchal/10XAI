@@ -2,7 +2,7 @@
 // Game-show structure: "업종 룰렛" — a prize wheel spins and lands on each business on the beat.
 // Beats: 10.3 wheel drops in, rim bulbs chase, mystery card · 13 lands on 에이전시 (clapper snaps,
 // cursor books a call) · 18 쇼핑몰 (bottle spins, add-to-cart, bottle arcs into the cart) · 23 매장
-// (search typed, pin drops, route draws) · 28 인플루언서 (links pop, hearts, followers tick) — each
+// (map-app listing → the page: hours, pin, route, booking) · 28 인플루언서 (links pop, hearts, followers tick) — each
 // card whip-pans in with blur while kinetic type stamps the benefit; Noa spins the wheel each time.
 // 32.5 wheel rolls off, the real page drops in, confetti, Noa blows a party horn, then points at it.
 (() => {
@@ -15,9 +15,9 @@ scene(10, 40, (R, s) => {
   s.caps = [[10.2, "이 몰입형 페이지, 업종을 가리지 않습니다", "Immersive pages work for any kind of business"],
             [13, "에이전시 — 포트폴리오가 곧 쇼릴", "Agency: the portfolio becomes a showreel"],
             [18, "온라인 쇼핑몰 — 제품이 화면 안에서 움직인다", "Online store: products move on screen"],
-            [23, "오프라인 매장 — 검색에서 방문까지 한 번에", "Offline store: from search to a visit"],
-            [28, "인플루언서 — 링크 하나가 나만의 매장", "Influencer: one link becomes your own shop"],
-            [33, "그리고 이게, 제가 실제로 만든 페이지", "And this is the page I actually built"]];
+            [23, "오프라인 매장 — 영업시간 · 길찾기 · 예약을 페이지에서 한 번에", "Local store: hours, directions, booking in one tap"],
+            [28, "인플루언서 — 링크 하나가 제대로 된 쇼윈도", "Influencer: one link becomes a real shop window"],
+            [33, "증거: Claude가 쓰고, Higgsfield가 호스팅한 실제 페이지", "Proof: Claude wrote it, Higgsfield hosts it"]];
   const cam = el("div", "position:absolute;inset:0", "", R);
   const head = chapter(cam, "CHAPTER 01", "누구를 위한 페이지인가");
   const W = 720, H = 600, TOP = 200, CX = 990, CS = 1, cards = [];
@@ -81,8 +81,8 @@ scene(10, 40, (R, s) => {
   const bRot = B.querySelector(".rot"), bShine = B.querySelector(".shine"), bBuy = B.querySelector(".buy"), bCart = B.querySelector(".cart"), bFly = B.querySelector(".fly"), bPlus = B.querySelector(".plus"), bCartW = B.querySelector(".cartw");
 
   // c) offline store ------------------------------------------------------
-  const C = mk(2, "#e3f0da", `${tag("매장 · OFFLINE STORE", "#9fd3a8")}
-    <div style="position:absolute;left:360px;right:28px;top:16px;height:58px;border:4px solid ${INK1};border-radius:999px;background:#fffaf0;display:flex;align-items:center;padding:0 18px;font-size:30px;gap:10px;white-space:nowrap;overflow:hidden">🔍 <span class="q"></span></div>
+  const C = mk(2, "#e3f0da", `${tag("매장 · STORE", "#9fd3a8")}
+    <div style="position:absolute;left:318px;right:22px;top:16px;height:58px;border:4px solid ${INK1};border-radius:999px;background:#fffaf0;display:flex;align-items:center;padding:0 16px;font-size:27px;gap:6px;white-space:nowrap;overflow:hidden">🗺️ 지도 앱 · <span class="q"></span></div>
     <svg viewBox="0 0 400 250" preserveAspectRatio="xMidYMid slice" style="position:absolute;left:0;top:90px;width:720px;height:320px;border-top:4px solid ${INK1};border-bottom:4px solid ${INK1}">
       <rect x="0" y="0" width="400" height="250" fill="#d5e8c8"/>
       <path d="M0 70 H400 M0 180 H400 M110 0 V250 M290 0 V250" stroke="#fffaf0" stroke-width="22"/>
@@ -96,7 +96,7 @@ scene(10, 40, (R, s) => {
     </svg>
     <svg class="pin" viewBox="0 0 60 80" style="position:absolute;left:556px;top:102px;width:80px;height:106px;overflow:visible"><path d="M30 78 C30 78 4 44 4 28 A26 26 0 0 1 56 28 C56 44 30 78 30 78Z" fill="#c8372d" stroke="${INK1}" stroke-width="4"/><circle cx="30" cy="28" r="10" fill="#fffaf0" stroke="${INK1}" stroke-width="3"/></svg>
     <div class="walk" style="position:absolute;left:210px;top:260px;z-index:6;padding:6px 20px 10px;background:#fffaf0;border:4px solid ${INK1};border-radius:14px;font-size:46px;white-space:nowrap;box-shadow:5px 6px 0 rgba(43,35,32,.2);opacity:0">🚶 도보 3분!</div>
-    <div style="position:absolute;left:28px;top:430px;font-size:30px;color:#2f5d3a">● 영업 중 · 성수동</div>
+    <div style="position:absolute;left:28px;top:430px;font-size:30px;color:#2f5d3a">● 영업 중 · 10–21시 · 성수동</div>
     <div class="btn go" style="position:absolute;left:28px;right:28px;bottom:28px;background:#f7d774;color:${INK1};border:4px solid ${INK1};font-size:34px;padding:12px 0">길찾기 · 방문 예약</div>`);
   const cQ = C.querySelector(".q"), cPin = C.querySelector(".pin"), cRoute = C.querySelector(".route"), cGlow = C.querySelector(".glow"), cWalk = C.querySelector(".walk"), cGo = C.querySelector(".go");
 
@@ -118,6 +118,15 @@ scene(10, 40, (R, s) => {
   const tada = el("div", `left:170px;top:104px;z-index:12;padding:8px 22px 10px;background:#c8372d;color:#fffaf0;border:4px solid ${INK1};border-radius:14px;font-size:36px;box-shadow:6px 7px 0 rgba(43,35,32,.25);white-space:nowrap;transform-origin:0 50%`, "짠! 제가 만든 페이지", cam); tada.className = "abs";
   const COLS = ["#f7d774", "#e0607e", "#3e8fb8", "#9fd3a8", "#e8894f"];
   const conf = Array.from({ length: 44 }, (_, i) => { const d = el("div", `left:0;top:0;width:${12 + c01_rnd(i) * 10}px;height:${8 + c01_rnd(i + 50) * 10}px;background:${COLS[i % 5]};border:2px solid ${INK1};border-radius:2px;z-index:15;opacity:0`, "", cam); d.className = "abs"; return d; });
+  // proof split (33.9–36.1): who did what on the page that just dropped, plus an arrow to the .higgsfield.app address
+  const C01_CL = `<svg width="30" height="30" viewBox="-20 -20 40 40" style="flex:none">${Array.from({ length: 8 }, (_, k) =>
+    `<path d="M0 -3 L-3 -17 Q0 -20 3 -17Z" fill="#d97757" stroke="${INK1}" stroke-width="1.6" stroke-linejoin="round" transform="rotate(${k * 45})"/>`).join("")}<circle r="4.5" fill="#d97757" stroke="${INK1}" stroke-width="1.6"/></svg>`;
+  const C01_HF = `<svg width="30" height="30" viewBox="0 0 40 40" style="flex:none"><rect x="2" y="2" width="36" height="36" rx="10" fill="#c7f25c" stroke="${INK1}" stroke-width="3.5"/><path d="M13 11 V29 M27 11 V29 M13 20 H27" stroke="${INK1}" stroke-width="4.5" stroke-linecap="round"/></svg>`;
+  const c01_tags = [[`${C01_CL}<b style="font-weight:inherit">Claude</b><span style="color:#6b5d52">카피 · 흐름</span>`, "#fbd0bd", 840, 360],
+                    [`${C01_HF}<b style="font-weight:inherit">Higgsfield</b><span style="color:#6b5d52">영상 · 호스팅</span>`, "#e4f7b8", 840, 462]]
+    .map(([h, bg, x, y]) => { const d = el("div", `left:${x}px;top:${y}px;z-index:14;display:flex;align-items:center;gap:12px;padding:8px 22px 10px;background:${bg};border:4px solid ${INK1};border-radius:16px;font-size:36px;white-space:nowrap;box-shadow:6px 7px 0 rgba(43,35,32,.25);transform-origin:0 50%;opacity:0`, h, cam); d.className = "abs"; return d; });
+  const c01_arr = el("div", "left:0;top:0;z-index:14;pointer-events:none;opacity:0", `<svg width="1920" height="1080" overflow="visible"><path class="p" d="M844 486 C 690 470, 560 330, 470 196" fill="none" stroke="${INK1}" stroke-width="5" stroke-dasharray="12 10" stroke-linecap="round"/><path class="h" d="M470 196 l2 22 M470 196 l19 10" stroke="${INK1}" stroke-width="5" stroke-linecap="round"/></svg>`, cam); c01_arr.className = "abs";
+  const c01_addrRing = el("div", `left:268px;top:150px;width:320px;height:46px;z-index:14;border:5px solid #c8372d;border-radius:24px;opacity:0`, "", cam); c01_addrRing.className = "abs";
   // "증거?" kinetic stamp bridges the wheel exit and the page drop (33.0–33.7)
   const c01_proof = el("div", `left:0;right:0;top:330px;text-align:center;z-index:14;font-size:150px;line-height:1;color:#c8372d;-webkit-text-stroke:4px ${INK1};text-shadow:7px 7px 0 #f7d774;opacity:0;white-space:nowrap`, "증거?", cam); c01_proof.className = "abs";
   // Noa's guide intro (35.9–39.3): nameplate, an "eye contact" reticle he keeps dodging, 0% stamp
@@ -166,7 +175,7 @@ scene(10, 40, (R, s) => {
   const mystery = el("div", `left:${CX - W / 2}px;top:${TOP}px;width:${W}px;height:${H}px;transform-origin:50% 0;background:repeating-linear-gradient(45deg,#f7d774 0 26px,#f2c14e 26px 52px);display:grid;place-items:center;text-align:center`,
     `<div><div style="font-size:180px;line-height:1;color:#fffaf0;-webkit-text-stroke:5px ${INK1}">?</div><div style="font-size:34px;margin-top:10px;padding:6px 18px;background:#fffaf0;border:3px solid ${INK1};border-radius:12px">당신의 업종은?</div></div>`, cam); mystery.className = "card";
   // kinetic type column
-  const KT = [[["포트폴리오가", "곧 쇼릴"], "Agency"], [["제품이", "화면에서", "움직인다"], "Online store"], [["검색에서", "방문까지", "한 번에"], "Offline store"], [["링크 하나가", "나만의 매장"], "Creator"]];
+  const KT = [[["포트폴리오가", "곧 쇼릴"], "Agency"], [["제품이", "화면에서", "움직인다"], "Online store"], [["영업시간", "길찾기 · 예약", "한 번에"], "Local store"], [["링크 하나가", "쇼윈도로"], "Creator"]];
   const kt = KT.map((k, i) => {
     const d = el("div", `left:1380px;top:290px;width:380px;z-index:9;word-break:keep-all`, "", cam); d.className = "abs";
     d.chars = [];
@@ -268,7 +277,7 @@ scene(10, 40, (R, s) => {
     bPlus.style.transform = `translateY(${-30 * out(pl)}px) scale(${back(seg(t, 21.0, 21.3))}) rotate(${-8 + 4 * Math.sin(t * 8)}deg)`;
 
     // store: search typed → pin slams down → route draws → "도보 3분!" pops
-    cQ.textContent = type("성수 쇼룸 근처", seg(t, 23.3, 24.3)) + (t > 23 && t < 24.5 && Math.floor(t * 4) % 2 ? "|" : "");
+    cQ.textContent = type("노아 쇼룸", seg(t, 23.3, 24.0)) + (t > 23 && t < 24.5 && Math.floor(t * 4) % 2 ? "|" : "");
     const pinDrop = seg(t, 24.4, 24.75);
     const pinB = t > 24.75 ? Math.abs(c01_settle(t - 24.75, 1.8, 4)) * 50 : 0;
     const squash = t > 24.75 ? 0.25 * Math.max(0, c01_settle(t - 24.75, 2.2, 6)) : 0;
@@ -315,6 +324,14 @@ scene(10, 40, (R, s) => {
     const c01_sh = ease(seg(t, 35.6, 36.2));
     ref.style.transform = `translate(${-110 * c01_sh}px, ${rY}px) rotate(${rRot}deg) scale(${(1 + 0.015 * ease(seg(t, 34, 40))) * (1 - 0.12 * c01_sh)})`;
     ref.scrollTo(ref.sectionFrac("proof", 0.55) * ease(seg(t, 34.8, 39.6)), t);   // "the page I built" glides to its proof
+    // proof split: "Claude wrote it" (34.0) · "Higgsfield hosts it" (34.9); gone before the page slides aside (36.0)
+    const c01_tOut = seg(t, 35.75, 36.0);
+    c01_tags.forEach((d, i) => { const p = back(seg(t, [34.0, 34.9][i], [34.0, 34.9][i] + .35));
+      d.style.opacity = clamp(p * 2) * (1 - c01_tOut); d.style.transform = `translateX(${40 * (1 - p)}px) scale(${.6 + .4 * p}) rotate(${i ? 1.5 : -1.5}deg)`; });
+    const c01_ap = seg(t, 35.05, 35.35);
+    c01_arr.style.opacity = c01_ap > 0 ? 1 - c01_tOut : 0; c01_arr.querySelector(".p").style.clipPath = `inset(0 0 0 ${(1 - c01_ap) * 100}%)`;
+    c01_arr.querySelector(".h").style.opacity = c01_ap >= 1 ? 1 : 0;
+    const c01_rp = back(seg(t, 35.3, 35.55)); c01_addrRing.style.opacity = clamp(c01_rp * 2) * (1 - c01_tOut); c01_addrRing.style.transform = `scale(${1.3 - .3 * c01_rp})`;
     const tdP = back(seg(t, 34.0, 34.35));
     tada.style.opacity = seg(t, 34.0, 34.05);
     tada.style.transform = `translate(${-60 * c01_sh}px, ${10 * c01_sh}px) rotate(${-6 + 2 * Math.sin(t * 3)}deg) scale(${(1.8 - 0.8 * tdP) * (1 - 0.1 * c01_sh)})`;

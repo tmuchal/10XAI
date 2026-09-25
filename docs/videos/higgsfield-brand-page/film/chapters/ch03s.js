@@ -4,8 +4,10 @@
 // (higgsfield.ai/blog/seedance-2-5-on-higgsfield-2026, higgsfield.ai/seedance/2.5). Prompt shape: one visual rule on top,
 // one sound rule at the bottom, shots in between like a shot list; "the character from the reference images";
 // one camera move per beat tied to an event; "Hard cut." (higgsfield.ai/blog/seedance-2-5-prompting-guide).
-// Beats: 0.3–4 references → Higgsfield · 4–12 Claude types the prompt + call-outs · 12–18 Generate → 3 shots ·
-//        18–20 Uchal "30초에 소리까지?!", Noa glints and exits toward the curtain.
+// Beats (cued to the narration): 0.3–4 references → Higgsfield ("Attach the sheet", 1.0) · 4–9 Claude types the prompt;
+//        "visual rule on top" 7.2 / "sound rule last" 8.6 call-outs · 10.4–13 shot anatomy ("action, framing, end point" 10.5,
+//        "Hard cut." 12.85) · 13.35 send → Higgsfield · 14.4 Generate ("A few takes later": 2 retakes, credits) → 3 shots
+//        15.15–17.85 · 18–20 Uchal "30초에 소리까지?!", Noa glints and exits toward the curtain.
 (() => {
   const INK = "#2b2320", SH = "7px 8px 0 rgba(43,35,32,.22)", RED = "#c8372d", GRN = "#2f9e5a", MUTE = "#6b5d52";
   const box = (parent, x, y, w, h, bg, extra = "") => {
@@ -109,8 +111,10 @@
       [3, [["curtain; ", ""], ["camera follows once it starts walking.", "cam"]]],
       [4, [["[SOUND]", "tag"], [" Curtain swish, light marimba, audience “ooh”.", ""]]],
     ];
-    const SEGT = [[4.45, 5.15], [5.3, 6.75], [6.95, 7.85], [8.05, 9.05], [9.25, 9.9]];   // typing windows
-    const FOCUS = [[4.45, 5.3], [5.3, 6.95], [6.95, 8.05], [8.05, 9.25], [9.25, 10.7]];  // line highlight while discussed
+    const SEGT = [[4.45, 5.15], [5.3, 6.4], [6.5, 7.2], [7.3, 8.0], [8.1, 8.7]];   // typing windows
+    // line highlight while typed / discussed: the rules on "visual rule on top" (7.1) and "sound rule last" (8.2),
+    // Shot 1 as the worked example while "Each shot: action, framing, end point. Hard cut." is spoken (10.4–13.3)
+    const FOCUS = [[[4.45, 5.3], [7.1, 8.2]], [[5.3, 6.5], [10.4, 13.35]], [[6.5, 7.1]], [], [[8.2, 9.6]]];
     const segLen = SEGT.map((_, g) => LINES.filter(l => l[0] === g).reduce((a, l) => a + l[1].reduce((b, k) => b + k[0].length, 0), 0));
     let y = 88, prev = 0;
     const LN = LINES.map(([g, toks], i) => {
@@ -125,11 +129,11 @@
     const send = el("div", `position:absolute;right:22px;bottom:18px;padding:6px 22px 8px;border:4px solid ${INK};border-radius:16px;background:#c7f25c;font-size:28px;color:${INK};white-space:nowrap;box-shadow:4px 5px 0 rgba(43,35,32,.25)`, "Higgsfield로 보내기 →", C);
     // call-outs (Korean), aligned with the lines they explain
     const CO = [
-      [300, 4.9, "#f7d774", "맨 위: <b>비주얼 규칙 1개</b>", ""],
-      [400, 5.9, "#bfe3a6", "캐릭터 재설명 ✗ →", "“the character from the reference images”"],
-      [520, 6.8, "#9fd3f0", "샷마다 카메라 1개 · 이벤트에 묶기", ""],
-      [606, 7.95, "#fbd9d3", "샷 끝 = <b>Hard cut.</b>", ""],
-      [732, 9.95, "#f7d774", "맨 아래: <b>사운드 규칙 1개</b>", ""],
+      [300, 7.2, "#f7d774", "맨 위: <b>비주얼 규칙 1개</b>", ""],
+      [400, 6.0, "#bfe3a6", "캐릭터 재설명 ✗ →", "“the character from the reference images”"],
+      [516, 10.5, "#9fd3f0", "샷마다: <b>동작 · 구도 · 끝 지점</b>", "+ 카메라 무브는 비트당 1개"],
+      [638, 12.85, "#fbd9d3", "샷 끝 = <b>Hard cut.</b>", ""],
+      [732, 8.6, "#f7d774", "맨 아래: <b>사운드 규칙 1개</b>", ""],
     ].map(([cy, at, bg, a, b]) => {
       const d = box(B, 1150, cy, 610, b ? 104 : 66, "#fffdf7", `display:flex;flex-direction:column;justify-content:center;padding:0 18px 0 30px;box-sizing:border-box;transform-origin:0 50%;border-left:14px solid ${INK}`);
       d.style.borderLeftColor = bg === "#fbd9d3" ? RED : bg === "#9fd3f0" ? "#3e8fb8" : bg === "#bfe3a6" ? GRN : "#d98c1f";
@@ -137,7 +141,7 @@
         (b ? `<div style="font-size:24px;line-height:1.2;color:${GRN};white-space:nowrap">${b}</div>` : "");
       d.at = at; return d;
     });
-    const arrows = el("div", "left:0;top:0;z-index:36;pointer-events:none", `<svg width="1920" height="1080" overflow="visible">${[[332, 337], [452, 431], [552, 515], [638, 609], [764, 755]].map(([ya, yb], i) =>
+    const arrows = el("div", "left:0;top:0;z-index:36;pointer-events:none", `<svg width="1920" height="1080" overflow="visible">${[[332, 337], [452, 431], [568, 473], [671, 609], [764, 755]].map(([ya, yb], i) =>
       `<path class="ar" d="M1144 ${ya} Q1132 ${(ya + yb) / 2} 1116 ${yb}" fill="none" stroke="${INK}" stroke-width="4" stroke-linecap="round"/><path class="ah" d="M1116 ${yb} l13 -8 M1116 ${yb} l12 9" stroke="${INK}" stroke-width="4" stroke-linecap="round"/>`).join("")}</svg>`, B);
     arrows.className = "abs";
     const AR = [...arrows.querySelectorAll(".ar")], AH = [...arrows.querySelectorAll(".ah")];
@@ -176,7 +180,7 @@
       f.noise = el("div", "position:absolute;inset:0;z-index:43;background:repeating-linear-gradient(0deg,#efe4cc 0 6px,#fffaf0 6px 12px,#e4d6b8 12px 15px)", "", f);
       f.cut = el("div", `position:absolute;inset:0;z-index:44;background:#fff;opacity:0`, "", f);
       f.st = el("div", `position:absolute;left:${27 + i * (TW + 30) + 140}px;top:${TY + TH - 26}px;z-index:46;padding:2px 16px 4px;border:5px solid ${GRN};border-radius:12px;color:${GRN};background:rgba(255,250,240,.95);font-size:32px;white-space:nowrap`, "✓ 같은 노아", P3);
-      f.a = [14.35, 15.55, 16.65][i]; f.b = [15.55, 16.65, 17.85][i];
+      f.a = [15.15, 16.05, 16.95][i]; f.b = [16.05, 16.95, 17.85][i];
       return f;
     });
     const badge = el("div", `position:absolute;left:27px;top:${TY + TH + 64}px;display:flex;align-items:center;gap:12px;padding:8px 22px 10px;border:4px solid ${INK};border-radius:16px;background:#f7d774;font-size:32px;color:${INK};white-space:nowrap;box-shadow:${SH};transform-origin:0 50%`,
@@ -231,32 +235,32 @@
       field.style.opacity = seg(t, 1.1, 1.4);
 
       // ---- B
-      const Bv = t > 3.9 && t < 12.4;
+      const Bv = t > 3.9 && t < 14.4;
       B.style.display = Bv ? "block" : "none";
-      const cIn = back(seg(t, 4.0, 4.45)), fly = ease(seg(t, 11.1, 11.75));
+      const cIn = back(seg(t, 4.0, 4.45)), fly = ease(seg(t, 13.45, 14.0));
       C.style.opacity = clamp(cIn * 2) * (1 - seg(fly, .75, 1));
       C.style.transformOrigin = "50% 50%";
       C.style.transform = `translate(${lerp(0, 1455 - 650, fly)}px, ${120 * (1 - cIn) + lerp(0, 164 - 548, fly)}px) scale(${lerp(1, .12, fly)}) rotate(${-1 * cIn + 8 * fly}deg)`;
-      const dIn = back(seg(t, 4.1, 4.5)), dOut = ease(seg(t, 11.95, 12.35));
-      const arrive = bump(t, 11.72, .35);
+      const dIn = back(seg(t, 4.1, 4.5)), dOut = ease(seg(t, 14.0, 14.35));
+      const arrive = bump(t, 13.95, .35);
       dock.style.opacity = clamp(dIn * 2) * (1 - dOut);
       dock.style.transform = `scale(${(.6 + .4 * dIn) * (1 + .1 * arrive) * (1 + .4 * dOut)})`;
-      dock.style.background = t > 11.72 ? "#eaffc4" : "#fff7fb";
-      const dst = t > 11.72 ? "레퍼런스 3 · 프롬프트 도착 ✓" : "레퍼런스 3 · 프롬프트 기다리는 중…";
+      dock.style.background = t > 13.95 ? "#eaffc4" : "#fff7fb";
+      const dst = t > 13.95 ? "레퍼런스 3 · 프롬프트 도착 ✓" : "레퍼런스 3 · 프롬프트 기다리는 중…";
       if (dockSt.textContent !== dst) dockSt.textContent = dst;
-      dockSt.style.color = t > 11.72 ? GRN : MUTE;
+      dockSt.style.color = t > 13.95 ? GRN : MUTE;
       // typing
       let caretAt = -1;
       LN.forEach((d, i) => {
         const [a, b] = SEGT[d.g], typed = Math.round(segLen[d.g] * seg(t, a, b)) - d.off, n = clamp(typed, 0, d.len);
         if (n > 0 && n < d.len) caretAt = i;
         else if (n >= d.len && t >= a && t < b + .05 && (i === LN.length - 1 || LN[i + 1].g !== d.g)) caretAt = i;
-        const foc = t >= FOCUS[d.g][0] && t < FOCUS[d.g][1];
+        const foc = FOCUS[d.g].some(([a2, b2]) => t >= a2 && t < b2);
         let left = n, h = "";
         d.toks.forEach(([tx, k]) => {
           if (left <= 0) return; const part = tx.slice(0, left); left -= tx.length;
-          const lit = k === "ref" ? t > 5.9 : k === "cam" ? t > 6.8 : k === "cut" ? t > 7.95 : false;
-          const hot = k === "ref" ? t > 5.9 && t < 6.95 : k === "cam" ? (t > 6.8 && t < 8.05) || (d.g === 3 && t > 8.9 && t < 9.25) : k === "cut" ? t > 7.95 && t < 9.1 : false;
+          const lit = k === "ref" ? t > 6.0 : k === "cam" ? t > 10.9 : k === "cut" ? t > 12.85 : false;
+          const hot = k === "ref" ? t > 6.0 && t < 7.0 : k === "cam" ? t > 10.9 && t < 12.2 : k === "cut" ? t > 12.85 && t < 13.45 : false;
           const css = k === "tag" ? `color:#fff;background:${d.g ? "#3e8fb8" : "#d98c1f"};padding:0 8px;border-radius:6px` :
             k === "shot" ? `color:${RED}` :
             k === "ref" && lit ? `background:${hot ? "#9be3a8" : "#dff4e2"};border-radius:6px;box-shadow:inset 0 -3px 0 ${GRN}` :
@@ -268,14 +272,14 @@
         if (h !== d.last) { d.innerHTML = h; d.last = h; }
         d.style.background = foc && n > 0 ? "rgba(247,215,116,.38)" : "transparent";
       });
-      const done = t > 10.0;
+      const done = t > 9.0;
       const cst = done ? "완성 ✓" : "작성 중…";
       if (cSt.textContent !== cst) cSt.textContent = cst;
       cSt.style.background = done ? "#bfe3a6" : "#fff";
-      const sIn = back(seg(t, 10.2, 10.55)), press = bump(t, 10.9, .22);
+      const sIn = back(seg(t, 9.1, 9.45)), press = bump(t, 13.35, .22);
       send.style.opacity = clamp(sIn * 2);
       send.style.transform = `scale(${(.6 + .4 * sIn) * (1 - .1 * press)}) translateY(${4 * press}px)`;
-      const coOut = ease(seg(t, 10.95, 11.3));
+      const coOut = ease(seg(t, 13.45, 13.75));
       CO.forEach((d, i) => {
         const p = back(seg(t, d.at, d.at + .4));
         d.style.opacity = clamp(p * 2) * (1 - coOut);
@@ -284,30 +288,33 @@
         AR[i].setAttribute("stroke-dasharray", "80"); AR[i].setAttribute("stroke-dashoffset", 80 * (1 - ap));
         AR[i].style.opacity = ap > 0 ? 1 - coOut : 0; AH[i].style.opacity = ap >= 1 ? 1 - coOut : 0;
       });
-      const hIn = back(seg(t, 10.55, 10.95)), hOut = ease(seg(t, 11.8, 12.2));
+      const hIn = back(seg(t, 13.0, 13.35)), hOut = ease(seg(t, 14.0, 14.35));
       handoff.style.opacity = clamp(hIn * 2) * (1 - hOut);
-      handoff.style.transform = `scale(${(.6 + .4 * hIn) * (1 + .06 * bump(t, 11.1, .4) + .08 * arrive)})`;
+      handoff.style.transform = `scale(${(.6 + .4 * hIn) * (1 + .06 * bump(t, 13.45, .4) + .08 * arrive)})`;
 
       // ---- C
-      const Cv = t > 11.9;
+      const Cv = t > 13.9;
       P3.style.display = Cv ? "block" : "none";
-      const p3 = back(seg(t, 11.95, 12.45)), shrink = ease(seg(t, 17.9, 18.3));
+      const p3 = back(seg(t, 13.95, 14.4)), shrink = ease(seg(t, 17.9, 18.3));
       P3.style.opacity = clamp(p3 * 2);
-      P3.style.transform = `translate(${lerp(510, 0, out(seg(t, 11.95, 12.4)))}px, ${lerp(-110, 0, out(seg(t, 11.95, 12.4)))}px) scale(${(.4 + .6 * p3) * (1 - .26 * shrink)})`;
-      const cp = ease(seg(t, 12.9, 13.55)), gp = bump(t, 13.6, .22);
-      cursor.style.opacity = t > 12.8 && t < 14.1 ? 1 : 0;
+      P3.style.transform = `translate(${lerp(510, 0, out(seg(t, 13.95, 14.35)))}px, ${lerp(-110, 0, out(seg(t, 13.95, 14.35)))}px) scale(${(.4 + .6 * p3) * (1 - .26 * shrink)})`;
+      // "A few takes later" (13.8): Generate, credits spent, two retakes flicker by, take 3 is the keeper
+      const cp = ease(seg(t, 14.0, 14.35)), gp = bump(t, 14.4, .22);
+      cursor.style.opacity = t > 13.95 && t < 14.85 ? 1 : 0;
       cursor.style.transform = `translate(${lerp(1100, 1470, cp)}px, ${lerp(240, 44, cp) + 6 * gp}px) scale(${1 - .12 * gp})`;
       gen.style.transform = `scale(${1 - .1 * gp}) translateY(${5 * gp}px)`;
       gen.style.boxShadow = gp > .3 ? "1px 2px 0 rgba(43,35,32,.3)" : "5px 6px 0 rgba(43,35,32,.3)";
-      const crp = back(seg(t, 13.65, 14.0)); credit.style.opacity = clamp(crp * 2); credit.style.transform = `scale(${.5 + .5 * crp}) rotate(${-4 * (1 - crp)}deg)`;
-      const pg = ease(seg(t, 13.65, 14.2));
-      prog.style.opacity = seg(t, 13.6, 13.75); progF.style.width = 100 * pg + "%";
-      const pt = pg >= 1 ? "완료 · 3샷" : "생성 중…"; if (progT.textContent !== pt) progT.textContent = pt;
+      const crp = back(seg(t, 14.45, 14.8)); credit.style.opacity = clamp(crp * 2); credit.style.transform = `scale(${.5 + .5 * crp}) rotate(${-4 * (1 - crp)}deg)`;
+      const TK = [14.45, 14.65, 14.85, 15.1], take = t < TK[1] ? 0 : t < TK[2] ? 1 : 2, pg = ease(seg(t, TK[take], TK[take + 1]));
+      prog.style.opacity = seg(t, 14.4, 14.5); progF.style.width = 100 * pg + "%";
+      const pt = t >= TK[3] ? "완료 · 3샷 · 재생성 ×2" : take ? `재생성 ×${take}…` : "생성 중…"; if (progT.textContent !== pt) progT.textContent = pt;
       TILES.forEach((f, i) => {
-        const tin = back(seg(t, 12.2 + i * .12, 12.65 + i * .12));
+        const tin = back(seg(t, 14.1 + i * .1, 14.5 + i * .1));
         f.style.opacity = clamp(tin * 2); f.style.transform = `translateY(${60 * (1 - tin)}px)`;
-        f.noise.style.opacity = 1 - seg(t, 14.15 + i * .1, 14.35 + i * .1);
-        f.noise.style.backgroundPosition = `0 ${Math.floor(clamp(t, 0, 13.65) * 4 + Math.max(0, t - 13.65) * 30) * 7}px`;
+        // each retake (14.65, 14.85) flashes a wrong frame through the noise before it clears
+        const rt = (t > 14.6 && t < 14.7) || (t > 14.8 && t < 14.9);
+        f.noise.style.opacity = rt ? .35 : 1 - seg(t, 15.0 + i * .05, 15.12 + i * .05);
+        f.noise.style.backgroundPosition = `0 ${Math.floor(clamp(t, 0, 14.45) * 4 + Math.max(0, t - 14.45) * 30) * 7}px`;
         const on = t >= f.a && t < f.b, lt = clamp(t, f.a, f.b) - f.a, played = t >= f.b;
         f.play.style.opacity = t < f.a ? 1 : 0;
         f.style.borderColor = on ? RED : INK; f.style.outline = on ? `4px solid ${RED}` : "none";
@@ -315,7 +322,7 @@
         f.film.update(t < f.a ? 0 : lt * (on ? 1 : 1), .9);
         f.bars.forEach((b2, k) => { b2.style.height = (on ? 8 + 20 * Math.abs(Math.sin(t * (7 + k * 1.7) + k)) : 8) + "px"; });
         if (i === 0) {   // hop in from the left, land, THEN dolly in
-          const hop = seg(lt, 0, .8), land = f.a + .8;
+          const hop = seg(lt, 0, .55), land = f.a + .55;
           poseNoa(f.n, t, { x: lerp(-180, 165, out(hop)), y: 72, s: 1, hop: hop > 0 && hop < 1 ? hop : 0, wave: t > land + .1 && on });
           f.cam.style.transform = `scale(${1 + .22 * ease(seg(t, land, f.b))})`;
         } else if (i === 1) {   // close-up, camera still: turns to camera, the sunglasses glint
@@ -330,8 +337,8 @@
         }
         slam(f.st, t, f.b - .3, [-4, 3, -2][i]);
       });
-      const bp = back(seg(t, 15.0, 15.45)); badge.style.opacity = clamp(bp * 2); badge.style.transform = `scale(${.5 + .5 * bp}) rotate(${-1.5 * bp}deg)`;
-      refsN.style.opacity = seg(t, 15.3, 15.6) * (1 - shrink);
+      const bp = back(seg(t, 15.4, 15.85)); badge.style.opacity = clamp(bp * 2); badge.style.transform = `scale(${.5 + .5 * bp}) rotate(${-1.5 * bp}deg)`;
+      refsN.style.opacity = seg(t, 15.7, 16.0) * (1 - shrink);
 
       // ---- D
       const nIn = back(seg(t, 17.95, 18.4)), exit = ease(seg(t, 18.95, 19.75));

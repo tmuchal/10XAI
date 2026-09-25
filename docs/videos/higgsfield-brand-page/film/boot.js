@@ -41,6 +41,33 @@ function renderScenes(t) {
   if ($("cite").textContent !== ct) $("cite").textContent = ct;
 }
 
+// ---- role motif: a small "✎ Claude → ▶ Higgsfield" tab riding on the caption box's top edge (TIMELINE.anchors.motif)
+const MOTIF = (TL.anchors.motif || []).map(m => Object.assign({}, m, { a: TL.at(m.ch, m.at), z: TL.at(m.ch, m.at) + m.dur }));
+const MOTIF_C = `<svg width="30" height="30" viewBox="-20 -20 40 40" style="flex:none">${Array.from({ length: 8 }, (_, k) =>
+  `<path d="M0 -3 L-3 -17 Q0 -20 3 -17Z" fill="#d97757" stroke="${INK}" stroke-width="1.6" stroke-linejoin="round" transform="rotate(${k * 45})"/>`).join("")}<circle r="4.5" fill="#d97757" stroke="${INK}" stroke-width="1.6"/></svg>`;
+const MOTIF_H = `<svg width="30" height="30" viewBox="0 0 40 40" style="flex:none"><rect x="2" y="2" width="36" height="36" rx="10" fill="#c7f25c" stroke="${INK}" stroke-width="3.5"/><path d="M13 11 V29 M27 11 V29 M13 20 H27" stroke="${INK}" stroke-width="4.5" stroke-linecap="round"/></svg>`;
+const motifEl = el("div", `position:absolute;left:50%;top:0;display:flex;align-items:center;gap:8px;padding:4px 8px;border:4px solid ${INK};border-radius:999px;background:#fff3cf;
+  box-shadow:4px 5px 0 rgba(60,30,15,.3);white-space:nowrap;font-family:"GaeguKo","GaeguLat",sans-serif;font-size:27px;line-height:1;color:${INK};opacity:0;z-index:2`, `
+  <span class="mc" style="display:flex;align-items:center;gap:8px;padding:4px 14px 6px 8px;border-radius:999px">${MOTIF_C}<span class="t"></span></span>
+  <span style="font-size:26px">→</span>
+  <span class="mh" style="display:flex;align-items:center;gap:8px;padding:4px 14px 6px 8px;border-radius:999px">${MOTIF_H}<span class="t"></span></span>`, capBox);
+const motifSide = [["mc", "#fbd0bd"], ["mh", "#dff7a8"]].map(([c, bg]) => { const e = motifEl.querySelector("." + c); e.bg = bg; e.t = e.querySelector(".t"); return e; });
+let motifKey = "";
+function motif(t) {
+  const m = MOTIF.find(m => t >= m.a && t < m.z);
+  if (!m) { motifEl.style.opacity = 0; return; }
+  const key = m.c[0] + "|" + m.h[0];
+  if (key !== motifKey) { motifSide[0].t.textContent = m.c[0]; motifSide[1].t.textContent = m.h[0]; motifKey = key; }
+  const p = back(seg(t, m.a, m.a + .4)), o = clamp(seg(t, m.a, m.a + .15) * 1) * (1 - seg(t, m.z - .3, m.z));
+  motifEl.style.opacity = o.toFixed(3);
+  motifEl.style.transform = `translate(-50%, -72%) scale(${(.6 + .4 * p).toFixed(3)}) rotate(${(-1.2 + wobble(t, m.a, 2, 12, 5)).toFixed(2)}deg)`;
+  [m.c, m.h].forEach(([, lit], i) => {
+    const e = motifSide[i], on = lit != null && t >= m.a + lit, k = on ? wobble(t, m.a + lit, .12, 16, 6) : 0;
+    e.style.background = on ? e.bg : "transparent"; e.style.opacity = on ? 1 : .45;
+    e.style.transform = `scale(${(1 + k).toFixed(3)})`;
+  });
+}
+
 // ============================================================================ STAGE FX
 // Everything here is a pure function of t. Cost notes: no full-frame SVG filters or blend modes
 // (they cost ~250 ms/frame); the hand-drawn "boil" comes from 3 pre-jittered variants of the
@@ -337,7 +364,7 @@ window.READY = Promise.all([...DECOR_READY, ...REF_READY, ...ALL3D.map(({ p }) =
   ...[["700 40px GaeguKo", "가나다"], ["400 40px GaeguKo", "가"], ["700 40px GaeguLat", "Aa"], ["400 40px GaeguLat", "A"]].map(([f, x]) => document.fonts.load(f, x))])
   .then(() => document.fonts.ready).then(() => Promise.all(window.__pending.splice(0)));
 // returns a Promise: the renderers' page.evaluate() awaits it, so every 3D frame is decoded before capture
-window.render = t => { renderScenes(t); stageFx(t); fx3d(t); return Promise.all(window.__pending.splice(0)); };
+window.render = t => { renderScenes(t); motif(t); stageFx(t); fx3d(t); return Promise.all(window.__pending.splice(0)); };
 window.DURATION = DURATION;
 if (!location.search.includes("render")) {
   const t0 = performance.now();

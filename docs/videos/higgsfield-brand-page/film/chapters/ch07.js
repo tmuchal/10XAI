@@ -1,6 +1,7 @@
 // ---------------------------------------------------------------- 07 · Curtain call (184–192)
 // The cast lines up, a title banner swings down, recap chips pop, the URL lights up on a
-// marquee, confetti falls (deterministic), and everyone takes a bow before the curtains close.
+// marquee, then an end card says where it lives and how to publish yours ("…higgsfield.app에서 보기 → Higgsfield에 게시"),
+// confetti falls (deterministic), and everyone takes a bow before the curtains close.
 const C07_INK = "#2b2320";
 const c07_card = (bg = "#fffaf0", r = 16) => `background:${bg};border:3px solid ${C07_INK};border-radius:${r}px;box-shadow:7px 8px 0 rgba(43,35,32,.22)`;
 const c07_abs = (css, html, parent) => el("div", "position:absolute;" + css, html, parent);
@@ -15,7 +16,7 @@ function c07_bow(n, b) {
 }
 
 scene(184, 192, (R, s) => {
-  s.caps = [[184.2, "다음 페이지의 주인공은, 당신의 브랜드", "The next hero is your brand"]];
+  s.caps = [[184.2, "다음 주인공은 고객. 노아 페이지 보고, 내 것도 Higgsfield에 게시", "Next hero: your customer. See Noa's page, then publish yours on Higgsfield"]];
   const INK = C07_INK; R.style.wordBreak = "keep-all";
   // warm spotlight behind the cast
   const spot = c07_abs("left:160px;top:380px;width:1600px;height:600px;border-radius:50%;background:radial-gradient(closest-side,rgba(255,236,170,.95),rgba(255,236,170,0));z-index:0", "", R);
@@ -27,7 +28,7 @@ scene(184, 192, (R, s) => {
       <div style="font-size:90px;line-height:1.05;margin-top:2px">사람을 붙잡는 브랜드 페이지</div>
       <div style="font-size:38px;color:#6b5d52">Brand pages that hold people</div></div>`, R);
   // recap chips
-  const CH = [["업종 무관", "#fbe0c0"], ["고객이 주인공", "#f8d3df"], ["Soul ID 일관성", "#e3f2f8"], ["3초 · 스크롤 · 영상", "#fff3c4"], ["전문성 + 유머", "#d8ecd3"], ["버튼 → 매출", "#fde6ec"]];
+  const CH = [["업종 무관", "#fbe0c0"], ["고객이 주인공", "#f8d3df"], ["캐릭터 일관성", "#e3f2f8"], ["3초 · 스크롤 · 영상", "#fff3c4"], ["전문성 + 유머", "#d8ecd3"], ["버튼 → 매출", "#fde6ec"]];
   const chipRow = c07_abs("left:100px;top:300px;width:1720px;display:flex;justify-content:center;gap:14px;z-index:6", "", R);
   const chips = CH.map(([c, bg], i) => el("div", `padding:4px 18px 6px;font-size:34px;white-space:nowrap;${c07_card(bg, 999)};box-shadow:4px 5px 0 rgba(43,35,32,.22)`, c, chipRow));
   // URL marquee with light bulbs
@@ -38,8 +39,15 @@ scene(184, 192, (R, s) => {
     <div class="u" style="position:absolute;left:20px;top:18px;right:20px;bottom:18px;border-radius:14px;background:#fffaf0;border:3px solid ${INK};display:flex;align-items:center;justify-content:center;font-size:70px;white-space:nowrap">
       <span>noainostory</span><span style="color:#d4623a">.higgsfield.app</span></div>
     <div class="h" style="position:absolute;left:20px;top:18px;right:20px;bottom:18px;border-radius:14px;background:#fff3c4;border:3px solid ${INK};display:flex;align-items:center;justify-content:center;gap:18px;font-size:64px;white-space:nowrap">
-      <span style="font-size:40px;color:#6b5d52">다음 주인공 ★</span><span style="color:#c8372d">당신의 브랜드</span></div>
+      <span style="font-size:40px;color:#6b5d52">다음 주인공 ★</span><span style="color:#c8372d">당신의 고객</span></div>
     ${bl.map(k => `<div class="bulb" style="position:absolute;left:${k[0] - 7}px;top:${k[1] - 7}px;width:14px;height:14px;border-radius:50%;border:2px solid ${INK}"></div>`).join("")}`, R);
+  // end card under the marquee: ① watch the live page → ② publish yours on Higgsfield (live at once on .higgsfield.app)
+  const c07_HF = `<svg width="40" height="40" viewBox="0 0 40 40" style="flex:none"><rect x="2" y="2" width="36" height="36" rx="10" fill="#c7f25c" stroke="${INK}" stroke-width="3.5"/><path d="M13 11 V29 M27 11 V29 M13 20 H27" stroke="${INK}" stroke-width="4.5" stroke-linecap="round"/></svg>`;
+  const c07_end = c07_abs("left:160px;top:512px;width:1600px;display:flex;justify-content:center;align-items:center;gap:18px;z-index:7", "", R);
+  const c07_steps = [[`<span style="font-size:28px">▶</span> 위 주소에서 노아 페이지 보기`, "#fffaf0"],
+    [`${c07_HF} 내 것도 Higgsfield에 게시 <span style="color:#6b5d52">→ 바로 <span style="color:#d4623a">.higgsfield.app</span> 주소로 공개</span>`, "#eaffc4"]]
+    .map(([h, bg]) => el("div", `display:flex;align-items:center;gap:10px;padding:4px 20px 7px;font-size:32px;white-space:nowrap;${c07_card(bg, 16)}`, h, c07_end));
+  const c07_arrow = el("div", "font-size:44px;color:#c8372d", "→", c07_end); c07_end.insertBefore(c07_arrow, c07_steps[1]);
   const bulbs = [...mq.querySelectorAll(".bulb")], c07_mU = mq.querySelector(".u"), c07_mH = mq.querySelector(".h");
   // "Noa's got the curtain": a pull rope drops from the valance for the final close
   const c07_rope = c07_abs("left:0;top:0;width:1920px;height:1000px;z-index:33;pointer-events:none", `<svg width="1920" height="1000" style="overflow:visible">
@@ -72,11 +80,15 @@ scene(184, 192, (R, s) => {
     ban.style.transform = `translateY(${-420 * (1 - out(bd))}px) rotate(${6 * sw}deg)`;
     chips.forEach((c, i) => { const p = back(seg(t, 187.35 + i * .12, 187.75 + i * .12));
       c.style.opacity = clamp(p * 2); c.style.transform = `translateY(${-40 * (1 - p)}px) scale(${0.5 + 0.5 * p}) rotate(${(i % 2 ? 2.5 : -2.5) * (0.6 + 0.4 * Math.sin(t * 2 + i))}deg)`; });
-    // marquee: "다음 주인공 ★ 당신의 브랜드" on "Your brand." (185.9), flips to the URL on "Go build it." (187.0)
+    // marquee: "다음 주인공 ★ 당신의 고객" on "your customer" (185.9), flips to the URL on "See Noa's page live" (187.0)
     const mp = back(seg(t, 185.55, 186.0)), fl = seg(t, 186.9, 187.25), fk = fl < .5 ? 1 - fl * 2 : (fl - .5) * 2;
     mq.style.opacity = clamp(mp * 2);
     mq.style.transform = `scale(${0.4 + 0.6 * mp}, ${(0.4 + 0.6 * mp) * Math.max(.04, fl > 0 && fl < 1 ? fk : 1)}) rotate(${-1.5 + 0.5 * Math.sin(t * 1.7) + wobble(t, 187.25, 3, 14, 5)}deg)`;
     c07_mH.style.display = fl < .5 ? "flex" : "none"; c07_mU.style.display = fl < .5 ? "none" : "flex";
+    // end card: "See Noa's page live" (187.45) → "publish yours on Higgsfield" (188.0)
+    [187.45, 187.95].forEach((a, i) => { const p = back(seg(t, a, a + .4)), e = c07_steps[i];
+      e.style.opacity = clamp(p * 2); e.style.transform = `translateY(${-30 * (1 - p)}px) scale(${.6 + .4 * p}) rotate(${(i ? 1.2 : -1.2) + wobble(t, a + .4, 1.5, 12, 5)}deg)`; });
+    c07_arrow.style.opacity = seg(t, 187.8, 188.0);
     const lit = Math.floor(t * 6);
     bulbs.forEach((b, i) => { const on = t > 185.9 && (i + lit) % 3 !== 0;
       b.style.background = on ? "#fff3a0" : "#8a5a2b"; b.style.boxShadow = on ? "0 0 14px 4px rgba(255,230,120,.9)" : "none"; });
