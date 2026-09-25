@@ -34,7 +34,7 @@
   .bubble { position:absolute; background:#fff; border:5px solid var(--ink); border-radius:30px 26px 32px 24px; padding:14px 24px; font-size:37px; text-align:center; white-space:nowrap; box-shadow:6px 7px 0 rgba(43,33,24,.18); }
   .bubble:after { content:''; position:absolute; bottom:-19px; width:30px; height:30px; background:#fff; border-right:5px solid var(--ink); border-bottom:5px solid var(--ink); transform:rotate(45deg); }
   .bubble.r:after { right:44px; } .bubble.l:after { left:-19px; bottom:auto; top:22px; transform:rotate(135deg); }
-  #cap { position:absolute; left:50%; bottom:34px; font-family:'Jua'; font-size:42px; color:var(--yellow); background:#3B2A20; border:5px solid var(--ink); border-radius:16px; padding:10px 36px; width:max-content; max-width:1440px; text-align:center; line-height:1.3; text-wrap:balance; word-break:keep-all; box-shadow:0 6px 0 rgba(0,0,0,.25); }
+  #cap { position:absolute; left:50%; bottom:34px; font-family:'Jua'; font-size:42px; color:#FFD65A; background:#22395C; border:4px solid #15243B; outline:3px dashed rgba(255,255,255,.35); outline-offset:-12px; border-radius:18px; padding:10px 36px; width:max-content; max-width:1440px; text-align:center; line-height:1.3; text-wrap:balance; word-break:keep-all; box-shadow:0 6px 0 rgba(0,0,0,.25); }
   .layer { position:absolute; left:0; top:0; width:1920px; height:1080px; transform-origin:0 0; }
   #L_beam { mix-blend-mode:screen; opacity:.55; pointer-events:none; }
   #dust .d { position:absolute; border-radius:50%; background:#FFF8E0; }
@@ -44,6 +44,7 @@
   #wipeL, #wipeR { position:absolute; top:0; width:1000px; height:1080px; border:8px solid var(--ink); background:repeating-linear-gradient(90deg,#C8322B 0 70px,#A12420 70px 96px,#C8322B 96px 150px); }
   #wipeL { left:-20px; } #wipeR { right:-20px; }
   #wipeSign { position:absolute; left:50%; top:44%; font-family:'Jua'; font-size:70px; color:var(--ink); background:#FFD65A; border:7px solid var(--ink); border-radius:18px; padding:14px 44px; white-space:nowrap; box-shadow:0 10px 0 rgba(0,0,0,.25); }
+  #audience .h { position:absolute; bottom:-34px; }
   .conf { position:absolute; left:0; top:0; width:18px; height:12px; border:2px solid var(--ink); border-radius:3px; }
 </style>
 </head>
@@ -319,6 +320,7 @@
   <polygon id="beam1" points="330,-20 390,-20 760,1100 120,1100" fill="url(#beamG)"/>
   <polygon id="beam2" points="1530,-20 1590,-20 1800,1100 1160,1100" fill="url(#beamG)"/>
 </svg><div id="dust"></div></div>
+<div id="audience"></div>
 <div id="vig"></div>
 <div id="night"><div id="clock">AM 2:00</div></div>
 <div id="wipeL"></div><div id="wipeR"></div><div id="wipeSign"></div>
@@ -354,63 +356,75 @@ const skin = '#FFE0C2';
 function arm(id, sx, sy, ex, ey, color, hand) {
   return `<g class="${id}" style="transform-origin:${sx}px ${sy}px"><path d="M${sx} ${sy} L${ex} ${ey}" stroke="${INK}" stroke-width="22" stroke-linecap="round"/><path d="M${sx} ${sy} L${ex} ${ey}" stroke="${color}" stroke-width="12" stroke-linecap="round"/>${hand ? `<circle cx="${ex}" cy="${ey}" r="10" fill="${hand}" stroke="${INK}" stroke-width="5"/>` : ''}</g>`;
 }
-const KODI = `<svg width="190" height="218" viewBox="0 0 200 230">
-  <rect x="66" y="176" width="24" height="44" rx="11" fill="#C4623E" stroke="${INK}" stroke-width="5"/><rect x="110" y="176" width="24" height="44" rx="11" fill="#C4623E" stroke="${INK}" stroke-width="5"/>
-  ${arm('armL', 34, 124, 10, 152, '#E8875B')}${arm('armR', 166, 124, 190, 152, '#E8875B')}
-  <path d="M100 36 C162 36 186 80 183 124 C180 170 150 192 100 192 C50 192 20 170 17 124 C14 80 38 36 100 36 Z" fill="#E8875B" stroke="${INK}" stroke-width="6"/>
-  <path d="M100 36 V24" stroke="${INK}" stroke-width="6"/>
-  <g class="spark" style="transform-origin:100px 16px">${[0,45,90,135].map(a => `<path d="M${100 - 14 * Math.cos(a * Math.PI / 180)} ${16 - 14 * Math.sin(a * Math.PI / 180)} L${100 + 14 * Math.cos(a * Math.PI / 180)} ${16 + 14 * Math.sin(a * Math.PI / 180)}" stroke="#C4623E" stroke-width="8" stroke-linecap="round"/>`).join('')}</g>
-  <ellipse cx="60" cy="130" rx="15" ry="9" fill="#F4A6A0" opacity=".8"/><ellipse cx="140" cy="130" rx="15" ry="9" fill="#F4A6A0" opacity=".8"/>
-  <g class="e-normal"><g class="blink" style="transform-origin:100px 104px"><ellipse cx="78" cy="104" rx="8" ry="11" fill="${INK}"/><ellipse cx="122" cy="104" rx="8" ry="11" fill="${INK}"/></g></g>
-  <g class="e-happy"><path d="M68 108 Q78 94 88 108 M112 108 Q122 94 132 108" stroke="${INK}" stroke-width="6" fill="none" stroke-linecap="round"/></g>
-  <g class="e-wow"><circle cx="78" cy="102" r="13" fill="#fff" stroke="${INK}" stroke-width="5"/><circle cx="122" cy="102" r="13" fill="#fff" stroke="${INK}" stroke-width="5"/><circle cx="79" cy="104" r="6" fill="${INK}"/><circle cx="121" cy="104" r="6" fill="${INK}"/></g>
-  <g class="m-normal"><path d="M88 136 Q100 148 112 136" stroke="${INK}" stroke-width="5" fill="none" stroke-linecap="round"/></g>
-  <g class="m-happy"><path d="M84 132 Q100 160 116 132 Z" fill="#7A2E1E" stroke="${INK}" stroke-width="5" stroke-linejoin="round"/></g>
-  <g class="m-wow"><ellipse cx="100" cy="142" rx="9" ry="12" fill="#7A2E1E" stroke="${INK}" stroke-width="5"/></g>
+// Cast modeled on the theater reference: Uchu (red suit, green face), Noa (cool hamster guide), Boss hamster.
+const RED = '#E0312B', REDD = '#B8231F', GRN = '#4FA83A', FUR = '#E9A04A', FURD = '#C97F2E', CREAM = '#FBE6C4';
+const UCHU = `<svg width="190" height="285" viewBox="0 0 200 300">
+  <path d="M84 36 Q70 16 64 4" stroke="${INK}" stroke-width="9" fill="none" stroke-linecap="round"/><path d="M84 36 Q70 16 64 4" stroke="${RED}" stroke-width="4" fill="none" stroke-linecap="round"/>
+  <path d="M116 36 Q130 16 136 4" stroke="${INK}" stroke-width="9" fill="none" stroke-linecap="round"/><path d="M116 36 Q130 16 136 4" stroke="${RED}" stroke-width="4" fill="none" stroke-linecap="round"/>
+  <circle cx="63" cy="4" r="9" fill="${RED}" stroke="${INK}" stroke-width="4"/><circle cx="137" cy="4" r="9" fill="${RED}" stroke="${INK}" stroke-width="4"/>
+  <rect x="70" y="236" width="26" height="54" rx="12" fill="${RED}" stroke="${INK}" stroke-width="5"/><rect x="104" y="236" width="26" height="54" rx="12" fill="${RED}" stroke="${INK}" stroke-width="5"/>
+  ${arm('armL', 56, 166, 30, 220, RED, REDD)}${arm('armR', 144, 166, 170, 220, RED, REDD)}
+  <rect x="48" y="138" width="104" height="116" rx="42" fill="${RED}" stroke="${INK}" stroke-width="5"/>
+  <path d="M64 170 Q70 150 90 146" stroke="#F4776F" stroke-width="7" fill="none" stroke-linecap="round" opacity=".7"/>
+  <circle cx="40" cy="98" r="21" fill="${REDD}" stroke="${INK}" stroke-width="5"/><circle cx="160" cy="98" r="21" fill="${REDD}" stroke="${INK}" stroke-width="5"/>
+  <ellipse cx="100" cy="96" rx="63" ry="70" fill="${RED}" stroke="${INK}" stroke-width="5"/>
+  <path d="M60 60 Q76 38 100 36" stroke="#F4776F" stroke-width="7" fill="none" stroke-linecap="round" opacity=".7"/>
+  <ellipse cx="100" cy="102" rx="41" ry="51" fill="${GRN}" stroke="${INK}" stroke-width="5"/>
+  <ellipse cx="78" cy="122" rx="5" ry="12" fill="#A8DB7C" opacity=".9"/><ellipse cx="122" cy="122" rx="5" ry="12" fill="#A8DB7C" opacity=".9"/>
+  <circle cx="90" cy="140" r="3" fill="#2E6B22" opacity=".5"/><circle cx="116" cy="70" r="3" fill="#2E6B22" opacity=".5"/>
+  <g class="brow"><path d="M76 72 Q86 66 94 71 M106 71 Q114 66 124 72" stroke="#23501A" stroke-width="4" fill="none" stroke-linecap="round"/></g>
+  <g class="e-normal"><g class="blink" style="transform-origin:100px 90px"><circle cx="87" cy="90" r="10" fill="#fff" stroke="${INK}" stroke-width="3"/><circle cx="113" cy="90" r="10" fill="#fff" stroke="${INK}" stroke-width="3"/><circle cx="88" cy="91" r="5" fill="#5A3A22"/><circle cx="112" cy="91" r="5" fill="#5A3A22"/></g></g>
+  <g class="e-happy"><path d="M78 92 Q87 82 96 92 M104 92 Q113 82 122 92" stroke="${INK}" stroke-width="5" fill="none" stroke-linecap="round"/></g>
+  <g class="e-wow"><circle cx="87" cy="89" r="13" fill="#fff" stroke="${INK}" stroke-width="3"/><circle cx="113" cy="89" r="13" fill="#fff" stroke="${INK}" stroke-width="3"/><circle cx="87" cy="90" r="5" fill="#5A3A22"/><circle cx="113" cy="90" r="5" fill="#5A3A22"/></g>
+  <circle cx="100" cy="108" r="4" fill="#2E6B22"/>
+  <g class="m-normal"><ellipse cx="100" cy="128" rx="7" ry="8" fill="#8A1C22" stroke="${INK}" stroke-width="3"/></g>
+  <g class="m-happy"><path d="M86 122 Q100 142 114 122 Z" fill="#8A1C22" stroke="${INK}" stroke-width="3" stroke-linejoin="round"/></g>
+  <g class="m-wow"><ellipse cx="100" cy="130" rx="12" ry="16" fill="#8A1C22" stroke="#F09A9A" stroke-width="4"/><ellipse cx="100" cy="138" rx="7" ry="5" fill="#F09A9A"/></g>
+  <g class="q"><text x="166" y="36" font-family="Jua" font-size="56" fill="#3E9C95" stroke="${INK}" stroke-width="2">?</text></g>
 </svg>`;
-const WORKER = `<svg width="190" height="285" viewBox="0 0 200 300">
-  <rect x="76" y="226" width="22" height="56" fill="#34427A" stroke="${INK}" stroke-width="5"/><rect x="102" y="226" width="22" height="56" fill="#34427A" stroke="${INK}" stroke-width="5"/>
-  <ellipse cx="84" cy="286" rx="19" ry="9" fill="${INK}"/><ellipse cx="116" cy="286" rx="19" ry="9" fill="${INK}"/>
-  ${arm('armL', 60, 176, 40, 232, '#fff', skin)}${arm('armR', 140, 176, 160, 232, '#fff', skin)}
-  <path d="M60 166 Q100 150 140 166 L150 242 Q100 254 50 242 Z" fill="#fff" stroke="${INK}" stroke-width="6"/>
-  <path d="M100 168 L91 181 L100 228 L109 181 Z" fill="#34427A" stroke="${INK}" stroke-width="4"/>
-  <path d="M76 166 L90 206 M124 166 L110 206" stroke="#3E9C95" stroke-width="5"/><rect x="80" y="204" width="24" height="30" rx="4" fill="#FFD65A" stroke="${INK}" stroke-width="4"/>
-  <circle cx="40" cy="98" r="12" fill="${skin}" stroke="${INK}" stroke-width="5"/><circle cx="160" cy="98" r="12" fill="${skin}" stroke="${INK}" stroke-width="5"/>
-  <circle cx="100" cy="92" r="62" fill="${skin}" stroke="${INK}" stroke-width="6"/>
-  <path d="M40 90 Q34 26 100 24 Q166 26 160 90 Q152 58 128 56 L120 40 L110 56 L94 38 L86 56 Q58 56 40 90 Z" fill="${INK}"/>
-  <ellipse cx="66" cy="124" rx="12" ry="7" fill="#F4A6A0" opacity=".8"/><ellipse cx="134" cy="124" rx="12" ry="7" fill="#F4A6A0" opacity=".8"/>
-  <g class="e-normal"><g class="blink" style="transform-origin:100px 102px"><circle cx="78" cy="102" r="5.5" fill="${INK}"/><circle cx="122" cy="102" r="5.5" fill="${INK}"/></g></g>
-  <g class="e-happy"><path d="M70 106 Q78 96 86 106 M114 106 Q122 96 130 106" stroke="${INK}" stroke-width="5" fill="none" stroke-linecap="round"/></g>
-  <g class="e-wow"><circle cx="78" cy="102" r="8" fill="${INK}"/><circle cx="122" cy="102" r="8" fill="${INK}"/><circle cx="80" cy="99" r="3" fill="#fff"/><circle cx="124" cy="99" r="3" fill="#fff"/></g>
-  <circle cx="78" cy="102" r="18" fill="#fff" fill-opacity=".25" stroke="${INK}" stroke-width="5"/><circle cx="122" cy="102" r="18" fill="#fff" fill-opacity=".25" stroke="${INK}" stroke-width="5"/><path d="M96 100 H104" stroke="${INK}" stroke-width="5"/>
-  <g class="m-normal"><path d="M88 130 Q100 138 112 130" stroke="${INK}" stroke-width="5" fill="none" stroke-linecap="round"/></g>
-  <g class="m-happy"><path d="M84 126 Q100 152 116 126 Z" fill="#7A2E1E" stroke="${INK}" stroke-width="5" stroke-linejoin="round"/></g>
-  <g class="m-wow"><ellipse cx="100" cy="134" rx="8" ry="11" fill="#7A2E1E" stroke="${INK}" stroke-width="5"/></g>
-  <g class="q"><text x="168" y="30" font-family="Jua" font-size="58" fill="#3E9C95" stroke="${INK}" stroke-width="2">?</text></g>
+const NOA = `<svg width="214" height="220" viewBox="0 0 220 226">
+  <ellipse cx="80" cy="214" rx="22" ry="9" fill="${FURD}" stroke="${INK}" stroke-width="4"/><ellipse cx="140" cy="214" rx="22" ry="9" fill="${FURD}" stroke="${INK}" stroke-width="4"/>
+  ${arm('armL', 40, 150, 20, 186, FUR, CREAM)}${arm('armR', 180, 150, 200, 186, FUR, CREAM)}
+  <circle cx="48" cy="54" r="22" fill="${FUR}" stroke="${INK}" stroke-width="5"/><circle cx="48" cy="56" r="11" fill="#F2A9A0"/>
+  <circle cx="172" cy="54" r="22" fill="${FUR}" stroke="${INK}" stroke-width="5"/><circle cx="172" cy="56" r="11" fill="#F2A9A0"/>
+  <path d="M110 30 C176 30 206 80 204 132 C202 186 164 210 110 210 C56 210 18 186 16 132 C14 80 44 30 110 30 Z" fill="${FUR}" stroke="${INK}" stroke-width="5"/>
+  <ellipse cx="110" cy="170" rx="56" ry="34" fill="${CREAM}"/>
+  <ellipse cx="110" cy="136" rx="46" ry="30" fill="${CREAM}" stroke="${INK}" stroke-width="3"/>
+  <path d="M40 176 Q110 200 180 176 L178 192 Q110 214 42 192 Z" fill="#F2C94C" stroke="${INK}" stroke-width="4"/>
+  <path d="M150 188 L166 222 L184 214 L164 184 Z" fill="#F2C94C" stroke="${INK}" stroke-width="4"/>
+  <g class="brow"><path d="M62 82 Q80 74 96 80 M124 80 Q140 74 158 82" stroke="${INK}" stroke-width="5" fill="none" stroke-linecap="round"/></g>
+  <g class="e-normal"><g class="blink" style="transform-origin:110px 104px"></g></g><g class="e-happy"></g><g class="e-wow"></g>
+  <path d="M56 100 Q58 90 72 90 L98 90 Q104 90 104 98 L102 112 Q98 124 84 124 L70 124 Q56 122 56 108 Z" fill="#15161C" stroke="${INK}" stroke-width="3"/>
+  <path d="M164 100 Q162 90 148 90 L122 90 Q116 90 116 98 L118 112 Q122 124 136 124 L150 124 Q164 122 164 108 Z" fill="#15161C" stroke="${INK}" stroke-width="3"/>
+  <path d="M104 98 Q110 94 116 98" stroke="#15161C" stroke-width="5" fill="none"/>
+  <path d="M64 98 L76 96" stroke="#fff" stroke-width="4" stroke-linecap="round" opacity=".8"/><path d="M126 98 L138 96" stroke="#fff" stroke-width="4" stroke-linecap="round" opacity=".8"/>
+  <path d="M104 128 L116 128 L110 136 Z" fill="#5A3326"/>
+  <path d="M70 140 L40 134 M70 146 L40 150 M150 140 L180 134 M150 146 L180 150" stroke="${INK}" stroke-width="2.5" stroke-linecap="round"/>
+  <g class="m-normal"><path d="M100 144 Q105 150 110 144 Q115 150 120 144" stroke="${INK}" stroke-width="3.5" fill="none" stroke-linecap="round"/></g>
+  <g class="m-happy"><path d="M96 142 Q110 162 124 142 Z" fill="#8A3A2A" stroke="${INK}" stroke-width="3.5" stroke-linejoin="round"/></g>
+  <g class="m-wow"><ellipse cx="110" cy="150" rx="9" ry="11" fill="#8A3A2A" stroke="${INK}" stroke-width="3.5"/></g>
 </svg>`;
-const BOSS = `<svg width="205" height="285" viewBox="0 0 216 300">
-  <rect x="80" y="228" width="24" height="54" fill="#4B4F5A" stroke="${INK}" stroke-width="5"/><rect x="112" y="228" width="24" height="54" fill="#4B4F5A" stroke="${INK}" stroke-width="5"/>
-  <ellipse cx="90" cy="286" rx="20" ry="9" fill="${INK}"/><ellipse cx="126" cy="286" rx="20" ry="9" fill="${INK}"/>
-  <path d="M52 170 Q108 150 164 170 L174 246 Q108 260 42 246 Z" fill="#6C7385" stroke="${INK}" stroke-width="6"/>
-  <path d="M92 164 L108 200 L124 164 Z" fill="#fff" stroke="${INK}" stroke-width="4"/><path d="M108 172 L101 184 L108 206 L115 184 Z" fill="#C8322B" stroke="${INK}" stroke-width="3"/>
-  <path d="M48 202 Q108 224 168 202 L166 226 Q108 248 50 226 Z" fill="#5B6272" stroke="${INK}" stroke-width="5"/>
-  <circle cx="62" cy="214" r="11" fill="${skin}" stroke="${INK}" stroke-width="5"/><circle cx="154" cy="214" r="11" fill="${skin}" stroke="${INK}" stroke-width="5"/>
-  <circle cx="108" cy="94" r="62" fill="${skin}" stroke="${INK}" stroke-width="6"/>
-  <path d="M48 110 Q40 70 60 60 Q58 90 66 104 Z M168 110 Q176 70 156 60 Q158 90 150 104 Z" fill="#8C8C8C" stroke="${INK}" stroke-width="4"/>
-  <ellipse cx="88" cy="50" rx="14" ry="7" fill="#fff" opacity=".7" transform="rotate(-20 88 50)"/>
-  <g class="brow"><path d="M72 84 H96 M120 84 H144" stroke="${INK}" stroke-width="7" stroke-linecap="round"/></g>
-  <g class="e-normal"><g class="blink" style="transform-origin:108px 100px"><circle cx="84" cy="100" r="5.5" fill="${INK}"/><circle cx="132" cy="100" r="5.5" fill="${INK}"/></g></g>
-  <g class="e-happy"><path d="M76 104 Q84 94 92 104 M124 104 Q132 94 140 104" stroke="${INK}" stroke-width="5" fill="none" stroke-linecap="round"/></g>
-  <g class="e-wow"><circle cx="84" cy="100" r="9" fill="#fff" stroke="${INK}" stroke-width="4"/><circle cx="132" cy="100" r="9" fill="#fff" stroke="${INK}" stroke-width="4"/><circle cx="84" cy="101" r="4.5" fill="${INK}"/><circle cx="132" cy="101" r="4.5" fill="${INK}"/></g>
-  <path d="M82 124 Q96 112 108 122 Q120 112 134 124 Q120 132 108 127 Q96 132 82 124 Z" fill="#6B5B4B" stroke="${INK}" stroke-width="4"/>
-  <g class="m-normal"><path d="M98 140 H118" stroke="${INK}" stroke-width="5" stroke-linecap="round"/></g>
-  <g class="m-happy"><path d="M94 136 Q108 156 122 136 Z" fill="#7A2E1E" stroke="${INK}" stroke-width="5" stroke-linejoin="round"/></g>
-  <g class="m-wow"><ellipse cx="108" cy="142" rx="9" ry="11" fill="#7A2E1E" stroke="${INK}" stroke-width="5"/></g>
+const BOSS = `<svg width="205" height="250" viewBox="0 0 220 268">
+  <rect x="70" y="222" width="30" height="40" rx="12" fill="#3B3F4A" stroke="${INK}" stroke-width="4"/><rect x="120" y="222" width="30" height="40" rx="12" fill="#3B3F4A" stroke="${INK}" stroke-width="4"/>
+  <circle cx="52" cy="58" r="20" fill="#D9A36A" stroke="${INK}" stroke-width="5"/><circle cx="168" cy="58" r="20" fill="#D9A36A" stroke="${INK}" stroke-width="5"/>
+  <path d="M110 30 C174 30 204 82 202 136 C200 196 164 232 110 232 C56 232 20 196 18 136 C16 82 46 30 110 30 Z" fill="#D9A36A" stroke="${INK}" stroke-width="5"/>
+  <path d="M50 170 Q110 150 170 170 L176 226 Q110 240 44 226 Z" fill="#5E6474" stroke="${INK}" stroke-width="5"/>
+  <path d="M96 166 L110 196 L124 166 Z" fill="#fff" stroke="${INK}" stroke-width="3"/><path d="M110 174 L103 186 L110 214 L117 186 Z" fill="#C8322B" stroke="${INK}" stroke-width="3"/>
+  <ellipse cx="110" cy="128" rx="44" ry="28" fill="${CREAM}" stroke="${INK}" stroke-width="3"/>
+  <g class="brow"><path d="M62 78 Q78 70 94 78 M126 78 Q142 70 158 78" stroke="#EDE6DA" stroke-width="9" fill="none" stroke-linecap="round"/></g>
+  <g class="e-normal"><g class="blink" style="transform-origin:110px 98px"><circle cx="82" cy="98" r="5.5" fill="${INK}"/><circle cx="138" cy="98" r="5.5" fill="${INK}"/></g></g>
+  <g class="e-happy"><path d="M72 102 Q82 92 92 102 M128 102 Q138 92 148 102" stroke="${INK}" stroke-width="5" fill="none" stroke-linecap="round"/></g>
+  <g class="e-wow"><circle cx="82" cy="97" r="9" fill="#fff" stroke="${INK}" stroke-width="3"/><circle cx="138" cy="97" r="9" fill="#fff" stroke="${INK}" stroke-width="3"/><circle cx="82" cy="98" r="4" fill="${INK}"/><circle cx="138" cy="98" r="4" fill="${INK}"/></g>
+  <circle cx="82" cy="98" r="18" fill="#fff" fill-opacity=".2" stroke="${INK}" stroke-width="4"/><circle cx="138" cy="98" r="18" fill="#fff" fill-opacity=".2" stroke="${INK}" stroke-width="4"/><path d="M100 96 H120" stroke="${INK}" stroke-width="4"/>
+  <path d="M104 118 L116 118 L110 126 Z" fill="#5A3326"/>
+  <g class="m-normal"><path d="M100 138 H120" stroke="${INK}" stroke-width="4" stroke-linecap="round"/></g>
+  <g class="m-happy"><path d="M96 134 Q110 154 124 134 Z" fill="#8A3A2A" stroke="${INK}" stroke-width="4" stroke-linejoin="round"/></g>
+  <g class="m-wow"><ellipse cx="110" cy="140" rx="9" ry="11" fill="#8A3A2A" stroke="${INK}" stroke-width="4"/></g>
 </svg>`;
 const CH = {
-  worker: { svg: WORKER, w: 190, h: 285, phase: 0.0, blinkOff: 0.4 },
-  kodi:   { svg: KODI,   w: 190, h: 218, phase: 1.3, blinkOff: 1.7 },
-  boss:   { svg: BOSS,   w: 205, h: 285, phase: 2.2, blinkOff: 2.6 },
+  worker: { svg: UCHU, w: 190, h: 285, phase: 0.0, blinkOff: 0.4 },
+  kodi:   { svg: NOA,  w: 214, h: 220, phase: 1.3, blinkOff: 1.7 },
+  boss:   { svg: BOSS, w: 205, h: 250, phase: 2.2, blinkOff: 2.6 },
 };
 const FEET = 915;
 for (const [k, c] of Object.entries(CH)) {
@@ -426,7 +440,7 @@ const START = { worker: -200, kodi: 2150, boss: 2300 };
 const BLOCK = [
   { worker: [275, 0.1, 1.5], kodi: [1462, 2.6, 4.0], boss: 2300 },
   {}, {}, {}, {}, {}, {}, {}, {},
-  { kodi: [1270, 0.3, 1.2], boss: [1455, 0.8, 2.8] },
+  { kodi: [1215, 0.3, 1.2], boss: [1460, 0.8, 2.8] },
   {},
   { boss: [2300, 0.3, 2.0], kodi: [1462, 0.6, 1.6] },
   {},
@@ -531,9 +545,25 @@ window.TOTAL = acc;
   timeline.forEach(e => { e.moves = {};
     for (const k of Object.keys(CH)) { const b = BLOCK[e.i][k]; const [to, t0, t1] = b === undefined ? [pos[k], 0, 0] : Array.isArray(b) ? b : [b, 0, 0];
       e.moves[k] = [pos[k], to, t0, t1]; pos[k] = to; } }); }
+// hamster audience (foreground, screen space)
+const AUD = [];
+{ const spots = [[40, 1.0, 1], [170, 0.85, 0], [300, 0.95, 1], [1540, 0.95, 0], [1670, 0.85, 1], [1790, 1.0, 1]];
+  const au = document.getElementById('audience');
+  spots.forEach(([x, sc, hat], k) => {
+    const d = document.createElement('div'); d.className = 'h'; d.style.left = x + 'px';
+    d.innerHTML = `<svg width="${110 * sc}" height="${120 * sc}" viewBox="0 0 110 120">
+      ${hat ? `<path d="M40 30 L55 -8 L70 30 Z" fill="${k % 2 ? '#F4A6A0' : '#9FD3D9'}" stroke="${INK}" stroke-width="4"/><circle cx="55" cy="-8" r="6" fill="#FFD65A" stroke="${INK}" stroke-width="3"/>` : ''}
+      <circle cx="22" cy="34" r="13" fill="#E9A04A" stroke="${INK}" stroke-width="4"/><circle cx="88" cy="34" r="13" fill="#E9A04A" stroke="${INK}" stroke-width="4"/>
+      <ellipse cx="55" cy="72" rx="46" ry="44" fill="#E9A04A" stroke="${INK}" stroke-width="4"/>
+      <ellipse cx="55" cy="84" rx="24" ry="16" fill="#FBE6C4"/>
+      <circle cx="40" cy="64" r="4.5" fill="${INK}"/><circle cx="70" cy="64" r="4.5" fill="${INK}"/>
+      <path d="M50 80 Q55 86 60 80" stroke="${INK}" stroke-width="3" fill="none" stroke-linecap="round"/>
+      <ellipse cx="30" cy="78" rx="7" ry="4" fill="#F4A6A0" opacity=".8"/><ellipse cx="80" cy="78" rx="7" ry="4" fill="#F4A6A0" opacity=".8"/></svg>`;
+    au.append(d); AUD.push({ el: d }); }); }
+
 // cinematic: chapter curtain wipes (scene index -> sign), close-up focus points per speaker
 const WIPES = { 2: '어디서 만들까?', 3: 'STEP 1 – 5', 9: '완성본 공개', 11: '프롬프트 템플릿' };
-const FOCUS = { worker: [560, 690], kodi: [1320, 690], boss: [1380, 640] };
+const FOCUS = { worker: [700, 520], kodi: [1220, 520], boss: [1260, 520] };
 const LAYERS = [['L_back', 0.35], ['L_main', 1.0], ['L_beam', 1.1]];
 { const dust = document.getElementById('dust'); let sd = 7; const r = () => (sd = (sd * 16807) % 2147483647) / 2147483647;
   for (let k = 0; k < 46; k++) { const d = document.createElement('div'); d.className = 'd'; const z = 2 + r() * 4; d.style.width = d.style.height = z + 'px';
@@ -550,10 +580,10 @@ function camera(cur, lt, t) {
   let w = 0, f = null;
   for (const { t0, t1, who } of cur.bubEls) {
     if (cur.act.night !== undefined && who === 'worker') continue;
-    const hold = Math.min(t1, t0 + 2.1), ww = Math.min(easeInOut((lt - t0 + 0.25) / 0.5), easeInOut((hold + 0.6 - lt) / 0.6));
+    const hold = Math.min(t1, t0 + 1.8), ww = Math.min(easeInOut((lt - t0 + 0.25) / 0.5), easeInOut((hold + 0.6 - lt) / 0.6));
     if (ww > w) { w = ww; f = FOCUS[who]; }
   }
-  if (f) { fx += (f[0] - fx) * w; fy += (f[1] - fy) * w; z += (1.42 - z) * w; }
+  if (f) { fx += (f[0] - fx) * w; fy += (f[1] - fy) * w; z += (1.2 - z) * w; }
   fx += 5 * Math.sin(t * 0.63); fy += 4 * Math.sin(t * 0.41 + 1);
   // whip pan at plain scene cuts (chapter cuts use the curtain instead)
   const i = cur.i, next = timeline[i + 1];
@@ -699,6 +729,10 @@ function seek(t) {
     const x = p.x0 + p.vx * s + Math.sin(s * 5 + p.x0) * 20, y = -40 + p.vy * s + 0.5 * 90 * s * s;
     p.d.style.opacity = clamp((4 - s) / 0.8); p.d.style.transform = `translate(${x}px, ${y}px) rotate(${p.spin * s}deg)`; });
 
+  // hamster audience peeking from the stage edge (cheers on confetti and at the finale)
+  const cheer = cur.act.confetti !== undefined && lt > cur.act.confetti && lt < cur.act.confetti + 3;
+  AUD.forEach((a, k) => { const hop = cheer ? Math.abs(Math.sin((lt * 7) + k)) * 34 : 0;
+    a.el.style.transform = `translateY(${-hop + Math.sin(t * 2.2 + k * 1.3) * 4}px) rotate(${Math.sin(t * 1.4 + k) * 4}deg)`; });
   // camera, lights, dust, curtain wipes
   const cam = camera(cur, lt, t); applyCamera(cam);
   document.getElementById('beam1').setAttribute('transform', `rotate(${3 * Math.sin(t * 0.5)} 360 -20)`);
