@@ -108,7 +108,7 @@ function curtainC(t) {   // 0 open .. 1 closed (overshoots both ways)
 }
 function innerX(y, c, t, side, lag) {
   const k1 = y / TIE_Y, k2 = (y - TIE_Y) / (1080 - TIE_Y);
-  const open = y < TIE_Y ? 150 + 120 * Math.pow(1 - k1, 1.6) : 150 + 95 * Math.pow(k2, .75);
+  const open = y < TIE_Y ? 100 + 75 * Math.pow(1 - k1, 1.6) : 100 + 45 * Math.pow(k2, .75);
   const closed = 985;
   const sway = (1 - clamp(c)) * 5 * Math.sin(t * 1.3 + y * .006 + side * 2) * (Math.max(0, y) / 1080);
   return lerp(open, closed, c) + sway + lag * Math.pow(Math.max(0, y) / 1080, 1.4);
