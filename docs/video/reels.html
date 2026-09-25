@@ -85,7 +85,7 @@
           <li><b>Payoff first.</b> OpusClip's Shorts hook formulas open on a claim or a contradiction. R01 answers its own headline: a deadpan hamster holds up FREE, struck out, over $0.40, in front of the Kanban board, while Uchu's shocked O face is the pattern interrupt. R02 shows the agent squad that measured it, then R03 rewinds.</li>
           <li><b>Three scene changes in three seconds.</b> Nielsen's Visual Attention work links 3 or more scene changes in the first 3 seconds with 58% higher completion. R01 (hamster verdict), R02 (agent squad) and R03 (rewind) are one-second micro-shots with three different pictures.</li>
           <li><b>Hold past second ten.</b> Meta reports that 65% of people who watch 3 seconds of a video reach 10 seconds. The board is on screen from frame 1, and by 0:06 the agents are throwing cards into its columns (R05).</li>
-          <li><b>A change every 2 to 4 seconds.</b> After the hook, every shot runs 2 to 3 seconds, and each one adds a new prop or a new agent.</li><li><b>One metaphor per concept.</b> Ontology is name tags on a card (R07). Harness is seatbelts for agents (R08a), then its four parts are numbered on screen: rules and tests (R08b ②), the gate (R09 ③) and the sandbox (R10 ④).</li>
+          <li><b>A change every 2 to 4 seconds.</b> After the hook, every shot runs 2 to 3 seconds, and each one adds a new prop or a new agent.</li><li><b>Varied framing.</b> The board-and-cast wide shot is broken up by a low angle (R05), a close-up (R06), a split screen (R08b) and a phone insert (R04), so the mid-video rhythm does not flatten.</li><li><b>One metaphor per concept.</b> Ontology is name tags on a card (R07). Harness is seatbelts for agents (R08a ①), then its parts are numbered on screen: rules and tests (R08b ②), the gate (R09 ③) and the sandbox (R10 ④).</li>
           <li><b>Loop ending.</b> The last line, "Next free post?" / "다음 공짜 글, 재볼까?", runs straight into "It said FREE." / "공짜라며?" in both languages. A seamless loop turns the end of the video into a replay.</li>
           <li><b>Safe zones.</b> Key text sits inside logical x 30–480 and y 110–765 (1080×1920: x 60–960, y 220–1530), clear of the top bar, the caption area and the icon column. The guides follow outfy, kreatli and veeso.</li>
           <li><b>Two languages at once.</b> English VO with a burned-in EN + KR subtitle strip, so the Reel works with the sound off in both markets. The Korean line is written as a native Shorts caption in the hamster's own voice, so it carries the meaning in its own words.</li>
@@ -97,7 +97,7 @@
           <li><b>Voice.</b> The hamster talks in 반말 with 음슴체 punch lines ("채움", "잡음", "까봄"). No 해요체 mixed in.</li>
           <li><b>Signature ending.</b> "~햄" appears twice (R02 "재봤햄", R10 "돌렸햄"), plus once in the mascot hook alternative. Like 뉴닉's 고슴체, the ending becomes the brand, so it is never on every line.</li>
           <li><b>Length.</b> 16 Korean characters or fewer, one line per language.</li>
-          <li><b>Key tokens.</b> *Asterisks* mark the same key word in both lines: FREE/공짜, agents/에이전트, Ontology/온톨로지, Harness/하네스, Tests/테스트, 70/70점, sandboxed/샌드박스, $0.40. <code>Theater.sub2</code> draws them in a highlight color at 1.12× size.</li>
+          <li><b>Key tokens.</b> *Asterisks* mark the same key word in both lines: FREE/공짜, agents/에이전트, Ontology/온톨로지, Harness/하네스, Tests/테스트, 70/70점, sandboxed/샌드박스, $0.40. SKILL.md stays unhighlighted in R12 so the only highlight there is free/공짜, the word that loops into R01. <code>Theater.sub2</code> draws them in a highlight color at 1.12× size.</li>
           <li><b>Meaning over wording.</b> Each Korean line says the point in its own words. Subjects and pronouns are cut. No passives, no "~에 대해", no "~을 가지고 있다".</li>
           <li><b>Terms.</b> Keep the forms Korean creators use: 칸반, 에이전트, 샌드박스, 온톨로지, 하네스, SKILL.md.</li>
           <li><b>References.</b> 조코딩, 안될공학, ITSub잇섭, 뉴닉 고슴이, 빵빵이의 일상, 영국남자, 올리버쌤.</li>
@@ -415,7 +415,7 @@
         g += Th.agent('decompose', 250, 590, 56, { carry: 'cut', mood: 'happy', noLabel: true });
         g += Th.agent('gapfill', 340, 590, 56, { carry: 'fill', mood: 'happy', noLabel: true });
         g += Th.agent('verify', 430, 590, 56, { carry: 'check', mood: 'alert', noLabel: true });
-        g += Th.agent('orchestrator', 95, 780, 210, { mood: 'star' });
+        g += Th.agent('orchestrator', 95, 780, 210, { mood: 'star', noLabel: true });
         g += Th.burst(240, 420, 36, 'x3!', { fill: '#f062a8', f: '#fff', z: 20 });
         return g;
       } },
@@ -434,7 +434,7 @@
         let g = G(`<rect x="196" y="126" width="290" height="470" rx="14" fill="#4f8ef7" fill-opacity=".22" stroke="#4f8ef7" stroke-width="4"/><rect x="196" y="126" width="290" height="52" rx="14" fill="#4f8ef7"/>` + T(341, 162, 'Decomposed', 30, { f: '#fff' }));
         [['1  clone repo', 'orig'], ['+  node 20', 'gap', 'gap'], ['2  API key', 'orig'], ['+  .env file', 'gap', 'gap'], ['3  deploy', 'orig']].forEach(([t, k, b], i) => { g += Th.card(212, 196 + i * 76, 258, 56, t, { kind: k, badge: b, z: 24 }); });
         g += Th.sign(110, 204, 150, ['+2', 'skipped'], { z: 34, fill: '#f1efe9', r: -6 });
-        g += Th.agent('gapfill', 70, 740, 190, { mood: 'happy' });
+        g += Th.agent('gapfill', 70, 740, 190, { mood: 'happy', noLabel: true });
         g += Th.arrow(170, 540, 205, 296, { c: '#b07a10', w: 5 }) + Th.arrow(170, 560, 205, 448, { c: '#b07a10', w: 5 });
         return g;
       } },
