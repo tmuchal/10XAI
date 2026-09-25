@@ -179,7 +179,11 @@ def main():
     scenes, t, vi, events = [], 0.0, 0, []
     for sc in script["scenes"]:
         start = t
-        t += tm["lead"]
+        if scenes:
+            events.append(("sfx", start - 0.25, sfx("whoosh")))       # curtain swish between scenes
+        if sc.get("chapter"):
+            events.append(("sfx", start + 0.35, sfx("tada")))         # chapter card
+        t += tm.get("chapterLead", tm["lead"]) if sc.get("chapter") else tm["lead"]
         cues = []
         for cue in sc["cues"]:
             v = vos[vi]; vi += 1

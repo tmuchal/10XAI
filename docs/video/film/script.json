@@ -1,55 +1,57 @@
 {
-  "title": "Harness Theater: It said FREE. We measured.",
-  "voices": { "noa": { "voice": "af_heart", "speed": 1.0 }, "uchu": { "voice": "am_puck", "speed": 1.08, "pitch": 1.2 } },
-  "timing": { "lead": 0.7, "gap": 0.32, "tail": 0.8 },
+  "title": "Harness Theater: automation that stays consistent",
+  "voices": { "noa": { "voice": "af_heart", "speed": 1.02 }, "uchu": { "voice": "am_puck", "speed": 1.08, "pitch": 1.2 } },
+  "timing": { "lead": 0.8, "gap": 0.3, "tail": 0.7, "chapterLead": 2.0 },
   "scenes": [
-    { "id": "hook", "chapter": null, "source": null, "cues": [
-      { "spk": "uchu", "en": "It says *FREE*! One prompt, five minutes!", "ko": "*공짜*래! 프롬프트 하나에 5분 컷!", "sfx": [["boing", 0.1]] },
-      { "spk": "noa", "en": "Every viral AI workflow says that.", "ko": "바이럴 AI 꿀팁은 다 그렇게 말하죠.", "sfx": [["whoosh", 0.0]] },
-      { "spk": "noa", "en": "So we stopped believing, and started *measuring*.", "ko": "그래서 믿는 대신, 직접 *재보기*로 했어요.", "sfx": [["stamp", 1.6]] },
-      { "spk": "noa", "en": "I'm Noa. Welcome to *Harness Theater*.", "ko": "저는 노아. *하네스 극장*에 오신 걸 환영해요.", "sfx": [["tada", 0.2]], "hold": 0.6 }
+    { "id": "cold", "chapter": null, "source": null, "cues": [
+      { "spk": "uchu", "en": "Day thirty of posting. Why does every post sound like a different person?", "ko": "업로드 30일째. 왜 글마다 딴 사람이 쓴 것 같지?", "sfx": [["pop", 0.3], ["pop", 0.9], ["pop", 1.5]] },
+      { "spk": "noa", "en": "Because every prompt starts from zero.", "ko": "프롬프트가 매번 0부터 시작하니까요.", "sfx": [["whoosh", 0.0]] },
+      { "spk": "noa", "en": "Different *tone*. Different *facts*. Different *mistakes*.", "ko": "*톤*도, *사실*도, *실수*도 매번 달라요.", "sfx": [["stamp", 0.2], ["stamp", 1.0], ["stamp", 1.9]] },
+      { "spk": "noa", "en": "Tonight we fix it with three things: a *harness*, a *board*, and a *crew*.", "ko": "오늘 밤, 세 가지로 고쳐요. *하네스*, *보드*, 그리고 *크루*.", "sfx": [["pop", 2.2], ["pop", 2.9], ["pop", 3.6], ["tada", 4.2]], "hold": 0.9 }
     ]},
-    { "id": "traps", "chapter": [1, "바이럴 꿀팁의 함정"], "source": "10XAI · live runs on viral posts", "cues": [
-      { "spk": "noa", "en": "Paste a viral post straight into an AI, and three things go wrong.", "ko": "바이럴 글을 AI에 그대로 넣으면, 세 가지가 터져요." },
-      { "spk": "noa", "en": "*Hidden costs.* *Skipped steps.* And actions nobody checked.", "ko": "*숨은 비용*, *빠진 단계*, 아무도 확인 안 한 행동.", "sfx": [["pop", 0.1], ["pop", 1.1], ["pop", 2.2]] },
-      { "spk": "uchu", "en": "Mine deleted a whole folder!", "ko": "내 건 폴더를 통째로 지웠어!", "sfx": [["boing", 0.0]] },
-      { "spk": "noa", "en": "The model isn't dumb. It just has no *structure* around it.", "ko": "모델이 멍청한 게 아니에요. 둘러싼 *구조*가 없을 뿐.", "hold": 0.3 }
+    { "id": "harness", "chapter": [1, "하네스 엔지니어링", "Harness engineering"], "source": "출처 · OpenAI 2026 · Böckeler, martinfowler.com", "cues": [
+      { "spk": "noa", "en": "An agent is a model, plus everything around it. That everything is the *harness*.", "ko": "에이전트 = 모델 + 그 주변 전부. 그 전부가 *하네스*예요.", "sfx": [["pop", 3.0]] },
+      { "spk": "noa", "en": "*Guides* go in before it acts: brand rules, a mission, the tools it may touch.", "ko": "*가이드*는 행동 전에: 브랜드 규칙, 미션, 쓸 수 있는 도구.", "sfx": [["pop", 1.2], ["pop", 2.2], ["pop", 3.2]] },
+      { "spk": "noa", "en": "*Sensors* check after. Some are code: length, banned words, dead links.", "ko": "*센서*는 행동 후에. 코드 센서는 길이, 금지어, 죽은 링크.", "sfx": [["ding", 2.0], ["ding", 2.6], ["ding", 3.2]] },
+      { "spk": "noa", "en": "Some are judges: a second model asking, is this true, and is this us?", "ko": "심판 센서도 있어요. 다른 모델이 묻죠. 사실이야? 우리다워?", "sfx": [["ding", 2.6]] },
+      { "spk": "noa", "en": "And *gates*. Anything risky waits for a human.", "ko": "그리고 *게이트*. 위험한 건 사람을 기다려요.", "sfx": [["stamp", 1.4]] },
+      { "spk": "uchu", "en": "So... a seatbelt for robots?", "ko": "그러니까… 로봇 안전벨트?", "sfx": [["boing", 0.0]] },
+      { "spk": "noa", "en": "Exactly. OpenAI shipped a million lines this way. Humans steer, agents execute.", "ko": "정확해요. OpenAI는 이렇게 백만 줄을 냈어요. 사람은 조종, 에이전트는 실행.", "sfx": [["tada", 3.4]], "hold": 0.4 }
     ]},
-    { "id": "harness", "chapter": [2, "하네스 = 모델 빼고 전부"], "source": "출처 · OpenAI, Harness engineering (2026)", "cues": [
-      { "spk": "noa", "en": "That structure has a name: the *harness*.", "ko": "그 구조의 이름이 바로 *하네스*예요.", "sfx": [["pop", 0.9]] },
-      { "spk": "noa", "en": "Agent equals model plus harness. Everything except the model.", "ko": "에이전트 = 모델 + 하네스. 모델 빼고 전부죠.", "sfx": [["pop", 0.3], ["pop", 1.2], ["tada", 2.2]] },
-      { "spk": "noa", "en": "*Guides* steer before the agent acts. *Sensors* check after.", "ko": "*가이드*는 하기 전에, *센서*는 한 뒤에 확인해요.", "sfx": [["ding", 2.4]] },
-      { "spk": "noa", "en": "OpenAI reports a million lines of code, built this way.", "ko": "OpenAI는 이렇게 코드 백만 줄을 만들었다고 해요.", "hold": 0.4 }
+    { "id": "ontology", "chapter": [2, "온톨로지", "Ontology"], "source": "출처 · Palantir Ontology · objects · links · actions", "cues": [
+      { "spk": "noa", "en": "Sensors need something solid to measure. That's the *ontology*.", "ko": "센서엔 단단한 기준이 필요해요. 그게 *온톨로지*.", "sfx": [["whoosh", 1.6]] },
+      { "spk": "noa", "en": "Every piece of content becomes typed objects: source, claim, evidence, script, asset.", "ko": "콘텐츠를 타입 있는 객체로: 출처, 주장, 근거, 대본, 결과물.", "sfx": [["pop", 2.4], ["pop", 3.0], ["pop", 3.6], ["pop", 4.2], ["pop", 4.8]] },
+      { "spk": "noa", "en": "Links carry the rules. A claim without *evidence* never reaches publish.", "ko": "규칙은 연결에 있어요. *근거* 없는 주장은 발행까지 못 가요.", "sfx": [["alarm", 2.8]] },
+      { "spk": "uchu", "en": "Wait. The robot can't lie anymore?", "ko": "잠깐. 이제 로봇이 거짓말 못 해?", "sfx": [["boing", 0.0]] },
+      { "spk": "noa", "en": "It can try. The sensors will catch it.", "ko": "해볼 순 있죠. 센서가 잡아요.", "sfx": [["ding", 1.4]], "hold": 0.3 }
     ]},
-    { "id": "ontology", "chapter": [3, "온톨로지 = 명사 · 관계 · 동사"], "source": "출처 · Palantir Ontology docs", "cues": [
-      { "spk": "noa", "en": "But a sensor needs something to check. That's the *ontology*.", "ko": "그런데 센서엔 잴 기준이 필요해요. 그게 *온톨로지*.", "sfx": [["pop", 1.8]] },
-      { "spk": "noa", "en": "Nouns, links, verbs. Every card gets typed tags.", "ko": "명사, 관계, 동사. 카드마다 정해진 이름표를 붙여요.", "sfx": [["pop", 0.0], ["pop", 0.6], ["pop", 1.2]] },
-      { "spk": "noa", "en": "*Claim.* *Measured.* *Risk.* *Gate.*", "ko": "*주장*, *측정*, *위험도*, *게이트*.", "sfx": [["pop", 0.05], ["pop", 0.6], ["pop", 1.15], ["pop", 1.7]] },
-      { "spk": "uchu", "en": "So... it's just name tags?", "ko": "그러니까… 그냥 이름표야?" },
-      { "spk": "noa", "en": "Name tags a machine can *check*. That's the trick.", "ko": "기계가 *검사*할 수 있는 이름표. 그게 핵심이에요.", "sfx": [["ding", 1.0]], "hold": 0.3 }
+    { "id": "board", "chapter": [3, "칸반 보드", "The Kanban board"], "source": "10XAI · localhost:8080 · live board", "cues": [
+      { "spk": "noa", "en": "So where does the work live? On one *Kanban board*.", "ko": "그럼 작업은 어디 있을까요? *칸반 보드* 하나에.", "sfx": [["whoosh", 1.2]] },
+      { "spk": "noa", "en": "Each card is one typed object. Each column is a stage it has to earn.", "ko": "카드 하나가 객체 하나. 칸마다 통과해야 하는 단계예요.", "sfx": [["pop", 0.6], ["pop", 1.2], ["pop", 1.8]] },
+      { "spk": "noa", "en": "Decomposed. Verifying. Gate. Verified. Nothing skips a column.", "ko": "분해, 검증, 게이트, 완료. 칸은 절대 못 건너뛰어요.", "sfx": [["whoosh", 0.2], ["whoosh", 1.1], ["whoosh", 1.9], ["tada", 2.8]] },
+      { "spk": "noa", "en": "Agents and humans watch the same board, live. *One source of truth*.", "ko": "에이전트와 사람이 같은 보드를 실시간으로. *진실은 하나*.", "sfx": [["ding", 3.0]], "hold": 0.3 }
     ]},
-    { "id": "crew", "chapter": [4, "칸반 보드 = 에이전트 팀"], "source": "출처 · Anthropic, multi-agent research (2025)", "cues": [
-      { "spk": "noa", "en": "Now meet the crew. Paste a post, and the board fills up.", "ko": "이제 크루를 만나봐요. 글을 붙여넣으면 보드가 채워져요.", "sfx": [["whoosh", 1.4]] },
-      { "spk": "noa", "en": "*Decompose* cuts it into cards. *Gap-fill* adds the steps they skipped.", "ko": "*분해* 담당이 카드로 쪼개고, *빈칸* 담당이 빠진 단계를 채워요.", "sfx": [["pop", 0.4], ["pop", 0.8], ["pop", 2.6]] },
-      { "spk": "noa", "en": "*Verify* scores every card, with Claude and Codex cross-checking.", "ko": "*검증* 담당이 점수를 매기고, Claude와 Codex가 교차 확인해요.", "sfx": [["ding", 1.2], ["ding", 2.4]] },
-      { "spk": "noa", "en": "And the *orchestrator* runs them all, like a stage manager.", "ko": "*오케스트레이터*가 무대 감독처럼 전체를 지휘해요.", "sfx": [["tada", 1.0]], "hold": 0.3 }
+    { "id": "crew", "chapter": [4, "멀티에이전트", "The multi-agent crew"], "source": "출처 · Anthropic, multi-agent research system (2025)", "cues": [
+      { "spk": "noa", "en": "Then the crew. One *orchestrator*, many specialists.", "ko": "이제 크루. *지휘자* 하나, 전문가 여럿.", "sfx": [["tada", 1.0]] },
+      { "spk": "noa", "en": "Decompose splits the idea. Gap-fill adds what the author skipped.", "ko": "분해 담당이 쪼개고, 빈칸 담당이 빠진 단계를 채워요.", "sfx": [["pop", 0.6], ["pop", 2.4]] },
+      { "spk": "noa", "en": "Two verifiers, *Claude* and *Codex*, check the same card. If they disagree, a human decides.", "ko": "*Claude*와 *Codex*가 같은 카드를 검증해요. 갈리면 사람이 정해요.", "sfx": [["ding", 2.0], ["alarm", 3.6]] },
+      { "spk": "noa", "en": "Runners work inside their own *sandbox*, so nothing touches your real files.", "ko": "실행 담당은 각자 *샌드박스*에서. 진짜 파일은 안 건드려요.", "sfx": [["pop", 1.4], ["pop", 1.8], ["pop", 2.2]] },
+      { "spk": "uchu", "en": "Can I be on the crew?", "ko": "나도 크루 해도 돼?" },
+      { "spk": "noa", "en": "You're the gate, Uchu. You press approve.", "ko": "우츄는 게이트예요. 승인 버튼 담당.", "sfx": [["ding", 1.6]] },
+      { "spk": "uchu", "en": "Power!", "ko": "권력이다!", "sfx": [["boing", 0.0]], "hold": 0.4 }
     ]},
-    { "id": "gate", "chapter": [5, "게이트와 샌드박스"], "source": "10XAI · RISK_GATE_THRESHOLD = 70", "cues": [
-      { "spk": "noa", "en": "This card wants to run a shell command. Risk: *seventy-two*.", "ko": "이 카드는 셸 명령을 실행하려 해요. 위험도 *72*.", "sfx": [["pump", 1.2], ["pump", 1.9], ["pump", 2.6], ["alarm", 3.3]] },
-      { "spk": "uchu", "en": "Just run it!", "ko": "그냥 돌려!", "sfx": [["boing", 0.0]] },
-      { "spk": "noa", "en": "Over *seventy*, it waits for a human. No exceptions.", "ko": "*70점*을 넘으면 사람이 승인해요. 예외 없이.", "sfx": [["stamp", 1.1]] },
-      { "spk": "noa", "en": "Safe cards run in a *sandbox*, and we write down real numbers.", "ko": "안전한 카드는 *샌드박스*에서 돌리고, 실제 숫자를 적어요.", "sfx": [["tick", 1.0], ["tick", 1.5], ["tick", 2.0], ["coin", 2.6]] },
-      { "spk": "noa", "en": "Claimed: *free*, five minutes. Measured: *forty cents*, twelve minutes.", "ko": "주장은 *공짜*에 5분. 실측은 *40센트*에 12분.", "sfx": [["whoosh", 1.9]] },
-      { "spk": "uchu", "en": "It said *FREE*!", "ko": "*공짜*라며!!", "sfx": [["boing", 0.0]], "hold": 0.4 }
-    ]},
-    { "id": "yours", "chapter": [6, "내 콘텐츠에 하네스 달기"], "source": "10XAI · export → SKILL.md", "cues": [
-      { "spk": "noa", "en": "Verified steps get packed into a *SKILL* file you can reuse.", "ko": "검증된 단계는 다시 쓰는 *SKILL* 파일로 묶여요.", "sfx": [["whoosh", 0.8], ["pop", 1.6]] },
-      { "spk": "noa", "en": "And you can build the same harness for your own content.", "ko": "여러분 콘텐츠에도 똑같은 하네스를 달 수 있어요.", "sfx": [["pop", 0.5], ["pop", 1.0], ["pop", 1.5], ["pop", 2.0], ["pop", 2.5]] },
-      { "spk": "noa", "en": "One rule: a claim without *evidence* never gets published.", "ko": "규칙은 하나. *근거* 없는 주장은 절대 발행하지 않기.", "sfx": [["stamp", 2.2]], "hold": 0.4 }
+    { "id": "auto", "chapter": [5, "콘텐츠 자동화와 일관성", "Automation that stays consistent"], "source": "10XAI · this series, made this way", "cues": [
+      { "spk": "noa", "en": "Now watch it make content. One idea goes in.", "ko": "이제 콘텐츠를 만들어요. 아이디어 하나를 넣으면,", "sfx": [["whoosh", 1.4]] },
+      { "spk": "noa", "en": "Out come a thirty-second *reel*, a *long video*, and a *card news* set.", "ko": "30초 *릴스*, *롱폼* 영상, *카드뉴스*가 나와요.", "sfx": [["pop", 1.4], ["pop", 2.4], ["pop", 3.4]] },
+      { "spk": "noa", "en": "Same facts. Same voice. Same cast. Because they share one ontology and one harness.", "ko": "같은 사실, 같은 목소리, 같은 캐릭터. 온톨로지와 하네스를 같이 쓰니까요.", "sfx": [["ding", 0.4], ["ding", 1.1], ["ding", 1.8]] },
+      { "spk": "noa", "en": "A critic agent scores every cut. Our reel went from *5.4* to *8.1*.", "ko": "비평 에이전트가 매 컷을 채점해요. 우리 릴스는 *5.4*에서 *8.1*로.", "sfx": [["pop", 2.2], ["pop", 2.9], ["tada", 3.4]] },
+      { "spk": "uchu", "en": "You graded yourself?!", "ko": "스스로 채점했다고?!", "sfx": [["boing", 0.0]] },
+      { "spk": "noa", "en": "With sensors, Uchu. Not vibes.", "ko": "센서로요, 우츄. 감이 아니라.", "hold": 0.4 }
     ]},
     { "id": "curtain", "chapter": null, "source": null, "cues": [
-      { "spk": "noa", "en": "Next time a post says *free*, paste it in. We'll measure it together.", "ko": "다음에 *공짜*라는 글을 보면, 붙여넣어요. 같이 재봐요.", "sfx": [["tada", 0.0]] },
-      { "spk": "uchu", "en": "Pasting it right now!", "ko": "지금 바로 붙여넣는다!", "sfx": [["boing", 0.0]], "hold": 2.2 }
+      { "spk": "noa", "en": "Harness for the rules. Board for the truth. Crew for the speed.", "ko": "규칙은 하네스, 진실은 보드, 속도는 크루.", "sfx": [["pop", 0.3], ["pop", 1.5], ["pop", 2.8]] },
+      { "spk": "noa", "en": "That's how automation stays consistent. See you at the next show.", "ko": "그래야 자동화가 흔들리지 않아요. 다음 공연에서 만나요.", "sfx": [["tada", 2.0]] },
+      { "spk": "uchu", "en": "Encore!", "ko": "앵콜!", "sfx": [["boing", 0.0]], "hold": 2.4 }
     ]}
   ]
 }
