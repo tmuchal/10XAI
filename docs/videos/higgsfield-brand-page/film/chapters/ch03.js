@@ -77,7 +77,7 @@ const c03_PENCIL = `<svg width="150" height="150" viewBox="0 0 150 150" overflow
 
 scene(72, 106, (R, s) => {
   s.caps = [[72.2, "컷마다 얼굴이 바뀌면, 몰입이 깨집니다", "If the face changes every shot, immersion breaks"],
-            [82, "① 캐릭터 시트: 정면 · 3/4 · 측면 · 클로즈업, 의상은 하나로", "1. Character sheet: 4 views, one outfit"],
+            [82, "① 캐릭터 시트: 회색 배경 · 얼굴 클로즈업 + 앞 · 뒤 전신", "1. Character sheet on grey: headshot + full body front & back"],
             [86.5, "② Soul ID: 같은 사람 사진 20장+ → 3~5분 학습 → 저장", "2. Soul ID: 20+ photos, ~3–5 min training, saved identity"],
             [91, "③ Reference Element로 Kling · Seedance 영상에 재사용", "3. Reuse it in Kling / Seedance via Reference Element"],
             [95, "④ 의상·헤어 고정 + 네거티브 프롬프트  ⑤ 시드보다 레퍼런스", "4. Lock outfit & hair  5. References beat seeds"],
@@ -106,7 +106,7 @@ scene(72, 106, (R, s) => {
   const whoB = makeBubble(gag), meB = [0, 1, 2].map(() => makeBubble(gag));
 
   // ============ step rail (82–99.5)
-  const RAIL = [["1", "캐릭터 시트", "4컷 · 의상 하나", 82, 86.5], ["2", "Soul ID", "사진 20장+ 학습", 86.5, 91],
+  const RAIL = [["1", "캐릭터 시트", "얼굴 + 앞 · 뒤 전신", 82, 86.5], ["2", "Soul ID", "사진 20장+ 학습", 86.5, 91],
                 ["3", "레퍼런스", "Kling · Seedance", 91, 95], ["4", "의상·헤어 고정", "+ 네거티브", 95, 96.7], ["5", "시드 < 레퍼런스", "레퍼런스가 이김", 96.7, 99.5]];
   const rail = RAIL.map((r, i) => {
     const n = c03_box(R, 1430, 228 + i * 122, 360, 104, "#fffaf0", "display:flex;align-items:center;gap:14px;padding:0 16px;transform-origin:0 50%");
@@ -116,30 +116,35 @@ scene(72, 106, (R, s) => {
     n.num = n.querySelector(".num"); n.ck = n.querySelector(".ck"); return n;
   });
 
-  // ============ B · character sheet drawn stroke by stroke (82–86.6)
-  const SX = 130, SY = 228, PW = 280, PH = 380;
-  const sheet = c03_box(R, SX, SY, 1270, 600, "#fffaf0", `background-image:linear-gradient(#e9dcc0 2px,transparent 2px),linear-gradient(90deg,#e9dcc0 2px,transparent 2px);background-size:40px 40px`);
-  el("div", `position:absolute;left:26px;top:12px;font-size:28px;letter-spacing:3px;color:#c8372d`, "캐릭터 시트 · 노아 <span style='font-size:22px;color:#6b5d52'>CHARACTER SHEET</span>", sheet);
-  const VIEWS = [["정면", "FRONT"], ["3/4", "THREE-QUARTER"], ["측면", "SIDE"], ["클로즈업", "CLOSE-UP"]];
+  // ============ B · character sheet, Higgsfield Cinema Studio standard (82–86.6)
+  // One reference sheet on a plain GREY background, three panels: headshot (locks the face),
+  // full body front + full body back (lock outfit and proportions).
+  // Source: higgsfield.ai/academy/courses/santiago-cinematic/character-sheets-in-soul-cinema
+  const SX = 130, SY = 228, PH = 360, PY = 62;
+  const PX = [26, 466, 846], PWS = [420, 360, 360];
+  const sheet = c03_box(R, SX, SY, 1270, 600, "#cfcfcf", `background-image:radial-gradient(ellipse at 22% 30%,rgba(255,255,255,.28),transparent 55%),radial-gradient(ellipse at 78% 70%,rgba(90,90,90,.12),transparent 60%),radial-gradient(rgba(0,0,0,.035) 1.5px,transparent 2px);background-size:auto,auto,18px 18px`);
+  el("div", `position:absolute;left:26px;top:12px;font-size:28px;letter-spacing:3px;color:#c8372d`, "캐릭터 시트 · 노아 <span style='font-size:22px;color:#5a5250'>CHARACTER SHEET · 회색 배경</span>", sheet);
+  const VIEWS = [["얼굴 클로즈업 · 정면", "HEADSHOT"], ["전신 · 앞", "FULL BODY FRONT"], ["전신 · 뒤", "FULL BODY BACK"]];
   const panels = VIEWS.map((v, i) => {
-    const p = el("div", `position:absolute;left:${26 + i * 306}px;top:62px;width:${PW}px;height:${PH}px;border-radius:12px;overflow:hidden;background:${["#fbe3b0", "#d8eef7", "#e4f2d6", "#fbd9d3"][i]}`, "", sheet);
-    p.n = makeNoa(i === 3 ? 470 : 190); p.appendChild(p.n);
-    p.lb = el("div", `position:absolute;left:0;right:0;bottom:8px;text-align:center;font-size:26px;color:${c03_INK};z-index:40`, `${v[0]} <span style="font-size:22px;color:#6b5d52">${v[1]}</span>`, p);
+    const p = el("div", `position:absolute;left:${PX[i]}px;top:${PY}px;width:${PWS[i]}px;height:${PH}px;border-radius:12px;overflow:hidden;background:#d6d6d6`, "", sheet);
+    p.n = makeNoa(i === 0 ? 540 : 230, i === 2 ? { back: true } : {}); p.appendChild(p.n);
+    p.lb = el("div", `position:absolute;left:50%;bottom:8px;transform:translateX(-50%);padding:2px 14px 4px;border-radius:10px;background:rgba(255,250,240,.9);text-align:center;line-height:1.05;white-space:nowrap;font-size:26px;color:${c03_INK};z-index:40`, `${v[0]}<br><span style="font-size:17px;letter-spacing:2px;color:#6b5d52">${v[1]}</span>`, p);
     return p;
   });
+  const HT = PY + 59 + 48 * 1.15, FT = PY + 59 + 204 * 1.15;   // head-top / feet lines of the full-body Noas
   const outl = el("div", "position:absolute;left:0;top:0;width:1270px;height:600px;z-index:41;pointer-events:none", `<svg width="1270" height="600" overflow="visible">
-    ${VIEWS.map((_, i) => `<rect class="ol" x="${26 + i * 306}" y="62" width="${PW}" height="${PH}" rx="12" fill="none" stroke="${c03_INK}" stroke-width="4" stroke-dasharray="${2 * (PW + PH)}" stroke-dashoffset="${2 * (PW + PH)}"/>`).join("")}
-    <path class="gd" d="M16 205 H1228" stroke="#c8372d" stroke-width="3" stroke-dasharray="14 10" fill="none"/>
-    <path class="gd" d="M16 352 H1228" stroke="#c8372d" stroke-width="3" stroke-dasharray="14 10" fill="none"/></svg>`, sheet);
+    ${VIEWS.map((_, i) => `<rect class="ol" x="${PX[i]}" y="${PY}" width="${PWS[i]}" height="${PH}" rx="12" fill="none" stroke="${c03_INK}" stroke-width="4" stroke-dasharray="${2 * (PWS[i] + PH)}" stroke-dashoffset="${2 * (PWS[i] + PH)}"/>`).join("")}
+    <path class="gd" d="M456 ${HT} H1214" stroke="#c8372d" stroke-width="3" stroke-dasharray="14 10" fill="none"/>
+    <path class="gd" d="M456 ${FT} H1214" stroke="#c8372d" stroke-width="3" stroke-dasharray="14 10" fill="none"/></svg>`, sheet);
   const ols = [...outl.querySelectorAll(".ol")], gds = [...outl.querySelectorAll(".gd")];
-  const gdL = el("div", `position:absolute;left:1234px;top:186px;font-size:24px;color:#c8372d;line-height:1.3;z-index:42`, "머리<br><br><br><br>발", sheet);
+  const gdL = el("div", `position:absolute;left:1220px;top:${HT - 16}px;height:${FT - HT + 32}px;display:flex;flex-direction:column;justify-content:space-between;font-size:24px;color:#c8372d;z-index:42`, "<div>머리</div><div>발</div>", sheet);
   const pencil = el("div", "position:absolute;left:0;top:0;z-index:45", c03_PENCIL, sheet);
-  const outfit = el("div", `position:absolute;left:26px;top:470px;right:26px;display:flex;align-items:center;gap:18px;font-size:30px;color:${c03_INK}`, "", sheet);
+  const outfit = el("div", `position:absolute;left:26px;top:438px;right:26px;display:flex;align-items:center;gap:18px;font-size:30px;color:${c03_INK}`, "", sheet);
   const chips = [["#211c1b", "까만 선글라스"], ["#f2c14e", "노란 스카프"], ["#e9a257", "주황 햄스터 털"]].map(([c, x]) => {
     const d = el("div", `display:flex;align-items:center;gap:10px;padding:10px 18px;border:4px solid ${c03_INK};border-radius:14px;background:#fff;box-shadow:4px 5px 0 rgba(43,35,32,.2)`,
       `<span style="width:30px;height:30px;border-radius:8px;border:3px solid ${c03_INK};background:${c}"></span>${x}`, outfit); return d;
   });
-  const eq = el("div", "padding:10px 20px;border-radius:14px;background:#f7d774;border:4px solid #2b2320", "= 의상은 하나로 고정", outfit);
+  const eq = el("div", `position:absolute;left:26px;top:522px;padding:8px 20px;border-radius:14px;background:#f7d774;border:4px solid ${c03_INK};font-size:30px;color:${c03_INK};white-space:nowrap;transform-origin:0 50%`, "회색 배경 · 3컷 = 얼굴 + 의상 + 비율 고정", sheet);
 
   // ============ C · Soul ID photo booth (86.5–91)
   const booth = el("div", "left:150px;top:228px;width:300px;height:560px", `<svg width="300" height="560" viewBox="0 0 300 560" overflow="visible">
@@ -336,24 +341,22 @@ scene(72, 106, (R, s) => {
     sheet.style.display = t > 81.8 && t < 86.8 ? "block" : "none";
     sheet.style.opacity = clamp(shIn * 2) * (1 - shOut);
     sheet.style.transform = `translateY(${60 * (1 - shIn) - 80 * shOut}px) scale(${1 - .08 * shOut}) rotate(${-1.2 * shOut}deg)`;
-    const DR = [82.3, 82.85, 83.4, 83.95];
+    const DR = [82.3, 82.95, 83.6];
     let pen = null;
     panels.forEach((p, i) => {
-      const dp = seg(t, DR[i], DR[i] + .5);
-      ols[i].setAttribute("stroke-dashoffset", 2 * (PW + PH) * (1 - ease(dp)));
-      if (dp > 0 && dp < 1) pen = c03_perim(26 + i * 306, 62, PW, PH, ease(dp));
+      const dp = seg(t, DR[i], DR[i] + .5), W = PWS[i];
+      ols[i].setAttribute("stroke-dashoffset", 2 * (W + PH) * (1 - ease(dp)));
+      if (dp > 0 && dp < 1) pen = c03_perim(PX[i], PY, W, PH, ease(dp));
       p.style.opacity = seg(t, DR[i] + .15, DR[i] + .45);
       const np = back(seg(t, DR[i] + .35, DR[i] + .75));
-      if (i === 3) poseNoa(p.n, t, { x: -95, y: 36 + 60 * (1 - np), s: np, look: 0 });
-      else poseNoa(p.n, t, { x: 45, y: 100 + 40 * (1 - np), s: np * (i === 1 ? .97 : 1), look: [0, .8, 1][i] });
-      if (i === 1) p.n.style.transform += " skewY(-5deg)";
-      if (i === 2) p.n.style.transform = p.n.style.transform.replace(/scale\(([^,]+), ([^)]+)\)/, (m, a, b2) => `scale(${(+a * .62).toFixed(3)}, ${b2})`);
+      if (i === 0) poseNoa(p.n, t, { x: -60, y: -108 + 60 * (1 - np), s: np, look: 0, blink: false });
+      else poseNoa(p.n, t, { x: 65, y: 59 + 40 * (1 - np), s: np, look: 0, arms: "down", blink: false });
       p.lb.style.opacity = seg(t, DR[i] + .5, DR[i] + .8);
     });
     const gp = ease(seg(t, 84.6, 85.2));
     gds.forEach(g => { g.setAttribute("stroke-dasharray", `14 10`); g.style.clipPath = `inset(0 ${100 - 100 * gp}% 0 0)`; });
     gdL.style.opacity = seg(t, 85.0, 85.3);
-    if (!pen && t > 84.45 && t < 85.3) pen = [16 + 1212 * gp, 205 + 147 * seg(t, 84.9, 85.2)];
+    if (!pen && t > 84.45 && t < 85.3) pen = [456 + 758 * gp, HT + (FT - HT) * seg(t, 84.9, 85.2)];
     pencil.style.opacity = pen ? 1 : 0;
     if (pen) pencil.style.transform = `translate(${pen[0]}px, ${pen[1] - 150}px) rotate(${4 * Math.sin(t * 30)}deg)`;
     chips.forEach((c, i) => { const p = back(seg(t, 85.2 + i * .18, 85.6 + i * .18)); c.style.opacity = clamp(p * 2); c.style.transform = `translateY(${30 * (1 - p)}px) scale(${.7 + .3 * p})`; });
