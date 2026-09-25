@@ -417,10 +417,11 @@ def s_applause(c, rng):
 SYNTH = {k[2:]: v for k, v in globals().items() if k.startswith("s_")}
 
 # per-type base level (dB) so that cue `gain` values are comparable across types
-LEVEL = {"whoosh": -6, "curtain": -4, "swipe": -6, "pop": -4, "pop_run": -5, "stamp": 0, "thud": -2, "clunk": -3, "boing": -5,
-         "coin": -8, "ding": -9, "kaching": -6, "flash": -6, "shutter": -6, "ticks": -8, "wheel": -6, "drumroll": -6,
-         "horn": -9, "rocket": -6, "keys": -7, "confetti": -6, "crowd": -4, "osting": -8, "sparkle": -10, "clack": -6,
-         "bonk": -4, "button": -5, "whistle": -12, "scribble": -10, "shaker": -8, "gulp": -4, "applause": -6}
+# (calibrated from each synth's measured momentary loudness: gain 0 = a headline hit, about 3-6 LU under the program)
+LEVEL = {"whoosh": -7, "curtain": -13, "swipe": -9, "pop": -4, "pop_run": -9, "stamp": 1, "thud": -3, "clunk": 0, "boing": -5,
+         "coin": -7, "ding": -10, "kaching": -10, "flash": -3, "shutter": 2, "ticks": 2, "wheel": -1, "drumroll": -1,
+         "horn": -4, "rocket": -9, "keys": 3, "confetti": -3, "crowd": -7, "osting": -2, "sparkle": -9, "clack": 6,
+         "bonk": -2, "button": 7, "whistle": -16, "scribble": -6, "shaker": 0, "gulp": -8, "applause": 2}
 
 
 # ============================================================================ loudness (ITU-R BS.1770-4)
