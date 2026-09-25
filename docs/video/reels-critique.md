@@ -184,3 +184,122 @@ Why: the viewer currently can't see the card being held, and the 70 threshold is
 - ~햄 count after the remake: R02 "재봤햄" and R10 "돌렸햄". That's 2, within the 2–4 rule.
 - Highlight pairs after the remake: FREE/공짜 (R01, R04, R11, R12), 72 (R09 card), 70/70점 (R09), $0.40 (R11), SKILL.md (EN R12 only; the KO loop line uses 공짜 instead), 하네스/Harness (R08a), 온톨로지/Ontology (R07), 테스트 (R08b), 샌드박스 (R10).
 - Fix `SERIES.md` "this one: 45 s" to 30 s, and align the SHOTS comment (≤33) with the notes panel (≤36).
+
+---
+
+# Round 2: re-score of the remade Reel (13 shots, with Uchu)
+
+I re-rendered all 13 frames at 540×960 with Playwright and viewed each one. Every hard limit was checked in code against the live `REEL` data and the rendered subtitle rects. The runtime sums to **30.0 s**. The only console error is the blocked Google Fonts request, so the fallback font is in use and it is slightly wider than Gaegu.
+
+## Hard-limit audit
+
+| Shot | dur | EN (visible) | EN chars | KO | KO chars (incl. spaces) | Strip x (limit 30–480) | Strip y bottom (limit 765) | EN↔KO highlights |
+|---|---|---|---|---|---|---|---|---|
+| R01 | 1.0 | It said FREE. | 13 | \*공짜\*라며?! | 6 | 164–347 | 757 | FREE↔공짜 ✓ |
+| R02 | 1.0 | We measured. | 12 | 직접 재봤햄 | 6 | 167–343 | 757 | none ✓ |
+| R03 | 1.0 | Rewind. | 7 | 처음부터 까봄 | 7 | 172–338 | 757 | none ✓ |
+| R04 | 2.5 | Free. 5 min. 1 prompt. Sure. | 28 | \*공짜\*에 5분 컷이래 | 10 | 85–425 | 757 | Free↔공짜 ✓ |
+| R05 | 3.0 | Paste it in. The agents split it. | 33 | 붙여넣자 \*에이전트\* 팀 출동 | 14 | 59–451 | 757 | agents↔에이전트 ✓ |
+| R06 | 2.5 | Cut into cards. Fill the gaps. | 30 | 카드로 쪼개고 빠진 단계 채움 | 16 (at limit) | 74–437 | 757 | none ✓ |
+| R07 | 3.0 | Ontology: every card gets tags. | 31 | \*온톨로지\* = 카드마다 이름표 | 15 | 65–445 | 757 | Ontology↔온톨로지 ✓ |
+| R08a | 2.0 | Harness = seatbelts for agents. | 31 | \*하네스\* = AI 안전벨트 | 13 | 65–445 | 757 | Harness↔하네스 ✓ |
+| R08b | 2.0 | Rules steer. Tests catch. DING! | 31 | 규칙이 끌고 \*테스트\*가 잡음 | 14 | 65–445 | 757 | Tests↔테스트 ✓ |
+| R09 | 3.0 | Over 70? It waits for a human. | 30 | \*70점\* 넘으면 사람 도장 필수 | 16 (at limit) | 76–434 | 757 | 70↔70점 ✓ |
+| R10 | 3.0 | Safe cards run sandboxed. Timed. | 32 | 안전한 건 \*샌드박스\*서 돌렸햄 | 15 | 60–450 | 757 | sandboxed↔샌드박스 ✓ |
+| R11 | 3.0 | Claimed: free. Measured: $0.40. | 31 | \*공짜\*라며? 실측 \*$0.40\* | 14 | 63–447 | 757 | free↔공짜, $0.40↔$0.40 ✓ |
+| R12 | 3.0 | Ship SKILL.md. Next free post? | 30 | 다음 \*공짜\* 글, 재볼까? | 13 | 71–439 | 757 | **SKILL.md ↔ (missing) ✗**, free↔공짜 ✓ |
+
+- **Korean characters:** 13/13 lines are 16 or fewer. Two sit exactly at 16.
+- **Strips:** 13/13 are inside x 30–480 and above y 765. The subtitle is now centered at x 255 at 22/20 px, so it clears the icon column.
+- **Highlights:** 12/13 match. R12 highlights *SKILL.md* in English but has no Korean counterpart.
+- **~햄:** used 2× (R02 재봤햄, R10 돌렸햄), within the 2–4 rule. Register is consistent 반말/음슴체 throughout.
+- **Speech rate:** no line goes over 2.5 words/s. The busiest are R04 (6 words in 2.5 s, split into four clipped sentences on purpose) and R08b (5 words in 2 s).
+
+## Scorecard (old → new)
+
+| # | Criterion | Old | New | One-line justification |
+|---|---|---|---|---|
+| 1 | Hook (0–3 s) | 5 | **8** | R01 now shows the cost payoff (~~FREE~~ → $0.40), with the hamster, Uchu's shock and the board, under a one-word headline. It loses points because R02's agents stand still (no lean, no bounce, no labels), so second 2 doesn't read as "measuring". |
+| 2 | Pacing and visual change | 7 | **7** | 13 cuts with a shot change every 1–3 s. But 9 of 13 frames use the same template: board in the top half, cast in a row on the floor. That flattens things in 2D, and in Blender it only works if the camera moves vary. |
+| 3 | Clarity (ontology + harness) | 4 | **7** | Tags = ontology lands. Harness = seatbelt is said out loud, and ②③④ tie the gate and sandbox to it. But R08a never *looks* like a seatbelt (it reads as a rope or leash), and there is no ①, so the numbering starts mid-count. |
+| 4 | Kanban centrality | 3 | **8** | The board is in 12/13 frames. Cards visibly go up into columns (R05) and drop into the sandbox (R10), and the Verified column fills up by R12. Across shots it still mostly acts as a backdrop rather than the stage. |
+| 5 | Hamster appeal and "hip" | 6 | **7** | The R01 deadpan, glasses pushed up in R11 and the mic drop in R12 all land. He is still tiny in R04 (about 0.55 scale) and floating in mid-air in R08a, and in R09 the rubber stamp covers his sunglasses and face. |
+| 6 | English VO | 5 | **7** | Every line is speakable, and "Sure." and "DING!" add deadpan. It still leans on slide grammar ("Harness = …", "Ontology: …", "Claimed: … Measured: …"). |
+| 7 | Korean subtitles | 6 | **8** | All within 16 characters, native tone, ~햄 used sparingly, and "5분 컷" and "사람 도장 필수" read like real Shorts captions. It loses a point for the R12 highlight mismatch and two lines sitting right at the limit. |
+| 8 | Composition | 6 | **7** | Every strip is safe and bright. But the R05 PASTE! burst covers the "Decomposed" header and the "check" card, the R07 ghost board muddies the tags and leaves stray motion lines at (120–150, 315–340), "72" appears three times in R09, and the "at a time" line on the R08b scroll is cut off by the roller. |
+| 9 | Fun and uniqueness | 6 | **7** | Uchu is a real foil, and it is a good running gag that he never learns (shocked in R01, shocked again in R11, grinning at the next FREE!! in R12). But he is missing from R04, the one beat that is literally "viewer falls for the post", and his shock pose is identical in R01 and R11. |
+| 10 | Loop and ending | 7 | **8** | R12 (Uchu with FREE!!, the thud, "다음 공짜 글, 재볼까?") flows into R01 ("공짜라며?!", Uchu gasping). But Uchu jumps from the right side of the frame (x 412) to the left (x 140) across the cut, which breaks the seamless loop. |
+
+**Overall (weighted: hook ×2, clarity ×1.5, Korean ×1.5, rest ×1):**
+(8×2 + 7 + 7×1.5 + 8 + 7 + 7 + 8×1.5 + 7 + 7 + 8) / 12 = 89.5 / 12 = **7.5 / 10 — Grade B−** (up from 5.4, C)
+
+The argument is now right. What's left is execution detail: one passive shot, one metaphor that isn't drawn, and three crowded frames.
+
+Uchu is visually distinctive (red hood with antennae, a green face, fuzzy "uchu" lettering). Before the Blender build, confirm it is original IP and doesn't closely resemble an existing mascot.
+
+## Per-shot table (old → new)
+
+| id | old | new | Main problem (one line) | Concrete fix |
+|---|---|---|---|---|
+| R01 | 5 | **8** | The hamster's paw doesn't visibly grip the sign stick, and Uchu is on the left while R12 ends with him on the right. | Mirror the cast: `Th.uchu(400, FY, 1, {m:'shock', bang:true, flip:true, …})` and move the hamster to x 150 with the sign at x 290, so Uchu stays on the right across the loop cut. |
+| R02 | 4 | **6** | The agents stand still. There's no motion, no labels, and the stopwatch floats alone. | See REMAKE #3. |
+| R03 | 5 | **7** | Clean. The dizzy Hype Box on the right is leftover cast that the story no longer needs. | Replace `hype(385, …)` with `Th.uchu(390, FY, .8, {m:'squint'})` being pulled backwards, and add `Th.motion(440, 600, 3, 40, 1)`. That keeps Uchu on the right. |
+| R04 | 7 | **7** | Uchu, the believer, is absent from the believer beat. The hamster is too small to sell "Sure." | See REMAKE #2. |
+| R05 | 7 | **7** | The PASTE! burst covers the Decomposed header and the "check" card. `POST /api/ingest` is dev jargon to a Korean viewer. | Move the burst to `Th.burst(150, 300, 36, 'PASTE!', {…})` over the empty lower half of column 1, and delete the `/api/ingest` label (it's in the description). |
+| R06 | 6 | **8** | Works. The confetti is random noise under the board. | Delete `Th.confetti(...)`. |
+| R07 | 7 | **7** | The ghost board fights the tags, stray motion lines float at (120–150, 315–340), and the Router is tiny. | Drop the ghost board's opacity to .25 or blur it, delete the stray `Th.motion`, and scale Router to 80. |
+| R08a | 3 (old R08) | **6** | The "seatbelt" is drawn as a rope. The hamster floats in mid-air at y 470. CLICK! is detached from any buckle. There's no HARNESS ①. | See REMAKE #1. |
+| R08b | — | **7** | Clear, but the "at a time" line is cut off by the scroll roller, the rule arrow is tiny, and DING! sits on top of the fence rails. | `scrollProp(90, 412, 140, 96, …)`, arrow `Th.arrow(160, 408, 175, 382, {c:'#b07a10', w:6})`, DING at `T(400, 520, …)`. |
+| R09 | 5 | **6** | The rubber stamp covers the hamster's face. "72" appears three times (board, badge, bulb). There are 9 text items. | See REMAKE #4. |
+| R10 | 4 | **8** | Clean and legible, and the rolling counters work. The runner's card overlaps the glass lid. | Lift the carried card by using `carry` at scale 64, or draw the lid before the agent. |
+| R11 | 8 | **8** | Strong reveal. Uchu's shock is a copy of R01. | Give Uchu `m:'squint'` plus `sweat:true` (a "wait… really?" beat) so his arc is shocked → doubtful → back to believing in R12. |
+| R12 | 5 | **7** | The KO line lacks the SKILL.md highlight, the paw print reads as a mark *on the board*, not on the glass, and Uchu's side conflicts with R01. | See REMAKE #5. |
+
+## REMAKE LIST (Round 2)
+
+Durations are unchanged: R01 1 · R02 1 · R03 1 · R04 2.5 · R05 3 · R06 2.5 · R07 3 · R08a 2 · R08b 2 · R09 3 · R10 3 · R11 3 · R12 3 = **30.0 s**.
+
+### 1. R08a: draw the seatbelt, ground the hamster (clarity ×1.5)
+- en: `*Harness* = seatbelts for agents.` (keep) · ko: `*하네스* = AI 안전벨트` (keep, 13) · dur **2.0**
+- draw:
+  - Keep `kb(60, 210, 420, 200, …)`.
+  - Delete both rope paths and the floating `Th.doc(270, 470, …)`.
+  - For each agent at x ∈ {140, 270, 400} (s 70, body y 611–657), add a diagonal seatbelt:
+    `G('<path d="M'+(x-30)+',613 L'+(x+30)+',655" stroke="#6b3f22" stroke-width="9" stroke-linecap="round"/><rect x="'+(x-8)+'" y="628" width="16" height="12" rx="3" fill="#ffd23f" stroke="'+INK+'" stroke-width="2.5"/>')`
+  - Hamster perched *on* the board's top edge: `Th.doc(440, 212, .5, { m: 'grin', la: [-40, -70] })` + `Th.arrow(420, 225, 290, 600, { c: '#6b3f22' })` (he "pulls" the buckle).
+  - `Th.burst(270, 572, 34, 'CLICK!', { fill: '#ffd23f', z: 16, r: -8 })` on the middle buckle.
+  - `pill(400, 432, 'HARNESS ①', '#d9f4ee')`, so ②③④ have a start.
+
+### 2. R04: put Uchu in the believer beat
+- en: `*Free*. 5 min. 1 prompt. Sure.` (keep) · ko: `*공짜*에 5분 컷이래` (keep, 10) · dur **2.5**
+- draw:
+  - Phone moves up 30 px: `Th.phone(96, 206, 230, 340, inner)`.
+  - Delete `hype(...)` and the boop bubble. The post itself is the Hype.
+  - `Th.uchu(400, FY, .85, { m: 'grin', la: [-40, -110], ra: [40, -110] })`, both mittens up and cheering.
+  - `Th.bubble(400, 440, 110, ['공짜!!'], [400, 520], { z: 26 })`
+  - Hamster larger and deadpan: `Th.doc(215, FY, .75, { m: 'flat' })`, then `T(282, 578, 'sure.', 26, { f: '#6b4a36', r: -8 })`.
+
+### 3. R02: make the squad *run*
+- en: `We measured.` · ko: `직접 재봤햄` (keep) · dur **1.0**
+- draw:
+  - Keep the board.
+  - For agent i at x ∈ {110, 215, 320, 425}: `Th.agent(r, x, FY - (i % 2) * 16, 62, { noLabel: true, mood: 'happy', rot: -12, … })` with `Th.motion(x - 40, 598 - (i % 2) * 16, 3, 55, -1)`. The lean and bounce read as sprinting.
+  - Move the stopwatch to the middle of the gap: `scaleAt(Th.stopwatch(270, 470), 270, 470, 1.8)`, plus `pill(270, 530, '0:00…', '#fffdf5')`.
+  - `Th.arrow(150, 580, 430, 580, { c: '#2fbf8a' })` across the floor as a direction cue.
+
+### 4. R09: unmask the hamster and cut the 72s
+- en/ko keep (`Over *70*? It waits for a human.` / `*70점* 넘으면 사람 도장 필수`, 16) · dur **3.0**
+- draw:
+  - Hamster raises the stamp *overhead*: `Th.doc(420, FY, .9, { m: 'flat', la: [-20, -190] })`, then `rubber(...Th.hand(420, FY, .9, [-20, -190]), 'OK?')`. The stamp sits at about y 440–510, above the head.
+  - Pinned card with no badge, shortened so it clears the stamp: `Th.card(212, 488, 150, 46, 'API key', { kind: 'risk', z: 20, small: true })`. 72 now lives on the meter bulb and the board card only.
+  - `stampMark(250, 420, 'HUMAN ONLY', -10)`
+  - Keep the meter, gate, red box and `HARNESS ③`.
+
+### 5. R12: finish the loop
+- en: `Ship SKILL.md. Next *free* post?`. Remove the asterisks from SKILL.md. SKILL.md stays on screen (package and Verified card), but only *free* is highlighted.
+- ko: `다음 *공짜* 글, 재볼까?` (keep, 13). Highlights now match (free↔공짜).
+- Why not add SKILL.md to the Korean line: every variant that carries both tokens runs over 16 characters. For example, `*SKILL.md* 완성. 다음 *공짜*?` is 19. The 공짜 token matters more because it drives the loop into "공짜라며?!".
+- dur **3.0**
+- draw:
+  - Put the paw on the glass, not the board: move `paw(118, 330, 1.8, -12)` to `paw(150, 470, 2.2, -12)` so it sits over the stage and hamster zone, below the board and in front of everything. Add a white smudge: `<ellipse cx="150" cy="485" rx="46" ry="30" fill="#fff" opacity=".35"/>`.
+  - Uchu stays at x 412 (the right side). With REMAKE R01's mirror fix, he is on the right in both frames, so the cut is seamless.
