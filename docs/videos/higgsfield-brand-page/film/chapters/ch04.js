@@ -122,7 +122,7 @@ scene(106, 134, (R, s) => {
   });
   const BIG = [["+32%", 32, "+", "로딩 1초 → 3초", "이탈 확률이 이만큼 올라요"], ["53%", 53, "", "3초 넘으면 떠나요", "모바일 방문자 · Google"]].map(([, v, pre, k1, k2], i) => {
     const c = c04_box(BA, 430, 250, 1060, 460, i ? "#fbd9d3" : "#fff4d0", "z-index:40;display:flex;flex-direction:column;align-items:center;justify-content:center;overflow:visible");
-    c.innerHTML = `<div class="sp" style="position:absolute;left:250px;top:-10px;width:560px;height:330px"></div>
+    c.innerHTML = `<div class="sp" style="position:absolute;left:230px;top:4px;width:600px;height:290px"></div>
       <div class="n" style="position:relative;font-size:210px;line-height:1;color:#c8372d;text-shadow:6px 6px 0 #fff">0%</div>
       <div style="position:relative;margin-top:26px;font-size:50px;color:${c04_INK}">${k1}</div>
       <div style="position:relative;margin-top:6px;font-size:30px;color:#6b5d52">${k2}</div>`;
@@ -195,7 +195,7 @@ scene(106, 134, (R, s) => {
   const pb = pbar.querySelector(".pb");
   const rec = el("div", `position:absolute;right:26px;top:36px;padding:2px 14px;border:3px solid ${c04_INK};border-radius:10px;background:#fff;font-size:30px;color:#c8372d;z-index:35`, "● 재생 중", vwrap);
   const cursor = el("div", "left:0;top:0;z-index:46", `<svg width="60" height="70" viewBox="0 0 60 70"><path d="M6 4 L6 56 L20 44 L30 66 L40 61 L30 40 L48 40Z" fill="#fff" stroke="${c04_INK}" stroke-width="4" stroke-linejoin="round"/></svg>`, BC); cursor.className = "abs";
-    const ring = el("div", "left:1180px;top:230px;width:320px;height:320px", `<svg width="320" height="320" viewBox="0 0 320 320">
+    const ring = el("div", "left:1180px;top:230px;width:320px;height:320px", `<svg width="320" height="320" viewBox="0 0 320 320" style="position:relative">
     <circle cx="160" cy="160" r="128" fill="#fffaf0" stroke="${c04_INK}" stroke-width="5"/>
     <circle cx="160" cy="160" r="110" fill="none" stroke="#f1e4c8" stroke-width="30"/>
     <circle class="arc" cx="160" cy="160" r="110" fill="none" stroke="#c8372d" stroke-width="30" stroke-dasharray="691" stroke-dashoffset="691" transform="rotate(-90 160 160)" stroke-linecap="round"/>
@@ -203,7 +203,7 @@ scene(106, 134, (R, s) => {
     <div class="n" style="position:absolute;left:0;right:0;top:108px;text-align:center;font-size:100px;color:#c8372d;line-height:1">0%</div>`, BC); ring.className = "abs";
   const ringSp = el("div", "position:absolute;left:-60px;top:-50px;width:440px;height:420px", c04_SPLASH("#fbd35a")); ring.insertBefore(ringSp, ring.firstChild);
   const arc = ring.querySelector(".arc"), ringN = ring.querySelector(".n");
-  const ringL = el("div", `position:absolute;left:-190px;top:340px;width:700px;text-align:center;font-size:40px;color:${c04_INK};line-height:1.25`, "영상 보고 구매를 결심했다<br><span style='font-size:26px;color:#6b5d52'>Wyzowl · 2026</span>", ring);
+  const ringL = el("div", `position:absolute;left:-190px;top:372px;width:700px;text-align:center;font-size:40px;color:${c04_INK};line-height:1.25`, "영상 보고 구매를 결심했다<br><span style='font-size:26px;color:#6b5d52'>Wyzowl · 2026</span>", ring);
   const crowd = Array.from({ length: 20 }, (_, i) => {
     const d = el("div", `left:${1150 + (i % 10) * 62}px;top:${720 + Math.floor(i / 10) * 72}px`, c04_person("#e9dcc0") + `<div class="bag" style="position:absolute;left:30px;top:30px;width:22px;height:24px;border:3px solid ${c04_INK};border-radius:4px;background:#f7d774;opacity:0"></div>`, BC);
     d.className = "abs"; d.body = d.querySelector("rect"); d.bag = d.querySelector(".bag"); return d;

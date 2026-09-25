@@ -82,8 +82,8 @@ scene(10, 40, (R, s) => {
 
   // c) offline store ------------------------------------------------------
   const C = mk(2, "#e3f0da", `${tag("매장 · OFFLINE STORE", "#9fd3a8")}
-    <div style="position:absolute;left:330px;right:28px;top:14px;height:58px;border:4px solid ${INK1};border-radius:999px;background:#fffaf0;display:flex;align-items:center;padding:0 18px;font-size:30px;gap:10px;white-space:nowrap;overflow:hidden">🔍 <span class="q"></span></div>
-    <svg viewBox="0 0 400 250" preserveAspectRatio="xMidYMid slice" style="position:absolute;left:0;top:90px;width:720px;height:340px;border-top:4px solid ${INK1};border-bottom:4px solid ${INK1}">
+    <div style="position:absolute;left:360px;right:28px;top:16px;height:58px;border:4px solid ${INK1};border-radius:999px;background:#fffaf0;display:flex;align-items:center;padding:0 18px;font-size:30px;gap:10px;white-space:nowrap;overflow:hidden">🔍 <span class="q"></span></div>
+    <svg viewBox="0 0 400 250" preserveAspectRatio="xMidYMid slice" style="position:absolute;left:0;top:90px;width:720px;height:320px;border-top:4px solid ${INK1};border-bottom:4px solid ${INK1}">
       <rect x="0" y="0" width="400" height="250" fill="#d5e8c8"/>
       <path d="M0 70 H400 M0 180 H400 M110 0 V250 M290 0 V250" stroke="#fffaf0" stroke-width="22"/>
       <path d="M0 70 H400 M0 180 H400 M110 0 V250 M290 0 V250" stroke="#b9d3a8" stroke-width="2" stroke-dasharray="8 8"/>
@@ -94,9 +94,9 @@ scene(10, 40, (R, s) => {
       <path class="route" d="M60 210 V180 H290 V120" fill="none" stroke="#c8372d" stroke-width="7" stroke-linecap="round" stroke-dasharray="4 14"/>
       <circle cx="60" cy="214" r="12" fill="#3e8fb8" stroke="${INK1}" stroke-width="4"/>
     </svg>
-    <svg class="pin" viewBox="0 0 60 80" style="position:absolute;left:556px;top:112px;width:80px;height:106px;overflow:visible"><path d="M30 78 C30 78 4 44 4 28 A26 26 0 0 1 56 28 C56 44 30 78 30 78Z" fill="#c8372d" stroke="${INK1}" stroke-width="4"/><circle cx="30" cy="28" r="10" fill="#fffaf0" stroke="${INK1}" stroke-width="3"/></svg>
+    <svg class="pin" viewBox="0 0 60 80" style="position:absolute;left:556px;top:102px;width:80px;height:106px;overflow:visible"><path d="M30 78 C30 78 4 44 4 28 A26 26 0 0 1 56 28 C56 44 30 78 30 78Z" fill="#c8372d" stroke="${INK1}" stroke-width="4"/><circle cx="30" cy="28" r="10" fill="#fffaf0" stroke="${INK1}" stroke-width="3"/></svg>
     <div class="walk" style="position:absolute;left:210px;top:260px;z-index:6;padding:6px 20px 10px;background:#fffaf0;border:4px solid ${INK1};border-radius:14px;font-size:46px;white-space:nowrap;box-shadow:5px 6px 0 rgba(43,35,32,.2);opacity:0">🚶 도보 3분!</div>
-    <div style="position:absolute;left:28px;top:448px;font-size:30px;color:#2f5d3a">● 영업 중 · 성수동</div>
+    <div style="position:absolute;left:28px;top:430px;font-size:30px;color:#2f5d3a">● 영업 중 · 성수동</div>
     <div class="btn go" style="position:absolute;left:28px;right:28px;bottom:28px;background:#f7d774;color:${INK1};border:4px solid ${INK1};font-size:34px;padding:12px 0">길찾기 · 방문 예약</div>`);
   const cQ = C.querySelector(".q"), cPin = C.querySelector(".pin"), cRoute = C.querySelector(".route"), cGlow = C.querySelector(".glow"), cWalk = C.querySelector(".walk"), cGo = C.querySelector(".go");
 
