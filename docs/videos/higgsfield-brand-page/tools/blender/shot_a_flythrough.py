@@ -179,11 +179,11 @@ for sx in (-1, 1):
 polyline('sunsmile', [(-0.14, 4.52, 2.72), (0, 4.52, 2.62), (0.14, 4.52, 2.72)], 0.025)
 
 # floor light pool
-pool = cylinder('pool', 1.8, 0.002, (0, -0.3, 0.004), flat('poolm', "#fff4c8", alpha=0.55), None)
+pool = cylinder('pool', 1.6, 0.002, (0, -1.0, 0.004), flat('poolm', "#fff4c8", alpha=0.55), None)
 pool.scale = (1.25, 0.6, 1)
 
 # ---------------------------------------------------------------- house curtain (parts)
-HY, HW, HH = -11.2, 5.2, 9.0
+HY, HW, HH = -11.2, 3.1, 9.0
 
 
 def house_fn(sx, p, sway):
@@ -194,8 +194,8 @@ def house_fn(sx, p, sway):
         xo = sx * (HW + 0.05)
         xr = xo - sx * HW * u                              # rest (u=1 -> centre seam)
         x = xo + (xr - xo) * c + sx * 0.0 + sway * (1 - v) ** 2 * sx
-        A = 0.14 * (1 + 1.6 * pz)
-        ph = u * math.pi * 22
+        A = 0.1 * (1 + 1.8 * pz)
+        ph = u * math.pi * 17
         y = HY + A * (math.sin(ph) + 0.25 * math.sin(2.3 * ph + 1)) + (0.03 if sx > 0 else 0)
         return (x, y, z)
     return fn
@@ -206,19 +206,19 @@ houseR, updR = grid_obj('houseR', 160, 16, house_fn(1, 0, 0), VEL2, None, thick=
 
 # ---------------------------------------------------------------- Noa
 NOA = hamster('noa', glasses=True, ol=0.024)
-cam = camera((0, -12.0, 1.8), (0, 0, 1.5), lens=30)
+cam = camera((0, -13.6, 1.8), (0, 0, 1.5), lens=30)
 
 
 def setup(f):
     t = f / 30.0
     # curtain: tiny inward tug (anticipation) then fast part with overshoot
     tug = -0.05 * math.sin(math.pi * seg(t, 0.12, 0.42))
-    p = tug + ease(seg(t, 0.42, 1.5))
+    p = tug + ease(seg(t, 0.35, 1.45))
     sway = 0.45 * spring(t - 1.5, 1.6, 3.0)
     updL(house_fn(-1, max(0.0, p), sway)); updR(house_fn(1, max(0.0, p), sway))
     # camera: creep, then rush through the gap, settle with a soft overshoot
-    k = ease(seg(t, 0.3, 2.05))
-    y = lerp(-12.05, -10.0, k) + 0.1 * spring(t - 2.05, 1.2, 4.0)
+    k = ease(seg(t, 0.15, 2.1))
+    y = lerp(-13.7, -10.0, k) + 0.1 * spring(t - 2.1, 1.2, 4.0)
     z = lerp(1.65, 2.05, k)
     look = (lerp(0.15, 0.0, k), 0.0, lerp(1.55, 1.75, k))
     aim(cam, (lerp(0.25, 0.0, k), y, z), look, roll=lerp(0.06, 0.0, out(seg(t, 0.2, 2.0))))
@@ -238,8 +238,9 @@ def setup(f):
     wave = seg(t, 1.45, 1.7)
     armR = lerp(0.2, 2.55, back(wave)) + (0.35 * math.sin((t - 1.6) * 16) if t > 1.6 else 0)
     armL = lerp(0.1, 0.9, out(seg(t, 1.12, 1.4))) - 0.5 * out(seg(t, 1.6, 1.9))
-    pose(NOA, f, loc=(0, -0.3, zj), turn=turn, squash=sq, armR=armR, armL=armL,
+    pose(NOA, f, loc=(0, -1.0, zj), turn=turn, squash=sq, armR=armR, armL=armL,
          head_tilt=0.12 * math.sin(math.pi * seg(t, 1.5, 2.4)), lean=0.05 * spring(t - 1.48, 2, 4))
+    NOA['root'].scale = tuple(v * 1.15 for v in NOA['root'].scale)
     NOA['shadow'].scale = (1 - 0.35 * math.sin(math.pi * air) if 0 < air < 1 else 1, 0.55, 1)
     g = seg(t, 1.62, 2.05)
     gs = math.sin(math.pi * g) * 1.1
