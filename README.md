@@ -139,3 +139,39 @@ lib/      agent runners, isolated git-worktree sandboxes, risk scoring & gate, c
 **Builders sell the 10X dream. 10XAI hands you the receipts — verified, measured, and runnable — before you waste a weekend.**
 
 Licensed under MIT — free to use, modify, and redistribute.
+
+---
+
+## Sports module — match video → player ratings → next-match prediction
+
+10XAI also applies its claim-vs-measured approach to sports. It rates every soccer and basketball player on each skill using match events, then predicts the next match. Every rating and prediction reports how well it held up against real results.
+
+```bash
+npm run sports -- demo                       # seed a fictional soccer + basketball league
+npm start                                    # then open http://localhost:8080/sports.html
+npm run sports -- players  --sport soccer --top 10
+npm run sports -- predict  --sport basketball --home "Northbay Hawks" --away "Ashdown Kites"
+npm run sports -- backtest --sport soccer
+```
+
+**Pipeline**
+
+| Step | How |
+|---|---|
+| **Intake** | Paste a YouTube URL. The official oEmbed endpoint returns the title, then teams, sport, and score are parsed from it. Downloading the video or captions with `yt-dlp` breaks YouTube's ToS without rights, so those steps are created as risk ≥ 70 cards that **stop at the gate**. |
+| **Events** | Three sources share one schema (`t, team, player, type, outcome`): a hand-tagged or tracker-exported event log (CSV/JSON, best quality), commentary from the video transcript (local EN/KR keyword rules or the `claude` CLI via `agents/sports-extract-agent.md`), or computer-vision tracker output mapped onto the same types. |
+| **Player ratings** | Soccer: passing, shooting, dribbling, creativity, defending, goalkeeping, discipline, plus an overall rating from event-value impact per 90. Basketball: scoring, efficiency (TS%), playmaking, rebounding, defense, ball security, plus an overall rating from Game Score per 36. Scale 1–99: 50 is the dataset average and each 15 points is one SD. Small samples are shrunk toward the mean, and recent matches can be weighted more (`halfLife`). |
+| **Prediction** | Team Elo from results (margin-aware, home advantage), shifted by how the named lineup rates against the team's usual roster. Soccer uses Poisson goals to give home/draw/away odds and likely scores. Basketball gives a win probability, a spread, and projected points. Also reports key players and the attribute matchups where the lineups differ most. |
+| **Backtest** | Walk-forward: each match is predicted from earlier data only. Reports Brier, log-loss, and accuracy against a no-skill baseline. |
+
+**Measured on the synthetic league** (112 matches per sport, known true skills, `test/sports.test.cjs`):
+
+| | Model | Baseline |
+|---|---|---|
+| Soccer, 3-way accuracy / Brier | 53.5% / 0.579 | 37.6% / 0.703 |
+| Basketball, accuracy / Brier | 62.7% / 0.428 | 57.8% / 0.503 |
+| Correlation of rating with true skill | passing 0.95 · rebounding 0.86 · efficiency 0.79 · dribbling 0.72 | — |
+
+These numbers come from simulated data. On a real league, run `backtest` on your own imported matches before trusting any pick. Commentary-only input also rates headline actions (goals, shots, threes) far better than routine passing. The coverage report flags this.
+
+**Status:** the computer-vision player-tracking step (detecting and following each player in the footage) is not included. The module takes its output as event rows, with approval-gated `yt-dlp` download into `workspace/sports/<id>/`.

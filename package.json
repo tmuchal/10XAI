@@ -1,7 +1,7 @@
 {
   "name": "10XAI",
   "version": "0.1.0",
-  "description": "10XAI — Builder content, into verified modules. Paste an AI-builder post or repo; decompose, verify, and measure claim vs. reality.",
+  "description": "10XAI \u2014 Builder content, into verified modules. Paste an AI-builder post or repo; decompose, verify, and measure claim vs. reality.",
   "keywords": [
     "ai",
     "content-verification",
@@ -25,7 +25,9 @@
   "scripts": {
     "start": "node server/kanban.cjs",
     "dev": "node server/kanban.cjs",
-    "gate": "node lib/gate/index.cjs"
+    "gate": "node lib/gate/index.cjs",
+    "sports": "node lib/sports/cli.cjs",
+    "test": "node --test test/*.test.cjs"
   },
   "dependencies": {
     "@slack/bolt": "^4.1.0"

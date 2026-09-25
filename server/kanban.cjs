@@ -15,6 +15,7 @@
 
 const config = require("../lib/config.cjs");
 const cardModel = require("../lib/model/card.cjs");
+const sportsRoutes = require("../lib/sports/routes.cjs");
 let UI_LANG = "en";
 function M(en, ko){ return UI_LANG === "en" ? en : ko; }
 
@@ -1951,12 +1952,17 @@ async function runRepairOrchestrator(){
   opsAppend("claude",M("🔧 Repair complete — "+fixed+" resolved and moved to the execute queue, "+(cards.length-fixed)+" still need human review.","🔧 Repair complete — "+fixed+" resolved and moved to the execute queue, "+(cards.length-fixed)+" still need human review."),null);
 }
 
+const handleSports = sportsRoutes.createRoutes({ createTask, workspace: path.join(HARNESS_ROOT, "workspace") });
+
 // ── HTTP server ──────────────────────────────────────────────────────────────
 const server = http.createServer(async (req, res) => {
   res.setHeader("Access-Control-Allow-Origin", "*");
   res.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
   res.setHeader("Access-Control-Allow-Headers", "Content-Type");
   if (req.method === "OPTIONS") { res.writeHead(204); res.end(); return; }
+
+  // 10XAI Sports — YouTube match intake, player ratings, prediction (lib/sports/)
+  if (req.url.startsWith("/api/sports/") && await handleSports(req, res)) return;
 
   if (req.url === "/events") {
     res.writeHead(200, { "Content-Type": "text/event-stream", "Cache-Control": "no-cache", Connection: "keep-alive" });

@@ -18,6 +18,8 @@ Write user-facing responses, instructions, and reports in English.
 | `lib/gate/index.cjs` | The gate that holds risky cards for manual approval. |
 | `lib/config.cjs` | Config loader. Reads `config.js` or `config.example.js`, `.env`, and env overrides. |
 | `lib/model/card.cjs` | Task/card model. |
+| `lib/sports/*` | Sports module: YouTube match intake, commentary → events, per-player skill ratings, Elo + lineup match prediction, walk-forward backtest. REST under `/api/sports/`, UI at `/sports.html`, CLI `npm run sports`. |
+| `examples/sports/generate.cjs` | Synthetic (fictional) league generator with known true player skills. Used by the demo and by `test/sports.test.cjs`. |
 | `config.example.js` / `config.js` | Config. Copy the example to `config.js`; `config.js` is gitignored. |
 | `.env.example` / `.env` | Optional tokens (Slack, etc.). Never commit `.env`. |
 
@@ -61,3 +63,4 @@ Risky cards (security / policy / high risk score) stop at the **Gate / Review** 
 3. Do not store plaintext secrets in logs or committed files. Use `.env`.
 4. Do not commit `.env` or `config.js`. Both are gitignored.
 5. Report claims in numbers — claimed vs. measured — not opinions.
+6. Sports: never download YouTube video or captions without explicit human approval. Those steps have risk ≥ 70 and wait at the gate.
