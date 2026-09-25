@@ -202,8 +202,8 @@ scene(134, 160, (R, s) => {
     noa.P.b.setAttribute("transform", `translate(100 200) scale(${1 + nsq} ${1 - nsq}) rotate(${-th * .6} 0 0) translate(-100 -200)`);
     if (!tilted) {
       const cheer = t > 147 && t < 148.6, flap = 16 * Math.sin(t * 5.2) * (0.4 + Math.min(1, Math.abs(th) / 6));
-      noa.P.al.setAttribute("transform", `rotate(${(cheer ? 55 : 0) + flap - th * 2} 46 118)`);
-      noa.P.ar.setAttribute("transform", `rotate(${(cheer ? -55 : 0) + flap - th * 2} 154 118)`);
+      noa.P.al.setAttribute("transform", `rotate(${(cheer ? 55 : 0) + flap - th * 2} 56 160)`);
+      noa.P.ar.setAttribute("transform", `rotate(${(cheer ? -55 : 0) + flap - th * 2} 144 160)`);
     }
     // ================= rule stamp (149–153.5)
     const sl = seg(t, 149.0, 149.32), impact = t - 149.32;
@@ -248,7 +248,7 @@ scene(134, 160, (R, s) => {
     desk.style.opacity = D; desk.style.transform = `translateX(${200 * (1 - D)}px)`;
     const sipPh = ((t - 154.6) % 2.6 + 2.6) % 2.6, sip = t < 154.6 ? 0 : ease(seg(sipPh, .2, .6)) * (1 - ease(seg(sipPh, 1.3, 1.7)));
     poseNoa(deskNoa, t, { x: 1400 + 200 * (1 - D), y: 575, s: 1, look: sip > .5 ? 0 : -1, mood: sip > .6 ? "pout" : "happy", op: D });
-    deskNoa.P.ar.setAttribute("transform", `rotate(${-70 * sip} 154 118)`);
+    deskNoa.P.ar.setAttribute("transform", `rotate(${-70 * sip} 144 160)`);
     const mx = lerp(1690, 1548, sip), my = lerp(790, 762, sip);
     mug.style.left = (mx + 200 * (1 - D)) + "px"; mug.style.top = my + "px"; mug.style.opacity = D;
     mug.style.transform = `rotate(${-24 * sip}deg)`;

@@ -1,7 +1,10 @@
 // ---------------------------------------------------------------- 00 · Opening (0–10)
-// Beats: 0.3 stopwatch counts 0.000 → 0.050s · 1.7 DING · 1.95 flash → the real page
-// pops in · 2.6 Noa runs in, slips on the stopwatch, backflips, lands · 4.8 page
-// becomes a poster on the right, title drops in letter by letter, Noa presents it.
+// (A Blender curtain fly-through covers 0–2.4s, so key 2D action starts ~2.2s.)
+// Beats: 2.25 stopwatch counts 0.000 → 0.050s · 3.0 DING · 3.15 the stopwatch morphs into
+// the real page (match cut) · 3.6 Noa runs in, slips on the dropped stopwatch, backflips ·
+// 4.7 camera pushes INTO the page hero · 5.05 ink-stroke wipe → title stamps in (5.25) with the
+// page as a poster · 6.3 Noa looks at camera, points at the viewer (sunglasses glint) ·
+// 7.85 open loop: sealed envelope "₩4,500,000?" stuffed into his cheek pouch · 9.2 push out.
 (() => {
 const INK0 = "#2b2320";
 const c00_rnd = i => { const x = Math.sin(i * 127.1 + 311.7) * 43758.5453; return x - Math.floor(x); };
@@ -72,128 +75,153 @@ scene(0, 10, (R, s) => {
   const noa = makeNoa(170); cam.appendChild(noa);
   const bub = makeBubble(cam), bub2 = makeBubble(cam);
   // open loop: a sealed envelope "₩4,500,000?" — Noa stashes it in his cheek pouch (opened in ch06)
-  const env = el("div", "left:0;top:0;z-index:33;opacity:0;transform-origin:50% 50%", `<svg width="210" height="134" viewBox="0 0 210 134" overflow="visible">
-    <rect x="8" y="10" width="194" height="116" rx="8" fill="rgba(43,35,32,.2)"/>
-    <rect x="3" y="4" width="194" height="116" rx="8" fill="#fffaf0" stroke="${INK0}" stroke-width="4.5"/>
-    <path d="M5 8 L100 64 L195 8" fill="none" stroke="${INK0}" stroke-width="4" stroke-linejoin="round"/>
-    <text x="100" y="104" text-anchor="middle" font-size="30" fill="#c8372d" font-family="GaeguLat">₩4,500,000?</text>
-    <circle cx="100" cy="62" r="17" fill="#c8372d" stroke="${INK0}" stroke-width="4"/><text x="100" y="71" text-anchor="middle" font-size="24" fill="#fffaf0" font-family="GaeguLat">?</text></svg>`, cam); env.className = "abs";
+  const env = el("div", "left:0;top:0;z-index:33;opacity:0;transform-origin:50% 50%", `<svg width="240" height="134" viewBox="0 0 240 134" overflow="visible">
+    <rect x="8" y="10" width="226" height="116" rx="8" fill="rgba(43,35,32,.2)"/>
+    <rect x="3" y="4" width="226" height="116" rx="8" fill="#fffaf0" stroke="${INK0}" stroke-width="4.5"/>
+    <path d="M5 8 L116 64 L227 8" fill="none" stroke="${INK0}" stroke-width="4" stroke-linejoin="round"/>
+    <text x="116" y="106" text-anchor="middle" font-size="28" fill="#c8372d" font-family="GaeguLat">₩4,500,000?</text>
+    <circle cx="116" cy="62" r="17" fill="#c8372d" stroke="${INK0}" stroke-width="4"/><text x="116" y="71" text-anchor="middle" font-size="24" fill="#fffaf0" font-family="GaeguLat">?</text></svg>`, cam); env.className = "abs";
   const puff = document.createElementNS("http://www.w3.org/2000/svg", "ellipse");
   puff.setAttribute("cx", "140"); puff.setAttribute("cy", "122"); puff.setAttribute("fill", "#f0b27a"); puff.setAttribute("stroke", INK0); puff.setAttribute("stroke-width", "4");
   noa.P.b.appendChild(puff);
 
-  return t => {
-    // gentle camera: push in on the stopwatch, settle, then slow push toward the title
-    const camS = 1 + 0.05 * out(seg(t, 0.2, 1.8)) - 0.05 * ease(seg(t, 1.9, 2.4)) + 0.035 * ease(seg(t, 5, 10));
-    const shake = t > 1.95 && t < 2.35 ? Math.sin(t * 90) * 6 * (1 - seg(t, 1.95, 2.35)) : 0;
-    cam.style.transform = `translate(${shake}px, 0) scale(${camS})`;
-    cam.style.transformOrigin = t < 4.8 ? "960px 400px" : "620px 420px";
+  // sunglasses glint (looking at camera)
+  const glint = document.createElementNS("http://www.w3.org/2000/svg", "path");
+  glint.setAttribute("d", "M0 -14 L3 -3 L14 0 L3 3 L0 14 L-3 3 L-14 0 L-3 -3Z"); glint.setAttribute("fill", "#fff"); glint.setAttribute("stroke", INK0); glint.setAttribute("stroke-width", "2");
+  noa.P.b.appendChild(glint);
+  // dust motes drifting in the stage light (parallax: bigger = nearer = faster)
+  const motes = Array.from({ length: 18 }, (_, i) => { const z = 0.4 + c00_rnd(i + 40) * 1.2;
+    const d = el("div", `left:0;top:0;width:${6 * z}px;height:${6 * z}px;border-radius:50%;background:#fff6d0;box-shadow:0 0 ${8 * z}px #fff3b0;z-index:36;opacity:0`, "", R); d.className = "abs"; d.z = z; return d; });
+  // ink-stroke wipe (outside the camera so it sweeps the whole frame)
+  const wipe = el("div", "left:-100px;top:-120px;width:2200px;height:1200px;z-index:45;pointer-events:none", `<svg width="2200" height="1200" overflow="visible">
+    <path class="w0" d="M-200 700 C 400 520, 700 900, 1100 560 S 1900 380, 2400 520" stroke="${INK0}" stroke-width="760" fill="none" stroke-linecap="round" stroke-dasharray="3200" stroke-dashoffset="3200"/>
+    <path class="w1" d="M-200 700 C 400 520, 700 900, 1100 560 S 1900 380, 2400 520" stroke="#f7d774" stroke-width="730" fill="none" stroke-linecap="round" stroke-dasharray="3200" stroke-dashoffset="3200"/>
+    <path class="w2" d="M-200 700 C 400 520, 700 900, 1100 560 S 1900 380, 2400 520" stroke="#e8894f" stroke-width="160" fill="none" stroke-linecap="round" stroke-dasharray="3200" stroke-dashoffset="3200" opacity=".7"/></svg>`, R); wipe.className = "abs";
+  const wP = [".w0", ".w1", ".w2"].map(c => wipe.querySelector(c));
 
-    // ---- stopwatch count ----
-    const swIn = back(seg(t, 0.15, 0.7));
-    const run = seg(t, 0.8, 1.7), ms = 0.05 * run;
-    const ang = 360 * run * 0.5; // dial = 0.1s, so 0.05s is half a turn
+  return t => {
+    const PH = t < 5.2 ? 0 : 1; // phase A (stopwatch/page) | phase B (title + poster)
+    // ---- camera: settle in · push into the page hero · reset behind the wipe · exit push ----
+    let camS = 1, ox = 960, oy = 400;
+    if (!PH) { camS = 1 + 0.03 * ease(seg(t, 2.2, 3.0)) - 0.03 * ease(seg(t, 3.1, 3.5)) + 1.3 * Math.pow(seg(t, 4.65, 5.2), 2.2); ox = t < 4.6 ? 960 : 560; oy = t < 4.6 ? 400 : 390; }
+    else { camS = 1 + 0.18 * (1 - back(seg(t, 5.2, 6.0))) + 0.1 * Math.pow(seg(t, 9.15, 10), 2); ox = 700; oy = 360; }
+    const shake = t > 3.15 && t < 3.5 ? Math.sin(t * 90) * 6 * (1 - seg(t, 3.15, 3.5)) : 0;
+    cam.style.transformOrigin = `${ox}px ${oy}px`;
+    cam.style.transform = `translate(${shake}px, 0) scale(${camS})`;
+
+    // ---- dust motes ----
+    motes.forEach((d, i) => {
+      const z = d.z, x = (c00_rnd(i) * 1900 + t * 22 * z + 30 * Math.sin(t * 0.8 + i)) % 1900, y = 880 - ((c00_rnd(i + 9) * 900 + t * 26 * z) % 900);
+      d.style.opacity = (0.25 + 0.55 * Math.abs(Math.sin(t * 1.3 + i))) * (1 - seg(t, 4.2, 5.0)) + 0.5 * seg(t, 9.1, 9.6) * Math.abs(Math.sin(t * 1.3 + i));
+      d.style.transform = `translate(${x}px, ${y}px)`;
+    });
+
+    // ---- stopwatch: pop, count, DING ----
+    const swIn = back(seg(t, 0.4, 1.0));
+    const run = seg(t, 2.25, 3.0), ms = 0.05 * run;
+    const ang = 180 * run; // dial = 0.1s, so 0.05s is half a turn
     hand.setAttribute("transform", `rotate(${ang} 210 230)`);
     const a1 = ang * Math.PI / 180, big = ang > 180 ? 1 : 0;
     wedge.setAttribute("d", run > 0 ? `M210 230 L210 72 A158 158 0 ${big} 1 ${210 + Math.sin(a1) * 158} ${230 - Math.cos(a1) * 158} Z` : "");
-    swBtn.setAttribute("transform", `translate(0 ${8 * (seg(t, 0.72, 0.8) - seg(t, 0.8, 0.9))})`);
-    const dingP = seg(t, 1.7, 2.0);
-    const jolt = t > 1.7 ? c00_settle(t - 1.7, 3, 6) : 0;
-    swRays.setAttribute("opacity", t > 1.7 && t < 2.1 ? 1 - seg(t, 1.9, 2.1) : 0);
+    swBtn.setAttribute("transform", `translate(0 ${8 * (seg(t, 2.12, 2.2) - seg(t, 2.2, 2.3))})`);
+    const dingP = seg(t, 3.0, 3.2), jolt = t > 3.0 ? c00_settle(t - 3.0, 3, 6) : 0;
+    swRays.setAttribute("opacity", t > 3.0 && t < 3.3 ? 1 - seg(t, 3.15, 3.3) : 0);
     swRays.setAttribute("transform", `translate(210 230) scale(${0.9 + 0.2 * dingP}) translate(-210 -230)`);
-    ding.style.opacity = t > 1.7 && t < 2.0 ? 1 : 0;
-    ding.style.transform = `scale(${back(seg(t, 1.7, 1.85))}) rotate(12deg)`;
-
-    // stopwatch life: pop in → after flash it shrinks, drops onto the floor, then gets kicked
-    const drop = seg(t, 2.0, 2.55), kick = seg(t, 3.38, 3.95);
-    let sx = 960, sy = 320, ss = swIn * (1 + 0.06 * jolt), rot = -4 * c00_settle(t - 0.15, 1.5, 3);
-    if (t > 2.0) {
-      const e = out(drop);
-      sx = lerp(960, 840, e); ss = lerp(1, 0.32, e);
-      const landY = 800;
-      sy = drop < 1 ? lerp(320, landY, drop * drop) : landY - 60 * Math.abs(Math.sin(Math.min(1, seg(t, 2.55, 3.1)) * Math.PI * 2)) * (1 - seg(t, 2.55, 3.1));
+    ding.style.opacity = t > 3.0 && t < 3.25 ? 1 : 0;
+    ding.style.transform = `scale(${back(seg(t, 3.0, 3.12))}) rotate(12deg)`;
+    // after the morph: a small stopwatch drops out, bounces, gets kicked by Noa's slip
+    const drop = seg(t, 3.2, 3.6), kick = seg(t, 4.25, 4.75);
+    let sx = 960, sy = 320, ss = swIn * (1 + 0.06 * jolt), rot = -4 * c00_settle(t - 0.4, 1.5, 3) + (t > 2.25 && t < 3 ? 1.5 * Math.sin(t * 30) : 0);
+    if (t > 3.2) {
+      const e = out(drop), landY = 800;
+      sx = lerp(960, 860, e); ss = lerp(0.9, 0.32, e);
+      sy = drop < 1 ? lerp(320, landY, drop * drop) : landY - 50 * Math.abs(Math.sin(seg(t, 3.6, 4.1) * Math.PI * 2)) * (1 - seg(t, 3.6, 4.1));
       rot = 200 * e;
-      if (t > 3.38) { sx = lerp(840, 160, out(kick)); sy = landY - 120 * Math.sin(kick * Math.PI); rot = 200 + 720 * out(kick); }
+      if (t > 4.25) { sx = lerp(860, 170, out(kick)); sy = landY - 120 * Math.sin(kick * Math.PI); rot = 200 + 720 * out(kick); }
     }
     sw.style.transform = `translate(${sx - 960}px, ${sy - 320}px) scale(${ss}) rotate(${rot}deg)`;
-    sw.style.opacity = (t < 0.15 ? 0 : 1) * (1 - seg(t, 3.85, 4.0));
-
-    // readout
+    sw.style.opacity = (t < 0.4 ? 0 : 1) * (1 - seg(t, 4.65, 4.8)) * (1 - PH);
     const str = ms.toFixed(3) + "s";
     cells.forEach((c, i) => c.textContent = str[i] || "");
-    readout.style.opacity = seg(t, 0.35, 0.6) * (1 - seg(t, 1.9, 2.0));
-    readout.style.transform = `translateY(${24 * (1 - out(seg(t, 0.35, 0.7)))}px) scale(${1 + 0.12 * c00_settle(t - 1.7, 3, 6)})`;
+    readout.style.opacity = seg(t, 0.5, 0.8) * (1 - seg(t, 3.15, 3.25));
+    readout.style.transform = `translateY(${24 * (1 - out(seg(t, 0.5, 0.9)))}px) scale(${1 + 0.14 * c00_settle(t - 3.0, 3, 6) + 0.05 * (seg(t, 2.25, 2.3) - seg(t, 2.3, 2.4))})`;
 
-    // ---- flash → reference page ----
-    flash.style.opacity = t < 1.9 ? 0 : t < 2.0 ? seg(t, 1.9, 2.0) : 1 - seg(t, 2.0, 2.45);
-    const rIn = seg(t, 1.95, 2.55), rB = seg(t, 4.8, 5.7);
-    const rS = lerp(0.82 + 0.18 * back(rIn), 0.56, ease(rB));
-    const rX = lerp(340, 1030, ease(rB)), rY = lerp(90, 196, ease(rB));
-    const rRot = lerp(-2.5 * c00_settle(t - 1.95, 1.4, 3) * 3, 2.5, ease(rB)) + (t > 5.7 ? 1.2 * c00_settle(t - 5.7, 1.2, 3) : 0);
-    // scale about the window centre while it pops, then glide to the poster slot
-    const cxOff = 620 * (1 - rS), cyOff = 350 * (1 - rS) * (1 - ease(rB));
-    ref.style.opacity = t < 1.95 ? 0 : 1;
-    ref.style.transform = `translate(${rX - 340 + cxOff * (1 - ease(rB))}px, ${rY - 90 + cyOff}px) scale(${rS}) rotate(${rRot}deg)`;
-    ref.scrollTo(0.08 * ease(seg(t, 2.6, 4.6)) * (1 - ease(rB)), t);
-    // "짠!" sticker slaps onto the page
-    const tdIn = back(seg(t, 2.45, 2.8)), tdB = ease(rB);
-    tada.style.opacity = seg(t, 2.45, 2.5);
-    tada.style.left = lerp(300, 1000, tdB) + "px"; tada.style.top = lerp(46, 132, tdB) + "px";
-    tada.style.transform = `rotate(${-7 + 3 * tdB}deg) scale(${(1.6 - 0.6 * tdIn) * lerp(1, 0.72, tdB)})`;
+    // ---- match cut: stopwatch → browser window (grows out of the dial) ----
+    flash.style.opacity = t < 3.1 ? 0 : t < 3.18 ? seg(t, 3.1, 3.18) * 0.8 : 0.8 * (1 - seg(t, 3.18, 3.5));
+    const m = seg(t, 3.12, 3.6), mB = back(m);
+    // window rect lerps from the dial (960,320 ~ r 180) to its full frame
+    const wS = lerp(0.29, 1, mB), wx = lerp(960 - 620 * 0.29, 340, mB), wy = lerp(320 - 350 * 0.29, 90, mB);
+    ref.style.opacity = !PH ? (t > 3.12 ? 1 : 0) : 1;
+    ref.style.borderRadius = `${lerp(200, 16, clamp(m * 1.6))}px`;
+    if (!PH) ref.style.transform = `translate(${wx - 340}px, ${wy - 90}px) scale(${wS}) rotate(${-3 * c00_settle(t - 3.6, 1.4, 3)}deg)`;
+    else {
+      const pb = back(seg(t, 5.3, 5.9)) , rr = 2.5 + 1.2 * c00_settle(t - 5.9, 1.2, 3);
+      ref.style.transform = `translate(${1030 - 340}px, ${196 - 90 + 40 * (1 - pb)}px) scale(0.56) rotate(${rr}deg)`;
+    }
+    ref.scrollTo(0.04 * ease(seg(t, 3.7, 4.6)) * (1 - PH), t);
+    const tdIn = back(seg(t, 3.55, 3.85));
+    tada.style.opacity = seg(t, 3.55, 3.6);
     tada.style.transformOrigin = "0 0";
-    // sparkles burst from the page corners at the reveal, and twinkle round the title later
+    tada.style.left = (PH ? 1000 : 300) + "px"; tada.style.top = (PH ? 132 : 46) + "px";
+    tada.style.transform = PH ? `rotate(-4deg) scale(${0.72 * back(seg(t, 5.5, 5.8))})` : `rotate(-7deg) scale(${1.6 - 0.6 * tdIn})`;
+    // sparkles: burst at the reveal, twinkle round the title later
     sparks.forEach((d, i) => {
       if (i < 8) {
-        const dt = t - 2.0 - (i % 4) * 0.04, ox = i < 4 ? 360 : 1560, oy = i % 2 ? 120 : 760;
-        const a = (i % 4) / 4 * Math.PI * 0.5 + (i < 4 ? Math.PI * 0.75 : -Math.PI * 0.25) + (oy > 400 ? (i < 4 ? -Math.PI * 0.5 : Math.PI * 0.5) : 0);
+        const dt = t - 3.2 - (i % 4) * 0.04, ox2 = i < 4 ? 360 : 1560, oy2 = i % 2 ? 120 : 760;
+        const a = (i % 4) / 4 * Math.PI * 0.5 + (i < 4 ? Math.PI * 0.75 : -Math.PI * 0.25) + (oy2 > 400 ? (i < 4 ? -Math.PI * 0.5 : Math.PI * 0.5) : 0);
         const p = out(clamp(dt / 0.9));
-        d.style.opacity = dt > 0 && dt < 1.2 ? 1 - seg(dt, 0.8, 1.2) : 0;
-        d.style.transform = `translate(${ox + Math.cos(a) * 160 * p}px, ${oy + Math.sin(a) * 160 * p}px) scale(${0.4 + 0.8 * Math.sin(p * Math.PI)}) rotate(${dt * 200}deg)`;
+        d.style.opacity = dt > 0 && dt < 1.2 && !PH ? 1 - seg(dt, 0.8, 1.2) : 0;
+        d.style.transform = `translate(${ox2 + Math.cos(a) * 160 * p}px, ${oy2 + Math.sin(a) * 160 * p}px) scale(${0.4 + 0.8 * Math.sin(p * Math.PI)}) rotate(${dt * 200}deg)`;
       } else {
         const j = i - 8, pos = [[870, 250], [930, 420], [120, 460], [700, 170]][j];
         const tw = 0.5 + 0.5 * Math.sin(t * 5 + j * 1.7);
-        d.style.opacity = seg(t, 6.6 + j * .2, 6.9 + j * .2) * (0.35 + 0.65 * tw);
+        d.style.opacity = seg(t, 6.4 + j * .2, 6.7 + j * .2) * (0.35 + 0.65 * tw);
         d.style.transform = `translate(${pos[0]}px, ${pos[1]}px) scale(${0.55 + 0.35 * tw}) rotate(${t * 40 + j * 30}deg)`;
       }
     });
 
-    // ---- title (phase B) ----
-    const chA = back(seg(t, 5.0, 5.45)), chB = back(seg(t, 5.15, 5.6)), bump = seg(t, 5.55, 5.7) - seg(t, 5.7, 5.95);
+    // ---- ink-stroke wipe 5.0–5.5 ----
+    const wIn = ease(seg(t, 4.95, 5.2)), wOut = ease(seg(t, 5.22, 5.55));
+    wP.forEach((p, i) => { p.setAttribute("stroke-dasharray", "3200 6400"); p.setAttribute("stroke-dashoffset", 3200 * (1 - wIn) - 3200 * wOut + (i === 2 ? 120 : 0)); });
+    wipe.style.opacity = t > 4.9 && t < 5.6 ? 1 : 0;
+
+    // ---- title (phase B): chips bump, letters stamp in, underline draws ----
+    const chA = back(seg(t, 5.3, 5.7)), chB = back(seg(t, 5.42, 5.82)), bump = seg(t, 5.8, 5.92) - seg(t, 5.92, 6.15);
     cA.style.transform = `translateX(${-340 * (1 - chA) + 6 * bump}px)`; cB.style.transform = `translateX(${340 * (1 - chB) - 6 * bump}px)`;
-    cX.style.transform = `scale(${back(seg(t, 5.55, 5.85)) * (1 + 0.3 * bump)}) rotate(${t * 30}deg)`;
-    chips.style.opacity = seg(t, 5.0, 5.2);
+    cX.style.transform = `scale(${back(seg(t, 5.8, 6.1)) * (1 + 0.3 * bump)}) rotate(${t * 30}deg)`;
+    chips.style.opacity = PH ? seg(t, 5.3, 5.4) : 0;
     chars.forEach((c, i) => {
-      const a = 5.35 + i * 0.075, p = seg(t, a, a + 0.45);
-      const wob = t > a + 0.45 ? 5 * c00_settle(t - a - 0.45, 1.6, 4) : 0;
-      c.style.opacity = p > 0 ? 1 : 0;
-      c.style.transform = `translateY(${-90 * (1 - out(p))}px) scale(${lerp(0.4, 1, back(p))}, ${lerp(1.4, 1, back(p))}) rotate(${(i % 2 ? 1 : -1) * (14 * (1 - p) + wob)}deg)`;
+      const a = 5.25 + i * 0.065, p = seg(t, a, a + 0.32);
+      const wob = t > a + 0.32 ? 6 * c00_settle(t - a - 0.32, 1.6, 4) : 0;
+      c.style.opacity = PH && p > 0 ? 1 : 0;
+      c.style.transform = `translateY(${-30 * (1 - out(p))}px) scale(${lerp(2.2, 1, back(p))}, ${lerp(0.5, 1, back(p))}) rotate(${(i % 2 ? 1 : -1) * (10 * (1 - p) + wob)}deg)`;
     });
-    uPath.setAttribute("stroke-dashoffset", 760 * (1 - ease(seg(t, 6.45, 7.05))));
+    uPath.setAttribute("stroke-dashoffset", 760 * (1 - ease(seg(t, 6.2, 6.8))));
     tBox.style.transform = `translateY(${-4 * Math.sin(t * 1.4) * seg(t, 7, 8)}px)`;
 
-    // ---- Noa: run in → slip on the stopwatch → backflip → land → present the title ----
-    let nx, ny = 690, nrot = 0, mood = "happy", hop = 0, flip = false, look = -0.6, wave = false, talk = false, arm = null;
-    const runIn = seg(t, 2.6, 3.38);
-    if (t < 3.38) { nx = lerp(1900, 880, runIn); hop = t > 2.6 ? (t * 5) % 1 * 0.25 : 0; look = -1; }
-    else if (t < 4.0) {
-      const f = seg(t, 3.38, 4.0);
-      nx = lerp(880, 800, f); ny = 690 - 200 * Math.sin(f * Math.PI); nrot = -360 * ease(f); mood = "shock";
-    } else if (t < 4.9) {
-      nx = 800; mood = seg(t, 4.0, 4.25) < 1 ? "shock" : "happy"; wave = t > 4.25; talk = t > 4.25 && t < 4.8;
+    // ---- Noa ----
+    let nx, ny = 690, nrot = 0, mood = "happy", hop = 0, flip = false, look = -0.6, wave = false, talk = false, arm = null, gl = 0;
+    if (!PH) {
+      if (t < 4.25) { nx = lerp(1900, 900, seg(t, 3.6, 4.25)); hop = t > 3.6 ? (t * 5) % 1 : 0; look = -1; }
+      else { const f = seg(t, 4.25, 4.8); nx = lerp(900, 820, f); ny = 690 - 200 * Math.sin(f * Math.PI); nrot = -360 * ease(f); mood = f < 1 ? "shock" : "happy"; }
     } else {
-      const w = ease(seg(t, 4.9, 5.6)); nx = lerp(800, 720, w); flip = true; look = -1;
-      talk = (t > 5.8 && t < 7.6) || (t > 8.1 && t < 8.9); arm = t > 5.7 && t < 7.8 ? -45 + 8 * Math.sin(t * 4) : null; if (t > 9.35) mood = "happy";
+      nx = 720; flip = true; look = -1;
+      if (t < 6.2) { talk = t > 5.6 && t < 6.2; wave = t > 5.5 && t < 6.2; }
+      else if (t < 7.8) { flip = false; look = 0; talk = t > 6.4 && t < 7.6; arm = -78 + 6 * Math.sin(t * 6); gl = seg(t, 6.3, 6.5) * (1 - seg(t, 6.75, 6.95)) + seg(t, 7.2, 7.35) * (1 - seg(t, 7.35, 7.55)); }
+      else { talk = t > 8.1 && t < 8.9; look = 0.4; mood = t > 9.0 && t < 9.35 ? "shock" : "happy"; }
     }
-    const land = t > 4.0 ? c00_settle(t - 4.0, 2.5, 5) : 0;
-    poseNoa(noa, t, { x: nx, y: ny, s: 1, mood, hop, flip, look, wave, talk, op: t > 2.55 ? 1 : 0 });
+    const land = !PH && t > 4.8 ? c00_settle(t - 4.8, 2.5, 5) : PH ? 0.6 * c00_settle(t - 9.35, 2.5, 5) : 0;
+    poseNoa(noa, t, { x: nx, y: ny, s: 1, mood, hop, flip, look, wave, talk, op: t > 3.55 ? 1 : 0 });
     noa.style.transform += ` rotate(${nrot}deg) scale(${1 + 0.12 * land}, ${1 - 0.12 * land})`;
-    noa.style.transformOrigin = t > 3.38 && t < 4.0 ? "50% 60%" : "50% 100%";
-    if (arm !== null) noa.P.ar.setAttribute("transform", `rotate(${arm} 154 118)`);
+    noa.style.transformOrigin = !PH && t > 4.25 && t < 4.8 ? "50% 60%" : "50% 100%";
+    if (arm !== null) noa.P.ar.setAttribute("transform", `rotate(${arm} 154 117)`);
+    glint.setAttribute("opacity", gl);
+    glint.setAttribute("transform", `translate(128 98) scale(${0.3 + 1.1 * gl}) rotate(${t * 200})`);
 
-    sayBubble(bub, t, 3.45, 4.0, "으앗!", nx + 150, 560);
-    sayBubble(bub2, t, 4.25, 5.1, "…안녕, 난 노아!", 960, 600);
-    if (t > 5.1 && t < 7.9) sayBubble(bub2, t, 5.9, 7.9, "첫인상은 0.05초면 끝나.", 880, 600);
-    if (t >= 7.9) sayBubble(bub2, t, 8.05, 9.8, "이 봉투는… 마지막에 열자 🤫", 880, 600);
+    sayBubble(bub, t, 4.3, 4.85, "으앗!", nx + 150, 560);
+    if (t < 6.3) sayBubble(bub2, t, 5.6, 6.3, "안녕, 난 노아!", 880, 600);
+    else if (t < 7.9) sayBubble(bub2, t, 6.3, 7.9, "첫인상은 0.05초면 끝나.", 880, 600);
+    else sayBubble(bub2, t, 8.05, 9.7, "이 봉투는… 마지막에 열자 🤫", 880, 600);
     // envelope: pops out at 7.9, wiggles, then gets stuffed into the cheek pouch at 9.0
     const eIn = seg(t, 7.85, 8.25), eSt = seg(t, 9.0, 9.35);
     const ex = lerp(lerp(nx + 40, 920, out(eIn)), nx + 30, ease(eSt)), ey = lerp(lerp(760, 700, out(eIn)) - 110 * Math.sin(eIn * Math.PI), 760, ease(eSt));

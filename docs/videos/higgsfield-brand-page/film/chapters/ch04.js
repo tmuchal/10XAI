@@ -56,6 +56,9 @@ function c04_popIn(node, t, a, d = .45, from = .5) {
 const c04_person = (c) => `<svg width="44" height="62" viewBox="0 0 44 62" overflow="visible"><rect x="6" y="26" width="32" height="32" rx="12" fill="${c}" stroke="${c04_INK}" stroke-width="3.5"/>
   <circle cx="22" cy="16" r="13" fill="#f6d7b8" stroke="${c04_INK}" stroke-width="3.5"/><circle cx="17" cy="16" r="2" fill="${c04_INK}"/><circle cx="27" cy="16" r="2" fill="${c04_INK}"/></svg>`;
 
+const c04_SPLASH = (c) => `<svg width="100%" height="100%" viewBox="-110 -100 220 200" overflow="visible"><path d="M0 -70 C30 -84 44 -40 72 -44 C100 -36 74 -2 90 22 C104 52 54 50 42 76 C26 100 -8 70 -30 82 C-62 96 -72 50 -88 30 C-104 4 -70 -10 -82 -42 C-92 -76 -40 -60 0 -70Z" fill="${c}" stroke="#2b2320" stroke-width="4" stroke-linejoin="round"/>
+  <circle cx="-96" cy="-66" r="9" fill="${c}" stroke="#2b2320" stroke-width="3"/><circle cx="104" cy="-58" r="7" fill="${c}" stroke="#2b2320" stroke-width="3"/><circle cx="92" cy="74" r="10" fill="${c}" stroke="#2b2320" stroke-width="3"/><circle cx="-80" cy="84" r="6" fill="${c}" stroke="#2b2320" stroke-width="3"/></svg>`;
+function c04_splat(node, t, a) { const p = back(seg(t, a, a + .3)); node.style.opacity = clamp(p * 3); node.style.transform = `scale(${p}) rotate(${-12 + 12 * p}deg)`; }
 scene(106, 134, (R, s) => {
   s.caps = [[106.2, "① 3초 안에 떠야 한다", "1. Load in under 3 seconds"],
             [112.5, "② 스크롤할 때마다 무언가 움직인다", "2. Something moves with every scroll"],
@@ -117,10 +120,22 @@ scene(106, 134, (R, s) => {
     return d;
   });
   const stat32 = c04_box(BA, 150, 670, 600, 170, "#fff4d0", "display:flex;align-items:center;gap:20px;padding:0 26px");
-  stat32.innerHTML = `<div style="font-size:84px;color:#c8372d;line-height:1">+32%</div><div style="font-size:28px;line-height:1.25;color:${c04_INK}">로딩 1초 → 3초<br><span style="color:#6b5d52;font-size:24px">이탈 확률 증가</span></div>`;
+  stat32.innerHTML = `<div class="sp" style="position:absolute;left:0;top:-20px;width:250px;height:210px"></div><div class="n" style="position:relative;width:210px;text-align:center;font-size:84px;color:#c8372d;line-height:1">+32%</div><div style="font-size:28px;line-height:1.25;color:${c04_INK}">로딩 1초 → 3초<br><span style="color:#6b5d52;font-size:24px">이탈 확률 증가</span></div>`;
   const stat53 = c04_box(BA, 790, 670, 640, 170, "#fff4d0", "display:flex;align-items:center;gap:20px;padding:0 26px");
-  stat53.innerHTML = `<div style="font-size:84px;color:#c8372d;line-height:1">53%</div><div style="font-size:28px;line-height:1.25;color:${c04_INK}">3초 넘으면 떠나는<br><span style="color:#6b5d52;font-size:24px">모바일 방문자 · Google</span></div>`;
-  const tapNoa = makeNoa(170); BA.appendChild(tapNoa);
+  stat53.innerHTML = `<div class="sp" style="position:absolute;left:0;top:-20px;width:230px;height:210px"></div><div class="n" style="position:relative;width:180px;text-align:center;font-size:84px;color:#c8372d;line-height:1">53%</div><div style="font-size:28px;line-height:1.25;color:${c04_INK}">3초 넘으면 떠나는<br><span style="color:#6b5d52;font-size:24px">모바일 방문자 · Google</span></div>`;
+  [stat32, stat53].forEach(c => { c.sp = c.querySelector(".sp"); c.sp.innerHTML = c04_SPLASH("#fbd35a"); c.n = c.querySelector(".n"); });
+  // hamster wheel: Noa powers the loading, sunglasses fly off at 5 s
+  const wheel = el("div", "left:1500px;top:600px;width:280px;height:280px", `<svg width="280" height="280" viewBox="-140 -140 280 280" overflow="visible">
+    <path d="M-70 120 L0 0 L70 120" fill="none" stroke="${c04_INK}" stroke-width="10" stroke-linecap="round"/><path d="M-70 120 L0 0 L70 120" fill="none" stroke="#e0a64f" stroke-width="5" stroke-linecap="round"/>
+    <circle r="118" fill="rgba(255,250,240,.55)" stroke="${c04_INK}" stroke-width="7"/>
+    <g class="sp">${Array.from({ length: 12 }, (_, k) => `<path d="M0 0 L0 -112" transform="rotate(${k * 30})" stroke="${c04_INK}" stroke-width="3" opacity=".55"/>`).join("")}
+      <circle r="106" fill="none" stroke="#c8372d" stroke-width="6" stroke-dasharray="14 12"/></g>
+    <circle r="12" fill="#f7d774" stroke="${c04_INK}" stroke-width="4"/></svg>`, BA); wheel.className = "abs";
+  const wSp = wheel.querySelector(".sp");
+  const tapNoa = makeNoa(120); BA.appendChild(tapNoa);
+  const tapSg = tapNoa.querySelector(".sg");
+  const shades = el("div", "left:0;top:0;z-index:38", `<svg width="90" height="34" viewBox="60 82 80 34"><g fill="#211c1b" stroke="${c04_INK}" stroke-width="3.5" stroke-linejoin="round"><path d="M66 86 H95 Q99 86 98 92 L96 103 Q94 110 87 110 H75 Q68 110 67 103 L64 92 Q63 86 66 86Z"/><path d="M104 86 H133 Q137 86 136 92 L134 103 Q132 110 125 110 H113 Q106 110 105 103 L102 92 Q101 86 104 86Z"/></g><path d="M97 91 Q101 87 105 91" stroke="${c04_INK}" stroke-width="4" fill="none"/></svg>`, BA); shades.className = "abs";
+  const whoosh = el("div", `left:1300px;top:600px;font-size:34px;color:#c8372d;z-index:38;white-space:nowrap`, "5초…!!", BA); whoosh.className = "abs";
   const tapB = makeBubble(BA);
 
   // ============ B · scroll → something moves (112.5–119)
@@ -181,6 +196,7 @@ scene(106, 134, (R, s) => {
   const pb = pbar.querySelector(".pb");
   const rec = el("div", `position:absolute;right:26px;top:36px;padding:2px 14px;border:3px solid ${c04_INK};border-radius:10px;background:#fff;font-size:26px;color:#c8372d;z-index:35`, "● 재생 중", vwrap);
   const cursor = el("div", "left:0;top:0;z-index:46", `<svg width="60" height="70" viewBox="0 0 60 70"><path d="M6 4 L6 56 L20 44 L30 66 L40 61 L30 40 L48 40Z" fill="#fff" stroke="${c04_INK}" stroke-width="4" stroke-linejoin="round"/></svg>`, BC); cursor.className = "abs";
+  const ringSp = el("div", "left:1140px;top:200px;width:400px;height:380px", c04_SPLASH("#fbd35a"), BC); ringSp.className = "abs";
   const ring = el("div", "left:1180px;top:230px;width:320px;height:320px", `<svg width="320" height="320" viewBox="0 0 320 320">
     <circle cx="160" cy="160" r="128" fill="#fffaf0" stroke="${c04_INK}" stroke-width="5"/>
     <circle cx="160" cy="160" r="110" fill="none" stroke="#f1e4c8" stroke-width="30"/>
@@ -286,9 +302,23 @@ scene(106, 134, (R, s) => {
       door.style.transform = `perspective(400px) rotateY(${-70 * dO}deg)`;
       c04_popIn(stat32, t, 109.85, .45, .5); stat32.style.transform += " rotate(-1.5deg)";
       c04_popIn(stat53, t, 111.0, .45, .5); stat53.style.transform += " rotate(1.2deg)";
+      [[stat32, 109.85, 32, "+"], [stat53, 111.0, 53, ""]].forEach(([c, a, v, pre]) => {
+        const k = ease(seg(t, a + .1, a + .7)), sl = seg(t, a + .7, a + .95);
+        c.n.textContent = pre + Math.round(v * k) + "%";
+        c.n.style.transform = `scale(${1 + .45 * Math.sin(Math.PI * sl)})`;
+        c04_splat(c.sp, t, a + .7);
+      });
       const tap = t > 107.6 && t < 112.3;
-      poseNoa(tapNoa, t, { x: 1510, y: 650, s: 1, look: -1, mood: t > 109.2 ? "pout" : "happy", hop: tap ? ((t * 4) % 1) * .12 : 0, op: seg(t, 106.5, 106.9) });
-      sayBubble(tapB, t, 108.6, 111.2, "빨리 좀…!", 1400, 560);
+      const wt = clamp(t - 106.8, 0, 6), fly = seg(t, 111.8, 112.5);
+      wSp.setAttribute("transform", `rotate(${90 * wt * wt + 120 * wt})`);
+      wheel.style.opacity = seg(t, 106.4, 106.8);
+      poseNoa(tapNoa, t, { x: 1580, y: 690 + 4 * Math.sin(t * 30) * (t > 107 ? 1 : 0), s: 1, look: 1, mood: t > 111.8 ? "shock" : t > 109.2 ? "pout" : "happy", hop: t > 106.9 && t < 112.3 ? ((t * (3 + wt)) % 1) * .18 : 0, op: seg(t, 106.5, 106.9) });
+      tapNoa.style.transform += ` rotate(${Math.min(18, wt * 4)}deg)`;
+      if (tapSg) tapSg.style.opacity = t > 111.8 ? 0 : 1;
+      shades.style.opacity = fly > 0 && fly < 1 ? 1 : 0;
+      shades.style.transform = `translate(${1595 + 190 * fly}px, ${745 - 260 * Math.sin(Math.PI * fly * .8) + 60 * fly}px) rotate(${fly * 720}deg)`;
+      const wh = back(seg(t, 111.8, 112.1)); whoosh.style.opacity = clamp(wh * 2) * (1 - seg(t, 112.2, 112.45)); whoosh.style.transform = `scale(${wh}) rotate(-8deg)`;
+      sayBubble(tapB, t, 108.6, 111.2, "더 빨리…!", 1360, 600);
     }
 
     // ---- B: phone
@@ -354,7 +384,8 @@ scene(106, 134, (R, s) => {
       const cp = ease(seg(t, 120.5, 122.0)), n = Math.round(85 * cp);
       arc.setAttribute("stroke-dashoffset", 691 * (1 - .85 * cp));
       ringN.textContent = n + "%";
-      ringN.style.transform = `scale(${1 + .12 * Math.sin(Math.PI * seg(t, 122.0, 122.3))})`;
+      ringN.style.transform = `scale(${1 + .35 * Math.sin(Math.PI * seg(t, 122.0, 122.3))})`;
+      c04_splat(ringSp, t, 122.0);
       const lIn = back(seg(t, 121.0, 121.4)); ringL.style.opacity = clamp(lIn * 2); ringL.style.transform = `translateY(${30 * (1 - lIn)}px)`;
       crowd.forEach((d, i) => {
         const on = i < Math.round(17 * seg(t, 121.3, 123.0)), a = 121.3 + (i / 17) * 1.7;

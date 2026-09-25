@@ -10,7 +10,7 @@ const c07_kick = (tau, a = 3, w = 6) => tau <= 0 ? 0 : Math.exp(-a * tau) * Math
 function c07_bow(n, b) {
   if (b <= 0) return;
   n.P.b.setAttribute("transform", `translate(100 200) scale(${1 + .06 * b} ${1 - .24 * b}) skewX(${-4 * b}) translate(-100 -200)`);
-  n.P.al.setAttribute("transform", `rotate(${-55 * b} 46 118)`); n.P.ar.setAttribute("transform", `rotate(${55 * b} 154 118)`);
+  n.P.al.setAttribute("transform", `rotate(${-55 * b} 56 160)`); n.P.ar.setAttribute("transform", `rotate(${55 * b} 144 160)`);
   if (b > .4) { n.P.e1.setAttribute("d", "M70 105 Q80 112 90 105"); n.P.e2.setAttribute("d", "M110 105 Q120 112 130 105"); n.P.e1.setAttribute("fill", "none"); n.P.e2.setAttribute("fill", "none"); }
 }
 

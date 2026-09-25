@@ -161,7 +161,7 @@ scene(160, 184, (R, s) => {
     const cOp = seg(t, 162.2, 162.6) * (1 - X1);
     const bump = c06_kick(t - lastCatch, 7, 18);
     poseNoa(catcher, t, { x: bx - 80, y: 722 + 6 * bump, s: 1, look: -.6, mood: "happy", hop: 0, op: cOp });
-    catcher.P.al.setAttribute("transform", `rotate(72 46 118)`); catcher.P.ar.setAttribute("transform", `rotate(-72 154 118)`);
+    catcher.P.al.setAttribute("transform", `rotate(72 56 160)`); catcher.P.ar.setAttribute("transform", `rotate(-72 144 160)`);
     basket.style.opacity = cOp; basket.style.transform = `translate(${bx - 60}px, ${688 + 8 * bump}px)`;
     const lp = back(seg(t, 161.2, 161.7)), lx = ease(seg(t, 166.5, 166.95));
     live.style.opacity = clamp(lp * 2) * (1 - lx); live.style.transform = `translateY(${-50 * lx}px) scale(${(0.6 + 0.4 * lp) * (1 - .2 * lx)}) rotate(${1.5 - 1.5 * lx}deg)`;
@@ -237,7 +237,7 @@ scene(160, 184, (R, s) => {
     const ap = back(seg(t, 182.1, 182.5)); act.style.opacity = clamp(ap * 2); act.style.transform = `translateX(${30 * (1 - ap)}px)`;
     const nIn = out(seg(t, 178.4, 178.9)), tadaArms = t > 178.6 && t < 179.8;
     poseNoa(noa, t, { x: 1470 + 200 * (1 - nIn), y: 520, s: 1, talk: t > 179.6 && t < 181.4, look: -1, hop: t > 178.6 && t < 179.3 ? (t - 178.6) / .7 : 0, op: nIn, wave: t > 182 && t < 183 });
-    if (tadaArms) { noa.P.al.setAttribute("transform", "rotate(60 46 118)"); noa.P.ar.setAttribute("transform", "rotate(-60 154 118)"); }
+    if (tadaArms) { noa.P.al.setAttribute("transform", "rotate(60 56 160)"); noa.P.ar.setAttribute("transform", "rotate(-60 144 160)"); }
     sayBubble(bub, t, 179.6, 183.4, "마지막은 늘 버튼 하나!", 1400, 410);
     head.style.opacity = 1 - seg(t, 177.6, 178);
     wipeA(t, 172.55, .8); wipeB(t, 177.45, .8);

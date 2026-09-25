@@ -23,8 +23,8 @@
   },
   {
    "at": 5.2,
-   "en": "Win that blink with Claude and Higgsfield. And stay to the end: one button pays off.",
-   "ko": "Claude와 Higgsfield로 그 찰나를 잡으세요. 끝까지 보시면, 버튼 하나가 돈이 되는 이유가 나옵니다."
+   "en": "Claude and Higgsfield can win it. Stay to the end: one button pays off.",
+   "ko": "Claude와 Higgsfield면 잡을 수 있어요. 끝까지 보세요, 버튼 하나가 돈이 됩니다."
   },
   {
    "at": 11.0,
@@ -165,12 +165,12 @@
   },
   {
    "at": 140.6,
-   "en": "And five reviews make a purchase 270% more likely.",
-   "ko": "후기 5개면 구매 가능성이 270% 올라갑니다."
+   "en": "Five reviews? Buying gets 270% more likely.",
+   "ko": "후기 5개면? 구매 가능성이 270% 올라갑니다."
   },
   {
    "at": 143.8,
-   "en": "Humor? 91% of people prefer funny brands, and 72% pick them over rivals.",
+   "en": "Humor? 91% prefer funny brands. 72% pick them over rivals.",
    "ko": "유머는요? 91%가 재밌는 브랜드를 선호하고, 72%는 경쟁사 대신 그 브랜드를 고릅니다."
   },
   {
@@ -180,9 +180,9 @@
   },
   {
    "at": 153.7,
-   "en": "Like this: 'Noa is rendering your video. Coffee number two.' Progress, plus a smile.",
-   "ko": "이렇게요. '노아가 영상 렌더링 중… 커피 두 잔째.' 진행 상황에 미소 한 스푼.",
-   "say": "Like this: Noah is rendering your video. Coffee number two. Progress, plus a smile."
+   "en": "Like this: 'Noa's rendering. Coffee number two.' Progress, plus a smile.",
+   "ko": "이렇게요. '노아 렌더링 중… 커피 두 잔째.' 진행 상황에 미소 한 스푼.",
+   "say": "Like this: Noah's rendering. Coffee number two. Progress, plus a smile."
   },
   {
    "at": 161.0,
@@ -201,7 +201,7 @@
   },
   {
    "at": 175.6,
-   "en": "That's the button: one clear call to action, plus a softer one for the maybe-laters.",
+   "en": "That's the button: one clear call to action, plus a soft one for maybe-laters.",
    "ko": "그게 바로 그 버튼. 분명한 행동 버튼 하나, 망설이는 분께는 부담 없는 보조 버튼 하나."
   },
   {

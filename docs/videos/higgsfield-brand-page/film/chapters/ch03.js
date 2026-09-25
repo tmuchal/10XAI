@@ -87,12 +87,18 @@ scene(72, 106, (R, s) => {
 
   // ============ A · gag: three generated shots, three different Noas (72–81.9)
   const gag = el("div", "left:0;top:0;width:1920px;height:1080px;transform-origin:960px 560px", "", R); gag.className = "abs";
-  const GAG = [["beach", { body: "#9fd3f0" }], ["park", { glasses: true, scarf: "#6fb3d9", beret: "#3f8f7a" }], ["lilac", { spiky: true, body: "#f7c6d4" }]];
+  const GAG = [["beach", { body: "#9fd3f0" }], ["park", { glasses: true, scarf: "#6fb3d9", beret: "#3f8f7a" }], ["lilac", { spiky: true, body: "#f7c6d4", scarf: null }]];
+  const board = c03_box(gag, 120, 262, 1680, 372, "#e8c48f", "background-image:radial-gradient(rgba(120,70,30,.18) 2px,transparent 2.5px);background-size:22px 22px");
+  const wanted = el("div", `left:760px;top:596px;z-index:37;padding:4px 22px 6px;border:4px solid ${c03_INK};border-radius:10px;background:#fffaf0;font-size:30px;color:#c8372d;white-space:nowrap`, "WANTED · 진짜 노아는?", gag); wanted.className = "abs";
   const shots = GAG.map(([pal, v], i) => {
     const f = c03_frame(gag, 150 + i * 560, 300, 500, 290, c03_PAL[pal], `AI SHOT ${i + 1}`, v);
     f.st = c03_stamp(gag, 150 + i * 560 + 250, 528, "✗ 다른 얼굴", "#c8372d", -10 + i * 5);
+    el("div", `position:absolute;left:236px;top:6px;width:26px;height:26px;border-radius:50%;background:#c8372d;border:3px solid ${c03_INK};z-index:37;box-shadow:2px 3px 0 rgba(43,35,32,.3)`, "", f);
+    el("div", `position:absolute;right:12px;top:10px;z-index:35;padding:0 12px;border:3px solid ${c03_INK};border-radius:8px;background:#fbd9d3;font-size:22px;color:${c03_INK}`, ["털 색 ✗", "안경 ✗", "머리·털 ✗"][i], f);
     return f;
   });
+  const yarn = el("div", "left:0;top:0;z-index:36;pointer-events:none", `<svg width="1920" height="700" overflow="visible"><path class="y" d="M400 318 Q680 400 960 318 Q1240 400 1520 318 M400 318 Q640 520 960 612 M1520 318 Q1280 520 960 612" fill="none" stroke="#c8372d" stroke-width="5" stroke-linecap="round" stroke-dasharray="2000" stroke-dashoffset="2000"/></svg>`, gag); yarn.className = "abs";
+  const yarnP = yarn.querySelector(".y");
   const real = makeNoa(200); gag.appendChild(real);
   const qm = [0, 1, 2].map(i => { const q = el("div", `left:${780 - i * 46}px;top:${690 - i * 20}px;font-size:${64 - i * 8}px;color:#c8372d;z-index:31`, "?", gag); q.className = "abs"; return q; });
   const sweat = el("div", "left:1050px;top:650px;z-index:32", `<svg width="30" height="40"><path d="M15 2 Q28 22 24 30 A10 10 0 0 1 6 30 Q2 22 15 2Z" fill="#9fd3f0" stroke="${c03_INK}" stroke-width="3"/></svg>`, gag); sweat.className = "abs";
@@ -135,7 +141,7 @@ scene(72, 106, (R, s) => {
   const eq = el("div", "padding:10px 20px;border-radius:14px;background:#f7d774;border:4px solid #2b2320", "= 의상은 하나로 고정", outfit);
 
   // ============ C · Soul ID photo booth (86.5–91)
-  const booth = el("div", "left:150px;top:250px;width:300px;height:560px", `<svg width="300" height="560" viewBox="0 0 300 560" overflow="visible">
+  const booth = el("div", "left:150px;top:228px;width:300px;height:560px", `<svg width="300" height="560" viewBox="0 0 300 560" overflow="visible">
     <rect x="16" y="530" width="268" height="24" rx="8" fill="#e0a64f" stroke="${c03_INK}" stroke-width="4"/>
     <rect x="6" y="60" width="288" height="476" rx="18" fill="#9fd3f0" stroke="${c03_INK}" stroke-width="5"/>
     <rect x="34" y="100" width="232" height="250" rx="12" fill="#fffaf0" stroke="${c03_INK}" stroke-width="4"/>
@@ -156,14 +162,14 @@ scene(72, 106, (R, s) => {
     const img = el("div", `position:absolute;left:7px;top:7px;width:98px;height:92px;overflow:hidden;border:2px solid ${c03_INK};background:${["#d8eef7", "#fbe3b0", "#e4f2d6", "#fbd9d3", "#e2dbff"][(i * 3) % 5]}`, "", d);
     d.n = makeNoa(76); img.appendChild(d.n);
     el("div", `position:absolute;left:0;right:0;bottom:4px;text-align:center;font-size:22px;color:${c03_INK}`, `#${i + 1}`, d);
-    d.tx = 520 + c * 172 + (c03_hash(i, 1) - .5) * 40; d.ty = 238 + r * 104 + (c03_hash(i, 2) - .5) * 24; d.rot = (c03_hash(i, 3) - .5) * 26;
+    d.tx = 476 + (i % 3) * 44 + (c03_hash(i, 1) - .5) * 30; d.ty = 236 + Math.floor(i / 3) * 62 + (c03_hash(i, 2) - .5) * 20; d.rot = (c03_hash(i, 3) - .5) * 34;
     d.at = 86.8 + i * .09; d.look = [-1, -.5, 0, .5, 1][i % 5]; d.flip = c03_hash(i, 4) > .6; d.ns = .9 + .25 * c03_hash(i, 5);
     return d;
   });
-  const cnt = c03_box(R, 520, 690, 250, 70, "#fffaf0", "display:grid;place-items:center;font-size:32px;color:#2b2320");
-  const train = c03_box(R, 800, 690, 590, 70, "#fffaf0", "overflow:hidden");
+  const cnt = c03_box(R, 150, 800, 250, 66, "#fffaf0", "display:grid;place-items:center;font-size:32px;color:#2b2320");
+  const train = c03_box(R, 420, 800, 300, 66, "#fffaf0", "overflow:hidden");
   const trainFill = el("div", "position:absolute;left:0;top:0;bottom:0;width:0;background:repeating-linear-gradient(-45deg,#f7d774 0 18px,#f2c14e 18px 36px)", "", train);
-  const trainTx = el("div", "position:absolute;left:84px;top:12px;font-size:32px;color:#2b2320", "학습 중 · 약 3~5분", train);
+  const trainTx = el("div", "position:absolute;left:70px;top:10px;font-size:30px;color:#2b2320;white-space:nowrap", "학습 중 · 3~5분", train);
   const clock = el("div", "position:absolute;left:14px;top:5px", `<svg width="54" height="54"><circle cx="27" cy="27" r="22" fill="#fff" stroke="${c03_INK}" stroke-width="4"/><path class="hd" d="M27 27 V11" stroke="${c03_INK}" stroke-width="4" stroke-linecap="round"/><path class="hd2" d="M27 27 H38" stroke="#c8372d" stroke-width="4" stroke-linecap="round"/></svg>`, train);
   const hands = [clock.querySelector(".hd"), clock.querySelector(".hd2")];
   // the Soul ID card (later becomes the Reference Element)
@@ -173,6 +179,7 @@ scene(72, 106, (R, s) => {
     <div style="position:absolute;left:220px;top:36px;font-size:28px;letter-spacing:3px;color:#c8372d">SOUL ID</div>
     <div style="position:absolute;left:218px;top:66px;font-size:78px;line-height:1;color:${c03_INK}">NOA</div>
     <div style="position:absolute;left:220px;top:160px;font-size:24px;line-height:1.4;color:#6b5d52">사진 20장+ 학습<br>3~5분 → 이름 저장</div>
+    <div style="position:absolute;left:24px;top:252px;font-size:22px;color:#c8372d;white-space:nowrap">고정: 선글라스 · 스카프 · 주황 털</div>
     <div class="rt" style="position:absolute;left:150px;top:-34px;padding:4px 18px;border:4px solid ${c03_INK};border-radius:12px;background:#9fd3f0;font-size:28px;color:${c03_INK};white-space:nowrap;opacity:0">Reference Element</div>`;
   const cNoa = makeNoa(150); card.querySelector(".ph").appendChild(cNoa);
   const cardRt = card.querySelector(".rt");
@@ -289,8 +296,14 @@ scene(72, 106, (R, s) => {
     });
     const sw = seg(t, 78.2, 79.8);
     sweat.style.opacity = sw > 0 && sw < 1 ? 1 : 0; sweat.style.transform = `translateY(${60 * sw}px)`;
-    sayBubble(whoB, t, 75.3, 77.3, "…누구세요?", 1060, 590);
+    sayBubble(whoB, t, 75.3, 77.3, "…누구세요?", 1080, 660);
 
+    const bd = back(seg(t, 72.3, 72.8));
+    board.style.opacity = clamp(bd * 2) * (1 - gagOut); board.style.transform = `scaleY(${.6 + .4 * bd})`;
+    yarnP.setAttribute("stroke-dashoffset", 2000 * (1 - ease(seg(t, 75.5, 76.6))));
+    yarn.style.opacity = 1 - gagOut;
+    const wtp = back(seg(t, 76.3, 76.7));
+    wanted.style.opacity = clamp(wtp * 2) * (1 - gagOut); wanted.style.transform = `scale(${wtp}) rotate(${-3 + 1.5 * Math.sin(t * 3)}deg)`;
     // ---- rail
     const railOut = ease(seg(t, 99.1, 99.6));
     rail.forEach((n, i) => {
@@ -353,7 +366,7 @@ scene(72, 106, (R, s) => {
       if (!Cv) { d.style.display = "none"; return; }
       d.style.display = "block";
       const p = out(seg(t, d.at, d.at + .45)); if (t >= d.at) shot++;
-      const x0 = 400, y0 = 690;
+      const x0 = 400, y0 = 668;
       let x = lerp(x0, d.tx, p), y = lerp(y0, d.ty, p) - 140 * Math.sin(Math.PI * p);
       x = lerp(x, 910, conv); y = lerp(y, 370, conv);
       d.style.opacity = (t >= d.at ? 1 : 0) * (1 - seg(conv, .8, 1));
@@ -366,7 +379,7 @@ scene(72, 106, (R, s) => {
     const tIn = back(seg(t, 88.4, 88.8)), tp = ease(seg(t, 88.7, 89.7));
     train.style.opacity = clamp(tIn * 2) * (1 - bOut); train.style.transform = `translateY(${40 * (1 - tIn)}px)`;
     trainFill.style.width = 100 * tp + "%";
-    trainTx.textContent = tp >= 1 ? "학습 완료! · 약 3~5분" : "학습 중 · 약 3~5분";
+    trainTx.textContent = tp >= 1 ? "학습 완료!" : "학습 중 · 3~5분";
     hands[0].setAttribute("transform", `rotate(${tp * 1440} 27 27)`); hands[1].setAttribute("transform", `rotate(${tp * 120} 27 27)`);
 
     // card: pops at 90, then docks left as a Reference Element for D

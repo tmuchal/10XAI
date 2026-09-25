@@ -256,6 +256,8 @@ def main():
     placed, problems = layout(cfg, lines)
     speech = sum(d for _, d in placed)
     print(f"\n{len(placed)} lines, {speech:.1f}s of speech ({100 * speech / D:.0f}% of {D}s)")
+    for (st, d), c in zip(placed, cfg["cues"]):
+        print(f"  {st:6.2f}-{st + d:6.2f}  (anchor {c['at']:6.2f})  {c['en'][:60]}")
     for p in problems: print("  !", p)
     if args.check: return
     if any(p.startswith("OVER") for p in problems):
