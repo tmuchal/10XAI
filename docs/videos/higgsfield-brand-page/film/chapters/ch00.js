@@ -71,6 +71,16 @@ scene(0, 10, (R, s) => {
   // ---- Noa ----
   const noa = makeNoa(170); cam.appendChild(noa);
   const bub = makeBubble(cam), bub2 = makeBubble(cam);
+  // open loop: a sealed envelope "₩4,500,000?" — Noa stashes it in his cheek pouch (opened in ch06)
+  const env = el("div", "left:0;top:0;z-index:33;opacity:0;transform-origin:50% 50%", `<svg width="210" height="134" viewBox="0 0 210 134" overflow="visible">
+    <rect x="8" y="10" width="194" height="116" rx="8" fill="rgba(43,35,32,.2)"/>
+    <rect x="3" y="4" width="194" height="116" rx="8" fill="#fffaf0" stroke="${INK0}" stroke-width="4.5"/>
+    <path d="M5 8 L100 64 L195 8" fill="none" stroke="${INK0}" stroke-width="4" stroke-linejoin="round"/>
+    <text x="100" y="104" text-anchor="middle" font-size="30" fill="#c8372d" font-family="GaeguLat">₩4,500,000?</text>
+    <circle cx="100" cy="62" r="17" fill="#c8372d" stroke="${INK0}" stroke-width="4"/><text x="100" y="71" text-anchor="middle" font-size="24" fill="#fffaf0" font-family="GaeguLat">?</text></svg>`, cam); env.className = "abs";
+  const puff = document.createElementNS("http://www.w3.org/2000/svg", "ellipse");
+  puff.setAttribute("cx", "140"); puff.setAttribute("cy", "122"); puff.setAttribute("fill", "#f0b27a"); puff.setAttribute("stroke", INK0); puff.setAttribute("stroke-width", "4");
+  noa.P.b.appendChild(puff);
 
   return t => {
     // gentle camera: push in on the stopwatch, settle, then slow push toward the title
@@ -172,7 +182,7 @@ scene(0, 10, (R, s) => {
       nx = 800; mood = seg(t, 4.0, 4.25) < 1 ? "shock" : "happy"; wave = t > 4.25; talk = t > 4.25 && t < 4.8;
     } else {
       const w = ease(seg(t, 4.9, 5.6)); nx = lerp(800, 720, w); flip = true; look = -1;
-      talk = t > 5.8 && t < 8.6; arm = t > 5.7 ? -45 + 8 * Math.sin(t * 4) : null;
+      talk = (t > 5.8 && t < 7.6) || (t > 8.1 && t < 8.9); arm = t > 5.7 && t < 7.8 ? -45 + 8 * Math.sin(t * 4) : null; if (t > 9.35) mood = "happy";
     }
     const land = t > 4.0 ? c00_settle(t - 4.0, 2.5, 5) : 0;
     poseNoa(noa, t, { x: nx, y: ny, s: 1, mood, hop, flip, look, wave, talk, op: t > 2.55 ? 1 : 0 });
@@ -182,7 +192,15 @@ scene(0, 10, (R, s) => {
 
     sayBubble(bub, t, 3.45, 4.0, "으앗!", nx + 150, 560);
     sayBubble(bub2, t, 4.25, 5.1, "…안녕, 난 노아!", 960, 600);
-    if (t > 5.1) sayBubble(bub2, t, 5.9, 9.8, "첫인상은 0.05초면 끝나.", 880, 600);
+    if (t > 5.1 && t < 7.9) sayBubble(bub2, t, 5.9, 7.9, "첫인상은 0.05초면 끝나.", 880, 600);
+    if (t >= 7.9) sayBubble(bub2, t, 8.05, 9.8, "이 봉투는… 마지막에 열자 🤫", 880, 600);
+    // envelope: pops out at 7.9, wiggles, then gets stuffed into the cheek pouch at 9.0
+    const eIn = seg(t, 7.85, 8.25), eSt = seg(t, 9.0, 9.35);
+    const ex = lerp(lerp(nx + 40, 920, out(eIn)), nx + 30, ease(eSt)), ey = lerp(lerp(760, 700, out(eIn)) - 110 * Math.sin(eIn * Math.PI), 760, ease(eSt));
+    env.style.opacity = eIn > 0 && eSt < 1 ? 1 : 0;
+    env.style.transform = `translate(${ex}px, ${ey}px) scale(${back(eIn) * (1 - 0.9 * eSt)}) rotate(${-8 + 6 * Math.sin(t * 7) * (1 - eSt) + 200 * eSt}deg)`;
+    const pf = t > 9.35 ? 1 + 0.25 * c00_settle(t - 9.35, 2.8, 5) : 0;
+    puff.setAttribute("rx", 24 * pf); puff.setAttribute("ry", 18 * pf); puff.setAttribute("opacity", pf ? 1 : 0);
   };
 });
 })();

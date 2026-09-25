@@ -1,4 +1,61 @@
 // ---------------------------------------------------------------- 04 · Immersion (106–134)
+// Local helpers (prefix c04_). Bright paper + ink look; only t drives motion.
+const c04_INK = "#2b2320", c04_SH = "7px 8px 0 rgba(43,35,32,.22)";
+const c04_hash = (i, k = 0) => { const s = Math.sin(i * 91.7 + k * 257.3) * 43758.5453; return s - Math.floor(s); };
+const c04_hill = (base, amp, k) => {
+  let d = `M0 470 L0 ${base}`;
+  for (let x = 0; x <= 1600; x += 20) d += ` L${x} ${(base + amp * Math.sin(2 * Math.PI * x * k / 800 + k)).toFixed(1)}`;
+  return d + " L1600 470 Z";
+};
+let c04_uid = 0;
+// bright landscape; update(t, sp, {sunY, hillX}) lets code "drive" the sun and hills
+function c04_scape(p) {
+  const id = "c04g" + c04_uid++;
+  const e = el("div", "position:absolute;inset:0;overflow:hidden");
+  const cloud = `<path d="M0 40 Q-6 14 22 14 Q30 -8 58 2 Q80 -10 96 12 Q122 12 116 40 Z" fill="#fff" stroke="${c04_INK}" stroke-width="3.5" stroke-linejoin="round"/>`;
+  e.innerHTML = `<svg viewBox="0 0 800 450" preserveAspectRatio="xMidYMid slice" width="100%" height="100%" style="display:block">
+    <defs><linearGradient id="${id}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${p.s[0]}"/><stop offset="1" stop-color="${p.s[1]}"/></linearGradient></defs>
+    <rect width="800" height="450" fill="url(#${id})"/>
+    <g class="sun"><g class="ry">${Array.from({ length: 10 }, (_, i) => `<path d="M0 -60 L0 -80" transform="rotate(${i * 36})" stroke="${c04_INK}" stroke-width="4" stroke-linecap="round"/>`).join("")}</g>
+      <circle r="44" fill="${p.sun}" stroke="${c04_INK}" stroke-width="4"/></g>
+    <g class="cl">${cloud}<g transform="translate(330 50) scale(.7)">${cloud}</g></g>
+    <path class="h0" d="${c04_hill(250, 16, 2)}" fill="${p.h[0]}" stroke="${c04_INK}" stroke-width="4"/>
+    <path class="h1" d="${c04_hill(305, 20, 1)}" fill="${p.h[1]}" stroke="${c04_INK}" stroke-width="4"/>
+    <path class="h2" d="${c04_hill(372, 12, 3)}" fill="${p.h[2]}" stroke="${c04_INK}" stroke-width="4"/>
+  </svg>`;
+  const q = s => e.querySelector(s);
+  const P = { sun: q(".sun"), ry: q(".ry"), cl: q(".cl"), h: [q(".h0"), q(".h1"), q(".h2")] };
+  e.update = (t, sp = 1, o = {}) => {
+    const s = t * sp, sy = o.sunY || 0, hx = o.hillX || 0;
+    P.sun.setAttribute("transform", `translate(${o.sunX || 600} ${110 + sy + 6 * Math.sin(s * .8)})`);
+    P.ry.setAttribute("transform", `rotate(${s * 18})`);
+    P.cl.setAttribute("transform", `translate(${((s * 16) % 1000) - 150} 44)`);
+    [8, 18, 34].forEach((v, i) => P.h[i].setAttribute("transform", `translate(${-(((s * v) + hx * [.4, .7, 1][i]) % 800 + 800) % 800} 0)`));
+  };
+  e.update(0);
+  return e;
+}
+const c04_SUNSET = { s: ["#ffc9ae", "#fff0c9"], sun: "#fff3a8", h: ["#f6b196", "#ec9180", "#d77a70"] };
+const c04_PARK = { s: ["#cdeefa", "#fff6d8"], sun: "#ffe07a", h: ["#bfe3a6", "#94d07c", "#6fba5e"] };
+const c04_LILAC = { s: ["#e2dbff", "#fff1e2"], sun: "#ffd98a", h: ["#cdbff3", "#ad9ee6", "#8f80d6"] };
+function c04_box(parent, x, y, w, h, bg, extra = "") {
+  const b = el("div", `left:${x}px;top:${y}px;width:${w}px;height:${h}px;background:${bg};border:4px solid ${c04_INK};border-radius:18px;box-shadow:${c04_SH};${extra}`, "", parent);
+  b.className = "abs"; return b;
+}
+function c04_slam(s, t, a, rot) {
+  const p = seg(t, a, a + .28);
+  s.style.opacity = p > 0 ? 1 : 0;
+  s.style.transform = `rotate(${rot}deg) scale(${2.4 - 1.4 * out(p)})`;
+}
+function c04_popIn(node, t, a, d = .45, from = .5) {
+  const p = back(seg(t, a, a + d));
+  node.style.opacity = clamp(p * 2);
+  node.style.transform = `scale(${from + (1 - from) * p})`;
+  return p;
+}
+const c04_person = (c) => `<svg width="44" height="62" viewBox="0 0 44 62" overflow="visible"><rect x="6" y="26" width="32" height="32" rx="12" fill="${c}" stroke="${c04_INK}" stroke-width="3.5"/>
+  <circle cx="22" cy="16" r="13" fill="#f6d7b8" stroke="${c04_INK}" stroke-width="3.5"/><circle cx="17" cy="16" r="2" fill="${c04_INK}"/><circle cx="27" cy="16" r="2" fill="${c04_INK}"/></svg>`;
+
 scene(106, 134, (R, s) => {
   s.caps = [[106.2, "① 3초 안에 떠야 한다", "1. Load in under 3 seconds"],
             [112.5, "② 스크롤할 때마다 무언가 움직인다", "2. Something moves with every scroll"],
@@ -6,69 +63,341 @@ scene(106, 134, (R, s) => {
             [125, "④ 부드러운 애니메이션은 Opus에게 코드로", "4. Ask Opus to write the animation code"]];
   s.cite = [[106, "Google mobile speed research"], [119, "Wyzowl Video Marketing Statistics 2026"], [125, "Anthropic · Introducing Claude Opus 5"]];
   chapter(R, "CHAPTER 04", "몰입감 만들기");
-  // a) speed race
-  const race = el("div", "left:96px;top:230px;width:1728px;height:560px", "", R); race.className = "abs";
-  const bars = [["1초", 1, "var(--gold)"], ["3초", 3, "#e0a64f"], ["5초", 5, "var(--terra)"]].map((b, i) => {
-    const row = el("div", `position:absolute;left:0;top:${i * 120}px;width:1000px;height:90px`, `<div style="position:absolute;left:0;top:26px;font-size:30px;font-weight:800;width:90px">${b[0]}</div>
-      <div style="position:absolute;left:100px;top:30px;width:880px;height:30px;border-radius:15px;background:#f1e4c8;overflow:hidden"><div class="fill" style="height:100%;width:0;background:${b[2]}"></div></div>`, race);
-    row.dur = b[1]; return row;
+  const beat = () => { const b = el("div", "left:0;top:0;width:1920px;height:1080px", "", R); b.className = "abs"; return b; };
+  const BA = beat(), BB = beat(), BC = beat(), BD = beat();
+  // paper-strip wipe that sweeps between beats
+  const WIPES = [112.5, 119, 125];
+  const band = el("div", `left:0;top:150px;width:170px;height:800px;z-index:45;border-left:5px solid ${c04_INK};border-right:5px solid ${c04_INK};
+    background:repeating-linear-gradient(0deg,#f7d774 0 26px,#f2c14e 26px 52px)`, "", R); band.className = "abs";
+  const wipeX = t => { for (const T of WIPES) { const p = seg(t, T - .35, T + .3); if (p > 0 && p < 1) return [lerp(-120, 2040, ease(p)), T]; } return null; };
+
+  // ============ A · load race (106.2–112.5)
+  const track = c04_box(BA, 130, 228, 880, 400, "#fffaf0", "overflow:hidden");
+  el("div", `position:absolute;left:24px;top:14px;font-size:32px;color:${c04_INK}`, "로딩 레이스 <span style='font-size:24px;color:#6b5d52'>LOAD RACE</span>", track);
+  const watch = el("div", "position:absolute;left:600px;top:8px;display:flex;align-items:center;gap:10px", `<svg width="64" height="70" viewBox="0 0 64 70"><rect x="26" y="0" width="12" height="10" rx="3" fill="#f7d774" stroke="${c04_INK}" stroke-width="3"/>
+    <circle cx="32" cy="40" r="26" fill="#fff" stroke="${c04_INK}" stroke-width="4"/><path class="wh" d="M32 40 V20" stroke="#c8372d" stroke-width="4" stroke-linecap="round"/></svg>
+    <div class="wt mono" style="font-size:40px;color:${c04_INK};width:150px">0.0s</div>`, track);
+  const wHand = watch.querySelector(".wh"), wTx = watch.querySelector(".wt");
+  el("div", `position:absolute;left:760px;top:80px;width:30px;height:300px;border-left:3px solid ${c04_INK};border-right:3px solid ${c04_INK};
+    background:repeating-conic-gradient(#c8372d 0 25%,#fff 0 50%) 0 0/30px 30px`, "", track);
+  const LANES = [["1초", 1, "#d8eef7"], ["3초", 3, "#fbe3b0"], ["5초", 5, "#e4f2d6"]];
+  const lanes = LANES.map(([lb, dur, bg], i) => {
+    const y = 90 + i * 100;
+    el("div", `position:absolute;left:18px;top:${y}px;width:760px;height:84px;border-radius:14px;background:${bg};border:3px solid ${c04_INK}`, "", track);
+    el("div", `position:absolute;left:34px;top:${y + 18}px;font-size:36px;color:${c04_INK}`, lb, track);
+    el("div", `position:absolute;left:110px;top:${y + 41}px;width:640px;border-top:3px dashed rgba(43,35,32,.35)`, "", track);
+    const r = el("div", `position:absolute;left:0;top:${y + 6}px;width:110px;height:74px;z-index:3`, "", track);
+    const done = el("div", `position:absolute;left:560px;top:${y + 16}px;padding:2px 14px;border:3px solid ${c04_INK};border-radius:10px;background:#fff;font-size:26px;z-index:4;white-space:nowrap`, "", track);
+    return { r, dur, done, y };
   });
-  const people = el("div", "position:absolute;left:0;top:380px;display:flex;gap:10px", "", race);
-  const ppl = Array.from({ length: 20 }, () => el("div", "width:40px;height:56px;border-radius:20px 20px 8px 8px;background:#6b5d52", "", people));
-  const rs = el("div", "position:absolute;left:1120px;top:0;width:600px", `<div class="stat">+32%</div><div style="font-size:22px;color:#6b5d52;margin:6px 0 30px">로딩 1→3초, 이탈 확률 증가</div>
-    <div class="stat" style="color:var(--terra)">53%</div><div style="font-size:22px;color:#6b5d52;margin-top:6px">3초 넘으면 떠나는 모바일 방문자</div>`, race);
-  const tapN = makeNoa(150); race.appendChild(tapN);
-  // b) scroll phone
-  const phone = el("div", "left:620px;top:190px;width:340px;height:660px;border-radius:44px;background:#2b2320;padding:14px;box-shadow:0 30px 90px rgba(0,0,0,.6)", "", R); phone.className = "abs";
-  const scr = el("div", "position:relative;width:100%;height:100%;border-radius:32px;overflow:hidden;background:var(--cream)", "", phone);
-  const pf = makeFilm(PAL.dawn); scr.appendChild(pf);
-  const layers = ["이야기가", "브랜드가", "되는 곳"].map((w, i) => el("div", `position:absolute;left:28px;top:${220 + i * 70}px;font-size:48px;font-weight:800;color:#fff;font-family:'Noto Serif CJK KR';text-shadow:0 4px 20px rgba(0,0,0,.5)`, w, scr));
-  const thumb = el("div", "position:absolute;left:1000px;top:420px;width:70px;height:110px;border:4px solid #6b5d52;border-radius:36px", `<div style="width:10px;height:22px;border-radius:5px;background:#6b5d52;margin:18px auto 0" class="wh"></div>`, R); thumb.className = "abs";
-  const scrollTxt = el("div", "left:1120px;top:380px;width:660px;font-size:30px;line-height:1.6", "스크롤 = 장면 전환<br><span style='color:var(--muted);font-size:24px'>레이어마다 다른 속도(패럴랙스), 문장이 한 줄씩 등장</span>", R); scrollTxt.className = "abs";
-  // c) hero video
-  const hv = el("div", "left:96px;top:210px;width:1000px;height:560px;border-radius:20px;overflow:hidden", "", R); hv.className = "abs";
-  const hvf = makeFilm(PAL.gold); hv.appendChild(hvf);
-  el("div", "position:absolute;left:24px;bottom:22px;right:24px;height:6px;border-radius:3px;background:rgba(255,255,255,.3)", `<div class="pb" style="height:100%;width:0;background:#fff;border-radius:3px"></div>`, hv);
-  const hvs = el("div", "left:1180px;top:300px;width:640px", `<div class="stat">85%</div><div style="font-size:24px;color:#6b5d52;margin-top:8px;line-height:1.5">영상을 보고 구매를 결심한 적 있다</div>`, R); hvs.className = "abs";
-  // d) Opus code → motion
-  const code = el("div", "left:96px;top:200px;width:900px;height:600px;padding:30px 34px;font-size:24px;line-height:1.75;white-space:pre", "", R); code.className = "card mono";
-  const CODE = `// Opus가 쓴 스크롤 애니메이션\nconst tl = timeline({ scroll: "#hero" });\ntl.from(".title", { y: 60, opacity: 0, ease: "out" })\n  .to(".sun",    { y: -120, scrub: true })\n  .to(".ridge",  { x: -200, scrub: 0.6 })\n  .from(".cta",  { scale: .8, ease: "back" });`;
-  const stageBox = el("div", "left:1060px;top:200px;width:760px;height:600px;border-radius:20px;overflow:hidden", "", R); stageBox.className = "abs";
-  const sbf = makeFilm(PAL.night); stageBox.appendChild(sbf);
-  const sbT = el("div", "position:absolute;left:40px;top:180px;font-size:60px;font-weight:800;color:#fff;font-family:'Noto Serif CJK KR'", "부드럽게, 재밌게", stageBox);
-  const sbC = el("div", "position:absolute;left:40px;top:300px;background:var(--gold);color:#1a1406", "지금 시작하기 →", stageBox); sbC.className = "btn";
-  const codeNoa = makeNoa(160); R.appendChild(codeNoa);
-  const cb = makeBubble(R);
+  lanes[0].r.innerHTML = `<svg width="110" height="74" viewBox="0 0 110 74" overflow="visible"><g class="fl"><path d="M14 37 L-26 26 L-14 37 L-26 48Z" fill="#f2a24e" stroke="${c04_INK}" stroke-width="3" stroke-linejoin="round"/><path d="M14 37 L-8 31 L-2 37 L-8 43Z" fill="#f7d774"/></g>
+    <path d="M30 22 L14 10 L20 30Z M30 52 L14 64 L20 44Z" fill="#c8372d" stroke="${c04_INK}" stroke-width="3" stroke-linejoin="round"/>
+    <path d="M14 24 H70 Q100 26 106 37 Q100 48 70 50 H14Z" fill="#fff" stroke="${c04_INK}" stroke-width="4" stroke-linejoin="round"/>
+    <circle cx="70" cy="37" r="8" fill="#9fd3f0" stroke="${c04_INK}" stroke-width="3"/></svg>`;
+  const flame = lanes[0].r.querySelector(".fl");
+  const runNoa = makeNoa(66); lanes[1].r.appendChild(runNoa);
+  lanes[2].r.innerHTML = `<svg width="110" height="74" viewBox="0 0 110 74" overflow="visible"><path d="M8 66 Q6 54 24 54 H84 Q98 54 100 40 L104 26" fill="none" stroke="${c04_INK}" stroke-width="4"/>
+    <path d="M8 66 H90 Q104 62 102 42 Q98 30 94 40 Q92 54 70 54 H24 Q8 54 8 66Z" fill="#bfe3a6" stroke="${c04_INK}" stroke-width="4" stroke-linejoin="round"/>
+    <circle cx="48" cy="36" r="24" fill="#f2a7a0" stroke="${c04_INK}" stroke-width="4"/><path d="M48 36 m0 -12 a12 12 0 1 1 -12 12 a7 7 0 1 1 7 -7" fill="none" stroke="${c04_INK}" stroke-width="3.5"/>
+    <path d="M100 30 L96 14 M104 30 L110 16" stroke="${c04_INK}" stroke-width="3"/><circle cx="96" cy="12" r="3" fill="${c04_INK}"/><circle cx="111" cy="14" r="3" fill="${c04_INK}"/></svg>`;
+  // visitors walking out the door
+  const room = c04_box(BA, 1050, 228, 740, 400, "#fffaf0", "overflow:hidden");
+  el("div", `position:absolute;left:24px;top:14px;font-size:32px;color:${c04_INK}`, "내 페이지 방문자", room);
+  const pct = el("div", `position:absolute;left:470px;top:6px;font-size:54px;color:#c8372d;white-space:nowrap`, "", room);
+  el("div", `position:absolute;left:0;right:0;top:330px;bottom:0;background:#e9dcc0;border-top:4px solid ${c04_INK}`, "", room);
+  el("div", `position:absolute;left:600px;top:110px;width:110px;height:224px;border:5px solid ${c04_INK};border-bottom:0;border-radius:10px 10px 0 0;background:#bfe3a6`, "", room);
+  el("div", `position:absolute;left:612px;top:80px;padding:0 10px;border:3px solid ${c04_INK};border-radius:8px;background:#c8372d;color:#fff;font-size:22px`, "EXIT", room);
+  const door = el("div", `position:absolute;left:605px;top:115px;width:100px;height:219px;background:#e0a64f;border:4px solid ${c04_INK};transform-origin:0 50%`, `<div style="position:absolute;right:12px;top:100px;width:14px;height:14px;border-radius:50%;background:#f7d774;border:3px solid ${c04_INK}"></div>`, room);
+  const COLS = ["#9fd3f0", "#f2a7a0", "#bfe3a6", "#f7d774", "#cdbff3"];
+  const order = Array.from({ length: 20 }, (_, i) => i).sort((a, b) => c04_hash(a, 3) - c04_hash(b, 3));
+  const ppl = Array.from({ length: 20 }, (_, i) => {
+    const d = el("div", "position:absolute;left:0;top:0", c04_person(COLS[i % 5]), room);
+    d.x0 = 40 + (i % 7) * 76 + (Math.floor(i / 7) % 2) * 34; d.y0 = 110 + Math.floor(i / 7) * 74;
+    const k = order.indexOf(i); d.leave = k < 11 ? 109.8 + k * .16 : 0;
+    return d;
+  });
+  const stat32 = c04_box(BA, 150, 670, 600, 170, "#fff4d0", "display:flex;align-items:center;gap:20px;padding:0 26px");
+  stat32.innerHTML = `<div style="font-size:84px;color:#c8372d;line-height:1">+32%</div><div style="font-size:28px;line-height:1.25;color:${c04_INK}">로딩 1초 → 3초<br><span style="color:#6b5d52;font-size:24px">이탈 확률 증가</span></div>`;
+  const stat53 = c04_box(BA, 790, 670, 640, 170, "#fff4d0", "display:flex;align-items:center;gap:20px;padding:0 26px");
+  stat53.innerHTML = `<div style="font-size:84px;color:#c8372d;line-height:1">53%</div><div style="font-size:28px;line-height:1.25;color:${c04_INK}">3초 넘으면 떠나는<br><span style="color:#6b5d52;font-size:24px">모바일 방문자 · Google</span></div>`;
+  const tapNoa = makeNoa(170); BA.appendChild(tapNoa);
+  const tapB = makeBubble(BA);
+
+  // ============ B · scroll → something moves (112.5–119)
+  const PX = 700, PY = 190, PW = 380, PH = 680, SW = 344, SH = 634;
+  const phone = c04_box(BB, PX, PY, PW, PH, "#fffaf0", "border-width:5px;border-radius:52px;padding:18px");
+  el("div", `position:absolute;left:140px;top:6px;width:90px;height:12px;border-radius:6px;background:#f2c14e;border:3px solid ${c04_INK};z-index:5`, "", phone);
+  const scr = el("div", `position:relative;width:${SW}px;height:${SH}px;border-radius:34px;overflow:hidden;border:3px solid ${c04_INK};background:#fff6d8`, "", phone);
+  const L = {};
+  L.sky = el("div", `position:absolute;left:0;top:0;width:${SW}px;height:700px;background:linear-gradient(#bfe6f5,#fff3d6)`, "", scr);
+  L.sun = el("div", `position:absolute;left:210px;top:0;width:90px;height:90px;border-radius:50%;background:#ffd65a;border:4px solid ${c04_INK}`, "", scr);
+  L.far = el("div", `position:absolute;left:-40px;top:0;width:${SW + 80}px;height:260px`, `<svg width="${SW + 80}" height="260" viewBox="0 0 424 260"><path d="M0 60 Q70 0 140 50 T280 40 T424 50 V260 H0Z" fill="#cdbff3" stroke="${c04_INK}" stroke-width="4"/></svg>`, scr);
+  L.near = el("div", `position:absolute;left:-40px;top:0;width:${SW + 80}px;height:260px`, `<svg width="${SW + 80}" height="260" viewBox="0 0 424 260"><path d="M0 70 Q90 10 190 60 T424 40 V260 H0Z" fill="#94d07c" stroke="${c04_INK}" stroke-width="4"/></svg>`, scr);
+  L.words = ["이야기가", "브랜드가", "되는 곳"].map((w, i) => el("div", `position:absolute;left:${24 + i * 22}px;top:0;font-size:46px;color:${c04_INK};white-space:nowrap;text-shadow:3px 3px 0 #fff`, w, scr));
+  L.sec = el("div", `position:absolute;left:0;top:0;width:${SW}px;height:900px;background:#fffaf0;border-top:4px solid ${c04_INK}`, "", scr);
+  el("div", `position:absolute;left:22px;top:22px;font-size:30px;color:${c04_INK}`, "우리의 작업", L.sec);
+  L.cards = [0, 1, 2].map(i => {
+    const c = el("div", `position:absolute;left:${22 + (i % 2) * 156}px;top:${70 + Math.floor(i / 2) * 170}px;width:140px;height:150px;border:4px solid ${c04_INK};border-radius:14px;overflow:hidden;background:#fff`, "", L.sec);
+    const sc = c04_scape([c04_PARK, c04_SUNSET, c04_LILAC][i]); sc.style.height = "96px"; sc.style.bottom = "auto"; c.appendChild(sc);
+    el("div", `position:absolute;left:10px;bottom:6px;font-size:22px;color:${c04_INK}`, ["필름", "제품", "캠페인"][i], c);
+    c.sc = sc; return c;
+  });
+  L.cta = el("div", `position:absolute;left:22px;top:436px;width:300px;padding:10px 0;text-align:center;border:4px solid ${c04_INK};border-radius:999px;background:#c8372d;color:#fff;font-size:26px`, "문의하기", L.sec);
+  L.noa = makeNoa(96); L.sec.appendChild(L.noa);
+  const thumbF = el("div", "left:0;top:0;z-index:36", `<svg width="90" height="120" viewBox="0 0 90 120" overflow="visible"><path d="M30 118 V48 Q30 34 42 34 Q54 34 54 48 V62 Q66 56 74 66 Q86 64 88 78 V100 Q86 118 70 118Z" fill="#f6d7b8" stroke="${c04_INK}" stroke-width="4" stroke-linejoin="round"/><path d="M42 36 Q42 8 42 8" stroke="${c04_INK}" stroke-width="0"/></svg>`, BB); thumbF.className = "abs";
+  const TICKS = [[114.0, 180], [115.3, 520], [116.6, 600]];
+  const scrollAt = t => TICKS.reduce((S, [a, v], i) => lerp(S, v, back(seg(t, a, a + .7))), 0);
+  // left: what each scroll triggers
+  const lh = el("div", `left:130px;top:236px;width:520px;font-size:40px;color:${c04_INK};line-height:1.2`, "스크롤 1번 =<br><span style='color:#c8372d'>움직임 1개</span>", BB); lh.className = "abs";
+  const evs = [["해가 뜨고 산이 밀려요", "#fbe3b0"], ["카드가 톡톡 튀어나와요", "#d8eef7"], ["버튼이 통통 인사해요", "#fbd9d3"]].map(([x, bg], i) => {
+    const d = c04_box(BB, 130, 400 + i * 128, 520, 100, bg, "display:flex;align-items:center;gap:16px;padding:0 20px;font-size:30px;color:#2b2320");
+    d.innerHTML = `<div style="flex:none;width:52px;height:52px;border-radius:50%;border:4px solid ${c04_INK};background:#fff;display:grid;place-items:center;font-size:28px">${i + 1}</div>${x}`;
+    return d;
+  });
+  // right: layer speeds (parallax)
+  const spH = el("div", `left:1150px;top:236px;font-size:34px;color:${c04_INK}`, "레이어마다 다른 속도", BB); spH.className = "abs";
+  const SPEEDS = [["하늘", .15, "#bfe6f5"], ["해", .35, "#ffd65a"], ["뒷산", .55, "#cdbff3"], ["앞산", .8, "#94d07c"], ["글자", 1, "#fff"]];
+  const spRows = SPEEDS.map(([n, v, c], i) => {
+    const r = el("div", `left:1150px;top:${310 + i * 96}px;width:640px;height:80px`, `<div style="position:absolute;left:0;top:10px;width:60px;height:60px;border-radius:14px;border:4px solid ${c04_INK};background:${c}"></div>
+      <div style="position:absolute;left:76px;top:14px;font-size:30px;color:${c04_INK};width:90px">${n}</div>
+      <div style="position:absolute;left:170px;top:18px;font-size:26px;color:#6b5d52" class="mono">×${v.toFixed(2)}</div>
+      <div class="ar" style="position:absolute;left:300px;top:28px;height:24px;width:0;border-radius:12px;border:3px solid ${c04_INK};background:${c}"></div>`, BB);
+    r.className = "abs"; r.ar = r.querySelector(".ar"); r.v = v; return r;
+  });
+  const lookNoa = makeNoa(150); BB.appendChild(lookNoa);
+
+  // ============ C · video in the hero (119–125)
+  const vid = c04_box(BC, 130, 222, 930, 590, "#fffaf0", "overflow:hidden");
+  el("div", `position:absolute;left:0;right:0;top:0;height:54px;background:#f6d9a0;border-bottom:4px solid ${c04_INK};display:flex;align-items:center;gap:10px;padding:0 18px;z-index:5`,
+    `${["#ff8a7a", "#f7d774", "#94d07c"].map(c => `<div style="width:18px;height:18px;border-radius:50%;border:3px solid ${c04_INK};background:${c}"></div>`).join("")}
+     <div style="margin-left:12px;flex:1;height:34px;border-radius:10px;border:3px solid ${c04_INK};background:#fffaf0;font-size:22px;padding:0 14px;display:flex;align-items:center" class="mono">noainostory.higgsfield.app</div>`, vid);
+  const vwrap = el("div", "position:absolute;left:0;right:0;top:58px;bottom:0;overflow:hidden", "", vid);
+  const vsc = c04_scape(c04_SUNSET); vwrap.appendChild(vsc);
+  const vNoa = makeNoa(190); vwrap.appendChild(vNoa);
+  const vHead = el("div", `position:absolute;left:34px;top:34px;padding:8px 22px 12px;border:4px solid ${c04_INK};border-radius:14px;background:#fffaf0;font-size:48px;color:${c04_INK};z-index:34;box-shadow:5px 6px 0 rgba(43,35,32,.2)`, "이야기가 브랜드가 되는 곳", vwrap);
+  const play = el("div", `position:absolute;left:390px;top:180px;width:150px;height:150px;border-radius:50%;background:#c8372d;border:5px solid ${c04_INK};z-index:36;box-shadow:6px 7px 0 rgba(43,35,32,.25);display:grid;place-items:center`,
+    `<svg width="60" height="70" viewBox="0 0 60 70"><path d="M10 6 L56 35 L10 64Z" fill="#fff" stroke="${c04_INK}" stroke-width="4" stroke-linejoin="round"/></svg>`, vwrap);
+  const pbar = el("div", `position:absolute;left:28px;right:28px;bottom:22px;height:22px;border-radius:11px;border:3px solid ${c04_INK};background:#fffaf0;z-index:35;overflow:hidden`, `<div class="pb" style="height:100%;width:0;background:#c8372d"></div>`, vwrap);
+  const pb = pbar.querySelector(".pb");
+  const rec = el("div", `position:absolute;right:26px;top:36px;padding:2px 14px;border:3px solid ${c04_INK};border-radius:10px;background:#fff;font-size:26px;color:#c8372d;z-index:35`, "● 재생 중", vwrap);
+  const cursor = el("div", "left:0;top:0;z-index:46", `<svg width="60" height="70" viewBox="0 0 60 70"><path d="M6 4 L6 56 L20 44 L30 66 L40 61 L30 40 L48 40Z" fill="#fff" stroke="${c04_INK}" stroke-width="4" stroke-linejoin="round"/></svg>`, BC); cursor.className = "abs";
+  const ring = el("div", "left:1180px;top:230px;width:320px;height:320px", `<svg width="320" height="320" viewBox="0 0 320 320">
+    <circle cx="160" cy="160" r="128" fill="#fffaf0" stroke="${c04_INK}" stroke-width="5"/>
+    <circle cx="160" cy="160" r="110" fill="none" stroke="#f1e4c8" stroke-width="30"/>
+    <circle class="arc" cx="160" cy="160" r="110" fill="none" stroke="#c8372d" stroke-width="30" stroke-dasharray="691" stroke-dashoffset="691" transform="rotate(-90 160 160)" stroke-linecap="round"/>
+    <circle cx="160" cy="160" r="94" fill="none" stroke="${c04_INK}" stroke-width="3"/><circle cx="160" cy="160" r="126" fill="none" stroke="${c04_INK}" stroke-width="3"/></svg>
+    <div class="n" style="position:absolute;left:0;right:0;top:112px;text-align:center;font-size:92px;color:#c8372d;line-height:1">0%</div>`, BC); ring.className = "abs";
+  const arc = ring.querySelector(".arc"), ringN = ring.querySelector(".n");
+  const ringL = el("div", `left:1110px;top:570px;width:680px;text-align:center;font-size:34px;color:${c04_INK};line-height:1.25`, "영상을 보고 구매를 결심한 적 있다<br><span style='font-size:24px;color:#6b5d52'>Wyzowl · 2026</span>", BC); ringL.className = "abs";
+  const crowd = Array.from({ length: 20 }, (_, i) => {
+    const d = el("div", `left:${1150 + (i % 10) * 62}px;top:${700 + Math.floor(i / 10) * 76}px`, c04_person("#e9dcc0") + `<div class="bag" style="position:absolute;left:30px;top:30px;width:22px;height:24px;border:3px solid ${c04_INK};border-radius:4px;background:#f7d774;opacity:0"></div>`, BC);
+    d.className = "abs"; d.body = d.querySelector("rect"); d.bag = d.querySelector(".bag"); return d;
+  });
+
+  // ============ D · Opus writes the animation (125–134)
+  const ed = c04_box(BD, 130, 212, 780, 560, "#fffaf0", "overflow:hidden");
+  el("div", `position:absolute;left:0;right:0;top:0;height:56px;background:#d8eef7;border-bottom:4px solid ${c04_INK};display:flex;align-items:center;gap:12px;padding:0 18px`,
+    `<div style="padding:2px 16px;border:3px solid ${c04_INK};border-radius:10px 10px 0 0;background:#fffaf0;font-size:24px" class="mono">hero.js</div>
+     <div style="margin-left:auto;padding:2px 14px;border:3px solid ${c04_INK};border-radius:999px;background:#f7d774;font-size:24px">✎ Claude Opus</div>`, ed);
+  const CODE = [["// Claude Opus가 쓴 애니메이션", 125.5, null],
+                ['tl.from(".title", { y: 60 })', 126.3, "title"],
+                ['tl.to(".sun", { y: -120 })', 127.2, "sun"],
+                ['tl.to(".hills", { x: -300 })', 128.1, "hills"],
+                ['tl.from(".cta", { scale: 0, ease: "back" })', 129.0, "cta"],
+                ["tl.play()  // ▶", 129.9, "play"]];
+  const codeLines = CODE.map((c, i) => {
+    const row = el("div", `position:absolute;left:0;right:0;top:${84 + i * 76}px;height:64px;display:flex;align-items:center`, `<div class="mono" style="width:62px;text-align:right;padding-right:14px;font-size:23px;color:#b0a79a">${i + 1}</div>
+      <div class="tx mono" style="font-size:23px;white-space:pre;color:${c04_INK}"></div><div class="run" style="margin-left:12px;padding:0 10px;border:3px solid ${c04_INK};border-radius:8px;background:#bfe3a6;font-size:22px;opacity:0">▶ run</div>`, ed);
+    row.tx = row.querySelector(".tx"); row.run = row.querySelector(".run"); return row;
+  });
+  const hl = el("div", `position:absolute;left:8px;right:8px;top:0;height:64px;border-radius:10px;background:rgba(247,215,116,.45)`, "", ed);
+  ed.insertBefore(hl, codeLines[0]);
+  const colorize = s => s.replace(/&/g, "&amp;").replace(/</g, "&lt;")
+    .replace(/(\/\/.*)$/, "<span style='color:#8a7f70'>$1</span>")
+    .replace(/(&quot;|")([^"]*)(")/g, "<span style='color:#c8372d'>$1$2$3</span>")
+    .replace(/\b(tl)\b/g, "<span style='color:#3e8fb8'>$1</span>")
+    .replace(/\b(from|to|play)\b(?=\()/g, "<span style='color:#7a5cc4'>$1</span>");
+  const pv = c04_box(BD, 960, 212, 830, 560, "#fffaf0", "overflow:hidden");
+  el("div", `position:absolute;left:0;right:0;top:0;height:56px;background:#f6d9a0;border-bottom:4px solid ${c04_INK};display:flex;align-items:center;gap:10px;padding:0 18px;z-index:5`,
+    `${["#ff8a7a", "#f7d774", "#94d07c"].map(c => `<div style="width:18px;height:18px;border-radius:50%;border:3px solid ${c04_INK};background:${c}"></div>`).join("")}<div style="margin-left:14px;font-size:26px">미리보기 · PREVIEW</div>`, pv);
+  const pvw = el("div", "position:absolute;left:0;right:0;top:60px;bottom:0;overflow:hidden", "", pv);
+  const psc = c04_scape(c04_PARK); pvw.appendChild(psc);
+  const pT = el("div", `position:absolute;left:40px;top:60px;padding:8px 24px 12px;border:4px solid ${c04_INK};border-radius:14px;background:#fffaf0;font-size:60px;color:${c04_INK};z-index:34;box-shadow:5px 6px 0 rgba(43,35,32,.2)`, "부드럽게, 재밌게", pvw);
+  const pC = el("div", `position:absolute;left:44px;top:220px;padding:12px 30px;border:4px solid ${c04_INK};border-radius:999px;background:#c8372d;color:#fff;font-size:34px;z-index:34;box-shadow:5px 6px 0 rgba(43,35,32,.25)`, "지금 시작하기 →", pvw);
+  const pNoa = makeNoa(130); pvw.appendChild(pNoa);
+  const sparks = [0, 1, 2, 3, 4].map(i => { const d = el("div", `position:absolute;left:0;top:0;font-size:40px;color:#f2a24e;z-index:36`, "✦", pvw); return d; });
+  const badge = el("div", `left:1230px;top:650px;z-index:37;padding:6px 20px 8px;border:5px solid #3e8fb8;border-radius:14px;background:rgba(255,250,240,.95);color:#3e8fb8;font-size:32px;white-space:nowrap`, "ANIMATED IN CODE · CLAUDE", BD); badge.className = "abs";
+  const proud = makeNoa(190); BD.appendChild(proud);
+  const pb2 = makeBubble(BD);
+
   return t => {
-    const A = seg(t, 106.2, 106.8) * (1 - seg(t, 112, 112.5));
-    race.style.opacity = A;
-    bars.forEach(b => b.querySelector(".fill").style.width = (100 * seg(t, 107, 107 + b.dur)) + "%");
-    ppl.forEach((p, i) => { const leave = i >= 20 - Math.round(20 * .53 * seg(t, 110, 111.5)); p.style.opacity = leave ? .15 : 1; p.style.transform = leave ? "translateY(20px)" : "none"; });
-    rs.style.opacity = seg(t, 108.5, 109.2);
-    const tap = Math.floor(t * 6) % 2;
-    poseNoa(tapN, t, { x: 1500, y: 360, s: .9, mood: t > 109.5 ? "pout" : "happy", look: -1, hop: t > 108 && t < 111 ? tap * .15 : 0 });
-    // b
-    const B = seg(t, 112.5, 113.1) * (1 - seg(t, 118.5, 119));
-    phone.style.opacity = B; thumb.style.opacity = B; scrollTxt.style.opacity = B;
-    const sc = ease(seg(t, 113.4, 118)) * 3;
-    thumb.querySelector(".wh").style.transform = `translateY(${(sc * 20) % 40}px)`;
-    pf.update(sc * 3, 1);
-    layers.forEach((l, i) => { const p = clamp(sc - i * .8); l.style.opacity = p; l.style.transform = `translateY(${40 * (1 - p) - sc * 22}px)`; });
-    // c
-    const C = seg(t, 119, 119.6) * (1 - seg(t, 124.5, 125));
-    hv.style.opacity = C; hvs.style.opacity = seg(t, 120, 120.6) * C;
-    hvf.update(t, 1.2); hv.querySelector(".pb").style.width = (100 * seg(t, 119.3, 124.5)) + "%";
-    // d
-    const D = seg(t, 125, 125.6);
-    code.style.opacity = D; stageBox.style.opacity = D;
-    const shown = type(CODE, seg(t, 125.4, 129.4));
-    code.innerHTML = shown.replace(/(\/\/.*)/g, "<span style='color:#77736b'>$1</span>").replace(/(".*?")/g, "<span style='color:var(--gold)'>$1</span>");
-    const run = seg(t, 129.4, 133.5);
-    sbf.update(run * 8, 1);
-    const tp = out(seg(run, 0, .3)); sbT.style.opacity = tp; sbT.style.transform = `translateY(${60 * (1 - tp)}px)`;
-    const cp = back(seg(run, .45, .7)); sbC.style.opacity = clamp(cp * 2); sbC.style.transform = `scale(${0.8 + 0.2 * cp})`;
-    poseNoa(codeNoa, t, { x: 1620, y: 690, s: .8, talk: t > 130 && t < 132.5, look: -1, op: D });
-    sayBubble(cb, t, 130, 133.8, "이 영상도 Claude가 코드로 움직였어 🎬", 1180, 640);
+    // ---- wipes: clip outgoing / incoming beats around the moving band
+    const W = wipeX(t);
+    band.style.opacity = W ? 1 : 0;
+    if (W) band.style.transform = `translateX(${W[0] - 85}px) skewX(-10deg)`;
+    const win = [[106, 112.5], [112.5, 119], [119, 125], [125, 134]];
+    [BA, BB, BC, BD].forEach((B, k) => {
+      const [a, b] = win[k];
+      let clip = "none", vis = t >= a - .4 && t < b + .35;
+      if (W && W[1] === a) clip = `inset(0 ${1920 - W[0]}px 0 0)`;       // incoming: revealed left of band
+      else if (W && W[1] === b) clip = `inset(0 0 0 ${W[0]}px)`;         // outgoing: hidden left of band
+      else if (t < a || t >= b) vis = false;
+      B.style.display = vis ? "block" : "none"; B.style.clipPath = clip;
+    });
+
+    // ---- A: race
+    if (t < 113) {
+      const el0 = clamp(t - 106.8, 0, 5);
+      wTx.textContent = el0.toFixed(1) + "s";
+      wHand.setAttribute("transform", `rotate(${el0 * 72} 32 40)`);
+      const tIn = back(seg(t, 106.2, 106.7)); track.style.opacity = clamp(tIn * 2); track.style.transform = `translateY(${80 * (1 - tIn)}px)`;
+      const rIn = back(seg(t, 106.4, 106.9)); room.style.opacity = clamp(rIn * 2); room.style.transform = `translateY(${80 * (1 - rIn)}px)`;
+      lanes.forEach((ln, i) => {
+        const p = seg(t, 106.8, 106.8 + ln.dur);
+        const e = i === 0 ? out(p) : p;
+        ln.r.style.transform = `translateX(${110 + 560 * e}px) translateY(${i === 0 ? 2 * Math.sin(t * 40) : 0}px)`;
+        const fin = seg(t, 106.8 + ln.dur, 107.1 + ln.dur);
+        ln.done.textContent = ["1.0s ✓", "3.0s …", "5.0s zzz"][i];
+        ln.done.style.color = ["#2f9e5a", "#e0a64f", "#c8372d"][i];
+        ln.done.style.left = "470px";
+        ln.done.style.opacity = fin > 0 ? 1 : 0; ln.done.style.transform = `scale(${back(fin)})`;
+      });
+      flame.setAttribute("transform", `translate(14 37) scale(${1 + .25 * Math.sin(t * 50)} 1) translate(-14 -37)`);
+      const rp = seg(t, 106.8, 109.8);
+      poseNoa(runNoa, t, { x: 20, y: -4, s: 1, look: 1, hop: rp > 0 && rp < 1 ? (t * 3.2) % 1 * .25 : 0 });
+      // visitors
+      let left = 0;
+      ppl.forEach((d, i) => {
+        let x = d.x0, y = d.y0, op = 1;
+        if (d.leave) {
+          const w = seg(t, d.leave, d.leave + .9);
+          if (w > 0) left++;
+          x = lerp(d.x0, 640, ease(seg(w, 0, .7))) + 140 * seg(w, .7, 1); y = lerp(d.y0, 262, ease(seg(w, 0, .7)));
+          op = 1 - seg(w, .8, 1);
+          y -= w > 0 && w < 1 ? Math.abs(Math.sin(t * 14 + i)) * 8 : 0;
+        }
+        const impatient = t > 109 && !d.leave ? Math.abs(Math.sin(t * 8 + i)) * 4 : 0;
+        d.style.opacity = op; d.style.transform = `translate(${x}px, ${y - impatient}px)`;
+      });
+      const pv53 = Math.round(53 * seg(t, 109.8, 111.4 + .9));
+      pct.innerHTML = `이탈 ${pv53}%`;
+      pct.style.opacity = seg(t, 109.6, 109.9);
+      const dO = seg(t, 109.6, 109.9) * (1 - seg(t, 111.9, 112.2));
+      door.style.transform = `perspective(400px) rotateY(${-70 * dO}deg)`;
+      c04_popIn(stat32, t, 109.85, .45, .5); stat32.style.transform += " rotate(-1.5deg)";
+      c04_popIn(stat53, t, 111.0, .45, .5); stat53.style.transform += " rotate(1.2deg)";
+      const tap = t > 107.6 && t < 112.3;
+      poseNoa(tapNoa, t, { x: 1510, y: 650, s: 1, look: -1, mood: t > 109.2 ? "pout" : "happy", hop: tap ? ((t * 4) % 1) * .12 : 0, op: seg(t, 106.5, 106.9) });
+      sayBubble(tapB, t, 108.6, 111.2, "빨리 좀…!", 1400, 560);
+    }
+
+    // ---- B: phone
+    if (t > 112 && t < 119.5) {
+      const pIn = back(seg(t, 112.5, 113.1));
+      phone.style.transform = `translateY(${300 * (1 - pIn)}px) rotate(${-2 * (1 - pIn) + .6 * Math.sin(t * 1.3)}deg)`;
+      const S = scrollAt(t), S0 = scrollAt(t - .06), vel = (S - S0) / .06;
+      L.sky.style.transform = `translateY(${-S * .15}px)`;
+      L.sun.style.transform = `translateY(${260 - S * .35 - 120 * ease(seg(t, 114.0, 114.8))}px)`;
+      L.far.style.transform = `translateY(${300 - S * .55}px)`;
+      L.near.style.transform = `translateY(${380 - S * .8}px)`;
+      L.words.forEach((w, i) => {
+        const p = back(seg(t, 113.1 + i * .22, 113.5 + i * .22));
+        w.style.opacity = clamp(p * 2);
+        w.style.transform = `translate(${-60 * (1 - p)}px, ${300 + i * 58 - S * (1 - i * .14)}px) rotate(${-4 * (1 - p)}deg)`;
+      });
+      L.sec.style.transform = `translateY(${SH - S * 1}px)`;
+      L.cards.forEach((c, i) => {
+        const p = back(seg(t, 115.45 + i * .18, 115.9 + i * .18));
+        c.style.opacity = clamp(p * 2); c.style.transform = `translateY(${50 * (1 - p)}px) scale(${.5 + .5 * p}) rotate(${(i - 1) * 4 * (1 - p)}deg)`;
+        c.sc.update(t + i, .8);
+      });
+      const cb = seg(t, 116.8, 118.6);
+      L.cta.style.transform = `translateY(${-Math.abs(Math.sin(cb * Math.PI * 4)) * 22 * (1 - cb * .5)}px) scale(${1 + .08 * Math.sin(cb * Math.PI * 4)})`;
+      L.cta.style.opacity = seg(t, 116.6, 116.9);
+      poseNoa(L.noa, t, { x: 196, y: 262, s: 1, wave: t > 116.9, look: 1, op: seg(t, 116.7, 117) });
+      // thumb swipes on each tick
+      const tk = TICKS.map(([a]) => seg(t, a - .25, a + .5)).find(p => p > 0 && p < 1) || 0;
+      thumbF.style.opacity = clamp(seg(t, 113.4, 113.7)) * (1 - seg(t, 118.4, 118.7));
+      thumbF.style.transform = `translate(${PX + 250}px, ${PY + 470 - 170 * Math.sin(Math.PI * tk) - 60 * tk}px) rotate(${-10 + 10 * tk}deg)`;
+      const lIn = back(seg(t, 112.7, 113.2)); lh.style.opacity = clamp(lIn * 2); lh.style.transform = `translateX(${-120 * (1 - lIn)}px)`;
+      evs.forEach((d, i) => {
+        const a = TICKS[i][0] + .1, p = back(seg(t, a, a + .45)), act = t > a && t < (TICKS[i + 1] ? TICKS[i + 1][0] + .1 : 119);
+        d.style.opacity = clamp(p * 2); d.style.transform = `translateX(${-200 * (1 - p)}px) rotate(${(i % 2 ? 1 : -1) * 1.2}deg) scale(${act ? 1.05 : 1})`;
+        d.style.background = act ? "#f7d774" : ["#fbe3b0", "#d8eef7", "#fbd9d3"][i];
+      });
+      const hIn = back(seg(t, 112.9, 113.4)); spH.style.opacity = clamp(hIn * 2); spH.style.transform = `translateX(${120 * (1 - hIn)}px)`;
+      spRows.forEach((r, i) => {
+        const p = back(seg(t, 113.2 + i * .1, 113.6 + i * .1));
+        r.style.opacity = clamp(p * 2); r.style.transform = `translateX(${160 * (1 - p)}px)`;
+        r.ar.style.width = Math.min(230, 40 + 110 * r.v + Math.abs(vel) * r.v * .4) + "px";
+      });
+      poseNoa(lookNoa, t, { x: 1640, y: 700, s: 1, look: -1, wave: t > 116.8 && t < 118.2, mood: vel > 200 ? "shock" : "happy", op: seg(t, 113, 113.4) });
+    }
+
+    // ---- C: hero video
+    if (t > 118.5 && t < 125.5) {
+      const vIn = back(seg(t, 119, 119.5)); vid.style.opacity = clamp(vIn * 2); vid.style.transform = `translateY(${120 * (1 - vIn)}px) rotate(${-1 + 1 * vIn}deg)`;
+      const press = seg(t, 119.85, 120.0), rel = seg(t, 120.0, 120.35), playing = t > 120.05;
+      play.style.transform = `scale(${(1 - .15 * press + .15 * rel) * (1 - ease(seg(t, 120.2, 120.5)))})`;
+      play.style.opacity = 1 - seg(t, 120.35, 120.5);
+      const pt = playing ? t - 120.05 : 0;
+      vsc.update(119 + pt * 1.4, 1, { sunY: -30 * Math.sin(pt * .5) });
+      vsc.style.filter = playing ? "none" : "saturate(.45) brightness(1.05)";
+      poseNoa(vNoa, t, { x: 560 + 40 * Math.sin(pt * 1.2), y: 290, s: 1, wave: playing, hop: playing ? (pt * 1.6) % 1 * .5 : 0, look: -1 });
+      const hp = back(seg(t, 120.3, 120.8)); vHead.style.opacity = playing ? clamp(hp * 2) : .0; vHead.style.transform = `translateX(${-200 * (1 - hp)}px)`;
+      pb.style.width = 100 * seg(t, 120.05, 124.7) + "%";
+      rec.style.opacity = playing && Math.floor(t * 2.5) % 2 === 0 ? 1 : playing ? .5 : 0;
+      const cm = ease(seg(t, 119.35, 119.85)), cOut = seg(t, 120.3, 120.6);
+      cursor.style.opacity = seg(t, 119.3, 119.4) * (1 - cOut);
+      cursor.style.transform = `translate(${lerp(820, 600, cm) + 30 * cOut}px, ${lerp(760, 540, cm) + 30 * cOut}px) scale(${1 - .15 * press + .15 * rel})`;
+      const rIn = back(seg(t, 120.2, 120.7)); ring.style.opacity = clamp(rIn * 2); ring.style.transform = `scale(${.4 + .6 * rIn}) rotate(${-20 * (1 - rIn)}deg)`;
+      const cp = ease(seg(t, 120.5, 122.0)), n = Math.round(85 * cp);
+      arc.setAttribute("stroke-dashoffset", 691 * (1 - .85 * cp));
+      ringN.textContent = n + "%";
+      ringN.style.transform = `scale(${1 + .12 * Math.sin(Math.PI * seg(t, 122.0, 122.3))})`;
+      const lIn = back(seg(t, 121.0, 121.4)); ringL.style.opacity = clamp(lIn * 2); ringL.style.transform = `translateY(${30 * (1 - lIn)}px)`;
+      crowd.forEach((d, i) => {
+        const on = i < Math.round(17 * seg(t, 121.3, 123.0)), a = 121.3 + (i / 17) * 1.7;
+        const pIn = back(seg(t, 120.9 + i * .03, 121.3 + i * .03));
+        d.style.opacity = clamp(pIn * 2);
+        d.style.transform = `translateY(${-(on ? 12 * Math.sin(Math.PI * seg(t, a, a + .3)) : 0) + 30 * (1 - pIn)}px)`;
+        d.body.setAttribute("fill", on && i < 17 ? ["#9fd3f0", "#f2a7a0", "#bfe3a6", "#f7d774", "#cdbff3"][i % 5] : "#e9dcc0");
+        d.bag.style.opacity = on && i < 17 ? 1 : 0;
+      });
+    }
+
+    // ---- D: code → motion
+    if (t > 124.5) {
+      const eIn = back(seg(t, 125, 125.5)); ed.style.opacity = clamp(eIn * 2); ed.style.transform = `translateX(${-160 * (1 - eIn)}px)`;
+      const vIn = back(seg(t, 125.15, 125.65)); pv.style.opacity = clamp(vIn * 2); pv.style.transform = `translateX(${160 * (1 - vIn)}px)`;
+      let cur = -1;
+      codeLines.forEach((row, i) => {
+        const [src, a] = CODE[i], p = seg(t, a, a + .7);
+        const shown = type(src, p);
+        const caret = p > 0 && (p < 1 || (i === CODE.length - 1 || t < CODE[i + 1][1])) && Math.floor(t * 3) % 2 === 0 ? "<span style='color:#c8372d'>▍</span>" : "";
+        row.tx.innerHTML = colorize(shown) + caret;
+        if (t >= a) cur = i;
+        const r = seg(t, a + .7, a + .95);
+        row.run.style.opacity = i > 0 && r > 0 ? 1 - seg(t, a + 1.6, a + 1.9) : 0;
+        row.run.style.transform = `scale(${back(r)})`;
+      });
+      hl.style.opacity = cur >= 0 ? 1 : 0; hl.style.transform = `translateY(${84 + Math.max(0, cur) * 76}px)`;
+      const fx = k => ease(seg(t, CODE[k][1] + .7, CODE[k][1] + 1.3)), fb = k => back(seg(t, CODE[k][1] + .7, CODE[k][1] + 1.2));
+      const tP = fb(1), sunP = fx(2), hP = fx(3), cP = fb(4), playT = Math.max(0, t - (CODE[5][1] + .7));
+      pT.style.opacity = clamp(tP * 2); pT.style.transform = `translateY(${80 * (1 - tP)}px) rotate(${-3 * (1 - tP)}deg)`;
+      psc.update(125 + playT * 1.2, playT > 0 ? 1 : 0, { sunY: 220 - 240 * sunP, sunX: 600, hillX: 300 * hP });
+      pC.style.opacity = clamp(cP * 3); pC.style.transform = `scale(${cP}) translateY(${-6 * Math.abs(Math.sin(playT * 4)) * (playT > 0 ? 1 : 0)}px)`;
+      poseNoa(pNoa, t, { x: 620 - 160 * seg(t, 130.6, 132.4), y: 330, s: 1, look: -1, op: seg(t, 130.5, 130.8), hop: playT > .6 ? (playT * 1.5) % 1 * .4 : 0, wave: playT > 1.8 });
+      sparks.forEach((sp, i) => {
+        const k = [1, 2, 3, 4, 4][i], p = seg(t, CODE[k][1] + .75, CODE[k][1] + 1.3);
+        const pos = [[330, 50], [610, 150], [360, 330], [260, 210], [60, 200]][i];
+        sp.style.opacity = p > 0 && p < 1 ? 1 - p : 0;
+        sp.style.transform = `translate(${pos[0]}px, ${pos[1] - 40 * p}px) scale(${.5 + p}) rotate(${p * 90}deg)`;
+      });
+      c04_slam(badge, t, 131.9, -4);
+      const nIn = back(seg(t, 130.3, 130.8));
+      poseNoa(proud, t, { x: 780, y: 690 + 280 * (1 - nIn), s: 1, talk: t > 130.9 && t < 133, wave: t > 131.2, look: 1, op: clamp(nIn * 3), hop: seg(t, 132.9, 133.4) > 0 && t < 133.4 ? seg(t, 132.9, 133.4) : 0 });
+      sayBubble(pb2, t, 130.9, 133.6, "이 영상도 Claude가 코드로 움직였어!", 960, 790);
+    }
   };
 });
-

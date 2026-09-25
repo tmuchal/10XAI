@@ -128,7 +128,7 @@ scene(72, 106, (R, s) => {
   const gdL = el("div", `position:absolute;left:1234px;top:186px;font-size:24px;color:#c8372d;line-height:1.3;z-index:42`, "머리<br><br><br><br>발", sheet);
   const pencil = el("div", "position:absolute;left:0;top:0;z-index:45", c03_PENCIL, sheet);
   const outfit = el("div", `position:absolute;left:26px;top:470px;right:26px;display:flex;align-items:center;gap:18px;font-size:30px;color:${c03_INK}`, "", sheet);
-  const chips = [["#c8372d", "빨간 베레모"], ["#f2c14e", "노란 스카프"], ["#e8894f", "주황 박스 몸"]].map(([c, x]) => {
+  const chips = [["#211c1b", "까만 선글라스"], ["#f2c14e", "노란 스카프"], ["#e9a257", "주황 햄스터 털"]].map(([c, x]) => {
     const d = el("div", `display:flex;align-items:center;gap:10px;padding:10px 18px;border:4px solid ${c03_INK};border-radius:14px;background:#fff;box-shadow:4px 5px 0 rgba(43,35,32,.2)`,
       `<span style="width:30px;height:30px;border-radius:8px;border:3px solid ${c03_INK};background:${c}"></span>${x}`, outfit); return d;
   });
@@ -197,7 +197,7 @@ scene(72, 106, (R, s) => {
     m.n = makeNoa(130); scr.appendChild(m.n);
     m.gear = m.querySelector(".g"); m.lts = [...m.querySelectorAll(".lt")]; m.ok = m.querySelector(".ok");
     m.chip = c03_box(R, 0, 0, 130, 86, "#fff4d0", "z-index:34;display:flex;align-items:center;gap:6px;padding:0 8px;overflow:hidden");
-    m.chip.innerHTML = `<div style="width:46px;height:56px;border:3px solid ${c03_INK};border-radius:8px;background:#e8894f;position:relative"><div style="position:absolute;left:4px;top:-8px;width:36px;height:14px;border-radius:50%;background:#c8372d;border:3px solid ${c03_INK}"></div></div><div style="font-size:26px;color:${c03_INK}">NOA</div>`;
+    m.chip.innerHTML = `<svg width="54" height="56" viewBox="0 0 54 56"><circle cx="12" cy="14" r="9" fill="#e9a257" stroke="${c03_INK}" stroke-width="3"/><circle cx="42" cy="14" r="9" fill="#e9a257" stroke="${c03_INK}" stroke-width="3"/><ellipse cx="27" cy="32" rx="23" ry="21" fill="#e9a257" stroke="${c03_INK}" stroke-width="3"/><path d="M12 26 H24 V32 H12Z M30 26 H42 V32 H30Z" fill="#211c1b" stroke="${c03_INK}" stroke-width="2"/></svg><div style="font-size:26px;color:${c03_INK}">NOA</div>`;
     m.sl = [x + 180, 214]; m.at = 91.7 + i * .35;
     return m;
   });
@@ -207,7 +207,7 @@ scene(72, 106, (R, s) => {
   el("div", `position:absolute;left:24px;top:14px;font-size:34px;color:${c03_INK}`, "④ 의상·헤어 고정 <span style='font-size:24px;color:#6b5d52'>+ 네거티브</span>", lockP);
   const shield = el("div", `position:absolute;left:78px;top:118px;width:340px;height:340px;border-radius:50%;border:5px dashed #3e8fb8;background:rgba(159,211,240,.25)`, "", lockP);
   const lNoa = makeNoa(230); lockP.appendChild(lNoa);
-  const tagHat = el("div", `position:absolute;left:14px;top:92px;padding:4px 14px;border:3px solid ${c03_INK};border-radius:10px;background:#fbd9d3;font-size:24px;z-index:36`, "베레모 고정", lockP);
+  const tagHat = el("div", `position:absolute;left:14px;top:92px;padding:4px 14px;border:3px solid ${c03_INK};border-radius:10px;background:#fbd9d3;font-size:24px;z-index:36`, "선글라스 고정", lockP);
   const tagSc = el("div", `position:absolute;left:14px;top:430px;padding:4px 14px;border:3px solid ${c03_INK};border-radius:10px;background:#fbe3b0;font-size:24px;z-index:36`, "스카프 고정", lockP);
   const lock = el("div", "position:absolute;left:300px;top:320px;z-index:37", `<svg width="110" height="140" viewBox="0 0 110 140" overflow="visible">
     <path class="sh" d="M26 64 V38 A29 29 0 0 1 84 38 V64" fill="none" stroke="${c03_INK}" stroke-width="16" stroke-linecap="round"/>
@@ -216,7 +216,7 @@ scene(72, 106, (R, s) => {
     <circle cx="55" cy="92" r="10" fill="${c03_INK}"/><path d="M55 96 V116" stroke="${c03_INK}" stroke-width="8" stroke-linecap="round"/></svg>`, lockP);
   const shk = [lock.querySelector(".sh"), lock.querySelector(".sh2")];
   const click = el("div", `position:absolute;left:400px;top:280px;font-size:40px;color:#c8372d;z-index:38;white-space:nowrap`, "찰칵!", lockP);
-  const negs = ["✗ 안경", "✗ 삐죽 머리", "✗ 파란 몸"].map((x, i) => {
+  const negs = ["✗ 안경", "✗ 삐죽 머리", "✗ 파란 털"].map((x, i) => {
     const d = el("div", `position:absolute;left:0;top:0;padding:6px 14px;border:4px solid #c8372d;border-radius:12px;background:#fff;color:#c8372d;font-size:28px;white-space:nowrap;z-index:39`, x, lockP);
     d.at = 96.05 + i * .28; d.y0 = 150 + i * 120; return d;
   });
@@ -225,22 +225,22 @@ scene(72, 106, (R, s) => {
   const tugP = c03_box(R, 800, 236, 600, 590, "#fffaf0", "overflow:hidden");
   el("div", `position:absolute;left:24px;top:14px;font-size:34px;color:${c03_INK}`, "⑤ 시드 &lt; 레퍼런스", tugP);
   el("div", `position:absolute;left:0;right:0;top:420px;bottom:0;background:#e4f2d6;border-top:4px solid ${c03_INK}`, "", tugP);
-  el("div", `position:absolute;left:298px;top:170px;height:250px;border-left:4px dashed #c8372d`, "", tugP);
+  el("div", `position:absolute;left:283px;top:170px;height:250px;border-left:4px dashed #c8372d`, "", tugP);
   const tug = el("div", "position:absolute;left:0;top:0;width:600px;height:590px", `<svg width="600" height="590" overflow="visible">
-    <path d="M150 300 C 250 318, 350 318, 450 300" fill="none" stroke="#b0733a" stroke-width="10" stroke-linecap="round"/>
-    <path d="M150 300 C 250 318, 350 318, 450 300" fill="none" stroke="${c03_INK}" stroke-width="3" stroke-dasharray="6 10"/>
-    <path d="M300 314 L300 356 L336 344Z" fill="#c8372d" stroke="${c03_INK}" stroke-width="3" stroke-linejoin="round"/></svg>`, tugP);
+    <path d="M180 300 C 240 316, 330 316, 390 300" fill="none" stroke="#b0733a" stroke-width="10" stroke-linecap="round"/>
+    <path d="M180 300 C 240 316, 330 316, 390 300" fill="none" stroke="${c03_INK}" stroke-width="3" stroke-dasharray="6 10"/>
+    <path d="M285 312 L285 354 L321 342Z" fill="#c8372d" stroke="${c03_INK}" stroke-width="3" stroke-linejoin="round"/></svg>`, tugP);
   const dice = el("div", "position:absolute;left:60px;top:250px;transform-origin:50% 100%", `<svg width="130" height="170" viewBox="0 0 130 170" overflow="visible">
     <rect x="40" y="130" width="14" height="36" rx="4" fill="#fff" stroke="${c03_INK}" stroke-width="4"/><rect x="76" y="130" width="14" height="36" rx="4" fill="#fff" stroke="${c03_INK}" stroke-width="4"/>
     <rect x="10" y="20" width="110" height="112" rx="20" fill="#fff" stroke="${c03_INK}" stroke-width="5"/>
     ${[[38, 48], [92, 48], [65, 76], [38, 104], [92, 104]].map(([x, y]) => `<circle cx="${x}" cy="${y}" r="8" fill="${c03_INK}"/>`).join("")}
     <path d="M120 70 L150 58" stroke="${c03_INK}" stroke-width="6" stroke-linecap="round"/></svg>`, tugP);
   const diceL = el("div", `position:absolute;left:30px;top:440px;width:230px;text-align:center;font-size:30px;color:${c03_INK};line-height:1.2`, "SEED<br><span style='font-size:24px;color:#6b5d52'>약한 신호</span>", tugP);
-  const frameC = el("div", `position:absolute;left:440px;top:196px;width:136px;height:170px;border:6px solid ${c03_INK};border-radius:10px;background:#f7d774;transform-origin:50% 100%`, "", tugP);
+  const frameC = el("div", `position:absolute;left:376px;top:196px;width:136px;height:170px;border:6px solid ${c03_INK};border-radius:10px;background:#f7d774;transform-origin:50% 100%`, "", tugP);
   const frameIn = el("div", `position:absolute;left:10px;top:10px;right:10px;bottom:10px;border:3px solid ${c03_INK};background:#d8eef7;overflow:hidden`, "", frameC);
   const fNoa = makeNoa(96); frameIn.appendChild(fNoa);
   const frameL = el("div", `position:absolute;left:350px;top:440px;width:240px;text-align:center;font-size:30px;color:${c03_INK};line-height:1.2`, "REFERENCE<br><span style='font-size:24px;color:#6b5d52'>강한 신호</span>", tugP);
-  const win = el("div", `position:absolute;left:390px;top:96px;padding:4px 20px;border:4px solid ${c03_INK};border-radius:14px;background:#f7d774;font-size:40px;color:#c8372d;z-index:5`, "WIN!", tugP);
+  const win = el("div", `position:absolute;left:360px;top:96px;padding:4px 20px;border:4px solid ${c03_INK};border-radius:14px;background:#f7d774;font-size:40px;color:#c8372d;z-index:5`, "WIN!", tugP);
   const conf = Array.from({ length: 14 }, (_, i) => el("div", `position:absolute;left:0;top:0;width:14px;height:22px;border:2px solid ${c03_INK};border-radius:3px;background:${["#c8372d", "#f7d774", "#9fd3f0", "#bfe3a6"][i % 4]}`, "", tugP));
 
   // ============ F · result: the same Noa in three scenes (99.5–106)
@@ -253,7 +253,7 @@ scene(72, 106, (R, s) => {
   const idBadge = c03_box(res, 150, 640, 420, 110, "#fff4d0", "display:flex;align-items:center;gap:16px;padding:0 20px");
   idBadge.innerHTML = `<div style="width:66px;height:66px;border-radius:50%;border:4px solid ${c03_INK};background:#bfe3a6;display:grid;place-items:center;font-size:40px">✓</div>
     <div style="line-height:1.15"><div style="font-size:24px;letter-spacing:2px;color:#c8372d">SOUL ID · NOA</div><div style="font-size:30px;color:${c03_INK}">3개 장면, 1개 얼굴</div></div>`;
-  const before = c03_box(res, 1300, 640, 450, 130, "#fffaf0", "overflow:hidden");
+  const before = c03_box(res, 1300, 712, 450, 130, "#fffaf0", "overflow:hidden");
   el("div", `position:absolute;left:14px;top:6px;font-size:22px;color:#6b5d52;z-index:40`, "BEFORE", before);
   const bNoas = GAG.map(([, v], i) => { const n = makeNoa(88, v); before.appendChild(n); return n; });
   const bX = el("div", `position:absolute;left:0;top:0;width:450px;height:130px;z-index:41`, `<svg width="450" height="130"><path class="x" d="M110 20 L400 118 M400 20 L110 118" stroke="#c8372d" stroke-width="8" stroke-linecap="round" fill="none" stroke-dasharray="320" stroke-dashoffset="320"/></svg>`, before);
@@ -373,8 +373,8 @@ scene(72, 106, (R, s) => {
     const cp = back(seg(t, 89.95, 90.4)), dock = ease(seg(t, 91.0, 91.55)), cOut = ease(seg(t, 94.6, 95.05));
     card.style.display = t > 89.9 && t < 95.1 ? "block" : "none";
     card.style.opacity = clamp(cp * 2) * (1 - cOut);
-    const cs = lerp(1, .72, dock) * (.4 + .6 * cp);
-    card.style.transform = `translate(${lerp(0, -560, dock) + 250 * (1 - cs / lerp(1, .72, dock)) }px, ${lerp(0, 120, dock) + 150 * (1 - cp)}px) scale(${cs}) rotate(${lerp(-2, 2, dock)}deg)`;
+    const cs = lerp(1, .85, dock) * (.4 + .6 * cp);
+    card.style.transform = `translate(${lerp(0, -560, dock) + 250 * (1 - cs / lerp(1, .85, dock)) }px, ${lerp(0, 120, dock) + 150 * (1 - cp)}px) scale(${cs}) rotate(${lerp(-2, 2, dock)}deg)`;
     poseNoa(cNoa, t, { x: 10, y: 34, s: 1, wave: t > 90.4 && t < 91.2 });
     c03_slam(saved, t, 90.45); saved.style.opacity = +saved.style.opacity * (1 - dock);
     const rtp = back(seg(t, 91.3, 91.7)); cardRt.style.opacity = clamp(rtp * 2); cardRt.style.transform = `scale(${rtp})`;
@@ -438,10 +438,10 @@ scene(72, 106, (R, s) => {
     tugP.style.opacity = clamp(uIn * 2) * (1 - eOut);
     tugP.style.transform = `translateY(${360 * (1 - uIn) - 500 * eOut}px) rotate(${1 - 3 * eOut}deg)`;
     const yank = back(seg(t, 97.9, 98.5)), wob = t > 97.0 && t < 97.95 ? 16 * Math.sin((t - 97) * 11) : 0;
-    const off = wob + 120 * yank;
+    const off = wob + 44 * yank;
     tug.style.transform = `translateX(${off}px)`;
     const fall = ease(seg(t, 98.4, 98.9));
-    dice.style.transform = `translate(${off * 1.1 + 40 * fall}px, ${30 * fall}px) rotate(${-10 - 12 * Math.abs(Math.sin(t * 6)) * (1 - yank) + 90 * fall}deg)`;
+    dice.style.transform = `translate(${off + 30 * fall}px, ${30 * fall}px) rotate(${-10 - 12 * Math.abs(Math.sin(t * 6)) * (1 - yank) + 90 * fall}deg)`;
     frameC.style.transform = `translateX(${off}px) rotate(${8 + 4 * Math.sin(t * 6) * (1 - yank)}deg)`;
     poseNoa(fNoa, t, { x: 5, y: 26, s: 1, mood: yank > .3 ? "happy" : "pout", wave: fall > .5 });
     diceL.style.opacity = frameL.style.opacity = seg(t, 96.9, 97.2);
@@ -451,7 +451,7 @@ scene(72, 106, (R, s) => {
     conf.forEach((c, i) => {
       const p = seg(t, 98.7, 99.5), a = c03_hash(i, 7) * Math.PI * 2, v = 120 + 120 * c03_hash(i, 8);
       c.style.opacity = p > 0 && p < 1 ? 1 : 0;
-      c.style.transform = `translate(${470 + Math.cos(a) * v * p}px, ${150 + Math.sin(a) * v * p - 60 * p + 300 * p * p}px) rotate(${p * 540 * (i % 2 ? 1 : -1)}deg)`;
+      c.style.transform = `translate(${460 + Math.cos(a) * v * p}px, ${150 + Math.sin(a) * v * p - 60 * p + 300 * p * p}px) rotate(${p * 540 * (i % 2 ? 1 : -1)}deg)`;
     });
 
     // ---- F: result
@@ -463,8 +463,8 @@ scene(72, 106, (R, s) => {
       f.style.opacity = clamp(p * 2);
       f.style.transform = `translateY(${-360 * (1 - p)}px) rotate(${[-2, 1.5, -1.5][i] * p}deg)`;
       f.sc.update(t + i * 5, .6, [620, 180, 560][i]);
-      if (i === 0) poseNoa(f.n, t, { x: 290, y: 118, s: .6, look: -1, wave: t > 101 });
-      else if (i === 1) poseNoa(f.n, t, { x: 80, y: 20, s: 1.6, look: .3, talk: t > 101.5 && t < 104 });
+      if (i === 0) poseNoa(f.n, t, { x: 70, y: 110, s: .62, look: 1, wave: t > 101 });
+      else if (i === 1) poseNoa(f.n, t, { x: 150, y: 150, s: 1.6, look: .3, talk: t > 101.5 && t < 104 });
       else {
         poseNoa(f.n, t, { x: 120 + 60 * Math.sin(t * .7), y: 96, s: 1, look: 1, hop: ((t * 2.4) % 1) * .12 });
         f.n.style.transform = f.n.style.transform.replace(/scale\(([^,]+), ([^)]+)\)/, (m, a, b2) => `scale(${(+a * .62).toFixed(3)}, ${b2})`);

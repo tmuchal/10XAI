@@ -7,6 +7,13 @@ const c05_abs = (css, html, parent) => el("div", "position:absolute;" + css, htm
 // critically-ish damped step response 0 → 1 (with a little overshoot) for tau seconds after an event
 const c05_spring = (tau, a = 3, w = 8) => tau <= 0 ? 0 : 1 - Math.exp(-a * tau) * (Math.cos(w * tau) + (a / w) * Math.sin(w * tau));
 // decaying wobble kick
+function c05_strips(R, cols) {
+  const S = cols.map((c, i) => el("div", `position:absolute;left:0;top:-300px;width:${620 - i * 180}px;height:1600px;z-index:60;background:repeating-linear-gradient(90deg,${c} 0 34px,rgba(255,255,255,.18) 34px 40px),${c};border-left:5px solid ${C05_INK};border-right:5px solid ${C05_INK};opacity:0`, "", R));
+  return (t, t0, dur) => S.forEach((e, i) => {
+    const p = seg(t, t0 + i * .08, t0 + i * .08 + dur), cx = lerp(-700, 2700, ease(p));
+    e.style.opacity = p > 0 && p < 1 ? 1 : 0; e.style.transform = `translateX(${cx - (310 - i * 90)}px) rotate(14deg)`;
+  });
+}
 const c05_kick = (tau, a = 2.6, w = 7) => tau <= 0 ? 0 : Math.exp(-a * tau) * Math.sin(w * tau);
 
 scene(134, 160, (R, s) => {
@@ -133,8 +140,10 @@ scene(134, 160, (R, s) => {
   const noteA = c05_abs(`left:720px;top:720px;padding:8px 18px 10px;${c05_card("#e3f2f8", 12)};font-size:32px;color:#2f6f94;z-index:34`, "← 과정 공개 = 전문성", R);
   const noteB = c05_abs(`left:1160px;top:640px;padding:8px 18px 10px;${c05_card("#fde6ec", 12)};font-size:32px;color:#c0405f;z-index:34`, "커피 = 유머 ↓", R);
 
+  const wipe = c05_strips(R, ["#f08aa0", "#f7d774"]);
   return t => {
     head.style.opacity = 1 - seg(t, 153.2, 153.6);
+    wipe(t, 153.05, .8);
     // ================= scale (134.2–149.3)
     const exit = ease(seg(t, 148.9, 149.4));
     SG.style.opacity = seg(t, 134.2, 134.5) * (1 - exit);
@@ -205,14 +214,14 @@ scene(134, 160, (R, s) => {
     const shake = impact > 0 ? Math.exp(-6 * impact) * Math.sin(48 * impact) : 0;
     const st2 = t - 151.95, shake2 = st2 > 0 ? .6 * Math.exp(-7 * st2) * Math.sin(50 * st2) : 0;
     W.style.transform = `translate(${14 * (shake + shake2)}px, ${9 * Math.abs(shake + shake2)}px)`;
-    pop(rOk, t, 150.3, .45, 20); pop(rNo, t, 150.9, .45, 20);
-    rNo.style.transform += ` rotate(${1.5 * c05_kick(t - 151.2, 3, 14)}deg)`;
+    pop(rOk, t, 149.75, .45, 20); pop(rNo, t, 150.35, .45, 20);
+    rNo.style.transform += ` rotate(${1.5 * c05_kick(t - 150.65, 3, 14)}deg)`;
     pop(rBv, t, 152.4, .5, 12);
     const sp = seg(t, 151.65, 151.95);
     stamp.style.opacity = t < 151.65 ? 0 : clamp(sp * 4) * (1 - seg(t, 153.1, 153.5));
     stamp.style.transform = `translateY(${-160 * seg(t, 153.1, 153.5)}px) rotate(-14deg) scale(${st2 < 0 ? 3 - 2 * sp * sp : 1 + 0.08 * c05_kick(st2, 6, 20)})`;
     const rn = seg(t, 149.5, 150.1);
-    poseNoa(ruleNoa, t, { x: 1540, y: 620 + 200 * (1 - out(rn)), s: 1.2, mood: t < 150.9 || t > 151.5 ? "happy" : "shock", talk: t > 150.2 && t < 150.9 || t > 152.3 && t < 153,
+    poseNoa(ruleNoa, t, { x: 1540, y: 620 + 200 * (1 - out(rn)), s: 1.2, mood: t < 150.35 || t > 151 ? "happy" : "shock", talk: t > 150.2 && t < 150.9 || t > 152.3 && t < 153,
       look: -1, hop: t > 152 && t < 152.6 ? (t - 152) / .6 : 0, op: out(rn) * (1 - seg(t, 153.1, 153.4)) });
     // ================= loading screen (153.5–160)
     const L = back(seg(t, 153.5, 154.1));

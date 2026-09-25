@@ -87,7 +87,7 @@
   #valance { position: absolute; left: 0; top: 0; width: 1920px; height: 90px; z-index: 41; }
   #extras { position: absolute; inset: 0; z-index: 42; pointer-events: none; }
   #confetti { position: absolute; left: 0; top: 0; z-index: 43; pointer-events: none; }
-  #grain { position: absolute; inset: 0; z-index: 44; pointer-events: none; opacity: .28; background: url(assets/grain.png); }
+  #grain { display: none; } /* paper grain is baked into assets/backdrop.jpg (a full-frame overlay costs ~30 ms/frame) */
   #sign { position: absolute; left: 960px; top: -40px; z-index: 43; transform-origin: 0 0; width: 0; height: 0; }
   #sign .rope { position: absolute; top: 0; width: 7px; height: 380px; background: repeating-linear-gradient(160deg, #c8964f 0 6px, #f2cf8a 6px 11px);
     border: 2px solid #2b2320; border-top: 0; }

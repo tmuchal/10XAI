@@ -24,6 +24,10 @@
 //   wobble(t, a, amp=6, freq=9, decay=3.5)  damped spring angle after an event at time a
 //   PAL.mint, PAL.sunny, PAL.lilac  extra bright film palettes (night/sea/... are bright too)
 //   poseNoa extra options: blink:false to keep eyes open, arms:'up'|'down'|'hips' override
+//   wipe(node, t, a, dur=.6, dir='right'|'left'|'up'|'down')  ragged ink/paper-strip reveal (clip-path)
+//   countStamp(node, t, a, to, {from, dur, fmt, prefix, suffix})  kinetic counter + stamp-in
+//   makeBurst(parent, n=24, seed=1) -> svg with .fire(t, a, x, y, power=1)  deterministic sparkle burst
+//   shakeCam(t, a, amp=10, dur=.45)  soft camera shake of the whole stage
 // Scenes/elements with class "boil" also get the hand-drawn wobble automatically
 // (as do .card .win .chap .bubble .chip .reftag .btn inside a scene).
 // ============================================================================
@@ -63,6 +67,51 @@ function popIn(node, t, a, d = 0.45) {
 function jiggle(node, t, amt = 1, i = 0) {
   const k = boilStep(t), r = (hash(i, k) - .5) * .5 * amt, x = (hash(i, k, 1) - .5) * 1.6 * amt, y = (hash(i, k, 2) - .5) * 1.6 * amt;
   node.style.rotate = r.toFixed(3) + "deg"; node.style.translate = `${x.toFixed(2)}px ${y.toFixed(2)}px`;
+}
+// ink/paper-strip wipe reveal: dir 'left'|'right'|'up'|'down'; ragged edge jitters on the boil clock
+function wipe(node, t, a, dur = .6, dir = "right") {
+  const p = ease(seg(t, a, a + dur)), k = boilStep(t), N = 10, pts = [];
+  const e = i => clamp(p * 112 - 6 + (hash(i, k, 9) - .5) * 8 * (p < 1 ? 1 : 0), 0, 100);
+  for (let i = 0; i <= N; i++) { const v = i * 100 / N;
+    pts.push(dir === "right" ? `${e(i)}% ${v}%` : dir === "left" ? `${100 - e(i)}% ${v}%` : dir === "down" ? `${v}% ${e(i)}%` : `${v}% ${100 - e(i)}%`); }
+  const base = dir === "right" ? ["0% 100%", "0% 0%"] : dir === "left" ? ["100% 100%", "100% 0%"] : dir === "down" ? ["100% 0%", "0% 0%"] : ["100% 100%", "0% 100%"];
+  node.style.clipPath = p >= 1 ? "none" : `polygon(${base[1]}, ${pts.join(", ")}, ${base[0]})`;
+  node.style.opacity = p > 0 ? 1 : 0;
+  return p;
+}
+// kinetic counter that stamps in: countStamp(node, t, a, to, {from, dur, fmt, prefix, suffix})
+function countStamp(node, t, a, to, o = {}) {
+  const { from = 0, dur = 1, fmt: f = fmt, prefix = "", suffix = "" } = o;
+  const p = out(seg(t, a, a + dur)), st = seg(t, a + dur, a + dur + .35);
+  const txt = prefix + f(lerp(from, to, p)) + suffix; if (node.textContent !== txt) node.textContent = txt;
+  node.style.opacity = t < a ? 0 : 1;
+  node.style.transform = `scale(${(st > 0 ? 1.35 - .35 * back(st) : 1 + .04 * Math.sin(t * 30) * (p < 1 ? 1 : 0)).toFixed(3)}) rotate(${(st > 0 ? -4 * (1 - st) : 0).toFixed(2)}deg)`;
+  return p;
+}
+// deterministic sparkle/confetti burst: const b = makeBurst(parent, 28, seed); b.fire(t, a, x, y, power)
+function makeBurst(parent, n = 24, seed = 1) {
+  const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+  svg.setAttribute("width", 1); svg.setAttribute("height", 1); svg.setAttribute("overflow", "visible");
+  svg.style.cssText = "position:absolute;left:0;top:0;overflow:visible;pointer-events:none;z-index:35";
+  const cols = ["#ffcf3f", "#ff7f9a", "#6cc6f0", "#7fd1a0", "#b79bf0", "#ff9a4f"];
+  const P = Array.from({ length: n }, (_, i) => { const e = document.createElementNS("http://www.w3.org/2000/svg", "path");
+    e.setAttribute("d", i % 2 ? "M0 -9 Q1.5 -1.5 9 0 Q1.5 1.5 0 9 Q-1.5 1.5 -9 0 Q-1.5 -1.5 0 -9Z" : "M-6 -4 H6 V4 H-6Z");
+    e.setAttribute("fill", cols[i % 6]); e.setAttribute("stroke", INK); e.setAttribute("stroke-width", 2); svg.appendChild(e); return e; });
+  parent.appendChild(svg);
+  svg.fire = (t, a, x, y, power = 1) => {
+    const u = t - a; if (u < 0 || u > 1.6) { svg.style.display = "none"; return; }
+    svg.style.display = "block";
+    P.forEach((e, i) => { const ang = hash(i, seed) * 6.283, v = (220 + hash(i, seed, 2) * 380) * power;
+      const px = x + Math.cos(ang) * v * u * (1 - u * .3), py = y + Math.sin(ang) * v * u * (1 - u * .3) + 300 * u * u;
+      e.setAttribute("transform", `translate(${px.toFixed(1)} ${py.toFixed(1)}) rotate(${(u * 400 * (i % 2 ? 1 : -1)).toFixed(0)}) scale(${(1 - u / 1.6).toFixed(2)})`); });
+  };
+  return svg;
+}
+// soft screen shake: call shakeCam(t, a, amp=10, dur=.45) in a scene update (applied to the stage camera by boot.js)
+function shakeCam(t, a, amp = 10, dur = .45) {
+  if (t < a || t > a + dur) return;
+  const u = (t - a) / dur, k = amp * (1 - u) * (1 - u), f = boilStep(t * 3);
+  const s = window.SHAKE || [0, 0]; window.SHAKE = [s[0] + (hash(f, 1) - .5) * 2 * k, s[1] + (hash(f, 2) - .5) * 2 * k];
 }
 const fmt = n => Math.round(n).toLocaleString("ko-KR");
 
@@ -128,47 +177,75 @@ function makeFilm(pal) {
 }
 
 // ---------------------------------------------------------------- Noa (the guide character)
-// One fixed identity in every scene: orange box body, red beret, yellow scarf.
-// Variants exist only for the "inconsistent character" gag in chapter 03.
-const NOA = { body: "#ef8f4f", beret: "#d63a2f", scarf: "#f7c948" };
+// Noa is a chubby golden hamster in COOL BLACK SUNGLASSES (identity marker in every shot)
+// with a yellow scarf. Hand-drawn watercolor fill, ink outline.
+// Variant keys (for the "inconsistent character" gag in chapter 03 and the floor extras):
+//   body: fur colour · glasses:true → nerdy round clear glasses instead of sunglasses ·
+//   spiky:true → punk mohawk tuft · party:true → party hat, no sunglasses (extras) ·
+//   beret: "#hex" → small beret · scarf: null → no scarf / "#hex" → scarf colour.
+const NOA = { body: "#e9a257", belly: "#f7d9a8", scarf: "#f2c14e" };
 function makeNoa(size = 200, v = {}) {
   const c = Object.assign({}, NOA, v);
+  const shades = !c.glasses && !c.party;
   const e = el("div"); e.className = "noa"; e.style.width = size + "px"; e.style.height = size * 1.1 + "px";
   const S = `stroke="${INK}" stroke-linejoin="round" stroke-linecap="round"`;
-  const legs = [52, 80, 108, 134].map(x => `<rect class="lg" x="${x}" y="168" width="15" height="30" rx="5" fill="${c.body}" ${S} stroke-width="4.5"/>`).join("");
-  const arm = (cls, x) => `<g class="${cls}"><rect x="${x}" y="108" width="34" height="18" rx="9" fill="${c.body}" ${S} stroke-width="4.5"/></g>`;
+  const id = "n" + uid;
+  const lens = dx => `<path d="M${66 + dx} 86 H${95 + dx} Q${99 + dx} 86 ${98 + dx} 92 L${96 + dx} 103 Q${94 + dx} 110 ${87 + dx} 110 H${75 + dx} Q${68 + dx} 110 ${67 + dx} 103 L${64 + dx} 92 Q${63 + dx} 86 ${66 + dx} 86Z"/>`;
+  const whisk = s => `<g class="wh${s < 0 ? "l" : "r"}" stroke="${INK}" stroke-width="2.5" stroke-linecap="round" fill="none" opacity=".75">
+      <path d="M${100 + s * 26} 121 L${100 + s * 50} 114"/><path d="M${100 + s * 27} 126 L${100 + s * 53} 127"/><path d="M${100 + s * 26} 131 L${100 + s * 48} 139"/></g>`;
   e.innerHTML = `<svg viewBox="0 0 200 220" width="100%" height="100%" overflow="visible">
-    <ellipse class="sh" cx="100" cy="204" rx="66" ry="8" fill="rgba(120,70,30,.22)"/>
+    <defs><radialGradient id="${id}f" cx=".38" cy=".3" r=".8"><stop offset="0" stop-color="#fff" stop-opacity=".38"/><stop offset=".45" stop-color="#fff" stop-opacity="0"/><stop offset="1" stop-color="#9a4a14" stop-opacity=".2"/></radialGradient></defs>
+    <ellipse class="sh" cx="100" cy="204" rx="62" ry="8" fill="rgba(120,70,30,.22)"/>
     <g class="b">
-      ${legs}
-      ${arm("al", 12)}${arm("ar", 154)}
-      <rect x="38" y="70" width="124" height="106" rx="14" fill="${c.body}" ${S} stroke-width="5.5"/>
-      <path d="M50 84 Q70 76 104 80 Q86 92 58 104 Q48 98 50 84Z" fill="#fff" opacity=".32"/>
-      <path d="M44 150 Q100 166 156 142 L156 164 Q156 172 146 172 L54 172 Q44 172 44 162Z" fill="#b8481f" opacity=".16"/>
-      <rect x="44" y="76" width="112" height="94" rx="10" fill="none" stroke="#fff" stroke-opacity=".18" stroke-width="3"/>
-      ${c.scarf && !c.party ? `<path d="M40 144 Q100 152 160 144 V161 Q100 168 40 161Z" fill="${c.scarf}" ${S} stroke-width="4"/><path d="M60 147 Q70 150 80 148" stroke="#fff" stroke-opacity=".5" stroke-width="3" fill="none"/>
-        <g class="tail"><path d="M126 158 Q140 172 146 190 L122 184 Q126 172 120 160Z" fill="${c.scarf}" ${S} stroke-width="3.5"/></g>` : ""}
-      <g class="eyes"><path class="e1" d="" stroke="${INK}" stroke-width="5.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
-        <path class="e2" d="" stroke="${INK}" stroke-width="5.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/></g>
-      ${c.glasses ? `<g fill="none" stroke="${INK}" stroke-width="4"><circle cx="80" cy="104" r="17"/><circle cx="120" cy="104" r="17"/><path d="M97 104 H103"/></g>` : ""}
-      <ellipse class="ck" cx="62" cy="124" rx="10" ry="6" fill="#ff7f9a" opacity=".55"/><ellipse class="ck" cx="138" cy="124" rx="10" ry="6" fill="#ff7f9a" opacity=".55"/>
-      <path class="m" d="" stroke="${INK}" stroke-width="4.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
-      <path class="sw" d="M160 78 Q168 92 164 98 Q156 100 156 92 Q156 86 160 78Z" fill="#9fdcf7" stroke="${INK}" stroke-width="3" opacity="0"/>
-      <g class="hat">${c.spiky ? `<path d="M44 74 L54 44 L66 70 L80 36 L92 68 L106 34 L116 68 L132 40 L140 70 L154 48 L156 74Z" fill="#5a4fcf" ${S} stroke-width="4"/>` :
-        c.party ? `<path d="M82 74 L100 20 L118 74Z" fill="#ffb0c0" ${S} stroke-width="4"/><path d="M90 50 L110 50 M86 62 L114 62" stroke="#fff" stroke-width="4" opacity=".8"/><circle cx="100" cy="18" r="7" fill="#f7c948" ${S} stroke-width="3"/>` :
-        `<ellipse cx="96" cy="70" rx="52" ry="14" fill="${c.beret}" ${S} stroke-width="4.5" transform="rotate(-8 96 70)"/><path d="M60 66 Q80 58 104 60" stroke="#fff" stroke-opacity=".35" stroke-width="4" fill="none"/><path d="M92 56 Q90 46 96 44" stroke="${INK}" stroke-width="4.5" fill="none" stroke-linecap="round"/>`}</g>
+      <g class="earl"><circle cx="62" cy="66" r="18" fill="${c.body}" ${S} stroke-width="4.5"/><circle cx="63" cy="67" r="9.5" fill="#f5a3b5"/></g>
+      <g class="earr"><circle cx="138" cy="66" r="18" fill="${c.body}" ${S} stroke-width="4.5"/><circle cx="137" cy="67" r="9.5" fill="#f5a3b5"/></g>
+      <circle class="tl" cx="166" cy="182" r="8" fill="${c.body}" ${S} stroke-width="4"/>
+      ${[74, 126].map(x => `<ellipse class="lg" cx="${x}" cy="196" rx="17" ry="8.5" fill="${c.belly}" ${S} stroke-width="4"/>`).join("")}
+      <path d="M100 56 C140 56 160 80 164 104 C183 110 185 146 166 153 C168 181 144 198 100 198 C56 198 32 181 34 153 C15 146 17 110 36 104 C40 80 60 56 100 56Z" fill="${c.body}" ${S} stroke-width="5.5"/>
+      <ellipse cx="100" cy="176" rx="40" ry="20" fill="${c.belly}"/>
+      <g class="ckl"><ellipse cx="50" cy="128" rx="17" ry="19" fill="${c.belly}" opacity=".85"/></g>
+      <g class="ckr"><ellipse cx="150" cy="128" rx="17" ry="19" fill="${c.belly}" opacity=".85"/></g>
+      <path d="M100 56 C140 56 160 80 164 104 C183 110 185 146 166 153 C168 181 144 198 100 198 C56 198 32 181 34 153 C15 146 17 110 36 104 C40 80 60 56 100 56Z" fill="url(#${id}f)"/>
+      <path d="M66 70 Q84 62 104 64" stroke="#fff" stroke-opacity=".45" stroke-width="5" fill="none" stroke-linecap="round"/>
+      <path d="M92 58 Q96 66 100 58 Q104 66 108 58" stroke="${INK}" stroke-width="2.5" fill="none" opacity=".45"/>
+      ${c.scarf ? `<path d="M34 146 Q100 164 166 146 L167 161 Q100 180 33 161Z" fill="${c.scarf}" ${S} stroke-width="4"/><path d="M52 154 Q66 158 80 159" stroke="#fff" stroke-opacity=".5" stroke-width="3" fill="none" stroke-linecap="round"/>
+        <g class="st"><path d="M128 162 Q142 176 146 194 L122 188 Q126 176 118 164Z" fill="${c.scarf}" ${S} stroke-width="3.5"/></g>` : ""}
+      <g class="pwl"><rect x="28" y="152" width="30" height="20" rx="10" fill="${c.body}" ${S} stroke-width="4.5"/><path d="M32 158 v8 M37 158 v9" stroke="${INK}" stroke-width="2" opacity=".5"/></g>
+      <g class="pwr"><rect x="142" y="152" width="30" height="20" rx="10" fill="${c.body}" ${S} stroke-width="4.5"/><path d="M168 158 v8 M163 158 v9" stroke="${INK}" stroke-width="2" opacity=".5"/></g>
+      <g class="face">
+        <ellipse cx="100" cy="126" rx="28" ry="18" fill="${c.belly}"/>
+        <ellipse cx="56" cy="134" rx="10" ry="6" fill="#ff8aa2" opacity=".55"/><ellipse cx="144" cy="134" rx="10" ry="6" fill="#ff8aa2" opacity=".55"/>
+        ${whisk(-1)}${whisk(1)}
+        <path class="m" d="" stroke="${INK}" stroke-width="3.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+        <g class="teeth"><rect x="94.5" y="124" width="11" height="8" rx="1.5" fill="#fff" stroke="${INK}" stroke-width="2"/><path d="M100 124 V132" stroke="${INK}" stroke-width="1.5"/></g>
+        <path d="M94 115 Q100 111 106 115 Q104 121 100 121 Q96 121 94 115Z" fill="#f58ca0" ${S} stroke-width="2.5"/>
+        <g class="eyes"><path class="e1" d="" stroke="${INK}" stroke-width="4.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+          <path class="e2" d="" stroke="${INK}" stroke-width="4.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+          <circle class="p1" cx="80" cy="98" r="4.5" fill="${INK}"/><circle class="p2" cx="120" cy="98" r="4.5" fill="${INK}"/></g>
+        ${c.glasses ? `<g fill="rgba(210,235,255,.35)" stroke="${INK}" stroke-width="3.5"><circle cx="80" cy="98" r="15"/><circle cx="120" cy="98" r="15"/><path d="M95 96 Q100 92 105 96" fill="none"/></g>` : ""}
+        ${shades ? `<g class="sg"><g fill="#211c1b" ${S} stroke-width="3.5">${lens(0)}${lens(38)}</g>
+          <path d="M97 91 Q101 87 105 91" stroke="${INK}" stroke-width="4" fill="none"/><path d="M63 89 L52 85 M137 89 L148 85" stroke="${INK}" stroke-width="3.5"/>
+          <path d="M70 101 L78 89 L83 89 L75 101Z M108 101 L116 89 L121 89 L113 101Z" fill="#fff" opacity=".8"/><circle cx="90" cy="92" r="2" fill="#fff" opacity=".7"/><circle cx="128" cy="92" r="2" fill="#fff" opacity=".7"/></g>` : ""}
+        <g class="brows" stroke="${INK}" stroke-width="4" fill="none" stroke-linecap="round"><path class="br1" d=""/><path class="br2" d=""/></g>
+      </g>
+      <g class="hat">${c.spiky ? `<path d="M80 62 L84 32 L92 50 L98 18 L106 48 L114 28 L118 50 L126 38 L122 62Z" fill="#8a6cf0" ${S} stroke-width="4"/>` :
+        c.party ? `<path d="M84 62 L100 12 L116 62Z" fill="#ffb0c0" ${S} stroke-width="4"/><path d="M92 38 L108 38 M88 50 L112 50" stroke="#fff" stroke-width="4" opacity=".8"/><circle cx="100" cy="11" r="7" fill="#f7c948" ${S} stroke-width="3"/>` :
+        v.beret ? `<ellipse cx="98" cy="58" rx="36" ry="11" fill="${v.beret}" ${S} stroke-width="4" transform="rotate(-8 98 58)"/><path d="M96 47 Q95 40 100 38" stroke="${INK}" stroke-width="4" fill="none" stroke-linecap="round"/>` : ""}</g>
     </g></svg>`;
   const q = x => e.querySelector(x);
-  e.P = { b: q(".b"), al: q(".al"), ar: q(".ar"), eyes: q(".eyes"), e1: q(".e1"), e2: q(".e2"), m: q(".m"), legs: [...e.querySelectorAll(".lg")],
-    sh: q(".sh"), sw: q(".sw"), hat: q(".hat"), tail: q(".tail") };
+  e.P = { b: q(".b"), al: q(".pwl"), ar: q(".pwr"), eyes: q(".face"), eye: q(".eyes"), e1: q(".e1"), e2: q(".e2"), p1: q(".p1"), p2: q(".p2"), m: q(".m"),
+    legs: [...e.querySelectorAll(".lg")], sh: q(".sh"), hat: q(".hat"), tail: q(".st"), teeth: q(".teeth"), sg: q(".sg"), br1: q(".br1"), br2: q(".br2"),
+    earl: q(".earl"), earr: q(".earr"), whl: q(".whl"), whr: q(".whr"), ckl: q(".ckl"), ckr: q(".ckr"), tl: q(".tl") };
+  e.shades = shades; e.party = !!c.party;
   e.seed = (uid++ % 7) * 0.47; e.size = size;
   return e;
 }
 // pose: { x, y, s (scale), wave, talk, look (-1..1), mood: happy|shock|pout, flip, hop (0..1), op, blink, arms }
 // hop is a 0..1 phase: 0-.18 anticipation crouch, .18-.86 airborne (stretch), .86-1 landing squash.
+// mood "shock" slides the sunglasses down the nose to reveal wide cartoon eyes.
 function poseNoa(n, t, o) {
   const { x = 0, y = 0, s = 1, wave = 0, talk = false, look = 0, mood = "happy", flip = false, hop = 0, op = 1, blink: canBlink = true, arms } = o;
-  const T = t + n.seed;
+  const T = t + n.seed, P = n.P;
   let lift = 0, sx = 1, sy = 1, air = 0;
   if (hop > 0 && hop < 1) {
     if (hop < .18) { const k = Math.sin(hop / .18 * Math.PI / 2); sy = 1 - .16 * k; sx = 1 + .12 * k; }
@@ -184,40 +261,60 @@ function poseNoa(n, t, o) {
   n.style.opacity = op;
   if (op <= 0) return;
   const lean = look * 2.5 + (talk ? Math.sin(T * 4.5) * 2.2 : 0) + (mood === "shock" ? Math.sin(t * 40) * 1.2 : 0);
-  n.P.b.setAttribute("transform", `translate(100 200) rotate(${lean.toFixed(2)}) scale(${sx.toFixed(3)} ${sy.toFixed(3)}) translate(-100 -200)`);
+  P.b.setAttribute("transform", `translate(100 200) rotate(${lean.toFixed(2)}) scale(${sx.toFixed(3)} ${sy.toFixed(3)}) translate(-100 -200)`);
   const unit = (n.size || 200) / 200 * Math.max(.05, s);
   const shK = 1 - Math.min(.5, lift / 140);
-  n.P.sh.setAttribute("transform", `translate(0 ${(lift / unit).toFixed(1)}) translate(100 204) scale(${shK.toFixed(3)}) translate(-100 -204)`);
-  n.P.sh.setAttribute("opacity", (1 - lift / 200).toFixed(2));
-  const bc = (T % 3.7), blink = canBlink && mood !== "shock" && (bc < 0.11 || (Math.floor(T / 3.7) % 3 === 1 && bc > .22 && bc < .31));
+  P.sh.setAttribute("transform", `translate(0 ${(lift / unit).toFixed(1)}) translate(100 204) scale(${shK.toFixed(3)}) translate(-100 -204)`);
+  P.sh.setAttribute("opacity", (1 - lift / 200).toFixed(2));
+  const bc = (T % 3.7), blink = canBlink && (bc < 0.11 || (Math.floor(T / 3.7) % 3 === 1 && bc > .22 && bc < .31));
   const squint = hop > 0 && hop < .18;
-  const eye = cx => mood === "shock" ? `M${cx} 95 a7 9 0 1 0 0.1 0` : mood === "pout" || blink || squint ? `M${cx - 10} 105 H${cx + 10}` : `M${cx - 11} 109 Q${cx} 90 ${cx + 11} 109`;
-  n.P.e1.setAttribute("d", eye(80)); n.P.e2.setAttribute("d", eye(120));
-  const fillEye = mood === "shock" ? INK : "none";
-  n.P.e1.setAttribute("fill", fillEye); n.P.e2.setAttribute("fill", fillEye);
-  n.P.eyes.setAttribute("transform", `translate(${look * 6} ${air ? -2 : 0})`);
+  // face: look shift
+  P.eyes.setAttribute("transform", `translate(${(look * 6).toFixed(1)} ${air ? -2 : 0})`);
+  // eyes: hidden behind sunglasses unless shocked (glasses slide down)
+  const shock = mood === "shock", showEyes = !n.shades || shock;
+  P.eye.style.display = showEyes ? "" : "none";
+  if (showEyes) {
+    const eye = cx => shock ? `M${cx} 82 a10 11 0 1 0 0.1 0` : mood === "pout" || blink || squint ? `M${cx - 9} 99 H${cx + 9}` : `M${cx - 10} 102 Q${cx} 88 ${cx + 10} 102`;
+    P.e1.setAttribute("d", eye(80)); P.e2.setAttribute("d", eye(120));
+    P.e1.setAttribute("fill", shock ? "#fff" : "none"); P.e2.setAttribute("fill", shock ? "#fff" : "none");
+    const pv = shock ? "" : "none"; P.p1.style.display = pv; P.p2.style.display = pv;
+    if (shock) { const j = Math.sin(t * 35) * 1.2; P.p1.setAttribute("cx", 80 + j); P.p2.setAttribute("cx", 120 + j); P.p1.setAttribute("cy", 93); P.p2.setAttribute("cy", 93); }
+  }
+  if (P.sg) { const sl = shock ? 21 : 0; P.sg.setAttribute("transform", `translate(0 ${sl}) rotate(${shock ? -4 : 0} 100 98)`); }
+  // eyebrows above the glasses carry the expression
+  const by = shock ? 62 : 76, tw = shock ? 0 : Math.sin(T * 2) * 1.2;
+  P.br1.setAttribute("d", mood === "pout" ? `M68 ${by - 6} L90 ${by + 3}` : `M68 ${by + 2 + tw} Q79 ${by - 7 + tw} 90 ${by + tw}`);
+  P.br2.setAttribute("d", mood === "pout" ? `M110 ${by + 3} L132 ${by - 6}` : `M110 ${by + tw} Q121 ${by - 7 + tw} 132 ${by + 2 + tw}`);
+  // mouth + buck teeth
   const ph = Math.floor(t * 9) % 4, open = talk && ph !== 3;
-  n.P.m.setAttribute("d",
-    mood === "shock" ? "M96 130 a5 7 0 1 0 0.1 0" : mood === "pout" ? "M90 133 Q100 124 110 133" :
-    open ? (ph === 1 ? "M92 120 Q100 134 108 120 Z" : "M88 119 Q100 142 112 119 Z") : air ? "M90 119 Q100 136 110 119 Z" : "M90 121 Q100 132 110 121");
-  n.P.m.setAttribute("fill", mood === "shock" || open || air ? INK : "none");
-  n.P.sw.setAttribute("opacity", mood === "shock" ? 1 : 0);
-  n.P.sw.setAttribute("transform", `translate(0 ${mood === "shock" ? (t * 14) % 10 : 0})`);
-  // arms
-  let rl = Math.sin(T * 3) * 5, rr = -Math.sin(T * 3) * 5;
-  if (talk) { rl += Math.sin(T * 5.5) * 16 + 8; }
-  if (wave) rr = Math.sin(t * 11) * 28 - 48;
-  if (air) { rl = 55; rr = wave ? rr : -55; }
+  P.m.setAttribute("d",
+    shock ? "M94 141 a6 7 0 1 0 0.1 0" : mood === "pout" ? "M92 131 Q100 125 108 131" :
+    open ? (ph === 1 ? "M92 123 Q100 136 108 123 Z" : "M89 122 Q100 142 111 122 Z") : air ? "M91 123 Q100 138 109 123 Z" : "M89 123 Q94 129 100 123 Q106 129 111 123");
+  P.m.setAttribute("fill", shock || open || air ? "#7a2d2a" : "none");
+  P.teeth.style.display = open || air ? "" : "none";
+  // whiskers twitch, ears flick on the blink cadence, cheeks puff on squash
+  const tw2 = Math.sin(T * 13) * (Math.sin(T * 1.3) > .4 ? 5 : 1);
+  P.whl.setAttribute("transform", `rotate(${tw2.toFixed(1)} 74 126)`); P.whr.setAttribute("transform", `rotate(${(-tw2).toFixed(1)} 126 126)`);
+  const flick = blink ? 14 : (bc > 3.5 ? 6 : 0);
+  P.earl.setAttribute("transform", `rotate(${(-flick - look * 3).toFixed(1)} 66 76)`); P.earr.setAttribute("transform", `rotate(${(flick * .6 - look * 3).toFixed(1)} 134 76)`);
+  const puff = 1 + Math.max(0, sx - 1) * 2.2 + (mood === "pout" ? .12 : 0);
+  P.ckl.setAttribute("transform", `translate(50 128) scale(${puff.toFixed(3)}) translate(-50 -128)`); P.ckr.setAttribute("transform", `translate(150 128) scale(${puff.toFixed(3)}) translate(-150 -128)`);
+  // paws
+  let rl = Math.sin(T * 3) * 6, rr = -Math.sin(T * 3) * 6;
+  if (talk) rl += Math.sin(T * 5.5) * 18 + 12;
+  if (wave) rr = Math.sin(t * 11) * 26 - 105;
+  if (air) { rl = 70; rr = wave ? rr : -70; }
   if (hop > 0 && hop < .18) { rl = -20; rr = 20; }
-  if (mood === "shock" || arms === "up") { rl = 55 + Math.sin(t * 30) * 5; rr = -55 - Math.sin(t * 30) * 5; }
-  if (mood === "pout" || arms === "down") { rl = -32; rr = 32; }
-  if (arms === "hips") { rl = -60; rr = 60; }
-  n.P.al.setAttribute("transform", `rotate(${rl.toFixed(1)} 46 117)`);
-  n.P.ar.setAttribute("transform", `rotate(${rr.toFixed(1)} 154 117)`);
-  if (n.P.tail) n.P.tail.setAttribute("transform", `rotate(${(Math.sin(T * 3.4) * 6 + (air ? -14 : 0)).toFixed(1)} 124 160)`);
-  n.P.hat.setAttribute("transform", `translate(0 ${air ? -5 : squint ? 3 : 0}) rotate(${(Math.sin(T * 2.2) * 2 + look * 2).toFixed(2)} 100 76)`);
+  if (shock || arms === "up") { rl = 100 + Math.sin(t * 30) * 6; rr = -100 - Math.sin(t * 30) * 6; }
+  if (mood === "pout" || arms === "down") { rl = -30; rr = 30; }
+  if (arms === "hips") { rl = -55; rr = 55; }
+  P.al.setAttribute("transform", `rotate(${rl.toFixed(1)} 56 160)`);
+  P.ar.setAttribute("transform", `rotate(${rr.toFixed(1)} 144 160)`);
+  if (P.tail) P.tail.setAttribute("transform", `rotate(${(Math.sin(T * 3.4) * 6 + (air ? -14 : 0)).toFixed(1)} 124 164)`);
+  P.tl.setAttribute("transform", `translate(${(Math.sin(T * 6) * 1.5).toFixed(1)} 0)`);
+  P.hat.setAttribute("transform", `translate(0 ${air ? -5 : squint ? 3 : 0}) rotate(${(Math.sin(T * 2.2) * 2 + look * 2).toFixed(2)} 100 60)`);
   const stepAmp = air ? 0 : hop > 0 ? 3 : 1.5;
-  n.P.legs.forEach((l, i) => l.setAttribute("transform", air ? `translate(0 4)` : `translate(0 ${(-Math.max(0, Math.sin(t * 9 + i * 1.6)) * stepAmp).toFixed(1)})`));
+  P.legs.forEach((l, i) => l.setAttribute("transform", air ? `translate(0 5)` : `translate(0 ${(-Math.max(0, Math.sin(t * 9 + i * 2.6)) * stepAmp).toFixed(1)})`));
 }
 function makeBubble(parent) { const b = el("div", "opacity:0", "", parent); b.className = "bubble"; return b; }
 function sayBubble(b, t, a, z, text, x, y) {

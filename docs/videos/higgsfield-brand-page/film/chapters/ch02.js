@@ -1,53 +1,452 @@
 // ---------------------------------------------------------------- 02 · The flow (40–72)
+// Beats: 40.6 Noa struts into the spotlight under a "주인공" sign · 42.2 the customer walks
+// in, the spotlight swings over, Noa is bumped aside and sulks under a rain cloud; the page's
+// hero line "우리 회사는 업계 최고!" is struck out and rewritten for the customer · 45 Noa
+// accepts a GUIDE badge · 46 a road draws: the customer walks problem → guide (Noa hands a
+// map) → 3 stepping stones → presses the big button → success flag + confetti; each station
+// lights the matching page section · 53 bars grow (+62% dwell, +317% scroll depth) while the
+// page scrolls scene to scene; the +317% bar launches Noa into the air · 60 the wireframe
+// flips into the real page; Hook / Proof / Action notes light up as it scrolls.
+(() => {
+const INK2 = "#2b2320";
+const c02_rnd = i => { const x = Math.sin(i * 127.1 + 311.7) * 43758.5453; return x - Math.floor(x); };
+const c02_settle = (t, f = 2.2, k = 5) => t <= 0 ? 0 : Math.exp(-k * t) * Math.sin(2 * Math.PI * f * t);
+const C02_COL = ["#f7d774", "#f2a7a0", "#9fd3a8", "#bcdcf0", "#e8894f", "#d7b8f0"];
+
+// Catmull-Rom through points → SVG path + arc-length lookup
+function c02_road(P) {
+  const pts = [P[0], ...P, P[P.length - 1]];
+  let d = `M${P[0][0]} ${P[0][1]}`; const S = [];
+  for (let i = 1; i < pts.length - 2; i++) {
+    const [p0, p1, p2, p3] = [pts[i - 1], pts[i], pts[i + 1], pts[i + 2]];
+    const c1 = [p1[0] + (p2[0] - p0[0]) / 6, p1[1] + (p2[1] - p0[1]) / 6], c2 = [p2[0] - (p3[0] - p1[0]) / 6, p2[1] - (p3[1] - p1[1]) / 6];
+    d += ` C${c1[0].toFixed(1)} ${c1[1].toFixed(1)} ${c2[0].toFixed(1)} ${c2[1].toFixed(1)} ${p2[0]} ${p2[1]}`;
+    for (let k = 0; k < 40; k++) {
+      const u = k / 40, v = 1 - u;
+      S.push([v * v * v * p1[0] + 3 * v * v * u * c1[0] + 3 * v * u * u * c2[0] + u * u * u * p2[0], v * v * v * p1[1] + 3 * v * v * u * c1[1] + 3 * v * u * u * c2[1] + u * u * u * p2[1], i - 1 + u]);
+    }
+  }
+  S.push([...P[P.length - 1], P.length - 1]);
+  let L = 0; S.forEach((s, i) => { if (i) L += Math.hypot(s[0] - S[i - 1][0], s[1] - S[i - 1][1]); s[3] = L; });
+  const at = u => { // u = point index (fractional) → [x,y]
+    for (let i = 1; i < S.length; i++) if (S[i][2] >= u) { const a = S[i - 1], b = S[i], f = (u - a[2]) / Math.max(1e-6, b[2] - a[2]); return [lerp(a[0], b[0], f), lerp(a[1], b[1], f)]; }
+    return S[S.length - 1];
+  };
+  const lenAt = u => { for (let i = 1; i < S.length; i++) if (S[i][2] >= u) return S[i][3]; return L; };
+  return { d, L, at, lenAt };
+}
+
+function c02_person(parent) {
+  const p = el("div", "left:0;top:0;width:100px;height:150px;z-index:24;transform-origin:50% 100%", `
+    <svg viewBox="0 0 100 150" width="100" height="150" overflow="visible">
+      <ellipse cx="50" cy="146" rx="30" ry="5" fill="rgba(43,35,32,.22)"/>
+      <g class="bd">
+      <rect class="lL" x="36" y="102" width="12" height="40" rx="5" fill="#3b3a58" stroke="${INK2}" stroke-width="3.5"/>
+      <rect class="lR" x="53" y="102" width="12" height="40" rx="5" fill="#3b3a58" stroke="${INK2}" stroke-width="3.5"/>
+      <rect class="aL" x="17" y="72" width="12" height="32" rx="5" fill="#3e8fb8" stroke="${INK2}" stroke-width="3.5"/>
+      <g class="aR"><rect x="71" y="72" width="12" height="32" rx="5" fill="#3e8fb8" stroke="${INK2}" stroke-width="3.5"/>
+        <path d="M70 100 h22 l-3 26 h-16z" fill="#f2a7a0" stroke="${INK2}" stroke-width="3"/><path d="M76 100 q5 -10 10 0" fill="none" stroke="${INK2}" stroke-width="3"/></g>
+      <path d="M24 112 Q22 66 50 64 Q78 66 76 112 Z" fill="#3e8fb8" stroke="${INK2}" stroke-width="4"/>
+      <path d="M40 66 L50 80 L60 66" fill="none" stroke="#fffaf0" stroke-width="4"/>
+      <circle cx="50" cy="40" r="25" fill="#f6d2b0" stroke="${INK2}" stroke-width="4"/>
+      <path d="M25 40 Q26 12 52 13 Q77 15 75 42 Q66 26 52 28 Q36 28 25 40Z" fill="#5b3a29" stroke="${INK2}" stroke-width="3.5"/>
+      <g class="ey"><circle cx="41" cy="44" r="3.4" fill="${INK2}"/><circle cx="59" cy="44" r="3.4" fill="${INK2}"/></g>
+      <path class="mo" d="M43 54 Q50 60 57 54" fill="none" stroke="${INK2}" stroke-width="3" stroke-linecap="round"/>
+      <ellipse cx="35" cy="52" rx="5" ry="3" fill="#f08aa0" opacity=".6"/><ellipse cx="65" cy="52" rx="5" ry="3" fill="#f08aa0" opacity=".6"/>
+      <g class="crown" opacity="0"><path d="M32 16 L36 -4 L45 8 L50 -8 L55 8 L64 -4 L68 16 Z" fill="#f7d774" stroke="${INK2}" stroke-width="3.5" stroke-linejoin="round"/></g>
+      </g></svg>`, parent); p.className = "abs";
+  const q = x => p.querySelector(x);
+  p.P = { bd: q(".bd"), lL: q(".lL"), lR: q(".lR"), aL: q(".aL"), aR: q(".aR"), mo: q(".mo"), crown: q(".crown"), ey: q(".ey") };
+  return p;
+}
+// feet at (x,y); walk = phase in cycles (0 = standing)
+function c02_posePerson(p, t, { x, y, s = 1, walk = 0, moving = false, flip = false, jump = 0, mood = "happy", reach = 0, crown = 0, op = 1 }) {
+  const sw = moving ? Math.sin(walk * Math.PI * 2) * 22 : 0;
+  const bob = moving ? -Math.abs(Math.sin(walk * Math.PI * 2)) * 6 : Math.sin(t * 3) * 1.5;
+  p.style.transform = `translate(${x - 50}px, ${y - 150 + bob - jump}px) scale(${flip ? -s : s}, ${s})`;
+  p.style.opacity = op;
+  p.P.lL.setAttribute("transform", `rotate(${sw} 42 104)`); p.P.lR.setAttribute("transform", `rotate(${-sw} 59 104)`);
+  p.P.aL.setAttribute("transform", `rotate(${-sw * 0.8 + (jump > 0 ? 140 : 0)} 23 74)`);
+  p.P.aR.setAttribute("transform", `rotate(${sw * 0.8 - reach * 70} 77 74)`);
+  p.P.mo.setAttribute("d", mood === "shock" ? "M46 56 a4 4 0 1 0 0.1 0" : mood === "big" ? "M42 52 Q50 64 58 52 Z" : "M43 54 Q50 60 57 54");
+  p.P.mo.setAttribute("fill", mood === "shock" || mood === "big" ? INK2 : "none");
+  p.P.crown.setAttribute("opacity", crown > 0 ? 1 : 0);
+  p.P.crown.setAttribute("transform", `translate(0 ${-30 * (1 - crown)}) rotate(${6 * Math.sin(t * 4)} 50 10)`);
+}
+
 scene(40, 72, (R, s) => {
   s.caps = [[40.2, "흐름의 핵심: 주인공은 브랜드가 아니라 고객", "The customer is the hero, not the brand"],
             [46, "고객의 문제 → 길잡이인 우리 → 3단계 계획 → 분명한 버튼", "Problem → you as the guide → a 3-step plan → a clear button"],
             [53, "스크롤이 곧 장면 전환: 인터랙티브 비주얼은 체류시간을 늘린다", "Scroll as scene change: interactive visuals raise dwell time"],
             [60, "제 페이지에 흐름을 대입하면", "Mapped onto my page"]];
   s.cite = [[40, "StoryBrand SB7 · Donald Miller"], [53, "Infogram × DC Thomson, 2015 (인용)"]];
-  chapter(R, "CHAPTER 02", "전체 흐름 잡기");
-  const NODES = [["주인공", "고객", "Hero · 고객"], ["문제", "무엇이 불편한가", "Problem"], ["가이드", "우리 = 길잡이", "Guide"], ["계획", "1 · 2 · 3 단계", "Plan"], ["행동", "분명한 버튼", "Call to action"], ["성공", "달라진 모습", "Success"]];
-  const svg = el("div", "left:96px;top:190px;width:780px;height:640px", "", R); svg.className = "abs";
-  svg.innerHTML = `<svg width="780" height="640"><path class="arc" d="M60 560 C 200 520, 200 360, 330 330 S 520 120, 720 80" stroke="#c8a266" stroke-width="5" fill="none" stroke-dasharray="1200" stroke-dashoffset="1200" stroke-linecap="round"/></svg>`;
-  const pts = [[60, 560], [190, 450], [330, 330], [470, 240], [600, 140], [720, 80]];
-  const nodes = NODES.map((n, i) => { const d = el("div", `left:${96 + pts[i][0] - 18}px;top:${190 + pts[i][1] - 18}px`, `
-    <div style="width:36px;height:36px;border-radius:50%;background:var(--gold);box-shadow:0 0 0 8px rgba(200,162,102,.18)"></div>
-    <div style="position:absolute;left:48px;top:-8px;white-space:nowrap"><div style="font-size:28px;font-weight:800">${n[0]}</div><div style="font-size:18px;color:var(--muted)">${n[1]}</div></div>`, R); d.className = "abs"; return d; });
-  const wire = el("div", "left:1000px;top:190px;width:820px;height:640px;background:var(--panel);border:1px solid var(--line);border-radius:20px;padding:26px", "", R); wire.className = "abs";
-  const secs = [["HERO", "고객이 원하는 결과를 한 줄로", 120], ["PROBLEM", "지금 무엇이 불편한가", 70], ["GUIDE", "공감 + 권위: 후기 · 숫자 · 로고", 90], ["PLAN", "1 상담 → 2 제작 → 3 오픈", 80], ["CTA", "상담 예약 / 장바구니 / 길찾기", 70], ["SUCCESS", "달라진 모습 · 사례", 80]];
-  const rows = secs.map(sx => el("div", `height:${sx[2]}px;border-radius:12px;background:#f1e4c8;margin-bottom:10px;display:flex;align-items:center;gap:18px;padding:0 20px`,
-    `<b style="font-size:17px;letter-spacing:3px;color:var(--gold);width:110px">${sx[0]}</b><span style="font-size:21px">${sx[1]}</span>`, wire));
-  const stat = el("div", "left:96px;top:180px;display:flex;gap:60px;z-index:3", `<div><div class="stat">+62%</div><div style="font-size:20px;color:#6b5d52;margin-top:6px">평균 체류시간</div></div>
-    <div><div class="stat">+317%</div><div style="font-size:20px;color:#6b5d52;margin-top:6px">스크롤 깊이</div></div>`, R); stat.className = "abs";
-  const ref = refWindow(R, 1000, 150, 820, 720);
-  const marks = REF_MARKS.map(m => { const d = el("div", "left:1020px;z-index:6", m[1], R); d.className = "reftag abs"; d.style.background = "var(--terra)"; d.style.color = "#fff"; return d; });
-  const noa = makeNoa(150); R.appendChild(noa);
-  const bub = makeBubble(R);
+  const cam = el("div", "position:absolute;inset:0", "", R);
+  chapter(cam, "CHAPTER 02", "전체 흐름 잡기");
+
+  // ================= spotlight stage (40–46) =================
+  const SPOT_X = 600;
+  const spot = el("div", "left:0;top:0;width:1000px;height:900px;z-index:2", `<svg width="1000" height="900" overflow="visible">
+    <g class="beam"><path d="M${SPOT_X - 40} 120 L${SPOT_X + 40} 120 L${SPOT_X + 170} 830 L${SPOT_X - 170} 830 Z" fill="#fff6c8" opacity=".75"/>
+    <ellipse cx="${SPOT_X}" cy="830" rx="175" ry="34" fill="#fff1a8" stroke="${INK2}" stroke-width="3" stroke-dasharray="10 10"/></g>
+    <g class="lamp"><rect x="${SPOT_X - 46}" y="92" width="92" height="40" rx="10" fill="#6b5d52" stroke="${INK2}" stroke-width="4"/><line x1="${SPOT_X}" y1="40" x2="${SPOT_X}" y2="92" stroke="${INK2}" stroke-width="5"/></g></svg>`, cam); spot.className = "abs";
+  const beam = spot.querySelector(".beam"), lamp = spot.querySelector(".lamp");
+  const sign = el("div", "left:0;top:0;z-index:6;transform-origin:50% -120px", `
+    <svg width="360" height="260" overflow="visible" style="position:absolute;left:-180px;top:-120px"><line x1="60" y1="0" x2="100" y2="120" stroke="${INK2}" stroke-width="4"/><line x1="300" y1="0" x2="260" y2="120" stroke="${INK2}" stroke-width="4"/></svg>
+    <div style="position:absolute;left:-180px;top:0;width:360px;padding:10px 0 14px;text-align:center;background:#fbe3b0;border:4px solid ${INK2};border-radius:14px;box-shadow:6px 7px 0 rgba(43,35,32,.25)">
+      <div style="font-size:26px;color:#c8372d;letter-spacing:3px">★ HERO ★</div>
+      <div class="sg" style="font-size:44px;line-height:1.1">주인공 = <span class="who">노아</span></div></div>`, cam); sign.className = "abs";
+  const who = sign.querySelector(".who");
+  const cloud = el("div", "left:0;top:0;z-index:26;opacity:0", `<svg width="150" height="120" viewBox="0 0 150 120" overflow="visible">
+    <g class="dr">${[30, 60, 90, 118].map((x, i) => `<line class="d${i}" x1="${x}" y1="70" x2="${x - 6}" y2="88" stroke="#3e8fb8" stroke-width="5" stroke-linecap="round"/>`).join("")}</g>
+    <path d="M22 66 Q4 64 10 46 Q14 30 34 34 Q40 10 66 14 Q88 4 100 26 Q126 20 132 42 Q148 50 138 64 Z" fill="#c9cfd8" stroke="${INK2}" stroke-width="4" stroke-linejoin="round"/></svg>`, cam); cloud.className = "abs";
+  const drops = [0, 1, 2, 3].map(i => cloud.querySelector(".d" + i));
+  const badge = el("div", `left:0;top:0;z-index:32;padding:4px 14px 6px;background:#f7d774;border:3px solid ${INK2};border-radius:10px;font-size:24px;white-space:nowrap;opacity:0`, "🧭 가이드", cam); badge.className = "abs";
+
+  // ================= story road (46–53) =================
+  const ST = [[230, 818], [560, 806], [835, 690], [600, 575], [320, 470], [590, 330]];
+  const road = c02_road([[140, 824], ...ST, [720, 300]]);
+  const U = i => i + 1; // station i sits at point index i+1
+  const roadEl = el("div", "left:0;top:0;width:1000px;height:900px;z-index:3", `<svg width="1000" height="900" overflow="visible">
+    <path class="r0" d="${road.d}" fill="none" stroke="${INK2}" stroke-width="66" stroke-linecap="round"/>
+    <path class="r1" d="${road.d}" fill="none" stroke="#f6dca8" stroke-width="58" stroke-linecap="round"/>
+    <path class="r2" d="${road.d}" fill="none" stroke="#fffaf0" stroke-width="5" stroke-dasharray="16 18" stroke-linecap="round"/></svg>`, cam); roadEl.className = "abs";
+  const rPaths = ["r0", "r1", "r2"].map(c => roadEl.querySelector("." + c));
+  // stations: numbered badge + label, plus a prop
+  const LBL = [["주인공", "Hero"], ["문제", "Problem"], ["가이드", "Guide"], ["계획", "Plan"], ["행동", "Action"], ["성공", "Success"]];
+  const LPOS = [[130, 568], [470, 640], [790, 430], [560, 420], [140, 290], [740, 250]];
+  const stations = ST.map((p, i) => {
+    const d = el("div", `left:${LPOS[i][0]}px;top:${LPOS[i][1]}px;z-index:20;white-space:nowrap;display:flex;align-items:center;gap:8px;padding:4px 14px 6px 6px;background:#fffaf0;border:3px solid ${INK2};border-radius:999px;box-shadow:4px 5px 0 rgba(43,35,32,.2);transform-origin:20% 100%`,
+      `<span style="display:grid;place-items:center;width:40px;height:40px;border-radius:50%;background:${C02_COL[i]};border:3px solid ${INK2};font-size:24px">${i + 1}</span><span style="font-size:30px">${LBL[i][0]}</span><span style="font-size:22px;color:#6b5d52">${LBL[i][1]}</span>`, cam);
+    d.className = "abs"; return d;
+  });
+  // props
+  const rock = el("div", `left:${ST[1][0] + 36}px;top:${ST[1][1] - 84}px;z-index:22`, `<svg width="110" height="90" viewBox="0 0 110 90" overflow="visible">
+    <path d="M8 86 Q2 50 30 36 Q50 8 78 26 Q106 36 102 86 Z" fill="#b8a898" stroke="${INK2}" stroke-width="4"/><path d="M40 50 q10 -8 20 2" fill="none" stroke="${INK2}" stroke-width="3"/>
+    <text class="qm" x="80" y="-6" font-size="46" fill="#c8372d" font-family="GaeguLat">?!</text></svg>`, cam); rock.className = "abs";
+  const qm = rock.querySelector(".qm");
+  const stones = [0, 1, 2].map(k => { const pt = road.at(U(3) - 0.55 + k * 0.4); const d = el("div", `left:${pt[0] - 34}px;top:${pt[1] + 2}px;z-index:4`, `<svg width="68" height="34" overflow="visible"><ellipse cx="34" cy="14" rx="30" ry="13" fill="#d7cfc4" stroke="${INK2}" stroke-width="3.5"/><text x="34" y="23" text-anchor="middle" font-size="24" fill="${INK2}" font-family="GaeguLat">${k + 1}</text></svg>`, cam); d.className = "abs"; d.pt = pt; return d; });
+  const bigBtn = el("div", `left:${ST[4][0] - 150}px;top:${ST[4][1] - 110}px;z-index:22`, `<svg width="110" height="120" overflow="visible">
+    <rect x="18" y="62" width="74" height="54" rx="6" fill="#6b5d52" stroke="${INK2}" stroke-width="4"/>
+    <g class="cap"><ellipse cx="55" cy="62" rx="42" ry="14" fill="#8f1f18" stroke="${INK2}" stroke-width="4"/><path d="M13 62 V44 A42 14 0 0 1 97 44 V62" fill="#c8372d" stroke="${INK2}" stroke-width="4"/><ellipse cx="55" cy="44" rx="42" ry="14" fill="#e0524a" stroke="${INK2}" stroke-width="4"/>
+    <text x="55" y="51" text-anchor="middle" font-size="22" fill="#fffaf0" font-family="GaeguKo">GO</text></g></svg>`, cam); bigBtn.className = "abs";
+  const btnCap = bigBtn.querySelector(".cap");
+  const flag = el("div", `left:${ST[5][0] + 30}px;top:${ST[5][1] - 190}px;z-index:22`, `<svg width="140" height="200" overflow="visible">
+    <line x1="20" y1="190" x2="20" y2="10" stroke="${INK2}" stroke-width="6" stroke-linecap="round"/>
+    <path class="fl" d="M20 12 Q60 2 100 16 L100 64 Q60 52 20 62 Z" fill="#c8372d" stroke="${INK2}" stroke-width="4"/>
+    <text x="58" y="46" text-anchor="middle" font-size="30" fill="#fffaf0" font-family="GaeguLat">★</text></svg>`, cam); flag.className = "abs";
+  const flagCloth = flag.querySelector(".fl"), flagSvg = flag.querySelector("svg");
+  const mapProp = el("div", `left:0;top:0;z-index:34;opacity:0`, `<svg width="56" height="44" viewBox="0 0 56 44"><path d="M3 6 L19 2 L37 8 L53 3 L53 38 L37 42 L19 36 L3 41 Z" fill="#fffaf0" stroke="${INK2}" stroke-width="3.5" stroke-linejoin="round"/><path d="M12 30 Q24 12 30 24 T46 12" fill="none" stroke="#c8372d" stroke-width="3" stroke-dasharray="4 4"/></svg>`, cam); mapProp.className = "abs";
+  const COLS = ["#f7d774", "#e0607e", "#3e8fb8", "#9fd3a8", "#e8894f"];
+  const conf = Array.from({ length: 36 }, (_, i) => { const d = el("div", `left:0;top:0;width:${12 + c02_rnd(i) * 10}px;height:${8 + c02_rnd(i + 50) * 9}px;background:${COLS[i % 5]};border:2px solid ${INK2};border-radius:2px;z-index:35;opacity:0`, "", cam); d.className = "abs"; return d; });
+  const burst = (t, T0, ox, oy, seed, from = 0, to = conf.length) => conf.slice(from, to).forEach((d, j) => {
+    const i = j + seed, dt = t - T0 - (j % 5) * 0.03;
+    if (dt < 0 || dt > 2.4) { d.style.opacity = 0; return; }
+    const a = -Math.PI / 2 + (c02_rnd(i + 9) - 0.5) * 2.6, v = 500 + 600 * c02_rnd(i + 3), k = (1 - Math.exp(-2.4 * dt)) / 2.4;
+    d.style.opacity = 1 - seg(dt, 1.8, 2.4);
+    d.style.transform = `translate(${ox + Math.cos(a) * v * k + 10 * Math.sin(dt * 7 + i)}px, ${oy + Math.sin(a) * v * k + 200 * dt * dt}px) rotate(${dt * (300 + 400 * c02_rnd(i))}deg) scaleX(${Math.cos(dt * 8 + i)})`;
+  });
+
+  // ================= page wireframe (right) =================
+  const WX = 1060, WY = 170, WW = 720, WH = 690;
+  const wire = el("div", `left:${WX}px;top:${WY}px;width:${WW}px;height:${WH}px;background:#fffaf0;border:4px solid ${INK2};border-radius:18px;overflow:hidden;box-shadow:9px 11px 0 rgba(43,35,32,.22);z-index:8;transform-origin:50% 50%`, `
+    <div style="height:48px;background:#f6d9a0;border-bottom:4px solid ${INK2};display:flex;align-items:center;gap:9px;padding:0 16px">
+      <i style="width:13px;height:13px;border-radius:50%;background:#ff5f57;border:2px solid ${INK2}"></i><i style="width:13px;height:13px;border-radius:50%;background:#febc2e;border:2px solid ${INK2}"></i><i style="width:13px;height:13px;border-radius:50%;background:#28c840;border:2px solid ${INK2}"></i>
+      <span style="margin-left:12px;font-size:24px">내 브랜드 페이지 · 설계도</span></div>
+    <div class="vp" style="position:absolute;left:0;right:0;top:52px;bottom:0;overflow:hidden"><div class="inner" style="position:absolute;left:0;right:0;top:0;padding:14px 18px"></div></div>
+    <div class="sb" style="position:absolute;right:6px;top:60px;width:10px;height:120px;border-radius:5px;background:#6b5d52;opacity:.5"></div>`, cam); wire.className = "abs";
+  const inner = wire.querySelector(".inner"), sbar = wire.querySelector(".sb");
+  const ROWS = [["HERO", 140, `<div class="h1" style="font-size:38px;position:relative;white-space:nowrap">우리 회사는 업계 최고!<svg class="strike" width="400" height="30" style="position:absolute;left:-6px;top:14px" overflow="visible"><path d="M0 16 Q100 4 200 14 T400 10" stroke="#c8372d" stroke-width="7" fill="none" stroke-linecap="round" stroke-dasharray="420" stroke-dashoffset="420"/></svg></div><div class="h2" style="font-size:40px;color:#c8372d;white-space:nowrap"></div>`],
+    ["PROBLEM", 76, `<span style="font-size:26px">"이런 게 불편하셨죠?"</span>`],
+    ["GUIDE", 76, `<span style="font-size:26px">후기 128 · 경력 7년 · ★4.6</span>`],
+    ["PLAN", 76, ["상담", "제작", "오픈"].map((x, k) => `<span style="font-size:24px;padding:2px 12px;border:3px solid ${INK2};border-radius:999px;background:#fffaf0;margin-right:8px">${k + 1} ${x}</span>`).join("")],
+    ["CTA", 76, `<span class="cta" style="font-size:26px;padding:4px 18px 6px;border:3px solid ${INK2};border-radius:999px;background:#c8372d;color:#fffaf0">지금 상담 예약 →</span>`],
+    ["SUCCESS", 76, `<span style="font-size:26px">"문의가 두 배가 됐어요" ★★★★★</span>`]];
+  const rows = ROWS.map((r, i) => {
+    const d = el("div", `position:relative;height:${r[1]}px;margin-bottom:10px;border:3px solid ${INK2};border-radius:12px;background:#f3ead8;display:flex;align-items:center;gap:14px;padding:0 16px;transform-origin:0 50%`,
+      `<span class="bd" style="flex:none;display:grid;place-items:center;width:40px;height:40px;border-radius:50%;background:${C02_COL[i]};border:3px solid ${INK2};font-size:24px">${i + 1}</span>
+       <span style="flex:none;width:96px;font-size:22px;letter-spacing:1px;color:#6b5d52">${r[0]}</span><div style="flex:1;min-width:0">${r[2]}</div>`, inner);
+    d.bd = d.querySelector(".bd"); return d;
+  });
+  const h1 = rows[0].querySelector(".h1"), h2 = rows[0].querySelector(".h2"), strike = rows[0].querySelector(".strike path");
+  // scroll-as-scene-change sections below the rows
+  const SCN = [[PAL.dawn, "장면 1 · 새벽의 첫 컷"], [PAL.forest, "장면 2 · 숲으로 스크롤"], [PAL.sea, "장면 3 · 바다에서 CTA"]];
+  const scenesF = SCN.map(([pl, lab]) => {
+    const box = el("div", `position:relative;height:430px;margin-bottom:12px;border:3px solid ${INK2};border-radius:12px;overflow:hidden`, "", inner);
+    const f = makeFilm(pl); box.appendChild(f);
+    const l = el("div", `position:absolute;left:18px;top:18px;padding:4px 16px 6px;background:#fffaf0;border:3px solid ${INK2};border-radius:10px;font-size:28px;z-index:2`, lab, box);
+    box.f = f; box.l = l; return box;
+  });
+  const mouse = el("div", `left:${WX + WW - 96}px;top:${WY + WH - 150}px;z-index:12;opacity:0`, `<svg width="64" height="96" viewBox="0 0 64 96"><rect x="4" y="4" width="56" height="86" rx="28" fill="#fffaf0" stroke="${INK2}" stroke-width="4"/><line x1="32" y1="4" x2="32" y2="36" stroke="${INK2}" stroke-width="3"/><rect class="wh" x="27" y="16" width="10" height="16" rx="5" fill="#c8372d" stroke="${INK2}" stroke-width="2.5"/></svg>`, cam); mouse.className = "abs";
+  const wheel = mouse.querySelector(".wh");
+
+  // ================= stats (53–60) =================
+  const BASE = 790, UNIT = 1.22;
+  const bars = [[180, 100, "#d7cfc4"], [290, 162, "#f7d774"], [520, 100, "#d7cfc4"], [630, 417, "#e8894f"]].map(([x, v, c]) => {
+    const d = el("div", `left:${x}px;top:${BASE}px;width:96px;height:0;z-index:10;background:${c};border:4px solid ${INK2};border-bottom:none;border-radius:10px 10px 0 0;box-shadow:6px 0 0 rgba(43,35,32,.18)`, "", cam);
+    d.className = "abs"; d.v = v; return d; });
+  const baseLine = el("div", `left:150px;top:${BASE}px;width:640px;height:5px;background:${INK2};border-radius:3px;z-index:11;transform-origin:0 50%`, "", cam); baseLine.className = "abs";
+  const nums = [[338, "+62%", 62], [678, "+317%", 317]].map(([cx, txt, v]) => { const d = el("div", `left:${cx - 140}px;top:0;width:280px;text-align:center;z-index:12;font-size:78px;color:#c8372d;text-shadow:4px 4px 0 #f7d774;-webkit-text-stroke:2px ${INK2};opacity:0`, txt, cam); d.className = "abs"; d.v = v; return d; });
+  const blabels = [[288, "평균 체류시간"], [628, "스크롤 깊이"]].map(([cx, txt]) => { const d = el("div", `left:${cx - 140}px;top:${BASE + 12}px;width:280px;text-align:center;z-index:12;font-size:30px;opacity:0`, txt, cam); d.className = "abs"; return d; });
+  const legend = el("div", `left:150px;top:230px;z-index:12;font-size:24px;white-space:nowrap;opacity:0`, `<span style="display:inline-block;width:22px;height:22px;background:#d7cfc4;border:3px solid ${INK2};vertical-align:-3px"></span> 정적 페이지 &nbsp; <span style="display:inline-block;width:22px;height:22px;background:#e8894f;border:3px solid ${INK2};vertical-align:-3px"></span> 인터랙티브`, cam); legend.className = "abs";
+  const dizzy = el("div", `left:0;top:0;z-index:33;font-size:30px;color:#d98c1f;opacity:0;white-space:nowrap`, "★ ✦ ★", cam); dizzy.className = "abs";
+
+  // ================= reference (60–72) =================
+  const ref = refWindow(cam, 980, 150, 800, 720);
+  ref.style.transformOrigin = "50% 50%";
+  const NOTES = [["훅 · Hook", "첫 화면에서 붙잡기", [0, 1]], ["증거 · Proof", "작업 · 숫자 · 후기", [2, 3]], ["행동 · Action", "분명한 버튼 하나", [4, 5]]];
+  const notes = NOTES.map((n, i) => {
+    const d = el("div", `left:170px;top:${236 + i * 176}px;width:560px;height:152px;z-index:14;background:${["#fbe3b0", "#f8d3df", "#d5ecd0"][i]};border:4px solid ${INK2};border-radius:14px;padding:14px 22px;box-shadow:7px 8px 0 rgba(43,35,32,.22);transform-origin:0 50%`,
+      `<div style="font-size:44px;line-height:1.05">${n[0]}</div><div style="font-size:28px;color:#6b5d52">${n[1]}</div>
+       <div style="position:absolute;right:18px;top:16px;display:flex;gap:8px">${n[2].map(k => `<span style="display:grid;place-items:center;width:40px;height:40px;border-radius:50%;background:${C02_COL[k]};border:3px solid ${INK2};font-size:24px">${k + 1}</span>`).join("")}</div>`, cam);
+    d.className = "abs"; return d; });
+  const arrow = el("div", "left:0;top:0;width:1920px;height:1000px;z-index:13", `<svg width="1920" height="1000" overflow="visible"><path class="ar" d="" fill="none" stroke="${INK2}" stroke-width="5" stroke-dasharray="12 10" stroke-linecap="round"/><path class="ah" d="" fill="${INK2}"/></svg>`, cam); arrow.className = "abs";
+  const arP = arrow.querySelector(".ar"), arH = arrow.querySelector(".ah");
+  const marks = REF_MARKS.map((m, i) => { const d = el("div", `left:930px;top:0;z-index:16;padding:6px 16px 8px;border:4px solid ${INK2};border-radius:12px;font-size:28px;white-space:nowrap;background:${["#fbe3b0", "#f8d3df", "#d5ecd0"][i]};box-shadow:4px 5px 0 rgba(43,35,32,.25);transform-origin:0 50%`, m[1], cam); d.className = "abs"; return d; });
+  const toot = el("div", `left:0;top:0;z-index:36;font-size:38px;color:#c8372d;opacity:0;white-space:nowrap`, "뿌우~!", cam); toot.className = "abs";
+
+  // ================= cast =================
+  const cust = c02_person(cam);
+  const noa = makeNoa(150); cam.appendChild(noa);
+  const horn = document.createElementNS("http://www.w3.org/2000/svg", "g");
+  horn.innerHTML = `<path d="M100 126 L136 114 L136 138 Z" fill="#3e8fb8" stroke="${INK2}" stroke-width="4" stroke-linejoin="round"/>
+    <rect class="tube" x="134" y="119" width="0" height="14" rx="4" fill="#f7d774" stroke="${INK2}" stroke-width="3.5"/>
+    <circle class="curl" cx="142" cy="126" r="9" fill="none" stroke="#e0607e" stroke-width="6"/>`;
+  noa.P.b.appendChild(horn);
+  const tube = horn.querySelector(".tube"), curl = horn.querySelector(".curl");
+  const bub = makeBubble(cam); bub.style.whiteSpace = "normal"; bub.style.width = "360px"; bub.style.textAlign = "center";
+  const bubC = makeBubble(cam), bubN = makeBubble(cam);
+
+  // customer timeline along the road: [arrive time, depart time] per station
+  const STOPS = [[46.4, 46.7], [47.2, 47.7], [48.2, 48.9], [49.6, 49.9], [50.5, 51.2], [51.9, 53]];
+  const custU = t => {
+    if (t < STOPS[0][0]) return U(0);
+    for (let i = 0; i < STOPS.length; i++) {
+      if (t <= STOPS[i][1]) return U(i);
+      if (i + 1 < STOPS.length && t < STOPS[i + 1][0]) return lerp(U(i), U(i + 1), ease(seg(t, STOPS[i][1], STOPS[i + 1][0])));
+    }
+    return U(5);
+  };
+  const reached = t => { let k = -1; STOPS.forEach((st, i) => { if (t >= st[0]) k = i; }); return k; };
+
   return t => {
-    const arc = svg.querySelector(".arc");
-    arc.setAttribute("stroke-dashoffset", 1200 * (1 - ease(seg(t, 41, 51))));
-    const act = Math.floor(clamp((t - 41) / 1.7, 0, 5.99));
-    nodes.forEach((n, i) => { const p = pop(n, t, 41 + i * 1.7, .5, 14); n.style.opacity = p * (i === act || t > 51.5 ? 1 : .5); });
+    // ---------------- phase switches ----------------
+    const toRoad = seg(t, 45.8, 46.6), toStats = seg(t, 52.9, 53.6), toRef = seg(t, 59.4, 60.4);
+    // spotlight stage
+    const beamX = t < 42.4 ? 0 : 0;
+    spot.style.opacity = seg(t, 40.3, 40.8) * (1 - toRoad);
+    beam.setAttribute("opacity", 0.6 + 0.4 * Math.abs(Math.sin(t * 7)) * (t < 40.9 ? 1 : 0) + (t > 40.9 ? 0.4 : 0));
+    beam.setAttribute("transform", `rotate(${t > 42.5 && t < 42.9 ? -3 * Math.sin(seg(t, 42.5, 42.9) * Math.PI) : 0} ${SPOT_X} 110)`);
+    lamp.setAttribute("transform", `translate(0 ${-20 * (1 - out(seg(t, 40.3, 40.8)))})`);
+    const sIn = seg(t, 40.5, 41.0), sOut = toRoad;
+    const swing = 7 * c02_settle(t - 41.0, 1.1, 1.8) + 9 * c02_settle(t - 42.9, 1.3, 2);
+    sign.style.opacity = sIn > 0 ? 1 - sOut : 0;
+    sign.style.transform = `translate(${SPOT_X}px, ${lerp(-300, 236, out(sIn)) - 400 * sOut * sOut}px) rotate(${swing}deg)`;
+    who.textContent = t < 42.9 ? "노아" : "고객";
+    who.style.color = t < 42.9 ? INK2 : "#c8372d";
+    who.style.display = "inline-block"; who.style.transform = `scale(${t > 42.9 ? back(seg(t, 42.9, 43.2)) : 1})`;
+
+    // road + stations
+    roadEl.style.opacity = t > 45.7 ? 1 - toStats : 0;
+    const drawn = ease(seg(t, 45.8, 47.0));
+    rPaths.forEach((p, i) => { p.setAttribute("stroke-dasharray", i === 2 ? "16 18" : `${road.L} ${road.L}`); if (i < 2) p.setAttribute("stroke-dashoffset", road.L * (1 - drawn)); });
+    rPaths[2].setAttribute("opacity", drawn >= 1 ? 1 : 0);
+    const rk = reached(t);
+    stations.forEach((d, i) => {
+      const a = i === 0 ? 46.3 : STOPS[i][0] - 0.25, p = seg(t, a, a + 0.4);
+      d.style.opacity = (p > 0 ? 1 : 0) * (1 - toStats);
+      const lit = rk === i && t < 52.9;
+      d.style.transform = `scale(${back(p) * (lit ? 1.12 : 1)}) rotate(${(i % 2 ? 2 : -2) + (lit ? 2 * Math.sin(t * 6) : 0)}deg)`;
+      d.style.background = lit ? "#fff1a8" : "#fffaf0";
+    });
+    const propOp = (a) => seg(t, a, a + 0.3) * (1 - toStats);
+    rock.style.opacity = propOp(46.6);
+    rock.style.transform = `translateY(${-20 * (1 - back(seg(t, 46.6, 46.9)))}px) rotate(${t > 47.2 && t < 47.7 ? 3 * Math.sin(t * 40) : 0}deg)`;
+    qm.setAttribute("opacity", t > 47.2 && t < 47.9 ? 1 : 0);
+    stones.forEach((d, k) => {
+      const hopOn = seg(t, 48.9 + k * 0.23, 49.1 + k * 0.23);
+      d.style.opacity = propOp(47.4 + k * 0.1);
+      d.style.transform = `translateY(${4 * Math.sin(hopOn * Math.PI)}px)`;
+    });
+    bigBtn.style.opacity = propOp(48.2);
+    const press = seg(t, 50.6, 50.72) - seg(t, 50.8, 51.0);
+    btnCap.setAttribute("transform", `translate(0 ${14 * press})`);
+    flag.style.opacity = propOp(48.8);
+    const raise = back(seg(t, 51.9, 52.4));
+    flagSvg.style.transform = `translateY(${120 * (1 - raise)}px)`; flagSvg.style.clipPath = "inset(-40px -40px 0 -40px)";
+    flag.style.overflow = "hidden"; flag.style.height = "200px";
+    flagCloth.setAttribute("d", `M20 12 Q60 ${2 + 8 * Math.sin(t * 6)} 100 16 L100 64 Q60 ${52 + 8 * Math.sin(t * 6 + 1)} 20 62 Z`);
+    burst(t, 52.0, ST[5][0] + 60, ST[5][1] - 160, 0, 0, 18);
+
+    // wireframe rows light up with the customer
+    const wIn = back(seg(t, 40.4, 41.0));
     rows.forEach((r, i) => {
-      const lit = t > 41 + i * 1.7 && (i === act || t > 51.5);
-      r.style.background = lit ? "#f7d774" : "#f1e4c8";
-      r.style.boxShadow = i === act && t < 51.5 ? "0 0 0 2px var(--gold)" : "none";
+      const lit = (t > 45.9 && rk >= i && t < 53) || (i === 0 && t > 42.6 && t < 53);
+      const now = rk === i && t < 52.9 && t > 45.9;
+      r.style.background = lit ? C02_COL[i] : "#f3ead8";
+      r.style.transform = `scale(${now ? 1.035 : 1})`;
+      r.bd.style.transform = `scale(${now ? 1 + 0.25 * Math.abs(Math.sin((t - STOPS[i][0]) * 8)) * (1 - seg(t, STOPS[i][0] + 0.5, STOPS[i][0] + 0.8)) : 1})`;
+      r.style.opacity = t < 53 ? seg(t, 40.6 + i * 0.08, 40.9 + i * 0.08) : 1;
     });
-    wire.style.opacity = seg(t, 40.5, 41.2) * (1 - seg(t, 59.5, 60));
-    stat.style.opacity = seg(t, 53, 53.6) * (1 - seg(t, 59.5, 60)); stat.style.transform = `translateY(${20 * (1 - seg(t, 53, 53.6))}px)`;
-    svg.style.opacity = nodes[0].parentNode ? 1 - .6 * seg(t, 53, 53.5) : 1;
-    // reference with section marks
-    const r = out(seg(t, 60, 60.8));
-    ref.style.opacity = r; ref.style.transform = `translateX(${60 * (1 - r)}px)`;
-    const f = ease(seg(t, 61, 71));
+    strike.setAttribute("stroke-dashoffset", 420 * (1 - ease(seg(t, 42.7, 43.1))));
+    h1.style.opacity = 1 - seg(t, 43.3, 43.5); h1.style.display = t > 43.5 ? "none" : "block";
+    h2.textContent = type("당신의 고민, 3일이면 끝 ★", seg(t, 43.5, 44.6));
+    // scrolling: rows scroll away, then snap from scene to scene
+    const sc = 620 * ease(seg(t, 53.3, 54.3)) + 442 * ease(seg(t, 55.3, 56.1)) + 442 * ease(seg(t, 57.2, 58.0));
+    inner.style.transform = `translateY(${-sc}px)`;
+    sbar.style.transform = `translateY(${sc / 1950 * 470}px)`;
+    scenesF.forEach((b, i) => { b.f.update(t + i * 3, 0.9); b.l.style.transform = `translateY(${Math.max(0, (sc - 620 - i * 442) * -0.3)}px)`; });
+    mouse.style.opacity = seg(t, 53.1, 53.4) * (1 - toRef);
+    wheel.setAttribute("transform", `translate(0 ${(t * 2 % 1) * 10})`);
+    // flip into the reference page
+    const fl1 = seg(t, 59.4, 59.9), fl2 = seg(t, 59.9, 60.5);
+    wire.style.opacity = fl1 < 1 ? 1 : 0;
+    wire.style.transform = `translateY(${40 * (1 - wIn)}px) scale(${fl1 < 1 ? 1 - fl1 : 1}, 1) rotate(${-1 + (1 - wIn) * 4}deg)`;
+    ref.style.opacity = fl2 > 0 ? 1 : 0;
+    const rb = back(fl2);
+    ref.style.transform = `scale(${rb}, 1) rotate(${1.5 * c02_settle(t - 60.5, 1.2, 3)}deg)`;
+    const f = ease(seg(t, 61.2, 71));
     ref.scrollTo(f, t);
-    marks.forEach((m, i) => {
-      const at = REF_MARKS[i][0], vis = r * clamp(1 - Math.abs(f - at) * 4.5);
-      m.style.opacity = vis; m.style.top = (230 + 200 * clamp((at - f) * 3 + .5, 0, 1)) + "px";
+
+    // stats
+    legend.style.opacity = seg(t, 53.4, 53.8) * (1 - toRef);
+    baseLine.style.opacity = seg(t, 53.2, 53.3) * (1 - toRef);
+    baseLine.style.transform = `scaleX(${out(seg(t, 53.2, 53.7))})`;
+    const growA = back(seg(t, 53.8, 54.6)), growB = back(seg(t, 55.1, 55.9));
+    const gB0 = out(seg(t, 53.8, 54.4));
+    bars.forEach((b, i) => {
+      const g = i === 0 || i === 2 ? gB0 : i === 1 ? growA : growB;
+      const h = b.v * UNIT * g;
+      b.style.height = h + "px"; b.style.top = (BASE - h) + "px";
+      b.style.opacity = seg(t, 53.6, 53.7) * (1 - toRef);
     });
-    // Noa sits on the first node and pouts: the hero isn't him
-    poseNoa(noa, t, { x: 110, y: 520, s: .75, mood: t > 42.5 && t < 46 ? "pout" : "happy", talk: t > 42.5 && t < 45.5, look: 1, op: seg(t, 41.4, 41.8) * (1 - seg(t, 59.5, 60)) });
-    sayBubble(bub, t, 42.5, 46, "주인공은 내가 아니라… 손님이래 😤", 150, 470);
+    nums.forEach((n, i) => {
+      const a = i ? 56.2 : 54.6, p = seg(t, a, a + 0.9);
+      const top = BASE - n.v * 0 - (i ? 417 : 162) * UNIT - 100;
+      n.textContent = "+" + Math.round(n.v * out(p)) + "%";
+      n.style.top = top + "px";
+      n.style.opacity = (p > 0 ? 1 : 0) * (1 - toRef);
+      n.style.transform = `scale(${back(seg(t, a, a + 0.35)) * (1 + 0.12 * Math.abs(c02_settle(t - a - 0.9, 2.5, 5)))}) rotate(-4deg)`;
+    });
+    blabels.forEach((l, i) => { l.style.opacity = seg(t, 53.7 + i * 0.2, 54 + i * 0.2) * (1 - toRef); });
+
+    // reference notes + marks
+    const H = ref.real ? ref.img.naturalHeight * (800 / ref.img.naturalWidth) : ref.mock.fullH * ref.k;
+    const viewH = ref.viewH, off = f * Math.max(0, H - viewH);
+    let act = 0; REF_MARKS.forEach((m, i) => { if (m[0] * H - off < viewH * 0.8) act = i; });
+    marks.forEach((m, i) => {
+      const y = 150 + 44 + REF_MARKS[i][0] * H - off + 20;
+      const vis = t > 60.5 && y > 190 && y < 830 ? 1 : 0;
+      const pp = back(seg(t, 60.6 + i * 0.15, 60.9 + i * 0.15));
+      m.style.opacity = vis * (pp > 0 ? 1 : 0);
+      m.style.top = clamp(y, 190, 830) + "px";
+      m.style.transform = `scale(${pp * (i === act ? 1.12 : 1)}) rotate(-3deg)`;
+    });
+    notes.forEach((n, i) => {
+      const p = back(seg(t, 60.4 + i * 0.25, 60.9 + i * 0.25));
+      const on = i === act && t > 61;
+      n.style.opacity = seg(t, 60.4 + i * 0.25, 60.5 + i * 0.25);
+      n.style.transform = `translateX(${-80 * (1 - p)}px) scale(${on ? 1.05 : 0.96}) rotate(${on ? -1.5 : 0}deg)`;
+      n.style.filter = on || t < 61 ? "none" : "saturate(.5)";
+    });
+    {
+      const my = 150 + 44 + REF_MARKS[act][0] * H - off + 40, ny = 236 + act * 176 + 76;
+      const tgtY = clamp(my, 210, 850), vis = t > 61.2 ? 1 : 0;
+      arP.setAttribute("d", `M740 ${ny} C 830 ${ny}, 850 ${tgtY}, 920 ${tgtY}`);
+      arH.setAttribute("d", `M926 ${tgtY} l-18 -11 l0 22 z`);
+      arrow.style.opacity = vis;
+      arP.setAttribute("stroke-dashoffset", -t * 40);
+    }
+
+    // ---------------- customer ----------------
+    let cx, cy, cm = false, cwalk = 0, cmood = "happy", cjump = 0, creach = 0, cflip = false;
+    if (t < 45.8) {
+      const w = seg(t, 42.1, 42.9); cx = lerp(-60, SPOT_X, out(w)); cy = 830; cm = w > 0 && w < 1; cwalk = t * 2.2;
+      cmood = t > 42.9 && t < 43.6 ? "big" : "happy";
+    } else if (t < 46.4) {
+      const w = ease(seg(t, 45.8, 46.4)); cx = lerp(SPOT_X, ST[0][0], w); cy = lerp(830, ST[0][1], w); cm = true; cwalk = t * 2.4; cflip = true;
+    } else {
+      const u = custU(t), pt = road.at(u), pt2 = road.at(Math.min(u + 0.02, 6.99));
+      cx = pt[0]; cy = pt[1]; cm = rk < 5 && t > STOPS[Math.max(0, rk)][1] && (rk + 1 >= STOPS.length || t < STOPS[rk + 1][0]);
+      cwalk = road.lenAt(u) / 90; cflip = pt2[0] < pt[0] - 0.01;
+      if (rk === 1 && t < 47.7) cmood = "shock";
+      if (rk === 2 && t < 48.9) creach = seg(t, 48.4, 48.6);
+      if (t > 48.9 && t < 49.6) cjump = 26 * Math.abs(Math.sin(seg(t, 48.9, 49.6) * Math.PI * 3));
+      if (rk === 4 && t < 51.2) creach = seg(t, 50.4, 50.6) - seg(t, 50.9, 51.1), cflip = true;
+      if (t > 51.9) { cjump = 60 * Math.abs(Math.sin(seg(t, 51.9, 52.9) * Math.PI * 2)); cmood = "big"; }
+    }
+    const cOp = seg(t, 42.1, 42.2) * (1 - toStats);
+    c02_posePerson(cust, t, { x: cx, y: cy, s: 1, walk: cwalk, moving: cm, flip: cflip, jump: cjump, mood: cmood, reach: creach, crown: t < 42.9 ? 0 : back(seg(t, 42.9, 43.3)), op: cOp });
+    sayBubble(bubC, t, 47.25, 47.9, "헉, 막혔다!", cx + 10, cy - 240);
+
+    // ---------------- Noa ----------------
+    let nx, ny, mood = "happy", wave = false, talk = false, look = 0, flip = false, hop = 0, arm = null, sq = 0, nop = 1, rot = 0;
+    const NS = 150 * 1.1; // Noa height
+    if (t < 45.8) {
+      const w = seg(t, 40.6, 41.3);
+      if (t < 42.6) { nx = lerp(-200, SPOT_X - 75, out(w)); ny = 830 - NS; wave = t > 41.3 && t < 42.4; hop = w > 0 && w < 1 ? (t * 4) % 1 * 0.3 : 0; look = 0.3;
+        sq = t > 41.3 ? 0.1 * c02_settle(t - 41.3, 2.4, 5) : 0; }
+      else {
+        const b = seg(t, 42.6, 43.0); nx = lerp(SPOT_X - 75, 830, out(b)); ny = 830 - NS - 80 * Math.sin(b * Math.PI); rot = 20 * Math.sin(b * Math.PI);
+        mood = t < 43.1 ? "shock" : t < 45.2 ? "pout" : "happy"; look = -1;
+        talk = t > 43.3 && t < 44.8;
+        if (t > 45.2) { wave = t < 45.7; sq = 0.12 * c02_settle(t - 45.2, 2.4, 5); }
+      }
+    } else if (t < 53) {
+      // hops over to the guide station
+      const h = seg(t, 45.9, 46.5), gx = ST[2][0] + 20, gy = ST[2][1] - NS - 6;
+      nx = lerp(830, gx, ease(h)); ny = lerp(830 - NS, gy, h) - 120 * Math.sin(h * Math.PI);
+      look = -0.6; flip = true;
+      if (t > 47.9 && t < 48.8) { arm = -20 + 10 * Math.sin(t * 12); talk = true; }
+      if (t > 51.9) { wave = true; hop = (t * 2.5) % 1 * 0.3; }
+    } else if (t < 59.6) {
+      // walks to the bar-B spot, gets launched by the +317% bar, lands dizzy
+      const gx = ST[2][0] + 20, gy = ST[2][1] - NS - 6;
+      const m = seg(t, 53.0, 53.8), bx = 630 + 48 - 75;
+      const hB = 417 * UNIT * back(seg(t, 55.1, 55.9));
+      if (t < 55.1) { nx = lerp(gx, bx, ease(m)); ny = lerp(gy, BASE - NS, m) - 90 * Math.sin(m * Math.PI); look = 0.5; mood = t > 54.6 ? "shock" : "happy"; }
+      else if (t < 55.75) { nx = bx; ny = BASE - NS - hB; mood = "shock"; }
+      else {
+        const fl = seg(t, 55.75, 56.55); const startY = BASE - NS - 417 * UNIT;
+        nx = lerp(bx, 820, fl); ny = fl < 1 ? lerp(startY, BASE - NS, fl) - 260 * Math.sin(fl * Math.PI) : BASE - NS; rot = 360 * ease(fl);
+        mood = t < 57.8 ? "shock" : "happy"; look = -0.8;
+        sq = t > 56.55 ? 0.16 * c02_settle(t - 56.55, 2.6, 5) : 0;
+        if (t > 58) { wave = true; talk = t < 59; }
+      }
+    } else {
+      // reference: toots the horn at the reveal, then points at the active note
+      const w = seg(t, 59.4, 60.2); nx = lerp(820, 700, ease(w)); ny = 870 - NS; flip = false; look = -1;
+      if (t > 61.2) { arm = null; flip = true; arm = -10 + 6 * Math.sin(t * 5); look = 1; }
+      nop = 1;
+    }
+    poseNoa(noa, t, { x: nx, y: ny, s: 1, mood, wave, talk, look, flip, hop, op: seg(t, 40.6, 40.7) * nop });
+    noa.style.transform += ` rotate(${rot}deg) scale(${1 + sq}, ${1 - sq})`;
+    noa.style.transformOrigin = rot ? "50% 60%" : "50% 100%";
+    if (arm !== null) noa.P.ar.setAttribute("transform", `rotate(${arm} 154 118)`);
+    // sulk cloud
+    const cl = seg(t, 43.2, 43.5) * (1 - seg(t, 45.0, 45.3));
+    cloud.style.opacity = cl;
+    cloud.style.transform = `translate(${nx + 5 + 6 * Math.sin(t * 2)}px, ${ny - 90 - 20 * seg(t, 45.0, 45.3)}px)`;
+    drops.forEach((d, i) => d.setAttribute("transform", `translate(0 ${((t * 1.8 + i * 0.3) % 1) * 40})`));
+    // GUIDE badge flies onto Noa and stays with him on the road
+    const bIn = seg(t, 44.9, 45.3);
+    badge.style.opacity = bIn > 0 && t < 53.2 ? 1 : 0;
+    badge.style.transform = `translate(${lerp(1100, nx + 20, out(bIn))}px, ${lerp(200, ny + 136, out(bIn)) - 80 * Math.sin(bIn * Math.PI)}px) rotate(${-8 + 360 * (1 - out(bIn))}deg)`;
+    // the map handed to the customer at the guide station
+    const mp = seg(t, 48.2, 48.6);
+    mapProp.style.opacity = mp > 0 && t < 49.5 ? 1 : 0;
+    { const hx = t < 48.6 ? lerp(nx + 10, cx - 10, mp) : cx + 20, hy = t < 48.6 ? lerp(ny + 90, cy - 80, mp) - 50 * Math.sin(mp * Math.PI) : cy - 80 - cjump;
+      mapProp.style.transform = `translate(${hx}px, ${hy}px) rotate(${-10 + 20 * Math.sin(t * 5)}deg)`; }
+    sayBubble(bub, t, 43.3, 45.1, "주인공은 내가 아니라… 손님이래 😤", 690, 470);
+    sayBubble(bubN, t, 47.9, 48.9, "지도 받아!", nx + 110, ny - 70);
+    if (t > 57.9 && t < 59.3) sayBubble(bubN, t, 57.9, 59.3, "317%… 어지러워", nx + 120, ny - 70);
+    dizzy.style.opacity = t > 56.6 && t < 57.9 ? 1 : 0;
+    dizzy.style.transform = `translate(${nx + 30 + 30 * Math.cos(t * 9)}px, ${ny + 10 + 8 * Math.sin(t * 9)}px)`;
+    // party horn toot at the reveal
+    horn.setAttribute("opacity", t > 60.0 && t < 61.2 ? 1 : 0);
+    const blow = Math.max(seg(t, 60.2, 60.4) - seg(t, 60.55, 60.7), seg(t, 60.75, 60.9) - seg(t, 61.0, 61.15));
+    tube.setAttribute("width", 90 * blow); curl.setAttribute("opacity", blow < 0.12 ? 1 : 0);
+    toot.style.opacity = blow > 0.5 ? 1 : 0;
+    toot.style.transform = `translate(${nx + 120}px, ${ny - 40}px) rotate(8deg) scale(${0.9 + 0.2 * blow})`;
   };
 });
-
+})();

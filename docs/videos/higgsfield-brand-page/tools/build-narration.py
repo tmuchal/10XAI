@@ -156,7 +156,7 @@ def music(cfg):
     for b in range(nbars):
         t0 = b * bar
         ch = prog[b % 4]
-        intro = t0 < 8.0
+        intro = t0 < 5.0
         # marimba arpeggio (sparser in the intro)
         for k, p in enumerate(arp):
             if intro and k % 2: continue
@@ -185,21 +185,36 @@ def music(cfg):
                 add(buf, (0.05 * (1.3 if k % 2 else 0.7) * y).astype(np.float32), t0 + k * beat / 2 + beat / 4, pan=0.5)
 
     # chapter swells: rising filtered noise into the curtain + a whoosh + a bright chime when it opens
-    hp = signal.butter(2, [400, 5000], "band", fs=SR)
-    for B in cfg["boundaries"]:
-        L = int(1.8 * SR); t = np.arange(L) / SR
-        noise = signal.lfilter(*hp, rng.normal(0, 1, L))
-        swell = noise * (t / t[-1]) ** 2 * 0.10
-        add(buf, swell.astype(np.float32), B - 2.2, pan=-0.2)
-        L = int(1.2 * SR); t = np.arange(L) / SR                     # whoosh: swept band-pass noise
+    bp = signal.butter(2, [400, 5000], "band", fs=SR)
+
+    def swell(t_start, length, level):
+        L = int(length * SR); t = np.arange(L) / SR
+        add(buf, (signal.lfilter(*bp, rng.normal(0, 1, L)) * (t / t[-1]) ** 2 * level).astype(np.float32), t_start, pan=-0.2)
+
+    def whoosh(t_start, length=1.2, level=0.16):
+        L = int(length * SR); t = np.arange(L) / SR               # swept band-pass noise
         nz = rng.normal(0, 1, L); out = np.zeros(L)
         for j in range(0, L, 2400):
             fc = 300 + 3500 * np.sin(np.pi * j / L)
             seg_ = nz[j:j + 2400]
             out[j:j + len(seg_)] = signal.lfilter(*signal.butter(2, [fc * 0.7, fc * 1.3], "band", fs=SR), seg_)
-        add(buf, (0.16 * out * np.sin(np.pi * t / t[-1]) ** 2).astype(np.float32), B - 0.7, pan=0.2)
-        for k, m in enumerate([74, 78, 81, 86]):                      # chime arpeggio as curtain opens
-            add(buf, marimba(hz(m + 12), dur=1.6, vel=0.35), B + 0.9 + k * 0.07, pan=-0.4 + k * 0.25)
+        add(buf, (level * out * np.sin(np.pi * t / t[-1]) ** 2).astype(np.float32), t_start, pan=0.2)
+
+    def chime(t_start, vel=0.35):
+        for k, m in enumerate([74, 78, 81, 86]):
+            add(buf, marimba(hz(m + 12), dur=1.6, vel=vel), t_start + k * 0.07, pan=-0.4 + k * 0.25)
+
+    for B in cfg["boundaries"]:
+        swell(B - 2.2, 1.8, 0.10)
+        whoosh(B - 0.7)
+        chime(B + 0.9)
+    # opening: camera pushes through the curtains at frame 0
+    L = int(1.2 * SR); t = np.arange(L) / SR                          # rising "curtain-opening" swell 0-1.2 s
+    rise = sum(np.sin(2 * np.pi * hz(m) * t * (1 + 0.06 * t)) for m in (62, 69, 74, 78)) / 4
+    add(buf, (0.35 * rise * (t / t[-1]) ** 1.5 * np.minimum(1, (t[-1] - t) / 0.15)).astype(np.float32), 0.0)
+    swell(0.0, 1.2, 0.12)
+    whoosh(0.2, 1.0, 0.2)
+    chime(1.15, 0.45)
 
     # simple stereo reverb
     Lr = int(1.6 * SR); tr = np.arange(Lr) / SR
@@ -209,7 +224,7 @@ def music(cfg):
 
     # master envelope: fade in/out, small lift around chapter changes
     t = np.arange(n) / SR
-    env = np.clip(t / 2.0, 0, 1) * np.clip((D - t) / 4.0, 0, 1)
+    env = np.clip(t / 0.03, 0, 1) * np.clip((D - t) / 4.0, 0, 1)   # no slow fade-in: bed starts at frame 0
     for B in cfg["boundaries"]:
         env *= 1 + 0.35 * np.exp(-((t - B) / 1.2) ** 2)
     buf *= env
