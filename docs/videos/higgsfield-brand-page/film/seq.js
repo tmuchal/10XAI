@@ -51,6 +51,9 @@
       display: 'none', pointerEvents: 'none', zIndex: String(opts.z != null ? opts.z : 5),
       objectFit: 'contain', willChange: 'opacity',
     });
+    // a missing frame must not paint a broken-image box (visible once a CSS filter is applied)
+    img.onerror = () => { img.style.visibility = 'hidden'; };
+    img.onload = () => { img.style.visibility = ''; };
     parentEl.appendChild(img);
 
     let cur = -1;

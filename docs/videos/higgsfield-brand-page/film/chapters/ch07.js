@@ -35,10 +35,17 @@ scene(184, 192, (R, s) => {
   for (let x = 40; x <= MW - 40; x += 72) { bl.push([x, 8]); bl.push([x, MH - 8]); }
   for (let y = 40; y <= MH - 40; y += 48) { bl.push([8, y]); bl.push([MW - 8, y]); }
   const mq = c07_abs(`left:${960 - MW / 2}px;top:378px;width:${MW}px;height:${MH}px;${c07_card("#c8372d", 22)};z-index:6`, `
-    <div style="position:absolute;left:20px;top:18px;right:20px;bottom:18px;border-radius:14px;background:#fffaf0;border:3px solid ${INK};display:flex;align-items:center;justify-content:center;font-size:70px;white-space:nowrap">
+    <div class="u" style="position:absolute;left:20px;top:18px;right:20px;bottom:18px;border-radius:14px;background:#fffaf0;border:3px solid ${INK};display:flex;align-items:center;justify-content:center;font-size:70px;white-space:nowrap">
       <span>noainostory</span><span style="color:#d4623a">.higgsfield.app</span></div>
+    <div class="h" style="position:absolute;left:20px;top:18px;right:20px;bottom:18px;border-radius:14px;background:#fff3c4;border:3px solid ${INK};display:flex;align-items:center;justify-content:center;gap:18px;font-size:64px;white-space:nowrap">
+      <span style="font-size:40px;color:#6b5d52">다음 주인공 ★</span><span style="color:#c8372d">당신의 브랜드</span></div>
     ${bl.map(k => `<div class="bulb" style="position:absolute;left:${k[0] - 7}px;top:${k[1] - 7}px;width:14px;height:14px;border-radius:50%;border:2px solid ${INK}"></div>`).join("")}`, R);
-  const bulbs = [...mq.querySelectorAll(".bulb")];
+  const bulbs = [...mq.querySelectorAll(".bulb")], c07_mU = mq.querySelector(".u"), c07_mH = mq.querySelector(".h");
+  // "Noa's got the curtain": a pull rope drops from the valance for the final close
+  const c07_rope = c07_abs("left:0;top:0;width:1920px;height:1000px;z-index:33;pointer-events:none", `<svg width="1920" height="1000" style="overflow:visible">
+    <path class="r" d="" stroke="${INK}" stroke-width="12" fill="none" stroke-linecap="round"/><path class="r2" d="" stroke="#f2c14e" stroke-width="6" fill="none" stroke-linecap="round" stroke-dasharray="10 8"/>
+    <g class="ts"><circle r="13" fill="#f2c14e" stroke="${INK}" stroke-width="4"/><path d="M-12 10 L-16 58 L16 58 L12 10Z" fill="#f2c14e" stroke="${INK}" stroke-width="4" stroke-linejoin="round"/><path d="M-6 16 L-8 54 M0 16 V56 M6 16 L8 54" stroke="#c8963a" stroke-width="2.5"/></g></svg>`, R);
+  const c07_r = c07_rope.querySelector(".r"), c07_r2 = c07_rope.querySelector(".r2"), c07_ts = c07_rope.querySelector(".ts");
   // cast: Noa in the middle, extras either side
   const noa = makeNoa(416); R.appendChild(noa);
   const EX = [[220, -1, 120], [470, -1, 340], [1194, 1, 1330], [1444, 1, 1540]]
@@ -63,12 +70,15 @@ scene(184, 192, (R, s) => {
     // title banner swings down on its ropes
     const bd = seg(t, 184.4, 184.95), sw = c07_kick(t - 184.95, 1.6, 5.5);
     ban.style.transform = `translateY(${-420 * (1 - out(bd))}px) rotate(${6 * sw}deg)`;
-    chips.forEach((c, i) => { const p = back(seg(t, 185.3 + i * .14, 185.7 + i * .14));
+    chips.forEach((c, i) => { const p = back(seg(t, 187.35 + i * .12, 187.75 + i * .12));
       c.style.opacity = clamp(p * 2); c.style.transform = `translateY(${-40 * (1 - p)}px) scale(${0.5 + 0.5 * p}) rotate(${(i % 2 ? 2.5 : -2.5) * (0.6 + 0.4 * Math.sin(t * 2 + i))}deg)`; });
-    const mp = back(seg(t, 186.2, 186.7));
-    mq.style.opacity = clamp(mp * 2); mq.style.transform = `scale(${0.4 + 0.6 * mp}) rotate(${-1.5 + 0.5 * Math.sin(t * 1.7)}deg)`;
+    // marquee: "다음 주인공 ★ 당신의 브랜드" on "Your brand." (185.9), flips to the URL on "Go build it." (187.0)
+    const mp = back(seg(t, 185.55, 186.0)), fl = seg(t, 186.9, 187.25), fk = fl < .5 ? 1 - fl * 2 : (fl - .5) * 2;
+    mq.style.opacity = clamp(mp * 2);
+    mq.style.transform = `scale(${0.4 + 0.6 * mp}, ${(0.4 + 0.6 * mp) * Math.max(.04, fl > 0 && fl < 1 ? fk : 1)}) rotate(${-1.5 + 0.5 * Math.sin(t * 1.7) + wobble(t, 187.25, 3, 14, 5)}deg)`;
+    c07_mH.style.display = fl < .5 ? "flex" : "none"; c07_mU.style.display = fl < .5 ? "none" : "flex";
     const lit = Math.floor(t * 6);
-    bulbs.forEach((b, i) => { const on = t > 186.6 && (i + lit) % 3 !== 0;
+    bulbs.forEach((b, i) => { const on = t > 185.9 && (i + lit) % 3 !== 0;
       b.style.background = on ? "#fff3a0" : "#8a5a2b"; b.style.boxShadow = on ? "0 0 14px 4px rgba(255,230,120,.9)" : "none"; });
     spot.style.opacity = seg(t, 184.6, 185.6) * (0.75 + 0.25 * seg(t, 189.5, 191));
     // cast: walk in, line up, bow twice
@@ -77,8 +87,17 @@ scene(184, 192, (R, s) => {
     // Noa: wave, lower the sunglasses + wink, then poof away so the 3D bow owns centre stage (187–190), then pop back
     const gone = seg(t, 186.85, 187.1) * (1 - seg(t, 190.05, 190.3)), back2 = back(seg(t, 190.05, 190.45));
     const winkP = seg(t, 185.9, 186.15) * (1 - seg(t, 186.6, 186.8));
-    poseNoa(noa, t, { x: 752, y: 466 + 460 * (1 - nIn), s: t > 190 ? Math.max(.01, back2) : Math.max(.01, 1 - gone), talk: t > 186.1 && t < 186.7,
-      wave: (t > 185.3 && t < 185.9) || t > 190.4, hop: t > 185.2 && t < 185.9 ? (t - 185.2) / .7 : 0, blink: winkP < .5, op: gone >= 1 && t < 190.05 ? 0 : nIn });
+    // rope drops at 190.1; Noa hops (190.45), grabs it and hauls it down as the curtains close (190.75–191.5)
+    const rDrop = back(seg(t, 190.1, 190.5)), pull = ease(seg(t, 190.72, 191.2)), grab = t > 190.62;
+    const ropeEnd = -40 + 560 * rDrop + 150 * pull + 10 * wobble(t, 190.5, 1, 9, 3);
+    c07_rope.style.display = t > 190.1 ? "block" : "none";
+    const rsw = 16 * wobble(t, 190.3, 1, 5, 1.6) * (1 - pull);
+    c07_r.setAttribute("d", `M1090 -20 Q${1090 + rsw} ${ropeEnd * .5} ${1090 + rsw * 1.6} ${ropeEnd}`); c07_r2.setAttribute("d", c07_r.getAttribute("d"));
+    c07_ts.setAttribute("transform", `translate(${1090 + rsw * 1.6} ${ropeEnd}) rotate(${-rsw * .8})`);
+    shakeCam(t, 190.75, 6, .3);
+    poseNoa(noa, t, { x: 752, y: 466 + 460 * (1 - nIn) + 60 * pull, s: t > 190 ? Math.max(.01, back2) : Math.max(.01, 1 - gone), talk: t > 186.1 && t < 186.7,
+      wave: (t > 185.3 && t < 185.9) || (t > 190.4 && !grab), hop: t > 185.2 && t < 185.9 ? (t - 185.2) / .7 : t > 190.45 && t < 190.72 ? .3 + (t - 190.45) / .27 * .56 : 0,
+      arms: grab ? "up" : undefined, look: grab ? .6 : 0, blink: winkP < .5, op: gone >= 1 && t < 190.05 ? 0 : nIn });
     if (noa.P.sg) noa.P.sg.setAttribute("transform", `translate(0 ${24 * ease(winkP)}) rotate(${-5 * winkP} 100 98)`);
     if (winkP > .5) { noa.P.eye.style.display = ""; noa.P.e1.setAttribute("d", "M71 90 Q80 84 89 90"); noa.P.e1.setAttribute("fill", "none");
       noa.P.p1.style.display = ""; noa.P.p1.setAttribute("cx", 80); noa.P.p1.setAttribute("cy", 98); noa.P.p1.setAttribute("r", 7);
@@ -96,7 +115,7 @@ scene(184, 192, (R, s) => {
       poseNoa(n, t + i * .3, { x: xx, y: 626, s: 1, look: -from * .5, flip: from > 0 && walking, hop: walking ? ((t - a) * 3.2) % 1 : (t > 186.9 && t < 187.5 ? (t - 186.9) / .6 : 0), wave: t > 190.2 && i % 2 === 0, op: seg(t, a, a + .2) });
       c07_bow(n, bw);
     });
-    sayBubble(bub, t, 185.95, 186.85, "고마워요! 😎", 1130, 500);
+    sayBubble(bub, t, 185.95, 186.85, "고마워요!", 1130, 500);
     // roses land at the cast's feet
     roses.forEach((r, i) => {
       const a = 188.3 + i * .22, p = seg(t, a, a + .7), tx = [300, 1500, 1680][i], sx = [700, 1200, 1300][i];

@@ -99,7 +99,7 @@ scene(160, 184, (R, s) => {
   const c06_b1 = makeBurst(R, 24, 11), c06_b2 = makeBurst(R, 28, 12);
   // "Noa's cheeks? Already full." (181.0–183.0): the finale gag
   const c06_q = c06_abs(`left:0;top:0;font-size:120px;color:#c8372d;z-index:39;-webkit-text-stroke:3px ${INK};opacity:0`, "?", R);
-  const c06_full = c06_abs(`left:1130px;top:300px;padding:8px 26px 12px;border:6px solid #c8372d;border-radius:16px;background:#fffaf0;color:#c8372d;font-size:64px;white-space:nowrap;z-index:40;opacity:0;box-shadow:6px 7px 0 rgba(43,35,32,.22)`, "볼주머니 만석!", R);
+  const c06_full = c06_abs(`left:1150px;top:330px;padding:8px 26px 12px;border:6px solid #c8372d;border-radius:16px;background:#fffaf0;color:#c8372d;font-size:64px;white-space:nowrap;z-index:40;opacity:0;box-shadow:6px 7px 0 rgba(43,35,32,.22)`, "볼주머니 만석!", R);
   const c06_fsub = el("div", "font-size:30px;color:#6b5d52;text-align:center;margin-top:-4px", "FULL · 더는 못 넣어요", c06_full);
   const c06_pc = [0, 1, 2, 3].map(() => c06_abs("left:0;top:0;width:52px;height:52px;z-index:37;opacity:0", `<svg width="52" height="52" viewBox="0 0 40 40"><circle cx="20" cy="20" r="17" fill="#f7c843" stroke="${INK}" stroke-width="3"/><circle cx="20" cy="20" r="11" fill="none" stroke="#c98a1a" stroke-width="2"/><text x="20" y="27" text-anchor="middle" font-size="19" font-family="GaeguLat" fill="#8a5a12">₩</text></svg>`, R));
   const burst = Array.from({ length: 18 }, (_, i) => c06_abs(`left:0;top:0;width:16px;height:12px;border:2px solid ${INK};border-radius:3px;background:${["#f2c14e", "#f08aa0", "#7cc3e0", "#9bd48a"][i % 4]};z-index:37;opacity:0`, "", R));
@@ -140,23 +140,31 @@ scene(160, 184, (R, s) => {
   const softNote = c06_abs(`left:560px;top:770px;padding:8px 22px 10px;${c06_card("#fffaf0", 14)};font-size:30px;white-space:nowrap`, "↑ 점선 = 보조 CTA · 망설이는 사람을 위한 부드러운 선택지", R);
   const cursor = c06_abs("left:0;top:0;width:60px;height:70px;z-index:45", `<svg width="60" height="70" viewBox="0 0 60 70" overflow="visible">
     <path d="M4 2 L4 52 L17 40 L27 62 L37 57 L27 36 L45 36 Z" fill="#fff" stroke="${INK}" stroke-width="4" stroke-linejoin="round"/></svg>`, R);
-  const PRESS = [174.0, 174.9, 175.8, 176.7];
+  const PRESS = [177.0, 177.45, 177.9, 178.35];
 
   // ================= reference page reveal
   const stars = [[330, 200], [1470, 170], [300, 640], [1500, 600], [760, 150], [1160, 760]].map(([x, y], i) => c06_abs(`left:${x}px;top:${y}px;width:70px;height:70px;z-index:6`,
     `<svg width="70" height="70" viewBox="-35 -35 70 70"><path d="M0 -32 L9 -9 L32 0 L9 9 L0 32 L-9 9 L-32 0 L-9 -9 Z" fill="${["#f2c14e", "#f08aa0", "#7cc3e0"][i % 3]}" stroke="${INK}" stroke-width="3" stroke-linejoin="round"/></svg>`, R));
   const noa = makeNoa(190); R.appendChild(noa);
+  // bulging cheek pouches for the finale (inked, drawn behind the face so whiskers stay on top)
+  const c06_pouch = [40, 160].map(cx => { const g = document.createElementNS("http://www.w3.org/2000/svg", "g");
+    g.innerHTML = `<ellipse cx="${cx}" cy="128" rx="27" ry="25" fill="${NOA.body}" stroke="${INK}" stroke-width="5"/><ellipse cx="${cx + (cx < 100 ? 4 : -4)}" cy="132" rx="17" ry="15" fill="${NOA.belly}"/>
+      <path d="M${cx - 12} 114 Q${cx - 4} 108 ${cx + 6} 110" stroke="#fff" stroke-opacity=".6" stroke-width="4" fill="none" stroke-linecap="round"/>`;
+    noa.P.ckl.parentNode.insertBefore(g, noa.P.ckl); g.cx = cx; return g; });
   const wipeA = c06_strips(R, ["#f7d774", "#f08aa0"]), wipeB = c06_strips(R, ["#7cc3e0", "#f7d774"]);
 
+  // Beats cued to the narration: button 161.0 · formula 167.0 · +1%p 170.9 · "4.5 million" 172.4 ·
+  // "That's the button" 176.15 · "Noa's cheeks? Already full." 181.0
   return t => {
-    // ---------- funnel + formula phase (160.2–173.2)
-    const M = seg(t, 160.2, 160.8), X1 = ease(seg(t, 172.7, 173.25));
+    // ---------- funnel + formula phase (160.2–176.1)
+    const M = seg(t, 160.2, 160.8), X1 = ease(seg(t, 175.55, 176.1));
     const fin = back(seg(t, 160.3, 161.0));
     fun.style.opacity = clamp(fin * 2) * (1 - X1);
     fun.style.transform = `translate(${-200 * X1}px, ${60 * (1 - clamp(fin))}px) scale(${0.9 + 0.1 * fin})`; fun.style.transformOrigin = "540px 700px";
     labels.forEach((l, i) => { const p = back(seg(t, 160.7 + i * .18, 161.1 + i * .18)); l.style.opacity = clamp(p * 2); l.style.transform = `scale(${0.4 + 0.6 * p})`; });
-    gear.setAttribute("transform", `rotate(${t * 260})`);
-    poseNoa(runner, t * 2.2, { x: CX - 160 - 42, y: SPY + 40 + 58 - 84, s: 1, flip: true, hop: (t * 3.4) % 1, op: fun.style.opacity });
+    const spin = t < 161.95 ? 0 : (t - 161.95) * 260 + 400 * (1 - Math.exp(-3 * (t - 161.95)));     // the machine starts on the press
+    gear.setAttribute("transform", `rotate(${spin.toFixed(1)})`);
+    poseNoa(runner, t * 2.2, { x: CX - 160 - 42, y: SPY + 40 + 58 - 84, s: 1, flip: true, hop: t > 161.95 ? (t * 3.4) % 1 : 0, op: fun.style.opacity });
     vis.forEach(v => {
       const tau = t - v.t0;
       if (tau < 0 || X1 >= 1) { v.e.style.opacity = 0; return; }
@@ -174,6 +182,35 @@ scene(160, 184, (R, s) => {
       v.e.style.opacity = op * M;
       v.e.style.transform = `translate(${x - 15}px, ${yy - 15}px) scale(${sc}) rotate(${y >= dy ? v.side * (y - dy) * 1.5 : 0}deg)`;
     });
+    // ---------- the promised button (161.05–162.75)
+    const bIn = back(seg(t, 161.05, 161.45)), bFly = ease(seg(t, 162.3, 162.8)), pr = seg(t, 161.9, 161.97) * (1 - seg(t, 162.05, 162.2));
+    c06_btn.style.display = t > 161.0 && bFly < 1 ? "block" : "none";
+    c06_btn.style.opacity = clamp(bIn * 2) * (1 - seg(t, 162.6, 162.8));
+    c06_btn.style.transform = `translate(${lerp(0, CX - 1440, bFly)}px, ${lerp(0, -40, bFly) - 160 * Math.sin(Math.PI * bFly)}px) scale(${(0.5 + 0.5 * bIn) * lerp(1, .25, bFly)}) rotate(${-2 + 2 * bIn + wobble(t, 161.97, 3, 16, 5) - 20 * bFly}deg)`;
+    c06_bb.style.transform = `translateY(${8 * pr}px)`; c06_bb.style.boxShadow = `0 ${10 - 8 * pr}px 0 ${INK}`;
+    c06_bb.style.background = t > 161.95 ? "#c8372d" : "#d4623a";
+    const tgp = back(seg(t, 161.3, 161.6)); c06_tg.style.opacity = clamp(tgp * 2); c06_tg.style.transform = `rotate(${5 + 3 * wobble(t, 161.6, 1, 10, 4)}deg) scale(${tgp})`;
+    const rrp = seg(t, 161.95, 162.5); c06_rr.style.opacity = rrp > 0 ? 1 - rrp : 0; c06_rr.style.transform = `scale(${.4 + 3.2 * out(rrp)})`;
+    c06_b1.fire(t, 161.95, 1440, 400, 1.1); shakeCam(t, 161.95, 10, .35);
+    // cursor: glides in, presses at 161.95; later presses the four CTA buttons
+    const bxy = i => [150 + i * 413 + 210, 340 + 184];
+    let cx = 1000, cy = 980, cop = 0;
+    if (t < 163) {
+      const m = ease(seg(t, 161.25, 161.88));
+      cx = lerp(1780, 1450, m); cy = lerp(760, 420, m) - 40 * Math.sin(Math.PI * m);
+      if (t > 162.1) { const e = ease(seg(t, 162.1, 162.6)); cx += 260 * e; cy += 300 * e; }
+      cop = seg(t, 161.25, 161.4) * (1 - seg(t, 162.35, 162.6));
+    } else if (t >= 176.6) {
+      let k = 0; while (k < 3 && t > PRESS[k] + .25) k++;
+      const from = k === 0 ? [1000, 980] : bxy(k - 1), to = bxy(k);
+      const m = ease(seg(t, k === 0 ? 176.6 : PRESS[k - 1] + .25, PRESS[k] - .05));
+      cx = lerp(from[0], to[0], m); cy = lerp(from[1], to[1], m) - 40 * Math.sin(m * Math.PI);
+      if (t > PRESS[3] + .25) { const e = ease(seg(t, PRESS[3] + .3, 179.2)); cx = lerp(to[0], 1850, e); cy = lerp(to[1], 900, e); }
+      cop = seg(t, 176.6, 176.8) * (1 - seg(t, 178.9, 179.2));
+    }
+    const cpr = [161.95, ...PRESS].some(p => t > p - .04 && t < p + .16);
+    cursor.style.opacity = cop;
+    cursor.style.transform = `translate(${cx}px, ${cy}px) scale(${cpr ? .82 : 1})`;
     // catcher + coins
     const bx = 760 + 30 * Math.sin(t * 1.4);
     let caught = 0, lastCatch = -9, inBasket = 0, inCheek = 0;
@@ -187,69 +224,57 @@ scene(160, 184, (R, s) => {
     });
     const cOp = seg(t, 162.2, 162.6) * (1 - X1), nOp = seg(t, 160.4, 160.8) * (1 - X1);
     const bump = c06_kick(t - lastCatch, 7, 18);
-    const popOut = t > 170 && t < 170.5, cheer = t > 171.9 && t < 172.7;
-    poseNoa(catcher, t, { x: bx - 80, y: 722 + 6 * bump, s: 1, look: t < 162 ? .4 : -.6, mood: popOut ? "shock" : "happy", talk: t > 160.6 && t < 161.2,
-      hop: cheer ? (t - 171.9) / .8 : 0, arms: t > 162.1 ? "up" : undefined, op: nOp });
-    // cheek pouches: the sealed envelope (left) + gobbled coins (both)
-    const envIn = seg(t, 161.35, 161.8), envOut = seg(t, 170.0, 170.25);
-    const puffL = 1 + .55 * envIn * (1 - envOut) + Math.min(.4, inCheek * .06) + .15 * c06_kick(t - 161.8, 6, 16);
-    const puffR = 1 + Math.min(.4, inCheek * .06) + .12 * c06_kick(t - lastCatch, 6, 16) * (inCheek > 0 ? 1 : 0);
-    catcher.P.ckl.setAttribute("transform", `translate(50 128) scale(${puffL.toFixed(3)}) translate(-50 -128)`);
-    catcher.P.ckr.setAttribute("transform", `translate(150 128) scale(${puffR.toFixed(3)}) translate(-150 -128)`);
-    basket.style.opacity = cOp * (1 - seg(t, 171.8, 172)); basket.style.transform = `translate(${bx - 60}px, ${688 + 8 * bump}px)`;
-    // envelope: shown, stuffed into the cheek (161.3), popped out (170), opened, matched (171.85)
-    const eShow = back(seg(t, 160.6, 161.0));
-    let ex, ey, es;
-    if (t < 170) { ex = lerp(bx + 110, bx - 38, ease(envIn)); ey = lerp(740, 830, ease(envIn)); es = (0.4 + 0.5 * eShow) * (1 - .93 * ease(envIn)); }
-    else { const f = back(seg(t, 170.0, 170.45)); ex = lerp(bx - 38, 860, clamp(f)); ey = lerp(830, 600, clamp(f)) - 120 * Math.sin(clamp(f) * Math.PI); es = 0.1 + 0.9 * f; }
-    env.style.opacity = t < 160.6 || (t > 161.8 && t < 170) ? 0 : 1 - X1;
-    const match = t > 171.85;
-    env.style.transform = `translate(${ex - 140}px, ${ey - 80}px) scale(${es * (1 + .12 * c06_kick(t - 171.85, 5, 16))}) rotate(${t < 170 ? -8 : -4 + 4 * c06_kick(t - 170.45, 4, 12)}deg)`;
-    const fo = seg(t, 170.45, 170.75);
-    eFlap.style.transform = `scaleY(${1 - 2 * fo})`; eSeal.style.opacity = fo < .5 ? 1 : 0; eFlap.style.zIndex = fo < .5 ? 4 : 1; eFront.style.opacity = t > 170.7 ? 0 : 1; eCard.style.opacity = t > 170.55 ? 1 : 0;
-    eCard.style.transform = `translateY(${-118 * ease(seg(t, 170.75, 171.2))}px)`;
-    eQ.style.display = match ? "none" : ""; eChk.style.opacity = match ? 1 : 0;
-    eCard.style.background = match ? "#d8f0cf" : "#fffaf0";
-    const lb = back(seg(t, 160.75, 161.1)); eLab.style.opacity = clamp(lb * 2) * (1 - seg(t, 161.3, 161.5)); eLab.style.transform = `translate(${bx + 20}px, 600px) rotate(-4deg) scale(${lb})`;
-    burst.forEach((b, i) => { const tau = t - 171.85, a = i / burst.length * 6.283 + .3 * c06_h(i, 2), d = (120 + 90 * c06_h(i, 3)) * out(seg(tau, 0, .6));
+    const cheer = t > 173.8 && t < 174.6;
+    poseNoa(catcher, t, { x: bx - 80, y: 722 + 6 * bump, s: 1, look: t < 162 ? .4 : -.6, mood: "happy",
+      hop: cheer ? (t - 173.8) / .8 : 0, arms: t > 162.1 ? "up" : undefined, op: nOp });
+    // cheek pouches fill up with every other coin (pays off at 181: "Noa's cheeks? Already full.")
+    const puffC = 1 + Math.min(.45, inCheek * .07) + .12 * c06_kick(t - lastCatch, 6, 16) * (inCheek > 0 ? 1 : 0);
+    catcher.P.ckl.setAttribute("transform", `translate(50 128) scale(${puffC.toFixed(3)}) translate(-50 -128)`);
+    catcher.P.ckr.setAttribute("transform", `translate(150 128) scale(${puffC.toFixed(3)}) translate(-150 -128)`);
+    basket.style.opacity = cOp * (1 - seg(t, 175.4, 175.6)); basket.style.transform = `translate(${bx - 60}px, ${688 + 8 * bump}px)`;
+    env.style.opacity = 0; eLab.style.opacity = 0;
+    burst.forEach((b, i) => { const tau = t - 173.8, a = i / burst.length * 6.283 + .3 * c06_h(i, 2), d = (120 + 90 * c06_h(i, 3)) * out(seg(tau, 0, .6));
       b.style.opacity = tau > 0 && X1 < 1 ? 1 - seg(tau, .5, .9) : 0;
-      b.style.transform = `translate(${860 + Math.cos(a) * d - 8}px, ${480 + Math.sin(a) * d * .8 + 120 * tau * tau - 8}px) rotate(${tau * 500 + i * 40}deg)`; });
-    const lp = back(seg(t, 161.2, 161.7)), lx = ease(seg(t, 166.5, 166.95)), lk = ease(seg(t, 162.7, 163.2));
+      b.style.transform = `translate(${1400 + Math.cos(a) * d * 1.4 - 8}px, ${590 + Math.sin(a) * d * .7 + 120 * tau * tau - 8}px) rotate(${tau * 500 + i * 40}deg)`; });
+    // compact live counter (top right, clear of the 3D insert at 163–166)
+    const lp = back(seg(t, 162.7, 163.1)), lx = ease(seg(t, 166.5, 166.95)), lk = 1;
     live.style.opacity = clamp(lp * 2) * (1 - lx); live.style.transformOrigin = "100% 0";
     live.style.transform = `translateY(${-50 * lx - 70 * lk}px) scale(${(0.6 + 0.4 * lp) * (1 - .45 * lk)}) rotate(${1.5 - 1.5 * lx}deg)`;
-    liveSub.forEach(e => e.style.opacity = 1 - lk);
+    liveSub.forEach(e => e.style.opacity = 0);
     liveC.textContent = caught; liveC.style.transform = `scale(${1 + .25 * c06_kick(t - lastCatch, 6, 16)})`;
-    liveV.textContent = vis.filter(v => t > v.t0).length; liveK.textContent = caught;
     const nPile = Math.min(9, inBasket);
     if (pile.childElementCount !== nPile) pile.innerHTML = Array.from({ length: nPile }, (_, k) =>
       `<circle cx="${22 + (k % 5) * 19 + (k >= 5 ? 9 : 0)}" cy="${k >= 5 ? 0 : 12}" r="11" fill="#f7c843" stroke="${INK}" stroke-width="2.5"/>`).join("");
-    // formula
+    // formula: tiles land on "visitors · conversion · order value"
     const F = seg(t, 166.9, 167.3);
     form.style.opacity = F * (1 - X1); form.style.transform = `translateX(${240 * X1}px)`;
     const hp = back(seg(t, 166.9, 167.4)); fh.style.opacity = clamp(hp * 2); fh.style.transform = `translateY(${-20 * (1 - hp)}px)`;
-    const tp = back(seg(t, 168.9, 169.3)); tag.style.opacity = clamp(tp * 2); tag.style.transform = `rotate(6deg) scale(${1.8 - 0.8 * tp})`;
-    tiles.forEach((e, i) => { const p = back(seg(t, 167.1 + i * .28, 167.55 + i * .28));
-      e.style.opacity = clamp(p * 2); e.style.transform = `translateY(${-60 * (1 - p)}px) rotate(${(i - 1) * 1.5}deg)`; });
-    ops.forEach((e, i) => { const p = back(seg(t, 167.3 + i * .28, 167.6 + i * .28)); e.style.opacity = clamp(p * 2); e.style.transform = `scale(${p})`; });
-    const rp = back(seg(t, 168.0, 168.4));
+    const tp = back(seg(t, 170.1, 170.5)); tag.style.opacity = clamp(tp * 2); tag.style.transform = `rotate(6deg) scale(${1.8 - 0.8 * tp})`;
+    const TT = [167.35, 168.35, 169.35];
+    tiles.forEach((e, i) => { const p = back(seg(t, TT[i], TT[i] + .45));
+      e.style.opacity = clamp(p * 2); e.style.transform = `translateY(${-60 * (1 - p)}px) rotate(${(i - 1) * 1.5 + 3 * wobble(t, TT[i] + .35, 1, 14, 6)}deg)`; });
+    ops.forEach((e, i) => { const p = back(seg(t, TT[i + 1] - .2, TT[i + 1] + .1)); e.style.opacity = clamp(p * 2); e.style.transform = `scale(${p})`; });
+    const rp = back(seg(t, 169.9, 170.3));
     res.style.opacity = clamp(rp * 2); res.style.transform = `scale(${0.7 + 0.3 * rp})`;
-    const boost = ease(seg(t, 170.25, 170.3));
-    const flip = t < 170 ? 1 : t < 170.2 ? 1 - seg(t, 170, 170.2) : back(seg(t, 170.2, 170.5));
+    const FL0 = 171.15;                                                  // "+1 point of conversion"
+    const flip = t < FL0 ? 1 : t < FL0 + .2 ? 1 - seg(t, FL0, FL0 + .2) : back(seg(t, FL0 + .2, FL0 + .5));
     tiles[1].style.transform += ` scaleY(${Math.max(.02, flip)})`;
-    tiles[1].style.background = t > 170.2 ? "#d8f0cf" : "#fffaf0";
-    crV.textContent = t > 170.2 ? "2.5%" : "1.5%"; crV.style.color = t > 170.2 ? "#2f7a3a" : INK;
-    const roll = t < 170.4 ? 2700000 * out(seg(t, 168.1, 169.5)) : lerp(2700000, 4500000, ease(seg(t, 170.4, 171.8)));
+    tiles[1].style.background = t > FL0 + .2 ? "#d8f0cf" : "#fffaf0";
+    crV.textContent = t > FL0 + .2 ? "2.5%" : "1.5%"; crV.style.color = t > FL0 + .2 ? "#2f7a3a" : INK;
+    const R1 = 172.35, R2 = 173.75;
+    const roll = t < R1 ? 2700000 * out(seg(t, 169.95, 170.75)) : lerp(2700000, 4500000, ease(seg(t, R1, R2)));
     rv.textContent = "₩" + fmt(Math.round(roll / 1000) * 1000);
-    rv.style.color = t > 170.4 ? "#2f7a3a" : INK;
-    res.style.transform += ` scale(${1 + 0.06 * c06_kick(t - 171.8, 5, 16)})`;
-    const bn = back(seg(t, 170.0, 170.45)); boostN.style.opacity = clamp(bn * 2); boostN.style.transform = `translateY(${30 * (1 - bn)}px)`;
-    const dp = back(seg(t, 171.8, 172.2)); delta.style.opacity = clamp(dp * 2); delta.style.transform = `rotate(-6deg) scale(${1.6 - 0.6 * dp})`;
-    // ---------- CTA board (173–178)
-    const X2 = ease(seg(t, 177.6, 178.05));
-    const hh = back(seg(t, 173.0, 173.45));
+    rv.style.color = t > R1 ? "#2f7a3a" : INK;
+    res.style.transform += ` scale(${1 + 0.1 * c06_kick(t - R2, 5, 16) + (t > R1 && t < R2 ? .02 * Math.sin(t * 40) : 0)})`;
+    c06_b2.fire(t, R2, 1400, 570, 1.2); shakeCam(t, R2, 10, .4);
+    const bn = back(seg(t, FL0 + .1, FL0 + .55)); boostN.style.opacity = clamp(bn * 2); boostN.style.transform = `translateY(${30 * (1 - bn)}px)`;
+    const dp = back(seg(t, R2, R2 + .4)); delta.style.opacity = clamp(dp * 2); delta.style.transform = `rotate(-6deg) scale(${1.6 - 0.6 * dp})`;
+    // ---------- CTA board (176.05–181): "That's the button: one clear call to action, plus a soft one for maybe-laters."
+    const X2 = ease(seg(t, 180.55, 181.0));
+    const hh = back(seg(t, 176.05, 176.5));
     ctaH.style.opacity = clamp(hh * 2) * (1 - X2); ctaH.style.transform = `translateY(${-30 * (1 - hh) - 60 * X2}px)`;
     cards.forEach((c, i) => {
-      const p = back(seg(t, 173.1 + i * .12, 173.55 + i * .12));
+      const p = back(seg(t, 176.15 + i * .12, 176.6 + i * .12));
       const tp2 = t - PRESS[i], pressed = tp2 > 0 && tp2 < .22;
       c.style.opacity = clamp(p * 2) * (1 - X2);
       c.style.transform = `translateY(${120 * (1 - p) + 200 * X2}px) rotate(${(i % 2 ? 1 : -1) * (1 - p) * 6 + (i % 2 ? .8 : -.8)}deg) scale(${1 + 0.04 * c06_kick(tp2, 6, 14)})`;
@@ -259,40 +284,34 @@ scene(160, 184, (R, s) => {
       pb.querySelector(".ok").style.opacity = seg(tp2, .15, .35);
       const rpp = seg(tp2, 0, .55), rr = c.querySelector(".rp > div");
       rr.style.opacity = tp2 > 0 ? 1 - rpp : 0; rr.style.transform = `scale(${0.3 + 2.4 * out(rpp)})`;
-      const sb = c.querySelector(".sb"), sp = back(seg(t, 173.5 + i * .12, 173.9 + i * .12));
-      sb.style.opacity = clamp(sp * 2) * (t > 176.9 ? 1 : .75); sb.style.transform = `scale(${(0.6 + 0.4 * sp) * (1 + .08 * c06_kick(t - 176.95 - i * .1, 5, 14))})`;
+      const sb = c.querySelector(".sb"), sp = back(seg(t, 176.55 + i * .12, 176.95 + i * .12));
+      sb.style.opacity = clamp(sp * 2) * (t > 178.85 ? 1 : .75); sb.style.transform = `scale(${(0.6 + 0.4 * sp) * (1 + .1 * c06_kick(t - 178.9 - i * .1, 5, 14))})`;
     });
-    const sn = back(seg(t, 177.05, 177.4)); softNote.style.opacity = clamp(sn * 2) * (1 - X2); softNote.style.transform = `translateY(${20 * (1 - sn)}px)`;
-    // cursor: glide button to button, press
-    const bxy = i => [150 + i * 413 + 210, 340 + 184];
-    let cx = 1000, cy = 980;
-    if (t >= 173.4) {
-      let k = 0; while (k < 3 && t > PRESS[k] + .25) k++;
-      const from = k === 0 ? [1000, 980] : bxy(k - 1), to = bxy(k);
-      const m = ease(seg(t, k === 0 ? 173.4 : PRESS[k - 1] + .25, PRESS[k] - .05));
-      cx = lerp(from[0], to[0], m); cy = lerp(from[1], to[1], m) - 40 * Math.sin(m * Math.PI);
-      if (t > PRESS[3] + .25) { const e = ease(seg(t, PRESS[3] + .3, 177.5)); cx = lerp(to[0], 1850, e); cy = lerp(to[1], 900, e); }
-    }
-    const cp = PRESS.some(p => t > p - .04 && t < p + .16);
-    cursor.style.opacity = seg(t, 173.4, 173.6) * (1 - seg(t, 177.2, 177.5));
-    cursor.style.transform = `translate(${cx}px, ${cy}px) scale(${cp ? .82 : 1})`;
-    // ---------- reference reveal (178–184)
-    const r = back(seg(t, 178.0, 178.75));
-    ref.style.opacity = clamp(r * 3); ref.style.transform = `translateY(${420 * (1 - r)}px) rotate(${-2 * (1 - clamp(r))}deg)`;
-    ref.scrollTo(lerp(0.35, 1, ease(seg(t, 178.8, 181.4))), t);
-    stars.forEach((e, i) => { const p = back(seg(t, 178.6 + i * .07, 178.95 + i * .07));
+    const sn = back(seg(t, 179.0, 179.4)); softNote.style.opacity = clamp(sn * 2) * (1 - X2); softNote.style.transform = `translateY(${20 * (1 - sn)}px)`;
+    // ---------- finale (181–184): "Noa's cheeks? Already full."
+    const nIn = back(seg(t, 180.95, 181.4)), CH1 = 181.95;
+    const puffF = t < 181 ? 1 : 1.25 + 1.05 * out(seg(t, CH1, CH1 + .3)) + .25 * c06_kick(t - CH1 - .3, 5, 13) + .04 * Math.sin(t * 9) * seg(t, CH1, CH1 + .3);
+    poseNoa(noa, t, { x: 865, y: 612 + 300 * (1 - clamp(nIn)), s: 2.1, look: t > 181.3 && t < CH1 ? .5 : 0, mood: t > CH1 && t < CH1 + .45 ? "pout" : "happy",
+      hop: t > 180.95 && t < 181.45 ? (t - 180.95) / .5 : t > 182.7 && t < 183.2 ? (t - 182.7) / .5 : 0, op: clamp(nIn * 3), arms: t > CH1 + .45 && t < 182.7 ? "hips" : undefined });
+    c06_pouch.forEach(g => { const k = Math.max(.01, (puffF - 1) / 1.3), sx = k * (1 + .12 * c06_kick(t - CH1 - .3, 5, 13)), sy = k * (1 - .1 * c06_kick(t - CH1 - .3, 5, 13));
+      g.setAttribute("transform", `translate(${g.cx} 128) scale(${sx.toFixed(3)} ${sy.toFixed(3)}) translate(${-g.cx} -128)`); g.style.display = t > 181 ? "" : "none"; });
+    shakeCam(t, CH1, 9, .35);
+    // "?" pops beside the cheek, then the FULL stamp slams
+    const qp = back(seg(t, 181.3, 181.6)); c06_q.style.opacity = clamp(qp * 2) * (1 - seg(t, CH1 - .1, CH1));
+    c06_q.style.transform = `translate(${1120}px, ${470}px) scale(${qp}) rotate(${10 + 8 * Math.sin(t * 6)}deg)`;
+    const fp = seg(t, CH1 + .1, CH1 + .38);
+    c06_full.style.opacity = t > CH1 + .1 ? 1 : 0;
+    c06_full.style.transform = `rotate(-6deg) scale(${fp < 1 ? 2.4 - 1.4 * out(fp) : 1 + .05 * c06_kick(t - CH1 - .38, 6, 18)})`;
+    shakeCam(t, CH1 + .38, 7, .3);
+    // one coin too many pops out of each cheek
+    c06_pc.forEach((c, i) => { const a = CH1 + .5 + i * .14, p = seg(t, a, a + .75), side = i % 2 ? 1 : -1;
+      const x0 = 960 + side * 125, y0 = 610;
+      c.style.opacity = p > 0 && p < 1 ? 1 : 0;
+      c.style.transform = `translate(${x0 + side * (140 + 60 * i) * p - 26}px, ${y0 - 330 * p + 520 * p * p - 26}px) rotate(${side * 600 * p}deg) scale(${Math.abs(Math.cos(t * 8 + i)) * .6 + .4}, 1)`; });
+    stars.forEach((e, i) => { const p = back(seg(t, 181.05 + i * .07, 181.4 + i * .07));
       e.style.opacity = clamp(p * 2); e.style.transform = `scale(${p * (0.85 + 0.2 * Math.sin(t * 5 + i))}) rotate(${t * 40 + i * 30}deg)`; });
-    const td = back(seg(t, 178.6, 179.0));
-    tada.style.opacity = clamp(td * 2) * (1 - seg(t, 181.2, 181.6)); tada.style.transform = `rotate(-5deg) scale(${1.8 - 0.8 * td})`;
-    const rg = seg(t, 181.6, 182.3);
-    ring.setAttribute("stroke-dasharray", "1400"); ring.setAttribute("stroke-dashoffset", 1400 * (1 - ease(rg)));
-    hl.style.opacity = ref.real ? 0 : (t > 181.6 ? 1 : 0);
-    const ap = back(seg(t, 182.1, 182.5)); act.style.opacity = clamp(ap * 2); act.style.transform = `translateX(${30 * (1 - ap)}px)`;
-    const nIn = out(seg(t, 178.4, 178.9)), tadaArms = t > 178.6 && t < 179.8;
-    poseNoa(noa, t, { x: 1470 + 200 * (1 - nIn), y: 520, s: 1, talk: t > 179.6 && t < 181.4, look: -1, hop: t > 178.6 && t < 179.3 ? (t - 178.6) / .7 : 0, op: nIn, wave: t > 182 && t < 183, arms: tadaArms ? "up" : undefined });
-    sayBubble(bub, t, 179.6, 183.4, "마지막은 늘 버튼 하나!", 1400, 410);
-    head.style.opacity = 1 - seg(t, 177.6, 178);
-    wipeA(t, 172.55, .8); wipeB(t, 177.45, .8);
+    head.style.opacity = 1 - seg(t, 180.5, 180.9);
+    wipeA(t, 175.45, .8); wipeB(t, 180.45, .8);
   };
 });
 
@@ -306,7 +325,7 @@ scene(160, 184, (R, s) => {
       coin = el("div", "position:absolute;left:0;top:0;z-index:33;width:44px;height:44px", `<svg width="44" height="44" viewBox="0 0 40 40"><circle cx="20" cy="20" r="17" fill="#f7c843" stroke="${INK}" stroke-width="3"/>
         <circle cx="20" cy="20" r="11" fill="none" stroke="#c98a1a" stroke-width="2"/><text x="20" y="27" text-anchor="middle" font-size="19" font-family="GaeguLat" fill="#8a5a12">₩</text></svg>`, s.root);
     }
-    const inP = seg(t, 162.7, 163.15), X1 = ease(seg(t, 172.7, 173.25));
+    const inP = seg(t, 162.7, 163.15), X1 = ease(seg(t, 175.55, 176.1));
     const x = 905 + 12 * Math.sin(t * 2.2) * (t < 165.8 ? 1 : 0), y = lerp(1060, 668, back(inP));
     let mood = "happy", hop = 0, arms = "up", look = -1, talk = false;
     if (t < 165.8) hop = ((t - 163.1) * 1.7) % 1 * .55;                 // jumping for coins, catching nothing
@@ -315,8 +334,8 @@ scene(160, 184, (R, s) => {
     const cf = seg(t, 166.0, 166.55), bonk = t > 166.55 && t < 167.0;
     if (bonk) { mood = "shock"; arms = undefined; }
     if (t >= 167.0 && t < 170.3) { mood = "happy"; arms = undefined; hop = t < 167.6 ? seg(t, 167.0, 167.6) : 0; look = -.4; }
-    if (t >= 170.3 && t < 171.85) { mood = "happy"; look = -.8; arms = "hips"; }
-    if (t >= 171.85) { mood = "shock"; look = -.2; }                    // ₩4,500,000 matches the envelope!
+    if (t >= 170.3 && t < 173.75) { mood = "happy"; look = .8; arms = "hips"; }
+    if (t >= 173.75) { mood = "shock"; look = .6; }                     // ₩4,500,000!
     poseUchu(u, t, { x: x + 700 * X1, y: y - 120 * Math.sin(X1 * Math.PI), mood, hop, arms, look, talk, op: inP > 0 && X1 < 1 ? 1 : 0 });
     // coin path: Noa's head (≈780,720) → arc → Uchu's head, bounce up, into his mitten
     let cx, cy, cop = 1, cr = t * 600;

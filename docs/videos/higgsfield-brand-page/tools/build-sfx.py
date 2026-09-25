@@ -9,7 +9,7 @@ Writes audio/sfx.wav         the SFX bus alone, at the level it has in the final
        audio/final.wav       mix.wav + SFX bus, loudness-normalized, 48 kHz stereo, exactly 192.0 s
 
 Every sound is synthesized here (numpy/scipy, fixed seeds), so the build is offline and reproducible.
-Usage:  /tmp/tts/venv/bin/python tools/build-sfx.py [--sfx-lufs -21] [--target-lufs -16] [--tp -1] [--duck-db -6]
+Usage:  /tmp/tts/venv/bin/python tools/build-sfx.py [--sfx-lufs -22] [--target-lufs -16] [--tp -1] [--duck-db -6]
         [--report]  (only print the cue report, write nothing)
 
 Cue fields
@@ -149,7 +149,7 @@ def s_stamp(c, rng):
     y = 1.0 * sub + 0.7 * trans + 0.45 * knock + (0.15 if soft else 0.4) * slap
     if big:   # a little room boom
         y += 0.35 * filt(rng.standard_normal(len(t)), "low", 300) * expdec(t, 0.18) * att(t, 0.01)
-    return norm(fade_out(y))
+    return norm(fade_out(np.tanh(1.8 * norm(y, 1.0))))
 
 def s_thud(c, rng):
     t = T(0.35)
@@ -335,7 +335,7 @@ def s_osting(c, rng):
     w = np.array([np.exp(-0.5 * ((np.log2(cutoff_env) - np.log2(fc)) / 0.5) ** 2) for fc in cuts])
     y = (w * np.array(lp)).sum(0) / (w.sum(0) + 1e-9)
     y *= att(t, 0.012) * np.where(t < 0.14, 1, expdec(t - 0.14, 0.09))
-    return norm(fade_out(y))
+    return norm(fade_out(np.tanh(2.5 * norm(y, 1.0))))              # a little brassy saturation
 
 def s_sparkle(c, rng):
     t = T(0.7); y = np.zeros(len(t))
@@ -417,11 +417,13 @@ def s_applause(c, rng):
 SYNTH = {k[2:]: v for k, v in globals().items() if k.startswith("s_")}
 
 # per-type base level (dB) so that cue `gain` values are comparable across types
-# (calibrated from each synth's measured momentary loudness: gain 0 = a headline hit, about 3-6 LU under the program)
-LEVEL = {"whoosh": -7, "curtain": -13, "swipe": -9, "pop": -4, "pop_run": -9, "stamp": 1, "thud": -3, "clunk": 0, "boing": -5,
-         "coin": -7, "ding": -10, "kaching": -10, "flash": -3, "shutter": 2, "ticks": 2, "wheel": -1, "drumroll": -1,
-         "horn": -4, "rocket": -9, "keys": 3, "confetti": -3, "crowd": -7, "osting": -2, "sparkle": -9, "clack": 6,
-         "bonk": -2, "button": 7, "whistle": -16, "scribble": -6, "shaker": 0, "gulp": -8, "applause": 2}
+# Per-type base level (dB) so that cue `gain` values compare across types (gain 0 = a headline hit).
+# Derived from each synth's measured momentary loudness, then capped at -8 dB so transient-heavy sounds
+# (stamps, clicks) keep their peaks in check; curtains/whistles sit lower because they are long and dense.
+LEVEL = {"whoosh": -8, "curtain": -13, "swipe": -9, "pop": -8, "pop_run": -9, "stamp": -8, "thud": -8, "clunk": -8,
+         "boing": -8, "coin": -8, "ding": -10, "kaching": -10, "flash": -8, "shutter": -8, "ticks": -8, "wheel": -8,
+         "drumroll": -8, "horn": -8, "rocket": -9, "keys": -8, "confetti": -8, "crowd": -8, "osting": -8, "sparkle": -9,
+         "clack": -8, "bonk": -8, "button": -8, "whistle": -16, "scribble": -8, "shaker": -8, "gulp": -8, "applause": -8}
 
 
 # ============================================================================ loudness (ITU-R BS.1770-4)
@@ -515,9 +517,10 @@ def room(x, rng):
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("--sfx-lufs", type=float, default=-21.0, help="integrated loudness of the SFX bus in the final mix")
+    ap.add_argument("--sfx-lufs", type=float, default=-22.0, help="integrated loudness of the SFX bus in the final mix")
     ap.add_argument("--target-lufs", type=float, default=-16.0)
     ap.add_argument("--tp", type=float, default=-1.0, help="true-peak ceiling, dBTP")
+    ap.add_argument("--sfx-peak", type=float, default=-4.0, help="peak ceiling of the SFX bus in the final mix, dBFS")
     ap.add_argument("--duck-db", type=float, default=-6.0, help="SFX ducking while the narrator speaks")
     ap.add_argument("--protect-db", type=float, default=-6.0, help="extra cut for long SFX over key spoken numbers")
     ap.add_argument("--report", action="store_true", help="print the cue report only")
@@ -563,21 +566,21 @@ def main():
     g_final = 10 ** ((args.target_lufs - L_mix) / 20)
     g_sfx = 10 ** ((args.sfx_lufs - lufs(bus)) / 20)
     for _ in range(3):
-        final = g_final * mix + g_sfx * bus
+        final = g_final * mix + limit(g_sfx * bus, 10 ** (args.sfx_peak / 20))[0]
         final, gr = limit(final, 10 ** ((args.tp - 0.15) / 20))
         L_f = lufs(final)
         g_final *= 10 ** ((args.target_lufs - L_f) / 20)
         g_sfx *= 10 ** ((args.target_lufs - L_f) / 20)
-    final = g_final * mix + g_sfx * bus
+    sfx_out, sfx_gr = limit(g_sfx * bus, 10 ** (args.sfx_peak / 20))     # keep single hits from poking out
+    final = g_final * mix + sfx_out
     final, gr = limit(final, 10 ** ((args.tp - 0.15) / 20))
-    sfx_out = g_sfx * bus
 
     # ------------------------------------------------------------------ report
     L_f, L_s, tp_f, tp_s = lufs(final), lufs(sfx_out), true_peak(final), true_peak(sfx_out)
     print(f"{len(cues)} cues, {len(set(c['type'] for c in cues))} types")
     print(f"mix.wav        {L_mix:6.2f} LUFS  TP {db(true_peak(mix)):6.2f} dBTP")
     print(f"SFX bus        {L_s:6.2f} LUFS  TP {db(tp_s):6.2f} dBTP  (short-term max {short_term_max(sfx_out):6.2f} LUFS; "
-          f"{L_s - L_f:+.1f} LU vs final)")
+          f"{L_s - L_f:+.1f} LU vs final; bus limiter max GR {-db(1 - sfx_gr):.1f} dB)")
     print(f"final.wav      {L_f:6.2f} LUFS  TP {db(tp_f):6.2f} dBTP  sample peak {db(np.abs(final).max()):6.2f} dBFS  "
           f"limiter max GR {-db(1 - gr):.2f} dB  {final.shape[1] / SR:.3f} s  finite={np.isfinite(final).all()}")
     sp = gate > 0.5

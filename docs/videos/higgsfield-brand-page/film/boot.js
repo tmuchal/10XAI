@@ -257,9 +257,9 @@ function stageFx(t) {
 // Keep frames/fps/ext in sync with assets/3d/manifest.json.
 const SHOTS3D = [
   { name: "flythrough", start: 0.0, frames: 72, fps: 30, alpha: false, ext: "jpg", x: 0, y: 0, w: 1920, h: 1080 },
-  { name: "photobooth", start: 86.5, frames: 90, fps: 30, alpha: true, ext: "png", x: 1120, y: 170, w: 740, h: 740 },
-  { name: "coinfunnel", start: 163.0, frames: 90, fps: 30, alpha: true, ext: "png", x: 590, y: 140, w: 740, h: 740 },
-  { name: "curtaincall", start: 187.0, frames: 90, fps: 30, alpha: true, ext: "png", x: 0, y: 0, w: 1920, h: 1080 },
+  { name: "photobooth", start: 86.5, frames: 90, fps: 30, alpha: true, ext: "png", x: 1120, y: 170, w: 740, h: 740, src_w: 1080 },
+  { name: "coinfunnel", start: 163.0, frames: 90, fps: 30, alpha: true, ext: "png", x: 590, y: 140, w: 740, h: 740, src_w: 1080 },
+  { name: "curtaincall", start: 187.0, frames: 90, fps: 30, alpha: true, ext: "png", x: 0, y: 0, w: 1920, h: 1080, src_w: 1920 },
 ];
 window.__pending = window.__pending || [];
 // RGBA inserts live inside #scenes so they share its scale(.92) about (960,300) and the #cam push/shake.
@@ -267,14 +267,22 @@ window.__pending = window.__pending || [];
 const SCN = .92, toScene = (X, Y, W, H) => ({ x: 960 + (X - 960) / SCN, y: 300 + (Y - 300) / SCN, w: W / SCN, h: H / SCN });
 const INK3D = "drop-shadow(0 0 .9px rgba(43,35,32,.95)) drop-shadow(6px 8px 0 rgba(120,70,30,.2))";
 const INSERTS = [
-  // screen-space box of the whole square/16:9 source frame; drop = px of drop-in; boil = jiggle amount
+  // box: screen-space box of the WHOLE source frame [x, y, w, h]; crop: optional source-px column range to keep
+  // (edges feathered by a mask); drop: px of the drop-in; boil: jiggle amount
   { name: "photobooth", box: [960, 140, 760, 760], fadeIn: .12, fadeOut: .3, drop: 46, boil: 1.1 },
   { name: "coinfunnel", box: [820, 236, 700, 700], fadeIn: .12, fadeOut: .3, drop: 40, boil: 1.1 },
-  { name: "curtaincall", box: [555, 506, 810, 456], fadeIn: .15, fadeOut: .3, drop: 30, boil: .8 },
+  // 5-Noa lineup is 1920 wide; keep the centre three (hero in shades) at 2D-Noa size between the 2D groups
+  { name: "curtaincall", box: [435, 415, 1056, 594], crop: [430, 1490], fadeIn: .15, fadeOut: .3, drop: 30, boil: .8 },
 ].map(o => {
-  const e = SHOTS3D.find(s => s.name === o.name), b = toScene(...o.box);
+  const e = SHOTS3D.find(s => s.name === o.name), [X, Y, W, H] = o.box, k = W / ((e.src_w || e.w)), c = o.crop || [0, e.src_w || e.w];
+  const b = toScene(X + c[0] * k, Y, (c[1] - c[0]) * k, H), f = toScene(X, Y, W, H);
   const wrap = el("div", `position:absolute;left:${b.x.toFixed(1)}px;top:${b.y.toFixed(1)}px;width:${b.w.toFixed(1)}px;height:${b.h.toFixed(1)}px;z-index:20;display:none;pointer-events:none;transform-origin:50% 100%`, null, $("scenes"));
-  const p = SEQ.attach(wrap, e, { x: 0, y: 0, w: b.w, h: b.h, fadeIn: o.fadeIn, fadeOut: o.fadeOut, z: 1 });
+  if (o.crop) {
+    wrap.style.overflow = "hidden";
+    const m = "linear-gradient(90deg, transparent, #000 6%, #000 94%, transparent)";
+    wrap.style.webkitMaskImage = wrap.style.maskImage = m;
+  }
+  const p = SEQ.attach(wrap, e, { x: f.x - b.x, y: 0, w: f.w, h: f.h, fadeIn: o.fadeIn, fadeOut: o.fadeOut, z: 1 });
   p.el.style.filter = INK3D;
   return Object.assign(o, { wrap, p });
 });
