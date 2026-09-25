@@ -35,7 +35,7 @@
     </nav>
     <div class="eyebrow">Harness Theater #1 · Ontology + harness engineering · with Dr. Harness</div>
     <h1><span class="hl">10-Slide</span> Card News<small>An Instagram carousel about the 10XAI multi-agent Kanban board</small></h1>
-    <p class="logline">A viral post says "free, 5 minutes, one prompt." Dr. Harness, a hip hamster in black sunglasses, a backwards snapback and a gold "10X" chain, pastes it onto a Kanban board run by AI agents. The ontology gives every card typed fields, the harness checks them, and the carousel ends on claimed vs. measured numbers.</p>
+    <p class="logline">A viral post says "free, 5 minutes, one prompt." Dr. Harness, a hip hamster in black sunglasses, a backwards snapback and a gold "10X" chain, pastes it onto a Kanban board run by AI agents. His co-star Uchu (우츄) stands in for the reader who believes every viral post: always shocked, always talking in 반말 bubbles. The ontology gives every card typed fields, the harness checks them, and the carousel ends on claimed vs. measured numbers.</p>
     <div class="facts">
       <span><b>10</b> slides</span><span><b>4:5</b> · 1080×1350 PNG</span><span>grid-safe center <b>3:4</b></span><span>EN headline + <b>KR</b> line</span><span>host: <b>Dr. Harness</b>, hip hamster</span>
     </div>
@@ -197,14 +197,16 @@ Theater.install();
       g += `<rect x="100" y="206" width="340" height="42" rx="21" fill="#e5533f" stroke="${INK}" stroke-width="3"/>` + tx(270, 236, "'무료'라며? 직접 재봤어요", 28, { f: '#fff', stroke: INK, sw: 3 });
       g += tx(270, 271, '온톨로지랑 하네스, 10장으로 끝내요', 15, { body: true, f: '#6b4a36' });
       // Hype Box with its FREE sign
-      g += Theater.sign(142, 292, 196, ['FREE!', '5 min · 1 prompt'], { z: 34, z2: 19, f: '#c9362f', f2: INK, stick: [142, 470], r: -4 }).replace('y="292"', 'y="300"');
-      g += Theater.box(142, FY, 128, Object.assign({ mood: 'star', label: 'VIRAL POST' }, Theater.PAL.gold));
+      g += Theater.sign(142, 292, 196, ['FREE!', '5 min · 1 prompt'], { z: 34, z2: 19, f: '#c9362f', f2: INK, stick: [134, 490], r: -4 }).replace('y="292"', 'y="300"');
+      g += Theater.box(128, FY, 108, Object.assign({ mood: 'star', label: 'VIRAL POST' }, Theater.PAL.gold));
       g += Theater.burst(236, 318, 26, 'WOW', { z: 13, fill: '#f062a8', f: '#fff' });
       // the red RISK 72 card
       g += `<g transform="rotate(5 405 390)">${panel(318, 300, 176, 168, { fill: '#fffdf5' })}<rect x="318" y="300" width="14" height="168" rx="6" fill="#e5533f"/><rect x="318" y="300" width="176" height="168" rx="14" fill="none" stroke="#c9362f" stroke-width="4"/>`;
       g += tx(412, 334, 'RISK', 24, { f: '#c9362f' }) + tx(412, 410, '72', 78, { f: '#e5533f', stroke: INK, sw: 5 }) + tx(412, 440, 'Deploy from chat', 16) + tx(412, 459, '운영 서버에 바로 배포', 14, { body: true, f: KR }) + '</g>';
       g += `<rect x="370" y="286" width="94" height="24" rx="12" fill="#e5533f" stroke="${INK}" stroke-width="2.5" transform="rotate(5 405 390)"/>` + tx(417, 303, 'GATED', 15, { f: '#fff', r: 5, mono: true });
-      g += Theater.doc(300, FY, .72, { m: 'o', ra: [46, -70], bang: true });
+      g += Theater.uchu(250, FY, .58, { m: 'shock', bang: true, sweat: true, la: [-46, -70], ra: [46, -70] });
+      g += Theater.bubble(262, 420, 128, ['공짜라며?!'], [252, 474], { z: 22, f: '#c9362f' });
+      g += Theater.doc(338, FY, .66, { m: 'flat', ra: [46, -70] });
       g += peek(a);
       return g;
     }),
@@ -226,8 +228,9 @@ Theater.install();
         g += tx(234, y + 61, reply, 17, { a: 'start' }) + tx(234, y + 81, ko, 14, { a: 'start', body: true, f: KR });
       });
       g += Theater.box(104, FY, 92, Object.assign({ mood: 'star', label: 'HYPE' }, Theater.PAL.gold));
-      g += Theater.card(168, 556, 70, 26, '.env ?', { kind: 'gap' }) + Theater.card(36, 496, 64, 24, 'keys ?', { kind: 'gap' });
-      g += Theater.doc(310, FY, .5, { m: 'flat', q: true });
+      g += Theater.card(152, 470, 70, 26, '.env ?', { kind: 'gap' }) + Theater.card(36, 496, 64, 24, 'keys ?', { kind: 'gap' });
+      g += Theater.uchu(232, FY, .46, { m: 'shock', sweat: true, look: 'l' });
+      g += Theater.doc(320, FY, .5, { m: 'flat', q: true });
       g += peek(a);
       return g;
     }),
@@ -344,9 +347,10 @@ Theater.install();
       flags.forEach((row, r) => { let x = px + 18; row.forEach((f) => { const w = f.length * 9 + 20; g += `<rect x="${x}" y="${py + 80 + r * 34}" width="${w}" height="26" rx="13" fill="#ffe3de" stroke="#c9362f" stroke-width="2"/>` + tx(x + w / 2, py + 98 + r * 34, f, 15, { mono: true, f: '#a62a1c' }); x += w + 7; }); });
       g += tx(px + 18, py + 164, '안전한 카드는 알아서 실행돼요', 15, { a: 'start', body: true });
       // gate + waiting card + stamp
-      g += Theater.gate(196, FY, false, 180);
-      g += Theater.agent('verify', 440, FY, 72, { carry: 'prod deploy', carryKind: 'risk', mood: 'worried' });
-      g += stamp(330, 464, 'APPROVED?', -5);
+      g += Theater.gate(196, FY, false, 120);
+      g += Theater.uchu(352, FY, .52, { m: 'shock', sweat: true, la: [-44, -86], ra: [44, -86] });
+      g += Theater.agent('verify', 456, FY, 66, { carry: 'prod deploy', carryKind: 'risk', mood: 'worried' });
+      g += Theater.bubble(330, 426, 148, ['그냥 돌려!'], [350, 484], { z: 24, f: '#c9362f' });
       g += Theater.doc(92, FY, .6, { m: 'flat', ra: [44, -64] });
       g += `<g transform="rotate(-20 126 540)"><rect x="112" y="522" width="26" height="22" rx="3" fill="#8a5a2b" stroke="${INK}" stroke-width="2"/><rect x="104" y="542" width="42" height="12" rx="3" fill="#c9362f" stroke="${INK}" stroke-width="2"/></g>`;
       g += foot('RISK_GATE_THRESHOLD = 70');
@@ -368,11 +372,13 @@ Theater.install();
       // seeds = cost
       [0, 1, 2, 3].forEach((i) => { g += seed(430 + i * 18, by + 104 + (i % 2) * 6, .8, 20 - i * 14); });
       // sandbox with the runner
-      g += `<rect x="30" y="${by + 216}" width="480" height="52" rx="12" fill="#fffdf5" stroke="${INK}" stroke-width="3"/>` + tx(270, by + 238, 'Every run gets its own git worktree.', 15, { mono: true, w: 400 }) + tx(270, by + 259, '실행할 때마다 샌드박스를 새로 만들어요', 15, { body: true, f: KR });
+      g += `<rect x="190" y="${by + 216}" width="320" height="52" rx="12" fill="#fffdf5" stroke="${INK}" stroke-width="3"/>` + tx(350, by + 238, 'Every run gets its own git worktree.', 14, { mono: true, w: 400 }) + tx(350, by + 259, '실행할 때마다 샌드박스를 새로 만들어요', 15, { body: true, f: KR });
+      g += Theater.bubble(98, by + 214, 140, ['$0.40?!', '공짜라며!'], [80, FY - 112], { z: 20, f: '#c9362f', f2: INK });
+      g += Theater.uchu(76, FY, .52, { m: 'shock', bang: true, look: 'r' });
       g += Theater.sandbox(250, FY - 4, 250);
       g += Theater.agent('runner', 250, FY - 14, 70, { mood: 'happy' });
       g += Theater.stopwatch(318, FY - 76);
-      g += Theater.doc(420, FY, .66, { m: 'o', eyes: true, la: [-46, -70] });
+      g += Theater.doc(420, FY, .66, { m: 'flat', eyes: true, la: [-46, -70] });
       g += foot('numbers are placeholders');
       g += peek(a);
       return g;
@@ -420,7 +426,7 @@ Theater.install();
         if (i < 4) g += `<line x1="46" y1="${y + 50}" x2="494" y2="${y + 50}" stroke="#e8d3b4" stroke-width="2" stroke-dasharray="5 5"/>`;
       });
       g += Theater.box(120, FY, 78, Object.assign({ mood: 'happy', harness: true, label: 'HYPE' }, Theater.PAL.gold));
-      g += Theater.doc(300, FY, .54, { m: 'grin', ra: [42, -66] }) + seed(323, FY - 36, .75, 30) + seed(200, FY - 20, .7, -20) + seed(216, FY - 14, .7, 25);
+      g += Theater.uchu(410, FY, .42, { m: 'squint', look: 'l' }) + Theater.doc(300, FY, .54, { m: 'grin', ra: [42, -66] }) + seed(323, FY - 36, .75, 30) + seed(200, FY - 20, .7, -20) + seed(216, FY - 14, .7, 25);
       g += foot('save it before you build');
       g += peek(a);
       return g;
@@ -437,24 +443,26 @@ Theater.install();
       g += panel(50, ry, 440, 62, {}) + tx(270, ry + 28, 'github.com/tmuchal/10XAI', 20, { mono: true }) + tx(270, ry + 50, '내 Claude CLI로 로컬에서 돌아가요 · no API key', 14, { body: true, f: '#6b4a36' });
       g += Theater.confetti(30, 7, [40, ry + 70, 500, FY - 20]);
       const roles = ['orchestrator', 'decompose', 'gapfill', 'verify', 'router', 'runner', 'repair', 'deploy'];
-      roles.forEach((r, i) => { const x = i < 4 ? 62 + i * 50 : 328 + (i - 4) * 50; g += Theater.agent(r, x, FY, 44, { noLabel: true, mood: i % 2 ? 'star' : 'happy' }); });
-      g += Theater.doc(270, FY, .66, { m: 'grin', la: [-44, -72], ra: [44, -72] });
+      roles.forEach((r, i) => { const x = i < 4 ? 52 + i * 44 : 376 + (i - 4) * 42; g += Theater.agent(r, x, FY, 40, { noLabel: true, mood: i % 2 ? 'star' : 'happy' }); });
+      g += Theater.doc(236, FY, .62, { m: 'grin', la: [-44, -72], ra: [44, -72] });
+      g += Theater.uchu(308, FY, .56, { m: 'grin', la: [-44, -84], ra: [44, -84] });
+      g += Theater.bubble(356, 424, 136, ['저장 완료!'], [322, 482], { z: 22, f: '#c9362f' });
       g += `<rect x="180" y="608" width="180" height="28" rx="14" fill="${a}" stroke="${INK}" stroke-width="3"/>` + tx(270, 628, 'Harness Theater #1', 15, { mono: true, f: '#fff' });
       return g;
     } })
   ];
 
   const META = [
-    { name: 'Cover', layout: 'hero', en: 'It said FREE. We measured.', ko: "'무료'라며? 직접 재봤어요", purpose: 'Stop the scroll. The cover doubles as the grid thumbnail.', design: 'Yellow hook type with ink outline. The Hype Box (star eyes) holds the FREE sign; a red RISK 72 card is tagged GATED. Dr. Harness, in shades and snapback, gasps. The KR hook is 15 characters with spaces.' },
-    { name: 'The problem', layout: 'dialogue', en: 'Viral AI workflows hide three things', ko: 'SNS AI 꿀팁, 이건 안 알려줘요', purpose: 'Name the pain: skipped steps, hidden costs, risky actions.', design: 'Speech-bubble dialogue. Gold hype bubbles on the left, the hamster’s numbered replies on the right, with gray gap cards falling out of the Hype Box.' },
+    { name: 'Cover', layout: 'hero', en: 'It said FREE. We measured.', ko: "'무료'라며? 직접 재봤어요", purpose: 'Stop the scroll. The cover doubles as the grid thumbnail.', design: 'Yellow hook type with ink outline. The Hype Box (star eyes) holds the FREE sign; a red RISK 72 card is tagged GATED. Uchu gasps "공짜라며?!" while Dr. Harness stays deadpan in shades and snapback. The KR hook is 15 characters with spaces.' },
+    { name: 'The problem', layout: 'dialogue', en: 'Viral AI workflows hide three things', ko: 'SNS AI 꿀팁, 이건 안 알려줘요', purpose: 'Name the pain: skipped steps, hidden costs, risky actions.', design: 'Speech-bubble dialogue. Gold hype bubbles on the left, the hamster’s numbered replies on the right, with gray gap cards falling out of the Hype Box. Uchu, who tried the workflow, sweats next to the hamster.' },
     { name: 'Agent = Model + Harness', layout: 'split', en: 'Agent = Model + Harness', ko: '에이전트 = 모델 + 하네스', purpose: 'Define the harness as guides (before) plus sensors (after).', design: 'Split panel: reins for guides, a bell for sensors. Below, the hamster runs a wheel that drives the AGENT machine: the model is the engine, the harness gives it direction. Credits Hashimoto and Böckeler.' },
     { name: 'Ontology', layout: 'zoom-in', en: 'Ontology = nouns, links, verbs', ko: '온톨로지는 명사, 연결, 동사예요', purpose: 'Show the typed fields on a 10XAI card: kind, claim, measured, risk, gate.', design: 'A loupe zooms from a tiny board into one card. Name tag = noun, rope = link, buttons = verbs. The hamster’s cheek pouches are stuffed with cards. The measured value is an example.' },
     { name: 'Mission control', layout: 'board map', en: 'Mission control: agents run the board', ko: '칸반 보드는 에이전트 팀이 굴려요', purpose: 'Map every agent to its column on the Kanban board.', design: 'The board is the map. Decompose and Gap-fill in Decomposed, Verify and Router in Verifying, the hamster at the gate, Runner, Repair and Deploy in Verified. The Orchestrator conducts from the headline.' },
-    { name: 'The gate', layout: 'stage scene', en: 'Risk ≥ 70? A human decides.', ko: '70점 이상이면 사람이 승인해요', purpose: 'State the safety contract: risky cards wait for a person.', design: 'RISK meter at 72, a hard-flag list from card.cjs, the closed gate barrier, and the Verify agent holding a "prod deploy" card. The hamster holds the stamp.' },
-    { name: 'Claimed vs. measured', layout: 'chalkboard', en: 'Claimed vs. measured', ko: '말한 숫자 vs 재본 숫자', purpose: 'Show the product output: numbers from a sandbox run.', design: 'Chalkboard rows marked EXAMPLE ($0.40 and 12 min are placeholders). Sunflower seeds stand in for cost. The runner works in the sandbox; the hamster pushes his sunglasses up for the reveal (eyes:true).' },
+    { name: 'The gate', layout: 'stage scene', en: 'Risk ≥ 70? A human decides.', ko: '70점 이상이면 사람이 승인해요', purpose: 'State the safety contract: risky cards wait for a person.', design: 'RISK meter at 72, a hard-flag list from card.cjs, the closed gate barrier, and the Verify agent holding a "prod deploy" card. The hamster holds the stamp, deadpan, while Uchu begs "그냥 돌려!" at the barrier.' },
+    { name: 'Claimed vs. measured', layout: 'chalkboard', en: 'Claimed vs. measured', ko: '말한 숫자 vs 재본 숫자', purpose: 'Show the product output: numbers from a sandbox run.', design: 'Chalkboard rows marked EXAMPLE ($0.40 and 12 min are placeholders). Sunflower seeds stand in for cost. The runner works in the sandbox; the hamster pushes his sunglasses up for the reveal (eyes:true) while Uchu shouts "$0.40?! 공짜라며!".' },
     { name: 'Export', layout: 'shelf', en: 'Verified steps become a module', ko: '검증된 단계만 모듈로 묶어요', purpose: 'Show the deliverable: SKILL.md, JSON or CLI in the Library.', design: 'Bookcase with three gift-wrapped packages. The Deploy agent carries the hamster on its head. Two rules: safe steps auto-run, risky steps keep a manual OK.' },
-    { name: 'Build your own', layout: 'checklist', en: 'Build your own content harness', ko: '내 콘텐츠에도 하네스 달기, 5단계', purpose: 'Give a takeaway the reader can save and reuse.', design: 'Five checked items: an EN step and a KR 해요체 line. The Hype Box now wears a harness and smiles; sunflower seeds (the cost coin) spill at the hamster’s feet.' },
-    { name: 'Save & share', layout: 'curtain call', en: 'Save this. Send it to the teammate who pastes viral prompts.', ko: '저장하고 팀에 공유하세요', purpose: 'Ask for the save and the share; point to the repo.', design: 'Spotlight, confetti, all eight agents take a bow around the hamster. Save and Share buttons, the repo URL, and the series tag. No swipe cue.' }
+    { name: 'Build your own', layout: 'checklist', en: 'Build your own content harness', ko: '내 콘텐츠에도 하네스 달기, 5단계', purpose: 'Give a takeaway the reader can save and reuse.', design: 'Five checked items: an EN step and a KR 해요체 line. The Hype Box now wears a harness and smiles; sunflower seeds (the cost coin) spill at the hamster’s feet. Uchu cameos, squinting at the list.' },
+    { name: 'Save & share', layout: 'curtain call', en: 'Save this. Send it to the teammate who pastes viral prompts.', ko: '저장하고 팀에 공유하세요', purpose: 'Ask for the save and the share; point to the repo.', design: 'Spotlight, confetti, all eight agents take a bow around the hamster, and a grinning Uchu says "저장 완료!". Save and Share buttons, the repo URL, and the series tag. No swipe cue.' }
   ];
 
   window.CARD_SLIDES = DRAW.map((f) => f());

@@ -43,7 +43,7 @@ td.tcell{font-family:var(--mono);font-size:12px;white-space:nowrap;font-variant-
     </nav>
     <div class="eyebrow">Harness Theater · YouTube long-form · storyboard + full script</div>
     <h1><span class="hl">14-Minute</span> Deep Dive<small>Ontology + harness engineering, explained on a multi-agent Kanban board</small></h1>
-    <p class="logline">A viral post promises a full app from one prompt, for free. Dr. Harness, a hip hamster in sunglasses, pastes it into 10XAI and walks the viewer through why prompts alone break, what a harness is, what an ontology is, and how a crew of AI agents turns the post into claimed-versus-measured numbers. The Kanban board builds up one layer per chapter, and card #4 is the cliffhanger.</p>
+    <p class="logline">A viral post promises a full app from one prompt, for free. Dr. Harness, a hip hamster in sunglasses, pastes it into 10XAI and walks the viewer through why prompts alone break, what a harness is, what an ontology is, and how a crew of AI agents turns the post into claimed-versus-measured numbers. His co-star Uchu (우츄) believes every viral post and is shocked by every reveal. The Kanban board builds up one layer per chapter, and card #4 is the cliffhanger.</p>
     <div class="facts" id="facts"></div>
     <div class="actions">
       <button class="btn btn-play" id="playAll" type="button"><span class="tri" aria-hidden="true"></span>Play animatic</button>
@@ -62,11 +62,22 @@ td.tcell{font-family:var(--mono);font-size:12px;white-space:nowrap;font-variant-
     <div class="tl-legend" id="tlLegend"></div>
   </section>
 
+  <section id="cast" aria-labelledby="cast-h">
+    <h2 id="cast-h">Cast</h2>
+    <p class="lede">Two leads and a crew. The hamster explains, Uchu reacts, and the agents do the work on the board.</p>
+    <div class="cols">
+      <div class="panel" style="padding:0;overflow:hidden"><div id="castArt"></div></div>
+      <div class="panel"><h3>Dr. Harness</h3><p>Host and narrator: a hip golden hamster in black sunglasses, a backwards snapback, a gold 10X chain, an oversized hoodie and sneakers. Deadpan, quick, a little smug. Pushes the sunglasses up only for reveals. Speaks the English VO; Korean captions in 해요체.</p>
+        <h3 style="margin-top:14px">Uchu (우츄)</h3><p>Co-star and audience stand-in: the viewer who believes every viral post. Red hooded suit, round ear pods, antenna stalks holding fuzzy red "uchu" lettering, a green face and a big shocked O mouth. Always shocked while the hamster stays deadpan. Short English lines; Korean captions in 반말. Appears in S01, S02, S05, S16, S27, S28, S33 and S34, plus thumbnail D.</p>
+        <h3 style="margin-top:14px">The crew</h3><p>Orchestrator, Decompose, Gap-fill, Verify, Router, Exec runner, Repair and Deploy, colored to match <code>agents/*.md</code>. They speak in "boop" gibberish.</p></div>
+    </div>
+  </section>
+
   <div id="chapters"></div>
 
   <section id="thumbs" aria-labelledby="thumbs-h">
     <h2 id="thumbs-h">Thumbnail and title</h2>
-    <p class="lede">Three thumbnail concepts for A/B testing with YouTube's Test and Compare. Each one uses a single hook of three words or fewer, the hamster's face, and one red number. The Blender hero stills will replace these sketches once they're rendered.</p>
+    <p class="lede">Four thumbnail concepts for A/B testing with YouTube's Test and Compare. Each one uses a single short hook, a character face (the hamster, or Uchu's shock face in D), and one red number. The Blender hero stills will replace these sketches once they're rendered.</p>
     <div class="thumbs" id="thumbGrid"></div>
     <div class="panel" style="margin-top:22px">
       <h3>Title options</h3>
@@ -104,6 +115,7 @@ td.tcell{font-family:var(--mono);font-size:12px;white-space:nowrap;font-variant-
         <li>No 번역투: no "~하는 것은", "~에 의해", "그것은", "~에 대해", "~을 가지고 있다", and no passives.</li>
         <li>Use the terms Korean creators actually say: 에이전트, 칸반, 샌드박스, 하네스, 온톨로지, 게이트.</li>
         <li>Mark the key token with asterisks in both lines (<code>*70*</code>, <code>*무료*</code>, <code>*SKILL.md*</code>). <code>Theater.sub2</code> highlights it in color.</li>
+        <li>Uchu speaks 반말 in Korean ("공짜라며?!", "그냥 돌려!"). The narration stays in 해요체.</li>
         <li>The hamster's signature "~햄" ending appears on four punch lines only: S01, S17, S28 and S34.</li>
       </ul></div>
       <div class="panel"><h3>Examples</h3><ul>
@@ -160,7 +172,7 @@ td.tcell{font-family:var(--mono);font-size:12px;white-space:nowrap;font-variant-
 (function () {
 Theater.install();
 const TH = Theater;
-const { INK, T, G, n, textW, agent, doc, box, card, kanban, COLS, sign, bubble, meter, gate, sandbox, fence, door, rope, board, pkg, browser, star, burst, motion, confetti, dice, bomb, stopwatch, arrow, PAL, machine } = TH;
+const { INK, T, G, n, textW, agent, doc, uchu, box, card, kanban, COLS, sign, bubble, meter, gate, sandbox, fence, door, rope, board, pkg, browser, star, burst, motion, confetti, dice, bomb, stopwatch, arrow, PAL, machine } = TH;
 const esc = (s) => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 const fmt = Player.fmt;
 const strip = (x) => String(x).replace(/\*/g, '');
@@ -237,23 +249,25 @@ const CH = [
  */
 const SHOTS = [
 /* ===== CH 0 · Cold open ===== */
-{ ch: 0, dur: 11, kind: 'anim', cam: 'Wide · snap push-in', k: 'push',
+{ ch: 0, dur: 12, kind: 'anim', cam: 'Wide · snap push-in', k: 'push',
   en: "It said *FREE*. We measured.", ko: "*무료*라길래 직접 재봤햄",
+  uchu: ['Wait. FREE?!', '잠깐, 공짜라며?!'],
   vo: "This post says you can build a full SaaS app with one prompt. For free. It has more views than my entire channel. We're not going to argue with it. We're going to measure it.",
   voKo: "이 글, 프롬프트 하나로 SaaS 앱을 통째로 만든대요. 그것도 공짜로요. 조회수는 제 채널 전체보다 많고요. 따지진 않을게요. 그냥 재 볼 거예요.",
-  visual: 'Payoff flash first: 0.5 s of the red #4 card. Then the gold Hype Box struts on stage with star-struck eyes, holding a picket sign: FULL SaaS · ONE PROMPT · FREE!. A "SO MANY VIEWS" burst pops behind it.',
+  visual: 'Payoff flash first: 0.5 s of the red #4 card. Then the gold Hype Box struts on stage with star-struck eyes, holding a picket sign: FULL SaaS · ONE PROMPT · FREE!. A "SO MANY VIEWS" burst pops behind it. Uchu, front row, jaw on the floor: "Wait. FREE?!"',
   onscreen: 'Picket sign text; the views burst (a gag, no real view count).',
   sound: 'Record scratch on the flash, then a kazoo strut loop.',
   blender: 'Cam: 35 mm snap dolly-in from the back of the house to mid-stage, 12 frames. Layers: curtain fringe foreground (DoF blur), Hype Box midground, sunburst backdrop. MoGraph: confetti particles and a kinetic-type "SO MANY VIEWS" burst that pops with overshoot.',
   edit: 'Hard cut in on the payoff frame, then whip back to the stage. Hit three visual changes in the first 3 s: flash, strut, burst. Blur the author handle if a real post is shown.',
-  pi: 'Payoff flash and record scratch',
-  draw: () => burst(250, 160, 82, 'SO MANY VIEWS', { z: 15, r: -8 }) + confetti(22, 3, [150, 60, 820, 260]) + sign(620, 76, 300, ['FULL SaaS', 'ONE PROMPT', 'FREE!'], { z: 34, stick: [590, 350], r: 4, f2: INK }) + motion(360, 330, 3, 60, -1) + box(480, 428, 150, gold()),
+  pi: 'Payoff flash, record scratch, Uchu shock face',
+  draw: () => burst(200, 122, 72, 'SO MANY VIEWS', { z: 14, r: -8 }) + confetti(22, 3, [150, 60, 820, 260]) + sign(620, 76, 300, ['FULL SaaS', 'ONE PROMPT', 'FREE!'], { z: 34, stick: [590, 350], r: 4, f2: INK }) + motion(380, 330, 3, 50, -1) + uchu(235, 428, .85, { m: 'shock', bang: true, ra: [46, -118] }) + box(500, 428, 150, gold()),
   st: { spots: [480] } },
 { ch: 0, dur: 18, kind: 'screen', cam: 'Screen rec on a 3D laptop · push to the red card', k: 'push', noCurtains: true,
   en: "*8* cards. *3* hidden steps. *1* red flag.", ko: "숨은 단계 *3*개에 빨간불 *1*개",
+  uchu: ['Eight cards?! It was ONE prompt!', '8장?! 프롬프트 하나라며!'],
   vo: "Thirty seconds later: eight cards, three steps the author never mentioned, and one card glowing red at risk seventy-two. Today: the two ideas behind that board, an ontology and a harness, plus the whole AI agent crew that runs it.",
   voKo: "붙여넣고 30초 뒤요. 카드 8장, 작성자가 한 번도 말 안 한 단계 3개, 그리고 위험도 72로 빨갛게 뜬 카드 하나. 오늘은 이 보드 뒤에 있는 두 가지, 온톨로지랑 하네스를 알려 드릴게요. 이걸 돌리는 AI 에이전트 팀도 전부 소개하고요.",
-  visual: 'The localhost:8080 board fills in real time. Card #4 lands in Gate / Review and turns red. On the right, a chalkboard reads CLAIMED free, MEASURED $0.40*. Dr. Harness pushes his sunglasses up for the reveal.',
+  visual: 'The localhost:8080 board fills in real time. Card #4 lands in Gate / Review and turns red. On the right, a chalkboard reads CLAIMED free, MEASURED $0.40*. Dr. Harness pushes his sunglasses up for the reveal; Uchu sweats beside him.',
   onscreen: 'Counter ticks from 1 to 8 cards; "#4 · risk 72" callout; the chalkboard number carries an asterisk: placeholder.',
   sound: 'A card "thwip" per card; low alarm hum on the red card; a record-scratch stop on the sunglasses.',
   blender: 'Cam: slow push toward a floating 3D laptop; the screen texture fills 70% of frame. Layers: hamster foreground right (shallow DoF), laptop midground, chalkboard background. MoGraph: cards fly out of the screen on physics arcs and snap back in; sunglasses-up shape key on the hamster.',
@@ -262,7 +276,7 @@ const SHOTS = [
   draw: () => browser(40, 40, 600, 380, 'localhost:8080', app(600, 352, C([K.c3, K.c6, K.c8], [K.c1, K.c2, K.c5, K.c7], [K.c4], []), { live: true }))
     + burst(575, 215, 50, 'RISK 72', { fill: '#e5533f', f: '#fff', z: 16, r: -6 })
     + board(665, 56, 270, 170, [['CLAIMED  free', '#ffffff', 24], ['MEASURED $0.40*', '#ffd23f', 24], ['* placeholder', '#bfe8d8', 16]], false)
-    + doc(820, 428, 1.05, { la: [-52, -100], m: 'o', eyes: true }) },
+    + uchu(700, 428, .62, { m: 'shock', sweat: true }) + doc(820, 428, 1.05, { la: [-52, -100], m: 'o', eyes: true }) },
 
 /* ===== CH 1 · Why prompts alone break ===== */
 { ch: 1, dur: 17, kind: 'anim', cam: 'Medium · static, then finger-guns', k: 'static', hookTag: ['1', 'WHY PROMPTS BREAK'],
@@ -291,11 +305,12 @@ const SHOTS = [
     + pill(200, 282, '1 · INCONSISTENT', '#f08a3e', { z: 20 }) + pill(700, 282, '2 · SILENT GAPS', '#8d8a86', { z: 20 })
     + dice(150, 380, 40, 22) + box(250, 428, 80, { mood: 'dizzy' }) + motion(190, 400, 2, 50, -1)
     + box(700, 428, 84, Object.assign({ mood: 'worried', carry: '.env + keys', carryKind: 'gap' }, PAL.gray)) },
-{ ch: 1, dur: 24, kind: 'anim', cam: 'Wide · night gag · slow push', k: 'push', st: { night: true },
+{ ch: 1, dur: 26, kind: 'anim', cam: 'Wide · night gag · slow push', k: 'push', st: { night: true },
   en: "Problem 3: unsafe actions. At *3 a.m.*", ko: "*새벽 3시*, 위험한 실행이에요",
+  uchu: ['I just ran it! Why is it on fire?!', '그냥 돌렸는데 왜 불나?!'],
   vo: "Problem three is the scary one: unsafe actions. An agent that can run shell commands can also run the wrong shell command. With your production credentials. At three in the morning. None of this happens because the model is dumb. It happens because nothing around the model checks its work.",
   voKo: "세 번째가 제일 무서워요. 위험한 실행이요. 셸 명령을 돌릴 수 있는 에이전트는 틀린 명령도 돌릴 수 있어요. 운영 서버 키를 들고요. 새벽 3시에요. 모델이 멍청해서 이러는 게 아니에요. 모델 옆에서 작업을 확인해 주는 게 하나도 없어서예요.",
-  visual: 'The one night gag: the stage goes soft blue. A red box, eyes wide, carries a bomb labeled prod toward a server rack. A wall clock reads 3:00 AM. Dr. Harness, hoodie pulled up, throws both paws in the air.',
+  visual: 'The one night gag: the stage goes soft blue. A red box, eyes wide, carries a bomb labeled prod toward a server rack. A wall clock reads 3:00 AM. Uchu, who followed the viral post to the letter, throws both arms up: "I just ran it! Why is it on fire?!" Dr. Harness, hoodie pulled up, stays deadpan.',
   onscreen: '3 · UNSAFE ACTIONS; clock 3:00 AM.',
   sound: 'Crickets, then a fuse hiss.',
   blender: 'Cam: slow 50 mm push with a slight Dutch tilt. Layers: server rack foreground right, red box midground, backdrop with a moonlit gel. MoGraph: fuse sparks as a particle emitter; blinking rack LEDs driven by a noise modifier.',
@@ -305,7 +320,7 @@ const SHOTS = [
     + G(`<circle cx="230" cy="130" r="42" fill="#fffdf5" stroke="${INK}" stroke-width="4"/><line x1="230" y1="130" x2="230" y2="100" stroke="${INK}" stroke-width="4" stroke-linecap="round"/><line x1="230" y1="130" x2="252" y2="130" stroke="${INK}" stroke-width="4" stroke-linecap="round"/>`) + T(230, 196, '3:00 AM', 24, { f: '#fffdf5', stroke: INK, sw: 5 })
     + G(`<rect x="650" y="220" width="120" height="208" rx="8" fill="#4a5078" stroke="${INK}" stroke-width="3"/>` + [0, 1, 2, 3].map((i) => `<rect x="664" y="${236 + i * 46}" width="92" height="34" rx="4" fill="#2c2e47" stroke="${INK}" stroke-width="2"/><circle cx="742" cy="${253 + i * 46}" r="4" fill="${i % 2 ? '#2fbf8a' : '#e5533f'}"/>`).join('')) + T(710, 212, 'PROD', 22, { f: '#ffd23f', stroke: INK, sw: 5 })
     + box(480, 428, 110, Object.assign({ mood: 'alert' }, PAL.red)) + bomb(480, 300) + motion(400, 360, 3, 50, -1)
-    + doc(200, 428, 1.1, { la: [-40, -128], ra: [40, -128], m: 'o', bang: true }) },
+    + doc(175, 428, 1.05, { m: 'flat' }) + uchu(325, 428, .8, { m: 'shock', sweat: true, la: [-48, -118], ra: [48, -118] }) },
 { ch: 1, dur: 23, kind: 'anim', cam: 'Home set · push-in to card #4', k: 'push', open: true,
   en: "The scariest card is *#4*. Hold that.", ko: "제일 무서운 건 *4번*이에요",
   vo: "So today we'll build that missing structure, piece by piece, on one board. That viral post became eight cards. Most of them are boring. One is not. The scariest card on this board is number four, and by the end you'll know exactly why a human has to sign off on it. Hold that thought.",
@@ -452,18 +467,19 @@ const SHOTS = [
   draw: () => browser(30, 40, 560, 290, 'lib/model/card.cjs', `<rect width="560" height="262" fill="#fffdf5"/>` + code(18, 36, [['const RISK_GATE_THRESHOLD = 70;', '#c9362f'], 'const HARD_FLAG_RE = /secret|credential|', '  api key|prod|payment|delete|rm -rf/i;', '', ['function claimGap(meta) {', '#2f5aa8'], ['  // claim vs measured: the gap', '#2f8f5a'], '  ...', '}'], 15, 27))
     + pill(130, 372, 'POST /api/ingest', '#4f8ef7', { z: 17 }) + pill(310, 372, '/api/verify/run', '#f7a928', { z: 17 }) + pill(490, 372, '/api/execute/run', '#2fbf8a', { z: 17 })
     + card(620, 190, 110, 40, 'CLAIM: free', { kind: 'amber' }) + rope(675, 232, 650, 330, 'no evidence', -8) + door(820, 428, true) },
-{ ch: 3, dur: 15, kind: 'anim', cam: 'Medium · quote scroll', k: 'push',
+{ ch: 3, dur: 19, kind: 'anim', cam: 'Medium · quote scroll', k: 'push',
   en: "The ontology becomes the harness.", ko: "온톨로지가 곧 하네스예요",
-  vo: "One research paper nails it: the ontology stops being the output of the model and becomes the harness around it. The ontology gives us types. The harness checks those types. That's the whole theory.",
-  voKo: "한 논문이 딱 짚었어요. 온톨로지는 모델이 내놓는 결과물이 아니라, 모델을 감싸는 하네스가 된다. 온톨로지는 타입을 주고, 하네스는 그 타입을 검사해요. 이론은 이게 다예요.",
-  visual: 'A big paper scroll unrolls with the quote. Below, the harnessed box now wears a name tag (risk 72). Dr. Harness nods slowly, very impressed with the paper.',
+  uchu: ["So... it's just name tags?", '그러니까… 그냥 이름표야?'],
+  vo: "One research paper nails it: the ontology stops being the output of the model and becomes the harness around it. The ontology gives us types. The harness checks those types. That's the whole theory. And yes, Uchu. Name tags a machine can check.",
+  voKo: "한 논문이 딱 짚었어요. 온톨로지는 모델이 내놓는 결과물이 아니라, 모델을 감싸는 하네스가 된다. 온톨로지는 타입을 주고, 하네스는 그 타입을 검사해요. 이론은 이게 다예요. 맞아요, 우츄. 기계가 검사할 수 있는 이름표요.",
+  visual: 'A big paper scroll unrolls with the quote. Below, the harnessed box now wears a name tag (risk 72). Dr. Harness nods slowly. Uchu squints at the tag and asks the question the viewer is thinking: "So... it\'s just name tags?"',
   onscreen: 'Quote with citation: arXiv 2604.00555.',
   sound: 'Harp glissando on the quote.',
   blender: 'Cam: slow push toward the scroll, DoF pulling focus from the scroll to the box. Layers: scroll foreground (cloth sim), box and hamster midground. MoGraph: kinetic type writes the quote on word by word.',
   edit: 'Keep it short and let the quote breathe for 2 s.',
   pi: 'Harp glissando',
   draw: () => sign(480, 86, 660, ['“The ontology stops being the output', 'of the LLM and becomes', 'the harness around it.”'], { z: 30, fill: '#fff6d8' }) + T(480, 242, 'arXiv 2604.00555', 16, { f: '#6b3f22', w: 400 })
-    + box(520, 428, 110, { harness: true, tag: 'risk 72', mood: 'happy' }) + doc(320, 428, 1.1, { ra: [48, -70], m: 'flat' }) },
+    + box(520, 428, 110, { harness: true, tag: 'risk 72', mood: 'happy' }) + doc(320, 428, 1.1, { ra: [48, -70], m: 'flat' }) + bubble(640, 246, 180, ['So… just', 'name tags?'], [720, 300], { z: 21 }) + uchu(755, 428, .75, { m: 'squint', flip: true }) },
 { ch: 3, dur: 17, kind: 'anim', cam: 'Fourth wall · lens knock', k: 'push',
   en: "Put down the cursor. The crew is next.", ko: "진행 바에서 손 떼햄",
   vo: "And yes, I can see you hovering over the progress bar. Put the cursor down. The demo is less than three minutes away, and it makes way more sense once you've met the crew. Because this isn't one agent. It's a whole crew.",
@@ -613,34 +629,36 @@ const SHOTS = [
       + code(640, 214, ['arbitrary shell exec', 'no sandbox · prod keys nearby', ['Claude: flag   Codex: flag', '#c9362f']], 14, 22)
       + `<rect x="640" y="296" width="150" height="40" rx="10" fill="#e3ddd3" stroke="#9a8f82" stroke-width="2.5"/>` + T(690, 323, 'Run', 20, { f: '#9a8f82' }) + `<path d="M750,310 v-6 a7,7 0 0 1 14,0 v6" fill="none" stroke="#9a8f82" stroke-width="3"/><rect x="746" y="310" width="22" height="16" rx="3" fill="#ffc23d" stroke="${INK}" stroke-width="2"/>`
       + T(812, 322, 'blocked', 17, { a: 'start', f: '#c9362f' })) },
-{ ch: 5, dur: 22, kind: 'anim', cam: 'Medium · stamp impact', k: 'static',
+{ ch: 5, dur: 24, kind: 'anim', cam: 'Medium · stamp impact', k: 'static',
   en: "The AI can recommend. It can't *sign*.", ko: "AI는 추천만, *도장*은 사람이",
-  vo: "So a human decides. I read the reason, I check what it touches, and only then do I stamp it approved. That's the gate. The AI can recommend. It can't sign. If I don't approve, the card just waits. Forever, if it has to. Boring? Yes. Safety features should be boring.",
-  voKo: "그래서 사람이 정해요. 이유 읽고, 뭘 건드리는지 확인하고, 그다음에야 승인 도장을 찍어요. 이게 게이트예요. AI는 추천까지만, 서명은 못 해요. 제가 승인 안 하면 카드는 그냥 기다려요. 필요하면 영원히요. 지루하냐고요? 네. 안전장치는 원래 지루해야 해요.",
-  visual: 'Dr. Harness brings a giant APPROVED stamp down on card #4. The striped gate barrier lifts. The red box, sheepish, walks through.',
-  onscreen: 'APPROVED stamp; lib/gate/index.cjs',
+  uchu: ['Just run it!', '그냥 돌려!'],
+  vo: "Uchu wants me to just run it. No. A human decides. I read the reason, I check what it touches, and only then do I stamp it approved. That's the gate. The AI can recommend. It can't sign. If I don't approve, the card just waits. Forever, if it has to. Boring? Yes. Safety features should be boring.",
+  voKo: "우츄는 그냥 돌리자는데요, 안 돼요. 사람이 정해요. 이유 읽고, 뭘 건드리는지 확인하고, 그다음에야 승인 도장을 찍어요. 이게 게이트예요. AI는 추천까지만, 서명은 못 해요. 제가 승인 안 하면 카드는 그냥 기다려요. 필요하면 영원히요. 지루하냐고요? 네. 안전장치는 원래 지루해야 해요.",
+  visual: 'Uchu begs behind the closed gate: "Just run it!" Dr. Harness stamps a giant NO on card #4 without looking up. Beat. He reads the reason, checks what it touches, and only then stamps APPROVED; the barrier lifts and the red box walks through.',
+  onscreen: 'NO stamp, then APPROVED stamp; lib/gate/index.cjs',
   sound: 'Heavy stamp THUNK; barrier creak; one kazoo toot.',
   blender: 'Cam: hard cut out of the laptop into the 3D stage; 50 mm medium with a 4-frame camera shake on the stamp impact. Layers: stamp foreground, card and hamster midground, gate background. MoGraph: ink-splat particles on impact; the barrier arm lifts on an eased rotation.',
-  edit: 'Hard cut from screen to animation on "So a human decides". Freeze 6 frames on the stamp impact.',
-  pi: 'Stamp THUNK',
+  edit: 'Hard cut from screen to animation on "Uchu wants me to just run it". Two stamp hits: NO lands on the VO "No", APPROVED after the read. Freeze 6 frames on each impact.',
+  pi: 'Uchu begs, NO stamp THUNK',
   draw: () => doc(250, 428, 1.3, { ra: [70, -150], m: 'grin' }) + G(`<rect x="316" y="178" width="30" height="34" rx="6" fill="#8a5a2b" stroke="${INK}" stroke-width="3"/><rect x="298" y="210" width="66" height="22" rx="4" fill="#c9362f" stroke="${INK}" stroke-width="3"/>`)
-    + G(`<rect x="330" y="344" width="230" height="84" fill="#e9c98f" stroke="${INK}" stroke-width="3"/>`) + card(340, 282, 210, 56, '#4 Run local GUI', { kind: 'risk', badge: '72', z: 20 }) + stampMark(446, 312, 'APPROVED', -12)
+    + G(`<rect x="330" y="344" width="230" height="84" fill="#e9c98f" stroke="${INK}" stroke-width="3"/>`) + card(340, 282, 210, 56, '#4 Run local GUI', { kind: 'risk', badge: '72', z: 20 }) + stampMark(446, 312, 'NO', -12)
     + G(`<path d="M300,262 l-18,-10 M366,258 l14,-14 M330,244 l0,-16" stroke="${INK}" stroke-width="3" stroke-linecap="round"/>`)
-    + gate(600, 428, true) + box(760, 428, 80, Object.assign({ mood: 'sheepish' }, PAL.red)) + motion(700, 380, 3, 40, -1) },
-{ ch: 5, dur: 33, kind: 'screen', cam: 'Run log · chalkboard', k: 'static', noCurtains: true,
+    + gate(600, 428, false) + uchu(700, 428, .8, { m: 'shock', la: [-40, -120], ra: [40, -120], sweat: true }) + bubble(700, 110, 210, ['JUST RUN IT!'], [700, 240], { z: 26 }) + box(795, 428, 60, Object.assign({ mood: 'worried' }, PAL.red)) },
+{ ch: 5, dur: 35, kind: 'screen', cam: 'Run log · chalkboard', k: 'static', noCurtains: true,
   en: "Claimed *free*. Measured *$0.40*.", ko: "*무료*라더니 *$0.40* 나왔햄",
+  uchu: ['Forty cents?! It said free!', '공짜라며?! 40센트?!'],
   vo: "Now the safe cards run in the sandbox. Every run gets its own fresh git worktree, a throwaway copy that's deleted afterwards, so nothing touches my real files. The runner writes cost, time, and exit codes into the measured field. And here's the chalkboard moment. Claimed: free, five minutes. Measured: forty cents and twelve minutes. Those are placeholder numbers until my own dry run, but the shape is always the same: the claim is shorter than reality.",
   voKo: "이제 안전한 카드들이 샌드박스에서 돌아요. 실행할 때마다 새 git 워크트리가 생겨요. 끝나면 지우는 일회용 복사본이라 제 진짜 파일은 하나도 안 건드려요. 러너가 비용, 시간, 종료 코드를 measured 필드에 적어요. 그리고 칠판 타임. 주장은 무료에 5분. 측정은 40센트에 12분. 리허설 전까지는 임시 숫자지만, 패턴은 늘 같아요. 주장은 현실보다 짧아요.",
-  visual: 'The run log (git worktree add, cards run, git worktree remove) beside a chalkboard: CLAIMED free · 5 min vs MEASURED $0.40 · 12 min. Sunflower seeds stack up as the cost coins. The Exec runner stands in the sandbox holding a stopwatch.',
+  visual: 'The run log (git worktree add, cards run, git worktree remove) beside a chalkboard: CLAIMED free · 5 min vs MEASURED $0.40 · 12 min. Sunflower seeds stack up as the cost coins. The Exec runner stands in the sandbox holding a stopwatch. Uchu\'s O mouth fills the frame for 12 frames: "Forty cents?! It said free!"',
   onscreen: 'Chalkboard with a "* placeholder" footnote; measured {cost, timeMin, exitCode}.',
   sound: 'Stopwatch ticking; chalk scratch; seeds clinking; a sad trombone on "shorter than reality".',
   blender: 'Cam: slow truck from the floating log screen to the 3D chalkboard. Layers: sunflower-seed stack foreground (rigid-body drop), chalkboard midground, sandbox background. MoGraph: each seed drops and settles as a cost tick; the measured number counts up as kinetic type.',
   edit: 'Replace $0.40 and 12 min with the recorded dry-run numbers before final (CLAUDE.md rule 5). Keep the asterisk until then.',
-  pi: 'Sunflower-seed coins and the sad trombone',
+  pi: 'Uchu O-mouth zoom, seed coins, sad trombone',
   draw: () => browser(24, 40, 480, 300, 'terminal · run log', `<rect width="480" height="272" fill="#2c2e47"/>` + code(16, 34, [['$ git worktree add .wt/run-7f3a', '#ffe9a8'], ['> #1 Clone repo     ok  0.3 min', '#bfe8d8'], ['> #2 Install CLI    ok  1.8 min', '#bfe8d8'], ['> #3 .env + keys    ok  4.1 min', '#bfe8d8'], ['> #6 Paid plan      $0.40', '#ffd23f'], ['$ git worktree remove .wt/run-7f3a', '#ffe9a8'], ['(times: placeholder)', '#9aa0ad']], 14, 32))
     + pill(264, 372, 'measured: {cost, timeMin, exitCode}', '#2fbf8a', { z: 15 })
     + board(530, 50, 400, 190, [['CLAIMED   free · 5 min', '#ffffff', 26], ['MEASURED  $0.40 · 12 min*', '#ffd23f', 26], ['* placeholder until dry run', '#bfe8d8', 17]], false)
-    + seed(560, 300, 1, -20) + seed(590, 296, 1, 15) + seed(575, 270, 1, 70)
+    + seed(680, 296, 1, -20) + seed(708, 292, 1, 15) + seed(694, 266, 1, 70) + uchu(575, 428, .8, { m: 'shock', bang: true })
     + sandbox(760, 428, 260) + agent('runner', 760, 412, 70) + stopwatch(880, 300) },
 { ch: 5, dur: 26, kind: 'screen', cam: 'SKILL.md preview · shelf', k: 'static', noCurtains: true,
   en: "A viral post, now a verified *SKILL.md*.", ko: "바이럴 글이 *SKILL.md*로",
@@ -705,11 +723,12 @@ const SHOTS = [
     + box(730, 428, 70, { mood: 'sheepish' }) },
 
 /* ===== CH 7 · Recap + CTA ===== */
-{ ch: 7, dur: 23, kind: 'anim', cam: 'Home set · full build', k: 'pull', hookTag: ['7', 'RECAP'],
+{ ch: 7, dur: 24, kind: 'anim', cam: 'Home set · full build', k: 'pull', hookTag: ['7', 'RECAP'],
   en: "Numbers, not opinions.", ko: "의견 말고 숫자로 말해요",
+  uchu: ["Ohh. So it's receipts.", '아~ 영수증이구나!'],
   vo: "Let's recap on the board we built. Prompts alone give you a slot machine. A harness adds guides, sensors, a sandbox, and a human gate. An ontology gives every card typed fields, so the sensors have something to check. And a crew of agents, working in parallel, turns a hype post into claimed-versus-measured numbers.",
   voKo: "우리가 쌓은 보드로 정리해 볼게요. 프롬프트만 쓰면 슬롯머신이에요. 하네스는 가이드, 센서, 샌드박스, 사람 게이트를 더해 줘요. 온톨로지는 카드마다 타입 있는 필드를 줘서, 센서가 검사할 대상이 생기고요. 그리고 동시에 일하는 에이전트 팀이 과장 글을 '주장 대 측정' 숫자로 바꿔요.",
-  visual: 'The home board, fully built (layer 4 of 4): every card verified or approved, reins and bell fence in place, the SKILL.md package beside the Verified column. Four layer labels light up in order. Confetti.',
+  visual: 'The home board, fully built (layer 4 of 4): every card verified or approved, reins and bell fence in place, the SKILL.md package beside the Verified column. Four layer labels light up in order. Uchu finally gets it and grins: "Ohh. So it\'s receipts." Confetti.',
   onscreen: 'Chapter card 7 · RECAP. Layer labels: harness, ontology, crew, measured.',
   sound: 'The theme swells.',
   blender: 'Cam: same framing as S06, S12 and S18, then a slow pull-out to the full stage. Layers: fence foreground, board midground, label tags floating on the right. MoGraph: each layer label lights with an emission pulse; confetti particle burst at the end.',
@@ -718,12 +737,13 @@ const SHOTS = [
   rehook: 'Chapter card: recap',
   draw: () => homeBoard(150, 80, 560, 290, 4, { cardH: 18 }) + fence(170, 700, 428) + rope(120, 170, 154, 200, '', 6)
     + ['harness ✓', 'ontology ✓', 'crew ✓', 'measured ✓'].map((t, i) => pill(778, 130 + i * 50, t, ['#39b3b0', '#4f8ef7', '#e5533f', '#2fbf8a'][i], { z: 18 })).join('')
-    + confetti(26, 11, [150, 80, 820, 220]) },
+    + uchu(790, 428, .58, { m: 'grin' }) + confetti(26, 11, [150, 80, 820, 220]) },
 { ch: 7, dur: 20, kind: 'anim', cam: 'Curtain call · end screen', k: 'static', end: true,
   en: "It said *FREE*. We measured. *mic drop*", ko: "*무료*라길래 재봤햄. 마이크 드롭",
+  uchu: ['Pasting my next post right now.', '나 지금 바로 붙여넣는다!'],
   vo: "The repo is linked below. Clone it, paste the last viral post that fooled you, and share your board in the comments. I want to see your scariest card. Subscribe for the next one, and remember: it said free. We measured.",
   voKo: "저장소 링크는 아래 있어요. 클론해서, 여러분을 낚았던 마지막 바이럴 글을 붙여넣고, 보드를 댓글로 보여 주세요. 여러분의 제일 무서운 카드가 궁금해요. 다음 편도 구독으로 챙기시고요. 기억하세요. 무료라길래, 재봤어요.",
-  visual: 'Curtain call: the crew bows, and the Hype Box bows too, sheepish now. Dr. Harness drops the mic. End-screen slots on the left for two videos and a subscribe button; the 10XAI ribbon and repo URL on the right.',
+  visual: 'Curtain call: the crew bows, and the Hype Box bows too, sheepish now. Dr. Harness drops the mic. Uchu is already pasting a new post into a phone. End-screen slots on the left for two videos and a subscribe button; the 10XAI ribbon and repo URL on the right.',
   onscreen: 'github.com/tmuchal/10XAI; end-screen slots: Reel, Card news, Subscribe.',
   sound: 'Mic-drop thud with feedback squeal; applause; kazoo fanfare; ukulele outro.',
   blender: 'Cam: wide, static; the curtains close for the final 2 s. Layers: bowing crew foreground, end-screen slot planes on the left (flat, unlit), backdrop. MoGraph: the mic bounces once on rigid body; confetti rain; 3D "10XAI" title object on the right.',
@@ -734,7 +754,7 @@ const SHOTS = [
     + sign(660, 80, 260, ['10XAI'], { z: 48, fill: '#ffd23f' }) + T(660, 190, 'github.com/tmuchal/10XAI', 20, { f: '#6b3f22' })
     + G(`<circle cx="780" cy="258" r="32" fill="#e5533f" stroke="${INK}" stroke-width="3"/>`) + T(780, 265, 'SUB', 20, { f: '#fff' })
     + doc(560, 428, 1, { ra: [44, -30], la: [-40, -70], m: 'grin' }) + G(`<rect x="604" y="410" width="10" height="26" rx="4" fill="#3b3a44" stroke="${INK}" stroke-width="2" transform="rotate(70 609 423)"/><circle cx="626" cy="419" r="9" fill="#9aa0ad" stroke="${INK}" stroke-width="2"/>`) + T(640, 392, 'thud', 18, { f: '#6b3f22', r: -10 })
-    + ['decompose', 'verify', 'runner'].map((r, i) => agent(r, 680 + i * 50, 428, 44, { arms: 'down', noLabel: true })).join('') + box(820, 428, 50, gold({ mood: 'sheepish', arms: 'down' }))
+    + ['decompose', 'verify', 'runner'].map((r, i) => agent(r, 680 + i * 50, 428, 44, { arms: 'down', noLabel: true })).join('') + box(820, 428, 50, gold({ mood: 'sheepish', arms: 'down' })) + uchu(495, 428, .58, { m: 'grin' })
     + confetti(20, 17, [480, 60, 830, 240]) }
 ];
 
@@ -756,6 +776,7 @@ tl.innerHTML = SHOTS.map((s, i) => `<button type="button" data-i="${i}" style="f
 document.getElementById('tlScale').innerHTML = [0, 2, 4, 6, 8, 10, 12].map((m) => `<span>${m}:00</span>`).join('') + `<span>${fmt(TOTAL)}</span>`;
 document.getElementById('tlLegend').innerHTML = CH.map((c, i) => `<span><i style="background:${c.color}"></i>${esc(c.name)} <span style="font-family:var(--mono);font-size:11px">${fmt(chStart[i])}</span></span>`).join('');
 
+document.getElementById('castArt').innerHTML = TH.scene({ label: 'Cast: Dr. Harness, Uchu and the crew', draw: () => doc(250, 428, 1.35, { ra: [58, -120], m: 'grin' }) + uchu(430, 428, 1.1, { m: 'shock', bang: true }) + ['orchestrator', 'verify', 'runner', 'deploy'].map((r, i) => agent(r, 580 + i * 70, 428, 56)).join(''), hook: chTag('THE', 'CAST') });
 /* ---------------- page: chapters and shot cards ---------------- */
 const kindLabel = (s) => s.kind === 'screen' ? '<span class="kind screen">Screen rec</span>' : '<span class="kind anim">Animation</span>';
 document.getElementById('chapters').innerHTML = CH.map((c, ci) => {
@@ -768,6 +789,7 @@ document.getElementById('chapters').innerHTML = CH.map((c, ci) => {
     <dl>
       <dt>Visual</dt><dd>${esc(s.visual)}</dd>
       <dt>VO</dt><dd class="vo">${esc(s.vo)}<small lang="ko">${esc(s.voKo)}</small></dd>
+      ${s.uchu ? `<dt>Uchu</dt><dd class="vo">${esc(s.uchu[0])}<small lang="ko">${esc(s.uchu[1])}</small></dd>` : ''}
       <dt>Sub</dt><dd>${richHtml(s.en)} <span lang="ko" style="color:#c2361f">/ ${richHtml(s.ko)}</span></dd>
       <dt>On screen</dt><dd>${esc(s.onscreen)}</dd>
       <dt>Sound</dt><dd>${esc(s.sound)}</dd>
@@ -794,7 +816,10 @@ const THUMBS = [
       hook: big(470, 118, "DON'T RUN #4", 76, '#ffd23f', -3) }) },
   { title: 'C · AGENT = MODEL + HARNESS', note: 'The concept thumbnail for search: the hamster in the wheel powering the machine, with the equation as the hook.',
     svg: TH.scene({ label: 'Thumbnail C', draw: () => wheel(300, 330, 96) + doc(300, 420, .7, { m: 'grin', ra: [40, -60], la: [-40, -40] }) + wheelRim(300, 330, 96) + G(`<path d="M300,330 L560,310 M300,330 L560,350" stroke="#6b3f22" stroke-width="6" stroke-linecap="round"/>`) + machine(660, 428, '10XAI'),
-      hook: big(480, 112, 'AGENT =', 70) + big(480, 188, 'MODEL + HARNESS', 62, '#ffffff') }) }
+      hook: big(480, 112, 'AGENT =', 70) + big(480, 188, 'MODEL + HARNESS', 62, '#ffffff') }) },
+  { title: 'D · FREE?!', note: 'Big-reaction concept: Uchu\'s shocked face beside the RISK meter at 72, with the deadpan hamster for contrast.',
+    svg: TH.scene({ label: 'Thumbnail D', draw: () => uchu(290, 428, 1.55, { m: 'shock', bang: true, sweat: true }) + doc(560, 428, .95, { m: 'flat' }) + meter(740, 150, 72, { H: 190 }),
+      hook: big(480, 505, 'IT SAID FREE?!', 66, '#ffd23f', -2) }) }
 ];
 document.getElementById('thumbGrid').innerHTML = THUMBS.map((t) => `<figure>${t.svg}<figcaption><b>${esc(t.title)}</b>${esc(t.note)}</figcaption></figure>`).join('');
 const TITLES = [
@@ -870,7 +895,7 @@ document.getElementById('piRows').innerHTML = SHOTS.map((s) => `<tr><td class="t
 const frames24 = TOTAL * 24;
 document.getElementById('blCols').innerHTML = [
   ['Set list', '<ul><li><b>Theater stage</b>: sunburst backdrop, red curtains, honey-wood floor. Built by <code>blender/harness_theater.py</code>.</li><li><b>Mission control</b>: the 3D Kanban board (four shallow column shelves) with the crew line in front.</li><li><b>Wheel room</b>: the hamster wheel belted to the 10XAI machine.</li><li><b>Night variant</b>: the stage with a light blue gel for S05 only.</li><li><b>Demo desk</b>: a 3D laptop and floating screen planes for every screen-rec shot.</li><li><b>Library corner</b>: shelf, SKILL.md, JSON and CLI packages.</li><li><b>Graph floor</b>: an ortho-friendly floor for the chapter 6 node graph.</li></ul>'],
-  ['Hamster rig', '<ul><li>Chubby golden hamster: backwards snapback, gold 10X chain (spring bone), oversized hoodie (cloth or corrective shape keys), chunky sneakers.</li><li>Face shape keys: smile, grin, o, flat, cheek-pouch puff (0–1), blink, brow up.</li><li>Sunglasses toggle: a driver slides the glasses to the forehead (the <code>eyes:true</code> beat) and reveals the eye meshes. Used in S02, S17 and thumbnail B.</li><li>Paw IK for pointing, finger-guns, the stamp and the mic drop. A run cycle for the wheel.</li><li>Agents: one box rig with swappable props and eye shape keys matching the eight moods.</li></ul>'],
+  ['Character rigs', '<ul><li>Chubby golden hamster: backwards snapback, gold 10X chain (spring bone), oversized hoodie (cloth or corrective shape keys), chunky sneakers.</li><li>Face shape keys: smile, grin, o, flat, cheek-pouch puff (0–1), blink, brow up.</li><li>Sunglasses toggle: a driver slides the glasses to the forehead (the <code>eyes:true</code> beat) and reveals the eye meshes. Used in S02, S17 and thumbnail B.</li><li>Paw IK for pointing, finger-guns, the stamp and the mic drop. A run cycle for the wheel.</li><li>Uchu: red hooded suit with ear pods; face shape keys for the big O mouth (shock), smile, grin and squint, plus a sweat-drop toggle. The antenna stalks and fuzzy "uchu" letters use spring bones or a soft-body jiggle, so they wobble on every shock and whenever something is fake. A mouth-zoom camera preset for the O-mouth pattern interrupt.</li><li>Agents: one box rig with swappable props and eye shape keys matching the eight moods.</li></ul>'],
   ['Camera language by chapter', '<ul><li>CH 0: snap dolly-ins and a whip back. Energetic.</li><li>CH 1: locked-off mediums, one Dutch tilt at night.</li><li>CH 2: slow orbits and rack focus. Explanatory.</li><li>CH 3: dolly-ins toward objects; the fourth-wall lens knock.</li><li>CH 4: cranes along the crew line; low heroic angles.</li><li>CH 5: near-static on the laptop so the capture stays readable; hard cuts to the stage.</li><li>CH 6: top-down ortho tilting to 3/4.</li><li>CH 7: match the S06 framing, then pull out; curtains close.</li></ul>'],
   ['Render settings', '<ul><li>EEVEE, 1920×1080, 24 fps. Hero stills and thumbnails can use Cycles.</li><li>Toon shading: Shader to RGB into a 2–3 step color ramp; warm key, cool fill, soft rim.</li><li>Line Art modifier (Grease Pencil) for ink outlines in #3A2418, about 3 px at 1080p, with crease detection on.</li><li>Grease Pencil accents: sparks, motion lines, "DING!", ticks, smudges.</li><li>DoF on every shot with an f-stop between 2.8 and 5.6; mist pass for the backdrop wash.</li><li>Subtitles are burned in during the edit, never in Blender.</li></ul>'],
   ['Render-time budget', `<ul><li>${fmt(TOTAL)} at 24 fps is about ${frames24.toLocaleString('en-US')} frames.</li><li>Target 4 s per frame in EEVEE with Line Art, so about ${Math.round(frames24 * 4 / 3600)} machine-hours for one full pass. These are estimates; measure on the first chapter and adjust.</li><li>Screen-rec shots are cheaper: render the 3D laptop and background once as a plate, then composite the capture.</li><li>Budget one full preview pass at 50% resolution, then a final pass. Cache Line Art and particle bakes per shot.</li></ul>`],

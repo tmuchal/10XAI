@@ -34,6 +34,7 @@ Hook line for the whole series: **"It said FREE. We measured."**
 | Exec runner | `agent('runner', …)` | Green, stopwatch. Runs safe cards in the sandbox and measures them. |
 | Repair | `agent('repair', …)` | Pink, wrench. Runs the fix loop on failures. |
 | Deploy | `agent('deploy', …)` | Purple, package. Exports SKILL.md / JSON / CLI to the library. |
+| Uchu (우츄) | `uchu(x, floorY, scale, {m:'shock'|'smile'|'grin'|'squint', la, ra, bang, sweat, look, flip})` | Co-star and audience stand-in: the viewer who believes every viral post. Red hooded suit, round ear pods, antenna stalks holding fuzzy red "uchu" lettering, green watercolor face, big shocked O mouth. Shocked at "FREE" in the hook, shocked again at the measured number in the reveal. Uchu stays a cartoon; never reproduce a real person's face. |
 | Hype Box | `box(x, fy, s, Object.assign({mood:'star'}, Theater.PAL.gold))` | The viral post. Gold, star-struck eyes. Sunglasses belong to the hamster only. |
 
 Moods: `happy`, `worried`, `dizzy`, `alert`, `sleep`, `cool`, `sheepish`, `star`. Options: `hat`, `crown`, `tag`, `label`, `carry` (holds a card overhead), `harness`, `mag`, `rot`, `arms:'down'`.
@@ -42,6 +43,7 @@ Moods: `happy`, `worried`, `dizzy`, `alert`, `sleep`, `cool`, `sheepish`, `star`
 
 - The final Reel and long-form video are made as **3D motion graphics in Blender**: a toon-shaded stage with Line Art ink outlines, a rigged hip-hamster host, 3D Kanban columns with cards flying on physics arcs, depth of field, parallax and particles.
 - The SVG frames in these pages are the 2D storyboard and animatic. `blender/harness_theater.py` builds the 3D set and renders hero stills into `renders/`.
+- Uchu gags: the shock face on every reveal (a zoom-in on the O mouth works as a pattern interrupt), the antenna letters wobbling when something is fake, and Uchu mouthing "공짜?!" while the hamster stays deadpan.
 - Hamster gags: a hamster wheel powers the 10XAI machine (the harness), cheek pouches stuffed with cards, sunglasses pushed up at reveals, and sunflower seeds as the cost coin.
 
 ## Home set: the multi-agent Kanban board

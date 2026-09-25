@@ -417,6 +417,65 @@ def hamster(loc, scale=1.0, rot_z=0.0, pose="idle", mouth="smile", glasses="on",
     return root
 
 
+def fuzzy_material(hexcol, name="fuzz"):
+    """Red plush look for Uchu's antenna lettering: base color with a fine noise bump."""
+    m = bpy.data.materials.new(name)
+    m.use_nodes = True
+    nt = m.node_tree
+    p = nt.nodes["Principled BSDF"]
+    p.inputs["Base Color"].default_value = rgb(hexcol)
+    p.inputs["Roughness"].default_value = 0.9
+    noise = nt.nodes.new("ShaderNodeTexNoise")
+    noise.inputs["Scale"].default_value = 180.0
+    noise.inputs["Detail"].default_value = 6.0
+    bump = nt.nodes.new("ShaderNodeBump")
+    bump.inputs["Strength"].default_value = 0.8
+    nt.links.new(noise.outputs["Fac"], bump.inputs["Height"])
+    nt.links.new(bump.outputs["Normal"], p.inputs["Normal"])
+    return m
+
+
+def uchu(loc, scale=1.0, rot_z=0.0, mood="shock", arms="up"):
+    """Uchu (우츄): red hooded suit, ear pods, fuzzy "uchu" antenna lettering, green face, shocked O mouth.
+    A cartoon co-star (the viewer who believes every viral post). Stands on z=0, faces -Y, ~3.1 units tall."""
+    root = empty("uchu", loc, (0, 0, rot_z), scale)
+    red, red2 = mat("#e8322b", 0.65), mat("#b8211c", 0.7)
+    grn, grn2 = mat("#5fae3a", 0.7), mat("#9ad06a", 0.7)
+    ink = mat(INK, 0.5)
+    for sx in (-1, 1):
+        sphere((sx * 0.25, -0.1, 0.08), 0.2, red2, root, scale=(1.1, 1.4, 0.5))
+    sphere((0, 0, 0.72), 0.64, red, root, scale=(1.0, 0.86, 1.08))
+    paws = {"up": {-1: (-0.95, -0.3, 1.75), 1: (0.95, -0.3, 1.75)}, "down": {-1: (-0.7, -0.2, 0.55), 1: (0.7, -0.2, 0.55)},
+            "cheeks": {-1: (-0.62, -0.5, 1.62), 1: (0.62, -0.5, 1.62)}}[arms]
+    for sx in (-1, 1):
+        a, b = Vector((sx * 0.52, -0.05, 1.1)), Vector(paws[sx])
+        tube([tuple(a), tuple(a.lerp(b, 0.5)), tuple(b)], 0.14, red, root)
+        sphere(tuple(b), 0.15, red2, root)
+    sphere((0, 0, 1.78), 0.64, red, root)
+    for sx in (-1, 1):
+        sphere((sx * 0.64, 0, 1.8), 0.22, red, root, scale=(0.6, 1, 1))
+    sphere((0, -0.47, 1.74), 0.5, grn, root, scale=(0.95, 0.34, 1.1))
+    for x, z, sz in ((-0.2, 1.72, 0.2), (0.2, 1.7, 0.18)):
+        sphere((x * 1.3, -0.6, z), 0.06, grn2, root, scale=(1, 0.4, sz / 0.06))
+    for sx in (-1, 1):
+        sphere((sx * 0.16, -0.6, 1.9), 0.12, mat("#ffffff", 0.3), root, scale=(1, 0.4, 0.85))
+        sphere((sx * 0.16, -0.645, 1.9), 0.06, mat("#7a4a2a", 0.4), root, scale=(1, 0.4, 1))
+        sphere((sx * 0.16, -0.665, 1.9), 0.03, ink, root, scale=(1, 0.4, 1))
+        sphere((sx * 0.04, -0.65, 1.7), 0.02, ink, root)
+        if mood == "shock":
+            tube([(sx * 0.07, -0.63, 2.05), (sx * 0.16, -0.63, 2.1), (sx * 0.26, -0.62, 2.05)], 0.014, ink, root)
+    if mood == "shock":
+        sphere((0, -0.61, 1.47), 0.14, mat("#8a1f1f", 0.6), root, scale=(1, 0.4, 1.3))
+        sphere((0, -0.65, 1.39), 0.08, mat("#f07f86", 0.6), root, scale=(1, 0.4, 0.6))
+    else:
+        sphere((0, -0.6, 1.52), 0.1, mat("#8a1f1f", 0.6), root, scale=(1.4, 0.4, 0.6))
+    for sx in (-1, 1):
+        tube([(sx * 0.2, 0, 2.35), (sx * 0.28, 0, 2.6), (sx * 0.38, 0, 2.85)], 0.035, red, root)
+    t = text("uchu", (0, 0, 3.0), 0.62, fuzzy_material("#e8322b"), root, extrude=0.08)
+    t.data.bevel_depth, t.data.bevel_resolution = 0.05, 3
+    return root
+
+
 def face(root, w, d, zc, mood="happy"):
     ink = mat(INK, 0.5)
     y = -d / 2 - 0.012
@@ -667,7 +726,8 @@ def shot_reel_cover():
     """9:16 cover: hamster + RISK meter + hook text."""
     stage(width=8.0, valance_z=10.4)
     meter((1.5, 0.8, 0), 72, 1.1)
-    hamster((-0.8, -1.2, 0), 1.6, math.radians(10), "cheer", "grin")
+    hamster((0.3, -1.0, 0), 1.45, math.radians(-10), "idle", "flat")
+    uchu((-1.6, -2.0, 0), 1.25, math.radians(15), "shock", "cheeks")
     title3d("IT SAID", (0, -0.2, 7.6), 0.95)
     title3d("\"FREE\"", (0, -0.2, 6.5), 1.15)
     confetti(50, (-3, -2.5, 4.0), (3, 0.5, 8.5), seed=5)
@@ -686,7 +746,21 @@ def shot_card_cover():
     camera((0, -11.5, 3.2), (0, 0, 2.8), lens=32, dof=(10.5, 4))
 
 
+def shot_hero_uchu():
+    """The hook: Uchu shocked at FREE, the hip hamster deadpan, RISK meter behind."""
+    stage()
+    kanban((0.6, 2.6, 3.4), cards={0: ["Clone repo"], 2: [("Run shell", "risk", "72")], 3: [("Export", "ok", "OK")]}, hl=2, scale=0.9)
+    uchu((-2.3, -1.6, 0), 1.35, math.radians(18), "shock", "cheeks")
+    hamster((2.0, -1.4, 0), 1.6, math.radians(-12), "idle", "flat")
+    meter((4.6, 0.6, 0), 72, 0.95)
+    title3d("FREE?!", (-2.4, -1.2, 5.6), 0.9, rot=(math.radians(90), 0, math.radians(8)))
+    confetti(40, (-6, -3, 4.5), (6, 0, 6.8), seed=19)
+    lights()
+    camera((0.0, -11.5, 3.1), (0.0, 0, 2.7), lens=30, dof=(10.4, 4))
+
+
 SHOTS = {
+    "hero_uchu": (shot_hero_uchu, 1920, 1080),
     "hero_kanban": (shot_hero_kanban, 1920, 1080),
     "hero_hamster": (shot_hero_hamster, 1920, 1080),
     "hero_gate": (shot_hero_gate, 1920, 1080),
@@ -753,6 +827,9 @@ def anim_mission_control():
             hop = 0.28 if (f // 6 + k) % 3 == 0 else 0.0
             kf(a, f, loc=(base[0], base[1], hop))
     ham = hamster((5.2, -1.4, 0), 1.45, math.radians(-25), "point", "grin")
+    fan = uchu((-6.0, -2.6, 0), 1.1, math.radians(30), "shock", "cheeks")
+    for f in range(1, 97, 6):
+        kf(fan, f, loc=(-6.0, -2.6, 0.18 if (f // 6) % 2 else 0.0))
     for f in range(1, 97, 8):
         kf(ham, f, rot=(0, math.radians(3 if (f // 8) % 2 else -3), math.radians(-25)))
     confetti(40, (-6, -2, 5.2), (6, 1.5, 6.8), seed=3)
@@ -766,25 +843,38 @@ def anim_mission_control():
             kp.easing = "EASE_IN_OUT"
 
 
-ANIMS = {"mission_control": (anim_mission_control, 1280, 720)}
+ANIMS = {"mission_control": (anim_mission_control, 960, 540)}
 
 
-def render_anim(name, samples, scale):
+def render_anim(name, samples, scale, step=2):
+    """Render every `step`-th frame (animation on twos) to PNG, then encode an MP4 at 24 fps with ffmpeg."""
+    import shutil
+    import subprocess
+    import tempfile
     fn, w, h = ANIMS[name]
     bpy.ops.wm.read_factory_settings(use_empty=True)
     _mats.clear()
     world_and_render(w, h, samples, scale)
     fn()
     sc = bpy.context.scene
-    sc.render.image_settings.file_format = "FFMPEG"
-    sc.render.ffmpeg.format = "MPEG4"
-    sc.render.ffmpeg.codec = "H264"
-    sc.render.ffmpeg.constant_rate_factor = "HIGH"
-    os.makedirs(OUT, exist_ok=True)
-    sc.render.filepath = os.path.join(OUT, f"{name}.mp4")
+    sc.frame_step = step
+    tmp = tempfile.mkdtemp(prefix=name + "-")
+    sc.render.image_settings.file_format = "PNG"
+    sc.render.filepath = os.path.join(tmp, "f")
     bpy.ops.render.render(animation=True)
+    frames = sorted(f for f in os.listdir(tmp) if f.endswith(".png"))
+    for i, f in enumerate(frames):
+        os.rename(os.path.join(tmp, f), os.path.join(tmp, f"s{i:05d}.png"))
+    ff = shutil.which("ffmpeg")
+    if not ff:
+        import imageio_ffmpeg
+        ff = imageio_ffmpeg.get_ffmpeg_exe()
+    os.makedirs(OUT, exist_ok=True)
+    out = os.path.join(OUT, f"{name}.mp4")
+    subprocess.run([ff, "-y", "-loglevel", "error", "-framerate", str(sc.render.fps / step), "-i", os.path.join(tmp, "s%05d.png"),
+                    "-r", str(sc.render.fps), "-c:v", "libx264", "-pix_fmt", "yuv420p", "-crf", "20", "-movflags", "+faststart", out], check=True)
+    shutil.rmtree(tmp, ignore_errors=True)
     print("rendered", name)
-
 
 def render(name, samples, scale):
     fn, w, h = SHOTS[name]

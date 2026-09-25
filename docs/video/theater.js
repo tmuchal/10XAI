@@ -33,6 +33,7 @@
   <filter id="ink2" x="-20%" y="-20%" width="140%" height="140%"><feTurbulence type="fractalNoise" baseFrequency="0.03" numOctaves="2" seed="9" result="n"/><feDisplacementMap in="SourceGraphic" in2="n" scale="3.2" xChannelSelector="R" yChannelSelector="G"/></filter>
   <filter id="ink3" x="-20%" y="-20%" width="140%" height="140%"><feTurbulence type="fractalNoise" baseFrequency="0.03" numOctaves="2" seed="17" result="n"/><feDisplacementMap in="SourceGraphic" in2="n" scale="3.2" xChannelSelector="R" yChannelSelector="G"/></filter>
   <filter id="wash" x="-5%" y="-5%" width="110%" height="110%"><feTurbulence type="fractalNoise" baseFrequency="0.011" numOctaves="3" seed="4" result="n"/><feDisplacementMap in="SourceGraphic" in2="n" scale="22" xChannelSelector="R" yChannelSelector="G"/></filter>
+  <filter id="fuzz" x="-10%" y="-20%" width="120%" height="140%"><feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="1" seed="8" result="n"/><feDisplacementMap in="SourceGraphic" in2="n" scale="4.5" xChannelSelector="R" yChannelSelector="G"/></filter>
   <filter id="soft" x="-40%" y="-40%" width="180%" height="180%"><feGaussianBlur stdDeviation="16"/></filter>
   <filter id="grain" x="0" y="0" width="100%" height="100%"><feTurbulence type="fractalNoise" baseFrequency="0.85" numOctaves="2" seed="5" stitchTiles="stitch"/><feColorMatrix type="matrix" values="0 0 0 0 0.36  0 0 0 0 0.25  0 0 0 0 0.14  0 0 0 0.14 0"/></filter>
   <radialGradient id="sun" cx="50%" cy="28%" r="80%"><stop offset="0" stop-color="#fffdf0"/><stop offset=".45" stop-color="#ffecb8"/><stop offset="1" stop-color="#ffcfb0"/></radialGradient>
@@ -216,6 +217,38 @@
     if (o.bang) g += `<text x="38" y="-156" font-size="40" fill="#e5533f" font-family="${FONT}" font-weight="700" transform="rotate(10 38 -156)">!</text>`;
     return G(`<g transform="translate(${x},${fy}) scale(${o.flip ? -sc : sc},${sc})">${g}</g>`);
   }
+  /* Uchu (우츄): the viewer who believes every viral post. Red hooded suit with round ear pods,
+     antenna stalks holding fuzzy red "uchu" lettering, a green watercolor face, and a big shocked O mouth.
+     Options: m ('shock'|'smile'|'grin'|'squint'), la/ra (mitten positions), bang, sweat, flip, label. */
+  function uchu(x, fy, sc, o) {
+    o = o || {}; sc = sc || 1;
+    const RED = '#e8322b', RED2 = '#b8211c', RED3 = '#ff6a5c', GRN = '#5fae3a', GRN2 = '#9ad06a', GRN3 = '#3f8a26';
+    const la = o.la || [-40, -44], ra = o.ra || [40, -44];
+    let g = `<ellipse cx="-17" cy="-5" rx="17" ry="7" fill="${RED2}" stroke="${INK}" stroke-width="2.5"/><ellipse cx="17" cy="-5" rx="17" ry="7" fill="${RED2}" stroke="${INK}" stroke-width="2.5"/>`;
+    g += `<path d="M-40,-8 Q-50,-58 -30,-96 L30,-96 Q50,-58 40,-8 Q0,0 -40,-8 Z" fill="${RED}" stroke="${INK}" stroke-width="3" stroke-linejoin="round"/><path d="M-26,-84 Q-34,-56 -28,-30" fill="none" stroke="${RED3}" stroke-width="6" stroke-linecap="round" opacity=".7"/>`;
+    for (const [sx, a] of [[-26, la], [26, ra]]) g += `<path d="M${sx},-80 L${a[0]},${a[1]}" stroke="${INK}" stroke-width="16" stroke-linecap="round"/><path d="M${sx},-80 L${a[0]},${a[1]}" stroke="${RED}" stroke-width="11" stroke-linecap="round"/><circle cx="${a[0]}" cy="${a[1]}" r="8" fill="${RED2}" stroke="${INK}" stroke-width="2"/>`;
+    // antenna stalks + fuzzy lettering
+    g += `<path d="M-15,-168 Q-22,-184 -26,-198 M15,-168 Q22,-184 26,-198" fill="none" stroke="${INK}" stroke-width="8" stroke-linecap="round"/><path d="M-15,-168 Q-22,-184 -26,-198 M15,-168 Q22,-184 26,-198" fill="none" stroke="${RED}" stroke-width="4.5" stroke-linecap="round"/>`;
+    g += `<g filter="url(#fuzz)"><text x="0" y="-198" font-size="46" text-anchor="middle" font-family="${FONT}" font-weight="700" fill="${RED}" stroke="${RED2}" stroke-width="5" paint-order="stroke" stroke-linejoin="round"${o.flip ? ' transform="scale(-1,1)"' : ''}>uchu</text></g>`;
+    // hood + ear pods
+    g += `<circle cx="-45" cy="-126" r="16" fill="${RED}" stroke="${INK}" stroke-width="2.8"/><circle cx="-47" cy="-130" r="6" fill="${RED3}" opacity=".7"/><circle cx="45" cy="-126" r="16" fill="${RED}" stroke="${INK}" stroke-width="2.8"/><circle cx="43" cy="-130" r="6" fill="${RED3}" opacity=".7"/>`;
+    g += `<circle cx="0" cy="-128" r="45" fill="${RED}" stroke="${INK}" stroke-width="3"/><path d="M-28,-160 Q-14,-172 4,-172" fill="none" stroke="${RED3}" stroke-width="5" stroke-linecap="round" opacity=".7"/>`;
+    // green face with watercolor streaks
+    g += `<ellipse cx="0" cy="-122" rx="31" ry="35" fill="${GRN}" stroke="${INK}" stroke-width="2.8"/><ellipse cx="-15" cy="-124" rx="5" ry="15" fill="${GRN2}" opacity=".75"/><ellipse cx="15" cy="-126" rx="5" ry="13" fill="${GRN2}" opacity=".7"/><ellipse cx="-4" cy="-146" rx="12" ry="4" fill="${GRN2}" opacity=".5"/><ellipse cx="10" cy="-98" rx="8" ry="4" fill="${GRN3}" opacity=".45"/><ellipse cx="-20" cy="-104" rx="4" ry="6" fill="${GRN3}" opacity=".4"/>`;
+    const m = o.m || 'shock';
+    if (m === 'squint') g += `<path d="M-18,-136 l7,-4 l7,4 M4,-136 l7,-4 l7,4" fill="none" stroke="${INK}" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>`;
+    else for (const ex of [-11, 11]) g += `<ellipse cx="${ex}" cy="-136" rx="7.5" ry="6.5" fill="#ffffff" stroke="${INK}" stroke-width="2"/><circle cx="${ex + (o.look || 0)}" cy="-135.5" r="3.8" fill="#7a4a2a"/><circle cx="${ex + (o.look || 0)}" cy="-135.5" r="1.8" fill="${INK}"/><circle cx="${ex + 1.4 + (o.look || 0)}" cy="-137" r="1" fill="#fff"/>`;
+    if (m === 'shock') g += `<path d="M-20,-146 q5,-5 11,-2 M9,-148 q6,-3 11,2" fill="none" stroke="${INK}" stroke-width="2.2" stroke-linecap="round"/>`;
+    g += `<circle cx="-3" cy="-121" r="1.8" fill="${INK}"/><circle cx="3" cy="-121" r="1.8" fill="${INK}"/>`;
+    if (m === 'shock') g += `<ellipse cx="0" cy="-104" rx="10.5" ry="13.5" fill="#8a1f1f" stroke="${INK}" stroke-width="2.4"/><ellipse cx="0" cy="-97" rx="6.5" ry="4.5" fill="#f07f86"/><rect x="-6" y="-116" width="12" height="3" rx="1.5" fill="#fff"/>`;
+    else if (m === 'grin') g += `<path d="M-12,-110 Q0,-94 12,-110 Z" fill="#8a1f1f" stroke="${INK}" stroke-width="2.2" stroke-linejoin="round"/><rect x="-7" y="-110" width="14" height="3.5" rx="1.5" fill="#fff"/>`;
+    else g += `<path d="M-9,-108 Q0,-100 9,-108" fill="none" stroke="${INK}" stroke-width="2.6" stroke-linecap="round"/>`;
+    if (o.sweat) g += `<path d="M28,-150 C33,-143 33,-137 28,-137 C23,-137 23,-143 28,-150 Z" fill="#9ad3ee" stroke="${INK}" stroke-width="1.6"/>`;
+    if (o.bang) g += `<text x="46" y="-170" font-size="44" fill="#e5533f" font-family="${FONT}" font-weight="700" transform="rotate(12 46 -170)" stroke="#fff" stroke-width="4" paint-order="stroke">!!</text>`;
+    let out = G(`<g transform="translate(${x},${fy}) scale(${o.flip ? -sc : sc},${sc})">${g}</g>`);
+    if (o.label) out += T(x, fy + 22 * sc, o.label, 16 * sc, { f: '#fff', stroke: INK, sw: 4 });
+    return out;
+  }
   const hand = (x, fy, sc, a, flip) => [x + a[0] * sc * (flip ? -1 : 1), fy + a[1] * sc];
 
   /* ---------- props ---------- */
@@ -358,5 +391,5 @@
     return `<svg viewBox="0 0 ${w} ${h}" role="img" aria-label="${esc(o.label || o.en || '')}" xmlns="http://www.w3.org/2000/svg"><g class="cam">${body}</g>${o.hook || ''}${sub2(o.en, o.ko, { w, h, y: o.subY, z1: o.z1, z2: o.z2, cx: o.subX })}<rect width="${w}" height="${h}" filter="url(#grain)" opacity=".5" style="mix-blend-mode:multiply" pointer-events="none"/></svg>`;
   }
 
-  root.Theater = { INK, FONT, esc, n, T, G, rich, rng, shade, textW, install, stage, curtains, sub2, hook, face, box, PAL, AGENTS, agent, doc, hand, card, kanban, COLS, sign, bubble, meter, pump, machine, gate, sandbox, fence, door, rope, board, banner, pkg, browser, star, burst, motion, confetti, dice, bomb, stopwatch, coin, arrow, phone, scene };
+  root.Theater = { INK, FONT, esc, n, T, G, rich, rng, shade, textW, install, stage, curtains, sub2, hook, face, box, PAL, AGENTS, agent, doc, uchu, hand, card, kanban, COLS, sign, bubble, meter, pump, machine, gate, sandbox, fence, door, rope, board, banner, pkg, browser, star, burst, motion, confetti, dice, bomb, stopwatch, coin, arrow, phone, scene };
 })(window);
