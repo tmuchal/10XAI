@@ -2,7 +2,7 @@
  *
  * Every scene is plain SVG markup built from these helpers, in a bright
  * watercolor-theater style: sunburst backdrop, red curtains, wooden stage,
- * boxy ^ ^ agent characters, and the host Dr. Harness: a hamster scientist in sunglasses.
+ * boxy ^ ^ agent characters, and the host Dr. Harness: a hip hamster in sunglasses, snapback and gold chain.
  *
  *   Theater.install()                     // once per page: fonts' fallbacks + <defs>
  *   Theater.scene({ w, h, st, draw, en, ko, subY, hook })  → "<svg …>…</svg>"
@@ -25,7 +25,7 @@
     const f = (v) => Math.round(amt < 0 ? v * (1 + amt) : v + (255 - v) * amt);
     return '#' + ((1 << 24) + (f(r) << 16) + (f(g) << 8) + f(b)).toString(16).slice(1);
   }
-  const textW = (s, z) => { let w = 0; for (const ch of String(s)) w += /[ᄀ-￿]/.test(ch) ? z * .96 : (ch === ' ' ? z * .3 : z * .52); return w; };
+  const textW = (s, z) => { let w = 0; for (const ch of String(s).replace(/\*/g, '')) w += /[ᄀ-￿]/.test(ch) ? z * .96 : (ch === ' ' ? z * .3 : z * .52); return w; };
 
   /* ---------- defs ---------- */
   const DEFS = `<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false"><defs>
@@ -73,7 +73,8 @@
     let v = `M0,0 L${w},0 L${w},${n(vh)}`; for (let x = w; x > 0; x -= step) v += ` Q${n(x - step / 2)},${n(vh + 28)} ${n(Math.max(0, x - step))},${n(vh)}`; v += ' Z';
     return G(`${half}<g transform="translate(${w},0) scale(-1,1)">${half}</g><path d="${v}" fill="#c9362f" stroke="${INK}" stroke-width="3"/>`);
   }
-  /* Bilingual subtitle: English line (ink) over Korean line (vermilion) on a paper strip. */
+  /* Bilingual subtitle: English line (ink) over Korean line (vermilion) on a paper strip.
+     Wrap key tokens in *asterisks* to highlight them in both lines (e.g. 'Risk *72*', '위험도 *72점*'). */
   function sub2(en, ko, o) {
     o = o || {}; if (!en && !ko) return ''; const w = o.w || 960, h = o.h || 540;
     const z1 = o.z1 || (w < h ? 24 : 26), z2 = o.z2 || (w < h ? 21 : 22);
@@ -81,9 +82,15 @@
     const bh = (en ? z1 * 1.2 : 0) + (ko ? z2 * 1.25 : 0) + 18, y = o.y != null ? o.y : h - bh - 16, x = w / 2;
     let g = `<rect x="${n(x - bw / 2 + 4)}" y="${n(y + 5)}" width="${n(bw)}" height="${n(bh)}" rx="12" fill="${INK}" opacity=".9"/><rect x="${n(x - bw / 2)}" y="${n(y)}" width="${n(bw)}" height="${n(bh)}" rx="12" fill="#fffdf5" stroke="${INK}" stroke-width="3"/>`;
     let yy = y + 9;
-    if (en) { yy += z1; g += T(x, yy - 2, en, z1, { f: '#23243a' }); }
-    if (ko) { yy += z2 * 1.2; g += T(x, yy - 4, ko, z2, { f: '#d4432f' }); }
+    if (en) { yy += z1; g += rich(x, yy - 2, en, z1, '#23243a', o.hi || '#e0357a'); }
+    if (ko) { yy += z2 * 1.2; g += rich(x, yy - 4, ko, z2, '#d4432f', o.hiKo || '#1f8a6e'); }
     return g;
+  }
+  /* Text with *key words* highlighted (color + slightly larger), used by subtitles. */
+  function rich(x, y, s, z, f, hi) {
+    const parts = String(s).split('*');
+    const spans = parts.map((p, i) => i % 2 ? `<tspan fill="${hi}" font-size="${n(z * 1.12)}">${esc(p)}</tspan>` : esc(p)).join('');
+    return `<text x="${n(x)}" y="${n(y)}" font-size="${n(z)}" text-anchor="middle" fill="${f}" font-family="${FONT}" font-weight="700">${spans}</text>`;
   }
   /* Big hook headline (reels / card news): thick ink outline, yellow fill. */
   function hook(lines, o) {
@@ -162,33 +169,51 @@
     const opts = Object.assign({ c: a.c, crown: a.crown, mag: a.prop === 'mag' ? 'r' : undefined, extra: a.prop === 'mag' ? '' : p, label: o.noLabel ? undefined : a.name }, o);
     return box(x, fy, s, opts);
   }
-  /* Dr. Harness: a chubby golden hamster scientist in black sunglasses and a lab coat.
+  /* Dr. Harness: a hip golden hamster. Black sunglasses, backwards snapback, gold "10X" chain,
+     oversized hoodie, chunky sneakers.
      Options: m ('smile'|'o'|'grin'|'flat'), la/ra (paw positions), q, bang, flip, eyes (sunglasses pushed up). */
   function doc(x, fy, sc, o) {
     o = o || {}; sc = sc || 1;
-    const la = o.la || [-34, -46], ra = o.ra || [34, -46], FUR = '#f0a64a', FUR2 = '#d9832e', CREAM = '#fff1d6', PINK = '#f7a1a8';
-    let g = `<ellipse cx="-13" cy="-4" rx="12" ry="6" fill="${PINK}" stroke="${INK}" stroke-width="2.5"/><ellipse cx="13" cy="-4" rx="12" ry="6" fill="${PINK}" stroke="${INK}" stroke-width="2.5"/>`;
-    g += `<path d="M-31,-10 Q-44,-52 -27,-86 L27,-86 Q44,-52 31,-10 Q0,-2 -31,-10 Z" fill="#ffffff" stroke="${INK}" stroke-width="3" stroke-linejoin="round"/>`;
-    g += `<path d="M-12,-86 Q0,-60 12,-86 Z" fill="${CREAM}" stroke="${INK}" stroke-width="2"/><path d="M-14,-86 L0,-58 L14,-86" fill="none" stroke="${INK}" stroke-width="2"/><path d="M-4,-62 L0,-52 L4,-62 Z" fill="#39b3b0" stroke="${INK}" stroke-width="1.8"/><rect x="11" y="-58" width="13" height="10" rx="2" fill="none" stroke="${INK}" stroke-width="2"/><line x1="15" y1="-63" x2="15" y2="-54" stroke="#39b3b0" stroke-width="3"/><circle cx="0" cy="-40" r="2.4" fill="${INK}"/><circle cx="0" cy="-28" r="2.4" fill="${INK}"/>`;
-    for (const [sx, a] of [[-24, la], [24, ra]]) g += `<path d="M${sx},-78 L${a[0]},${a[1]}" stroke="${INK}" stroke-width="13" stroke-linecap="round"/><path d="M${sx},-78 L${a[0]},${a[1]}" stroke="#ffffff" stroke-width="8" stroke-linecap="round"/><circle cx="${a[0]}" cy="${a[1]}" r="6.5" fill="${PINK}" stroke="${INK}" stroke-width="2"/>`;
-    g += `<circle cx="-25" cy="-137" r="11" fill="${FUR}" stroke="${INK}" stroke-width="2.5"/><circle cx="-25" cy="-137" r="5.5" fill="${PINK}"/><circle cx="25" cy="-137" r="11" fill="${FUR}" stroke="${INK}" stroke-width="2.5"/><circle cx="25" cy="-137" r="5.5" fill="${PINK}"/>`;
-    g += `<ellipse cx="0" cy="-110" rx="35" ry="31" fill="${FUR}" stroke="${INK}" stroke-width="3"/><ellipse cx="0" cy="-131" rx="15" ry="7" fill="${FUR2}" opacity=".8"/><path d="M-3,-141 q4,-8 9,-3" fill="none" stroke="${INK}" stroke-width="2.2" stroke-linecap="round"/>`;
+    const la = o.la || [-34, -46], ra = o.ra || [34, -46], FUR = '#f0a64a', CREAM = '#fff1d6', PINK = '#f7a1a8';
+    const HOOD = o.hoodie || '#7c5cff', HOOD2 = shade(HOOD, -.18), HOOD3 = shade(HOOD, .25), CAP = o.cap || '#e5533f', GOLD = '#ffc23d';
+    let g = '';
+    // hood behind the head + hoodie body
+    g += `<ellipse cx="0" cy="-88" rx="30" ry="12" fill="${HOOD2}" stroke="${INK}" stroke-width="2.5"/>`;
+    g += `<path d="M-33,-12 Q-46,-54 -28,-88 L28,-88 Q46,-54 33,-12 Q0,-4 -33,-12 Z" fill="${HOOD}" stroke="${INK}" stroke-width="3" stroke-linejoin="round"/>`;
+    g += `<path d="M-18,-40 Q-18,-30 -10,-28 L10,-28 Q18,-30 18,-40 Z" fill="${HOOD3}" stroke="${INK}" stroke-width="2" stroke-linejoin="round"/><path d="M-30,-15 Q0,-8 30,-15" fill="none" stroke="${HOOD2}" stroke-width="4"/>`;
+    g += `<path d="M-7,-86 L-9,-62 M7,-86 L9,-62" stroke="#ffffff" stroke-width="2.5" stroke-linecap="round"/><circle cx="-9" cy="-61" r="2.4" fill="#ffffff" stroke="${INK}" stroke-width="1"/><circle cx="9" cy="-61" r="2.4" fill="#ffffff" stroke="${INK}" stroke-width="1"/>`;
+    // sneakers
+    for (const sx of [-1, 1]) g += `<g transform="translate(${sx * 14},0)"><path d="M-15,-2 L-15,-9 Q-15,-17 -6,-17 L4,-17 Q14,-15 15,-7 L15,-2 Z" fill="#ffffff" stroke="${INK}" stroke-width="2.5" stroke-linejoin="round"/><rect x="-16" y="-5" width="32" height="5" rx="2" fill="#e8e3dc" stroke="${INK}" stroke-width="2"/><path d="M-8,-11 Q0,-7 8,-12" fill="none" stroke="${CAP}" stroke-width="3" stroke-linecap="round"/></g>`;
+    // gold chain + pendant
+    g += `<path d="M-19,-87 Q-12,-66 0,-64 Q12,-66 19,-87" fill="none" stroke="${INK}" stroke-width="5.5" stroke-linecap="round"/><path d="M-19,-87 Q-12,-66 0,-64 Q12,-66 19,-87" fill="none" stroke="${GOLD}" stroke-width="3.2" stroke-dasharray="3 1.6" stroke-linecap="round"/>`;
+    g += `<rect x="-12" y="-66" width="24" height="15" rx="4" fill="${GOLD}" stroke="${INK}" stroke-width="2"/><text x="0" y="-54.5" font-size="10.5" text-anchor="middle" fill="${INK}" font-family="${FONT}" font-weight="700"${o.flip ? ' transform="scale(-1,1)"' : ''}>10X</text>`;
+    // sleeves + paws
+    for (const [sx, a] of [[-24, la], [24, ra]]) g += `<path d="M${sx},-78 L${a[0]},${a[1]}" stroke="${INK}" stroke-width="15" stroke-linecap="round"/><path d="M${sx},-78 L${a[0]},${a[1]}" stroke="${HOOD}" stroke-width="10" stroke-linecap="round"/><circle cx="${a[0]}" cy="${a[1]}" r="6.5" fill="${PINK}" stroke="${INK}" stroke-width="2"/>`;
+    // backwards cap brim peeks out behind the head
+    g += `<path d="M14,-146 Q34,-160 46,-150 Q40,-142 22,-140 Z" fill="${shade(CAP, -.2)}" stroke="${INK}" stroke-width="2.5" stroke-linejoin="round"/>`;
+    // head
+    g += `<ellipse cx="0" cy="-110" rx="35" ry="31" fill="${FUR}" stroke="${INK}" stroke-width="3"/>`;
     g += `<ellipse cx="-23" cy="-100" rx="14" ry="12" fill="${CREAM}" stroke="${INK}" stroke-width="2"/><ellipse cx="23" cy="-100" rx="14" ry="12" fill="${CREAM}" stroke="${INK}" stroke-width="2"/><ellipse cx="0" cy="-99" rx="14" ry="11" fill="${CREAM}"/><ellipse cx="-24" cy="-97" rx="6" ry="3.5" fill="#f07f86" opacity=".6"/><ellipse cx="24" cy="-97" rx="6" ry="3.5" fill="#f07f86" opacity=".6"/>`;
     g += `<path d="M-30,-101 l-14,-3 M-30,-97 l-15,2 M30,-101 l14,-3 M30,-97 l15,2" stroke="${INK}" stroke-width="1.5" stroke-linecap="round"/>`;
     g += `<ellipse cx="0" cy="-106" rx="4.5" ry="3.2" fill="#e8747c" stroke="${INK}" stroke-width="1.5"/>`;
+    // snapback dome (worn backwards: the strap opening sits on the forehead)
+    g += `<path d="M-31,-121 Q-32,-152 0,-153 Q32,-152 31,-121 Q0,-129 -31,-121 Z" fill="${CAP}" stroke="${INK}" stroke-width="2.8" stroke-linejoin="round"/><path d="M0,-153 L0,-125" stroke="${shade(CAP, -.25)}" stroke-width="1.6"/><circle cx="0" cy="-153" r="3" fill="${shade(CAP, -.25)}" stroke="${INK}" stroke-width="1.5"/>`;
+    g += `<path d="M-9,-123 Q0,-134 9,-123 Z" fill="${FUR}" stroke="${INK}" stroke-width="2"/><rect x="-7" y="-127" width="14" height="3.4" rx="1.5" fill="#ffffff" stroke="${INK}" stroke-width="1.2"/>`;
+    // ears poke out below the cap
+    g += `<circle cx="-32" cy="-128" r="10" fill="${FUR}" stroke="${INK}" stroke-width="2.5"/><circle cx="-32" cy="-128" r="5" fill="${PINK}"/><circle cx="32" cy="-128" r="10" fill="${FUR}" stroke="${INK}" stroke-width="2.5"/><circle cx="32" cy="-128" r="5" fill="${PINK}"/>`;
     const m = o.m || 'smile';
     if (m === 'o') g += `<ellipse cx="0" cy="-95" rx="4" ry="5" fill="#8a2f2a" stroke="${INK}" stroke-width="1.8"/><rect x="-3" y="-100" width="6" height="4" fill="#fff" stroke="${INK}" stroke-width="1"/>`;
-    else if (m === 'grin') g += `<path d="M-9,-100 Q0,-86 9,-100 Z" fill="#8a2f2a" stroke="${INK}" stroke-width="2" stroke-linejoin="round"/><rect x="-3.5" y="-100" width="7" height="5" fill="#fff" stroke="${INK}" stroke-width="1"/>`;
+    else if (m === 'grin') g += `<path d="M-10,-100 Q0,-85 10,-100 Z" fill="#8a2f2a" stroke="${INK}" stroke-width="2" stroke-linejoin="round"/><rect x="-3.5" y="-100" width="7" height="5" fill="#fff" stroke="${INK}" stroke-width="1"/>`;
     else if (m === 'flat') g += `<path d="M-5,-99 L5,-99" stroke="${INK}" stroke-width="2.2" stroke-linecap="round"/>`;
-    else g += `<path d="M-6,-101 q3,4 6,0 q3,4 6,0" fill="none" stroke="${INK}" stroke-width="2" stroke-linecap="round"/>`;
+    else g += `<path d="M-7,-101 q3.5,4 7,0 q3.5,4 7,0" fill="none" stroke="${INK}" stroke-width="2" stroke-linecap="round"/><path d="M4,-101 q5,1 8,-3" fill="none" stroke="${INK}" stroke-width="2" stroke-linecap="round"/>`;
     if (o.eyes) {
-      g += `<circle cx="-12" cy="-116" r="5.5" fill="${INK}"/><circle cx="12" cy="-116" r="5.5" fill="${INK}"/><circle cx="-10.5" cy="-118" r="1.8" fill="#fff"/><circle cx="13.5" cy="-118" r="1.8" fill="#fff"/>`;
-      g += `<g transform="translate(0,-17) rotate(-6)"><rect x="-26" y="-126" width="22" height="13" rx="5" fill="#15151c" stroke="${INK}" stroke-width="2"/><rect x="4" y="-126" width="22" height="13" rx="5" fill="#15151c" stroke="${INK}" stroke-width="2"/><path d="M-4,-121 L4,-121" stroke="${INK}" stroke-width="2.5"/></g>`;
+      g += `<circle cx="-12" cy="-112" r="5.5" fill="${INK}"/><circle cx="12" cy="-112" r="5.5" fill="${INK}"/><circle cx="-10.5" cy="-114" r="1.8" fill="#fff"/><circle cx="13.5" cy="-114" r="1.8" fill="#fff"/>`;
+      g += `<g transform="translate(0,-12) rotate(-6)"><rect x="-27" y="-128" width="23" height="14" rx="5" fill="#15151c" stroke="${INK}" stroke-width="2"/><rect x="4" y="-128" width="23" height="14" rx="5" fill="#15151c" stroke="${INK}" stroke-width="2"/><path d="M-4,-122 L4,-122" stroke="${INK}" stroke-width="2.5"/></g>`;
     } else {
-      g += `<path d="M-35,-119 L-26,-120 M26,-120 L35,-119" stroke="${INK}" stroke-width="2.5" stroke-linecap="round"/><rect x="-27" y="-126" width="23" height="15" rx="6" fill="#15151c" stroke="${INK}" stroke-width="2.2"/><rect x="4" y="-126" width="23" height="15" rx="6" fill="#15151c" stroke="${INK}" stroke-width="2.2"/><path d="M-4,-120 Q0,-123 4,-120" fill="none" stroke="${INK}" stroke-width="2.5"/><path d="M-23,-122 l7,0 M8,-122 l7,0" stroke="#9fb4ff" stroke-width="2.2" stroke-linecap="round" opacity=".9"/>`;
+      g += `<path d="M-36,-114 L-27,-115 M27,-115 L36,-114" stroke="${INK}" stroke-width="2.5" stroke-linecap="round"/><rect x="-28" y="-121" width="24" height="15" rx="6" fill="#15151c" stroke="${INK}" stroke-width="2.2"/><rect x="4" y="-121" width="24" height="15" rx="6" fill="#15151c" stroke="${INK}" stroke-width="2.2"/><path d="M-4,-115 Q0,-118 4,-115" fill="none" stroke="${INK}" stroke-width="2.5"/><path d="M-24,-117 l7,0 M8,-117 l7,0" stroke="#9fb4ff" stroke-width="2.2" stroke-linecap="round" opacity=".9"/>`;
     }
-    if (o.q) g += `<text x="34" y="-150" font-size="38" fill="#3b7fd0" font-family="${FONT}" font-weight="700" transform="rotate(14 34 -150)">?</text><text x="48" y="-172" font-size="22" fill="#3b7fd0" font-family="${FONT}" font-weight="700">?</text>`;
-    if (o.bang) g += `<text x="34" y="-150" font-size="40" fill="#e5533f" font-family="${FONT}" font-weight="700" transform="rotate(10 34 -150)">!</text>`;
+    if (o.q) g += `<text x="38" y="-156" font-size="38" fill="#3b7fd0" font-family="${FONT}" font-weight="700" transform="rotate(14 38 -156)">?</text><text x="52" y="-178" font-size="22" fill="#3b7fd0" font-family="${FONT}" font-weight="700">?</text>`;
+    if (o.bang) g += `<text x="38" y="-156" font-size="40" fill="#e5533f" font-family="${FONT}" font-weight="700" transform="rotate(10 38 -156)">!</text>`;
     return G(`<g transform="translate(${x},${fy}) scale(${o.flip ? -sc : sc},${sc})">${g}</g>`);
   }
   const hand = (x, fy, sc, a, flip) => [x + a[0] * sc * (flip ? -1 : 1), fy + a[1] * sc];
@@ -333,5 +358,5 @@
     return `<svg viewBox="0 0 ${w} ${h}" role="img" aria-label="${esc(o.label || o.en || '')}" xmlns="http://www.w3.org/2000/svg"><g class="cam">${body}</g>${o.hook || ''}${sub2(o.en, o.ko, { w, h, y: o.subY })}<rect width="${w}" height="${h}" filter="url(#grain)" opacity=".5" style="mix-blend-mode:multiply" pointer-events="none"/></svg>`;
   }
 
-  root.Theater = { INK, FONT, esc, n, T, G, rng, shade, textW, install, stage, curtains, sub2, hook, face, box, PAL, AGENTS, agent, doc, hand, card, kanban, COLS, sign, bubble, meter, pump, machine, gate, sandbox, fence, door, rope, board, banner, pkg, browser, star, burst, motion, confetti, dice, bomb, stopwatch, coin, arrow, phone, scene };
+  root.Theater = { INK, FONT, esc, n, T, G, rich, rng, shade, textW, install, stage, curtains, sub2, hook, face, box, PAL, AGENTS, agent, doc, hand, card, kanban, COLS, sign, bubble, meter, pump, machine, gate, sandbox, fence, door, rope, board, banner, pkg, browser, star, burst, motion, confetti, dice, bomb, stopwatch, coin, arrow, phone, scene };
 })(window);

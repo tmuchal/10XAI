@@ -339,60 +339,77 @@ def camera(loc, target, lens=35, dof=None):
 
 
 # ---------------------------------------------------------------- characters
-def hamster(loc, scale=1.0, rot_z=0.0, pose="idle", mouth="smile", glasses="on"):
-    """Dr. Harness. Stands on z=0 in local space, faces -Y, about 2.1 units tall."""
+def hamster(loc, scale=1.0, rot_z=0.0, pose="idle", mouth="smile", glasses="on", hoodie="#7c5cff", cap="#e5533f"):
+    """Dr. Harness: a hip golden hamster (sunglasses, backwards snapback, gold 10X chain, hoodie, sneakers).
+    Stands on z=0 in local space, faces -Y, about 2.2 units tall."""
     root = empty("hamster", loc, (0, 0, rot_z), scale)
-    fur, fur2, cream, pink = mat(C["fur"], 0.8), mat(C["fur2"], 0.8), mat(C["cream"], 0.8), mat(C["pink"], 0.6)
-    coat, ink, glass = mat(C["coat"], 0.6), mat(INK, 0.5), mat(C["glass"], 0.08, metal=0.2)
-    # feet + coat body
+    fur, cream, pink = mat(C["fur"], 0.8), mat(C["cream"], 0.8), mat(C["pink"], 0.6)
+    hood, hood2 = mat(hoodie, 0.7), mat("#5a3fe0" if hoodie == "#7c5cff" else hoodie, 0.75)
+    ink, glass = mat(INK, 0.5), mat(C["glass"], 0.08, metal=0.2)
+    gold = mat("#ffc23d", 0.25, metal=0.85)
+    capm, capd = mat(cap, 0.55), mat("#b8372a", 0.6)
+    # sneakers
     for sx in (-1, 1):
-        sphere((sx * 0.24, -0.18, 0.06), 0.16, pink, root, scale=(1.1, 1.5, 0.5))
-    sphere((0, 0, 0.66), 0.62, coat, root, scale=(1.0, 0.86, 1.08))
-    sphere((0, -0.36, 0.9), 0.24, cream, root, scale=(1.0, 0.5, 1.2))
-    tube([(-0.25, -0.5, 1.12), (0, -0.56, 0.72), (0.25, -0.5, 1.12)], 0.022, ink, root)
-    cone((0, -0.56, 0.93), 0.07, 0.0, 0.2, mat(C["teal"], 0.4), root, rot=(math.pi, 0, 0))
-    for z in (0.55, 0.38):
-        sphere((0, -0.54, z), 0.035, ink, root)
-    cube((0.24, -0.53, 0.72), (0.15, 0.02, 0.12), mat("#f4f4f4", 0.6), root)
-    cyl((0.27, -0.55, 0.8), 0.018, 0.18, mat(C["teal"], 0.4), root)
+        cube((sx * 0.25, -0.12, 0.1), (0.3, 0.46, 0.2), mat("#ffffff", 0.45), root, bevel=0.07)
+        cube((sx * 0.25, -0.12, 0.02), (0.32, 0.5, 0.05), mat("#e0dbd3", 0.6), root, bevel=0.02)
+        tube([(sx * 0.25 - 0.1, -0.36, 0.13), (sx * 0.25, -0.35, 0.09), (sx * 0.25 + 0.1, -0.33, 0.15)], 0.02, capm, root)
+    # hoodie body, pocket, hood, drawstrings
+    sphere((0, 0, 0.7), 0.64, hood, root, scale=(1.02, 0.88, 1.06))
+    sphere((0, -0.47, 0.5), 0.3, mat("#9c85ff", 0.7), root, scale=(1.1, 0.35, 0.55))
+    torus((0, 0.02, 1.17), 0.36, 0.13, hood2, root, rot=(math.radians(-15), 0, 0))
+    for sx in (-1, 1):
+        tube([(sx * 0.1, -0.5, 1.12), (sx * 0.12, -0.6, 0.85)], 0.018, mat("#ffffff", 0.4), root)
+        sphere((sx * 0.12, -0.6, 0.83), 0.03, mat("#ffffff", 0.4), root)
+    # gold chain + 10X pendant
+    torus((0, -0.1, 1.12), 0.36, 0.035, gold, root, rot=(math.radians(-58), 0, 0))
+    cube((0, -0.6, 0.93), (0.3, 0.05, 0.2), gold, root, bevel=0.03)
+    text("10X", (0, -0.635, 0.93), 0.13, ink, root, extrude=0.008)
     # arms (sleeves + paws)
     shoulder = {-1: (-0.5, -0.05, 1.05), 1: (0.5, -0.05, 1.05)}
-    paws = {"idle": {-1: (-0.62, -0.25, 0.58), 1: (0.62, -0.25, 0.58)},
-            "wave": {-1: (-0.62, -0.25, 0.58), 1: (0.85, -0.3, 1.75)},
-            "point": {-1: (-0.62, -0.25, 0.58), 1: (1.15, -0.45, 1.25)},
-            "stamp": {-1: (-0.62, -0.25, 0.58), 1: (0.7, -0.45, 1.9)},
+    paws = {"idle": {-1: (-0.64, -0.25, 0.58), 1: (0.64, -0.25, 0.58)},
+            "wave": {-1: (-0.64, -0.25, 0.58), 1: (0.85, -0.3, 1.75)},
+            "point": {-1: (-0.64, -0.25, 0.58), 1: (1.15, -0.45, 1.25)},
+            "stamp": {-1: (-0.64, -0.25, 0.58), 1: (0.7, -0.45, 1.9)},
             "cheer": {-1: (-0.9, -0.25, 1.8), 1: (0.9, -0.25, 1.8)},
-            "run": {-1: (-0.5, -0.55, 0.95), 1: (0.5, -0.6, 1.1)}}[pose]
+            "run": {-1: (-0.5, -0.55, 0.95), 1: (0.5, -0.6, 1.1)},
+            "guns": {-1: (-0.95, -0.55, 1.1), 1: (0.95, -0.55, 1.1)}}[pose]
     for sx in (-1, 1):
         a, b = Vector(shoulder[sx]), Vector(paws[sx])
-        tube([tuple(a), tuple(a.lerp(b, 0.5)), tuple(b)], 0.11, coat, root)
+        tube([tuple(a), tuple(a.lerp(b, 0.5)), tuple(b)], 0.13, hood, root)
         sphere(tuple(b), 0.12, pink, root)
+        if pose == "guns":
+            tube([tuple(b), tuple(b + Vector((sx * 0.02, -0.22, 0.02)))], 0.035, pink, root)
     # head
-    sphere((0, -0.05, 1.55), 0.52, fur, root, scale=(1.08, 0.95, 0.9))
-    sphere((0, 0.05, 1.93), 0.22, fur2, root, scale=(1.2, 0.8, 0.35))
+    sphere((0, -0.05, 1.58), 0.52, fur, root, scale=(1.08, 0.95, 0.9))
     for sx in (-1, 1):
-        sphere((sx * 0.4, 0.0, 1.98), 0.17, fur, root, scale=(1, 0.55, 1))
-        sphere((sx * 0.4, -0.08, 1.98), 0.1, pink, root, scale=(1, 0.4, 1))
-        sphere((sx * 0.3, -0.36, 1.4), 0.24, cream, root, scale=(1, 0.8, 0.85))
-        sphere((sx * 0.33, -0.55, 1.38), 0.07, mat("#f07f86", 0.7), root, scale=(1, 0.3, 0.6))
+        sphere((sx * 0.5, 0.0, 1.86), 0.16, fur, root, scale=(1, 0.55, 1))
+        sphere((sx * 0.5, -0.07, 1.86), 0.09, pink, root, scale=(1, 0.4, 1))
+        sphere((sx * 0.3, -0.36, 1.43), 0.24, cream, root, scale=(1, 0.8, 0.85))
+        sphere((sx * 0.33, -0.55, 1.41), 0.07, mat("#f07f86", 0.7), root, scale=(1, 0.3, 0.6))
         for dz, dx in ((0.03, 0.34), (-0.04, 0.36)):
-            tube([(sx * 0.36, -0.52, 1.4 + dz), (sx * (0.36 + dx), -0.5, 1.4 + dz * 3)], 0.008, ink, root)
-    sphere((0, -0.5, 1.4), 0.2, cream, root, scale=(1, 0.7, 0.75))
-    sphere((0, -0.64, 1.47), 0.06, mat("#e8747c", 0.4), root, scale=(1.2, 0.8, 0.8))
+            tube([(sx * 0.36, -0.52, 1.43 + dz), (sx * (0.36 + dx), -0.5, 1.43 + dz * 3)], 0.008, ink, root)
+    sphere((0, -0.5, 1.43), 0.2, cream, root, scale=(1, 0.7, 0.75))
+    sphere((0, -0.64, 1.5), 0.06, mat("#e8747c", 0.4), root, scale=(1.2, 0.8, 0.8))
     if mouth == "grin":
-        sphere((0, -0.63, 1.33), 0.08, mat("#8a2f2a", 0.6), root, scale=(1.3, 0.5, 0.8))
-        cube((0, -0.68, 1.36), (0.07, 0.02, 0.06), mat("#ffffff", 0.3), root)
+        sphere((0, -0.63, 1.36), 0.08, mat("#8a2f2a", 0.6), root, scale=(1.3, 0.5, 0.8))
+        cube((0, -0.68, 1.39), (0.07, 0.02, 0.06), mat("#ffffff", 0.3), root)
     elif mouth == "o":
-        sphere((0, -0.63, 1.32), 0.06, mat("#8a2f2a", 0.6), root, scale=(1, 0.5, 1.2))
+        sphere((0, -0.63, 1.35), 0.06, mat("#8a2f2a", 0.6), root, scale=(1, 0.5, 1.2))
     else:
-        tube(arc(-0.045, -0.66, 1.38, 0.045, 0.03, math.pi, 2 * math.pi, 8) + arc(0.045, -0.66, 1.38, 0.045, 0.03, math.pi, 2 * math.pi, 8)[1:], 0.012, ink, root)
+        tube(arc(-0.045, -0.66, 1.41, 0.045, 0.03, math.pi, 2 * math.pi, 8) + arc(0.045, -0.66, 1.41, 0.045, 0.03, math.pi, 2 * math.pi, 8)[1:], 0.012, ink, root)
+        tube([(0.09, -0.65, 1.41), (0.15, -0.63, 1.45)], 0.012, ink, root)
+    # backwards snapback: dome + brim pointing back + strap opening on the forehead
+    sphere((0, 0.0, 1.97), 0.48, capm, root, scale=(1.08, 1.0, 0.5))
+    cube((0.1, 0.5, 2.02), (0.55, 0.5, 0.05), capd, root, bevel=0.03, rot=(math.radians(-12), 0, math.radians(8)))
+    sphere((0, 0.0, 2.22), 0.05, capd, root)
+    cube((0, -0.49, 1.93), (0.22, 0.04, 0.06), mat("#ffffff", 0.4), root, bevel=0.01)
     # sunglasses
-    gz = 1.62 if glasses == "on" else 1.95
-    gy = -0.6 if glasses == "on" else -0.4
+    gz = 1.64 if glasses == "on" else 1.98
+    gy = -0.6 if glasses == "on" else -0.45
     if glasses == "up":
         for sx in (-1, 1):
-            sphere((sx * 0.17, -0.55, 1.62), 0.07, ink, root)
-            sphere((sx * 0.17 + 0.03, -0.61, 1.65), 0.02, mat("#ffffff", 0.2, emit=1.0), root)
+            sphere((sx * 0.17, -0.55, 1.64), 0.07, ink, root)
+            sphere((sx * 0.17 + 0.03, -0.61, 1.67), 0.02, mat("#ffffff", 0.2, emit=1.0), root)
     for sx in (-1, 1):
         cube((sx * 0.19, gy, gz), (0.3, 0.06, 0.19), glass, root, bevel=0.05)
         tube([(sx * 0.33, gy + 0.02, gz + 0.03), (sx * 0.5, -0.1, gz + 0.05)], 0.015, glass, root)
@@ -597,7 +614,7 @@ def shot_hero_kanban():
     agent((-0.9, -0.7, 0), C["verify"], 1.35, "alert", "Verify", prop="mag")
     agent((1.1, -1.5, 0), C["runner"], 1.3, "happy", "Runner", carry="Export", carry_color=C["green"], prop="watch", rot_z=-0.1)
     agent((3.0, -0.5, 0), C["orchestrator"], 1.5, "happy", "Orchestrator", crown=True, prop="baton", rot_z=-0.2)
-    hamster((5.2, -1.4, 0), 1.45, math.radians(-25), "point", "grin")
+    hamster((5.2, -1.4, 0), 1.45, math.radians(-25), "guns", "grin")
     confetti(60, (-6, -2, 5.2), (6, 1.5, 6.8), seed=3)
     lights()
     camera((0.4, -11.2, 3.0), (0.3, 0, 2.3), lens=28, dof=True)

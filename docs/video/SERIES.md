@@ -10,7 +10,7 @@ Hook line for the whole series: **"It said FREE. We measured."**
 
 ## Language and subtitles
 
-- **Voice-over is in English.** Dr. Harness, the hamster, is the narrator: warm, quick, a little deadpan. Keep Fireship-style density: one joke or punchline roughly every 20 seconds.
+- **Voice-over is in English.** Dr. Harness, the hip hamster, is the narrator: warm, quick, a little deadpan. Keep Fireship-style density: one joke or punchline roughly every 20 seconds.
 - **Every line has a combined subtitle** drawn with `Theater.sub2(en, ko)`: the English line in ink on top, the Korean line in vermilion below at about 85% of the English size, on a white paper strip. Keep English to 42 characters or fewer per subtitle, and write natural Korean, not literal translation.
 - Box characters speak in "boop" gibberish. Their meaning goes in the subtitles.
 
@@ -25,7 +25,7 @@ Hook line for the whole series: **"It said FREE. We measured."**
 
 | Character | Call | Role |
 |---|---|---|
-| Dr. Harness | `doc(x, floorY, scale, {m, ra, la, q, bang, eyes})` | Host and narrator: a chubby golden hamster scientist in black sunglasses and a lab coat. `eyes:true` pushes the sunglasses up for reveal beats. |
+| Dr. Harness | `doc(x, floorY, scale, {m, ra, la, q, bang, eyes})` | Host and narrator: a hip golden hamster in black sunglasses, a backwards snapback, a gold "10X" chain, an oversized purple hoodie and chunky sneakers. Swagger: finger-guns, a mic drop. `eyes:true` pushes the sunglasses up for reveal beats. |
 | Orchestrator | `agent('orchestrator', …)` | Crowned rose box with a baton. Fans work out to the others. (`verify-orchestrator`, `exec-orchestrator`) |
 | Decompose | `agent('decompose', …)` | Blue, scissors. Cuts the post into ordered cards. |
 | Gap-fill | `agent('gapfill', …)` | Amber, pencil. Adds the gray, dashed cards for steps the author skipped. |
@@ -40,7 +40,7 @@ Moods: `happy`, `worried`, `dizzy`, `alert`, `sleep`, `cool`, `sheepish`, `star`
 
 ## Production: Blender 3D motion graphics
 
-- The final Reel and long-form video are made as **3D motion graphics in Blender**: a toon-shaded stage with Line Art ink outlines, a rigged hamster host, 3D Kanban columns with cards flying on physics arcs, depth of field, parallax and particles.
+- The final Reel and long-form video are made as **3D motion graphics in Blender**: a toon-shaded stage with Line Art ink outlines, a rigged hip-hamster host, 3D Kanban columns with cards flying on physics arcs, depth of field, parallax and particles.
 - The SVG frames in these pages are the 2D storyboard and animatic. `blender/harness_theater.py` builds the 3D set and renders hero stills into `renders/`.
 - Hamster gags: a hamster wheel powers the 10XAI machine (the harness), cheek pouches stuffed with cards, sunglasses pushed up at reveals, and sunflower seeds as the cost coin.
 
@@ -90,3 +90,32 @@ The Kanban board appears in **every format**. It's the show's "mission control":
 - Style references: Kurzgesagt (bright flat characters, one idea per scene), Fireship (density and punchlines), ByteByteGo (step-by-step flow diagrams), 3Blue1Brown (one persistent visual, built up), Vibe Kanban's "mission control" explainer (agents moving cards), and 조코딩 (practical Korean follow-along).
 - Card news: 뉴닉 (mascot-led explainer voice), 고구마팜 (the cover as a "thumbnail"), 캐릿 (casual tone), Ruben Hassid / Brij Kishore Pandey (big type, one tip per slide; overview map).
 - Specs: Instagram grid 3:4 crop update (2025), carousels up to 20 slides, safe-zone guides (outfy, kreatli, veeso).
+
+## Korean subtitle style (from Korean short-form references)
+
+References:
+- 조코딩: practical "you can do this too" framing, with the result on screen first.
+- 안될공학: lead with one number, then one plain explanation.
+- ITSub잇섭: full-script captions and one fixed accent color.
+- 뉴닉 고슴이: the mascot's sentence ending becomes the brand.
+- 빵빵이의 일상: deadpan mascot reaction on the reveal.
+- 영국남자 Korean Englishman: English audio with localized, not literal, Korean captions.
+- 올리버쌤: the key term is highlighted in both languages.
+
+Rules:
+- **16 Korean characters or fewer per line.** This follows the Netflix Korean timed-text guide. Keep to 1–2 lines on screen.
+- **Voice:**
+  - In the Reel, the hip hamster speaks 반말 with 음슴체 punch lines.
+  - In the long-form and card news, use 해요체.
+  - Signature ending "~햄" (e.g. "직접 재봤햄"), used 2–4 times per piece, never on every line.
+- **Key tokens:** wrap them in `*asterisks*` in both lines (`Theater.sub2` highlights them): FREE/공짜, 72, 70, $, SKILL.md.
+- **No 번역투 (translationese):** rewrite for meaning. Cut subjects and pronouns. Turn passives active. Drop "~에 대해" and "~을 가지고 있다".
+- **Hook examples:** "공짜라며? 재보니까…", "이 AI 꿀팁, 진짜 공짜야?", "그 '무료' 워크플로우, 재봤햄".
+
+Sources:
+- Netflix Korean Timed Text Style Guide: https://partnerhelp.netflixstudios.com/hc/en-us/articles/216001127-Korean-Timed-Text-Style-Guide
+- youtube.com/@jocoding
+- youtube.com/@unrealtech
+- namu.wiki/w/잇섭
+- youtube.com/@koreanenglishman/shorts
+- instagram.com/b2ang_official
