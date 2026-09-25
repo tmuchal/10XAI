@@ -1,4 +1,14 @@
 // ---------------------------------------------------------------- 05 · Expertise + humor (134–160)
+// A balance scale: expertise drops onto the left pan, humor onto the right, Noa balances on the
+// fulcrum. Then the humor rule slams in like a stamp, and a loading screen shows both at once.
+const C05_INK = "#2b2320";
+const c05_card = (bg = "#fffaf0", r = 16) => `background:${bg};border:3px solid ${C05_INK};border-radius:${r}px;box-shadow:6px 7px 0 rgba(43,35,32,.22)`;
+const c05_abs = (css, html, parent) => el("div", "position:absolute;" + css, html, parent);
+// critically-ish damped step response 0 → 1 (with a little overshoot) for tau seconds after an event
+const c05_spring = (tau, a = 3, w = 8) => tau <= 0 ? 0 : 1 - Math.exp(-a * tau) * (Math.cos(w * tau) + (a / w) * Math.sin(w * tau));
+// decaying wobble kick
+const c05_kick = (tau, a = 2.6, w = 7) => tau <= 0 ? 0 : Math.exp(-a * tau) * Math.sin(w * tau);
+
 scene(134, 160, (R, s) => {
   s.caps = [[134.2, "전문성은 본문, 유머는 양념", "Expertise is the meal, humor is the seasoning"],
             [137, "전문성: 과정을 보여주고, 숫자와 후기로 증명", "Expertise: show the work, prove it with numbers and reviews"],
@@ -6,50 +16,242 @@ scene(134, 160, (R, s) => {
             [149, "규칙 — 상황은 비틀되, 고객은 놀리지 않는다", "Rule: poke fun at the situation, never the customer"],
             [153.5, "둘을 한 화면에: 과정 공개 + 유머 로딩", "Both at once: show the process, with a joke"]];
   s.cite = [[137, "Buell & Norton 2011 · Spiegel Research Center"], [143, "Oracle Happiness Report"], [149, "McGraw & Warren 2010, Benign Violations"]];
-  chapter(R, "CHAPTER 05", "전문성과 유머 코드");
-  const sc = el("div", "left:360px;top:180px;width:1200px;height:640px", "", R); sc.className = "abs";
-  sc.innerHTML = `<svg width="1200" height="640" style="position:absolute;left:0;top:0">
-    <path d="M600 110 L600 560 M520 580 L680 580" stroke="#c8a266" stroke-width="10" stroke-linecap="round"/>
-    <polygon points="600,90 585,120 615,120" fill="#c8a266"/></svg>`;
-  const beam = el("div", "position:absolute;left:120px;top:100px;width:960px;height:10px;background:var(--gold);border-radius:5px;transform-origin:480px 5px", "", sc);
-  const panL = el("div", "position:absolute;left:-60px;top:5px;width:420px;transform-origin:210px 0", "", beam), panR = el("div", "position:absolute;left:600px;top:5px;width:420px;transform-origin:210px 0", "", beam);
-  const mkPan = (p, title, color) => { el("div", `height:56px;width:3px;background:var(--gold);margin:0 auto`, "", p);
-    return el("div", `margin-top:0;padding:18px;border-radius:0 0 30px 30px;border-top:4px solid ${color};background:rgba(255,255,255,.03);min-height:120px`, `<div style="font-size:30px;font-weight:900;color:${color};text-align:center;margin-bottom:10px">${title}</div>`, p); };
-  const LP = mkPan(panL, "전문성", "var(--sky)"), RP = mkPan(panR, "유머", "var(--pink)");
-  const L = [["과정을 보여준다", "노동의 착시: 과정이 보이면 가치가 오른다"], ["후기 5개 = 구매 가능성 +270%", "별점은 4.0~4.7이 5.0보다 잘 팔린다"], ["숫자와 결과", "제작 기간 · 성과 · 고객 수"]];
-  const Rr = [["91%", "재밌는 브랜드를 선호"], ["72%", "경쟁사보다 유머 있는 브랜드를 선택"], ["90%", "웃긴 광고를 더 잘 기억"]];
-  const lItems = L.map(x => el("div", "background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:12px 16px;margin-bottom:8px", `<div style="font-size:22px;font-weight:800">${x[0]}</div><div style="font-size:16px;color:var(--muted)">${x[1]}</div>`, LP));
-  const rItems = Rr.map(x => el("div", "background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:12px 16px;margin-bottom:8px;display:flex;gap:14px;align-items:center", `<div style="font-size:34px;font-weight:900;color:var(--pink)">${x[0]}</div><div style="font-size:18px">${x[1]}</div>`, RP));
-  const rule = el("div", "left:0;right:0;top:250px;text-align:center;z-index:5", `<div style="display:inline-block;padding:30px 50px;border-radius:24px;background:var(--cream);color:var(--ink);box-shadow:0 30px 80px rgba(0,0,0,.6)">
-    <div style="font-size:18px;letter-spacing:4px;color:var(--terra)">HUMOR RULE</div>
-    <div class="serif" style="font-size:52px;font-weight:800;margin-top:8px">상황은 비틀되,<br>고객은 놀리지 않는다</div>
-    <div style="font-size:20px;color:#6b6358;margin-top:12px">웃음 = 약간 어긋났지만 안전한 것 (양성 위반)</div></div>`, R); rule.className = "abs";
-  // loading card example
-  const ld = el("div", "left:460px;top:220px;width:1000px;height:520px;background:var(--cream);color:var(--ink);border-radius:24px;padding:40px 50px", "", R); ld.className = "abs";
-  ld.innerHTML = `<div style="font-size:18px;letter-spacing:4px;color:var(--terra)">예시 · 로딩 화면</div>
-    <div class="lt" style="font-size:40px;font-weight:800;margin-top:14px;font-family:'Noto Serif CJK KR'">노아가 브랜드 영상 렌더링 중…</div>
-    <div class="lc" style="font-size:24px;color:#6b6358;margin-top:8px">(커피 2잔째 ☕)</div>
-    <div style="margin-top:30px;height:18px;border-radius:9px;background:#e0d6c6;overflow:hidden"><div class="lb" style="height:100%;width:0;background:var(--terra)"></div></div>
-    <div class="ls" style="margin-top:26px;font-size:24px;line-height:1.9"></div>`;
-  const ldNoa = makeNoa(170); ld.appendChild(ldNoa);
-  const STEPS = ["✓ 대본 확정 (Claude)", "✓ 스틸 4장 생성 (Higgsfield)", "● 5초 영상 렌더링", "○ 페이지에 배치"];
+  const head = chapter(R, "CHAPTER 05", "전문성과 유머 코드");
+  const INK = C05_INK;
+  const W = c05_abs("left:0;top:0;width:1920px;height:1000px", "", R);          // shake wrapper
+  const SG = c05_abs("left:0;top:0;width:1920px;height:1000px", "", W);         // scale group
+
+  // ---------- scale: post, beam, strings, pans (SVG)
+  const PIV = [960, 300], ARM = 500, DROP = 330;
+  SG.innerHTML = `<svg width="1920" height="1000" style="position:absolute;left:0;top:0;overflow:visible">
+    <g class="post">
+      <path d="M850 872 L1070 872 L1036 832 L884 832Z" fill="#c98a4a" stroke="${INK}" stroke-width="4" stroke-linejoin="round"/>
+      <rect x="944" y="300" width="32" height="536" rx="9" fill="#e6ac66" stroke="${INK}" stroke-width="4"/>
+      <path d="M952 330 V820" stroke="#fff" stroke-opacity=".35" stroke-width="5" stroke-linecap="round"/>
+    </g>
+    <g class="strs" stroke="${INK}" stroke-width="3" fill="none">
+      <path class="sL"/><path class="sR"/></g>
+    <g class="panL"><path d="M-236 0 Q0 96 236 0 Z" fill="#bfe0ef" stroke="${INK}" stroke-width="4" stroke-linejoin="round"/>
+      <path d="M-200 10 Q0 70 200 10" stroke="#fff" stroke-opacity=".6" stroke-width="5" fill="none"/></g>
+    <g class="panR"><path d="M-236 0 Q0 96 236 0 Z" fill="#f8cdd8" stroke="${INK}" stroke-width="4" stroke-linejoin="round"/>
+      <path d="M-200 10 Q0 70 200 10" stroke="#fff" stroke-opacity=".6" stroke-width="5" fill="none"/></g>
+    <g class="beam">
+      <rect x="446" y="289" width="1028" height="22" rx="11" fill="#f2c14e" stroke="${INK}" stroke-width="4"/>
+      <path d="M470 296 H1450" stroke="#fff" stroke-opacity=".5" stroke-width="4" stroke-linecap="round"/>
+      <circle cx="460" cy="300" r="11" fill="#c8372d" stroke="${INK}" stroke-width="3"/>
+      <circle cx="1460" cy="300" r="11" fill="#c8372d" stroke="${INK}" stroke-width="3"/></g>
+    <circle cx="960" cy="300" r="24" fill="#f2c14e" stroke="${INK}" stroke-width="4"/><circle cx="960" cy="300" r="7" fill="${INK}"/>
+  </svg>`;
+  const q = x => SG.querySelector(x);
+  const P = { post: q(".post"), beam: q(".beam"), sL: q(".sL"), sR: q(".sR"), panL: q(".panL"), panR: q(".panR") };
+
+  // pan tags (hang under each pan)
+  const mkTag = (col, bg, ko, en, icon) => c05_abs(`width:300px;padding:8px 12px 10px;text-align:center;${c05_card(bg, 14)};z-index:3`,
+    `<div style="font-size:34px;line-height:1.05;color:${col}">${icon} ${ko}</div><div style="font-size:22px;color:#6b5d52">${en}</div>`, SG);
+  const tagL = mkTag("#2f6f94", "#e3f2f8", "전문성 · 본문", "EXPERTISE = the meal", "🍚");
+  const tagR = mkTag("#c0405f", "#fde6ec", "유머 · 양념", "HUMOR = the seasoning", "🧂");
+
+  // ---------- items dropped onto the pans
+  const LI = [
+    [`<div style="font-size:30px;line-height:1.1">과정을 보여준다</div><div style="display:flex;gap:6px;margin:6px 0 2px">${["기획", "촬영", "편집", "완성"].map((x, i) => `<span style="font-size:22px;padding:0 8px;border:2px solid ${INK};border-radius:8px;background:${i < 3 ? "#d8ecd3" : "#fff3c4"}">${x}</span>`).join('<span style="font-size:22px">→</span>')}</div><div style="font-size:22px;color:#6b5d52">노동의 착시 · 과정이 보이면 더 가치 있게</div>`, "#eef7fb"],
+    [`<div style="display:flex;align-items:baseline;gap:12px"><span style="font-size:26px">후기 5개 →</span><span style="font-size:50px;line-height:1;color:#2f6f94">+270%</span></div><div style="font-size:22px;color:#6b5d52">구매 가능성 · <span style="color:#d98c1f">★4.0–4.7</span> 이 ★5.0 보다 잘 팔림</div>`, "#eef7fb"],
+    [`<div style="font-size:30px;line-height:1.1">숫자와 결과로 증명</div><div style="font-size:22px;color:#6b5d52">제작 기간 · 성과 · 고객 수</div>`, "#eef7fb"],
+  ];
+  const RI = [["91%", "재밌는 브랜드를 선호"], ["72%", "경쟁사보다 웃긴 브랜드 선택"], ["90%", "웃긴 광고를 기억한다"]];
+  const lItems = LI.map(([h, bg]) => c05_abs(`width:420px;padding:10px 16px 12px;${c05_card(bg, 14)};transform-origin:50% 100%;z-index:4`, h, SG));
+  const rItems = RI.map(([n, x]) => {
+    const e = c05_abs(`width:420px;padding:8px 18px 10px;${c05_card("#fff", 30)};display:flex;align-items:center;gap:16px;transform-origin:50% 100%;z-index:4`,
+      `<span style="font-size:56px;line-height:1;color:#c0405f">${n}</span><span style="font-size:26px;line-height:1.15">${x}</span>
+       <svg width="34" height="22" style="position:absolute;left:36px;bottom:-21px;overflow:visible"><path d="M0 0 L8 20 L28 0" fill="#fff" stroke="${INK}" stroke-width="3" stroke-linejoin="round"/><path d="M2 -2 H26" stroke="#fff" stroke-width="5"/></svg>`, SG);
+    return e;
+  });
+  const LAND_L = [137.9, 139.5, 141.1], LAND_R = [143.8, 145.3, 146.8];
+  const ITEM_H = [118, 100, 84], ITEM_HR = [82, 82, 82];
+  // impact text: "쿵!" for expertise, laughs for humor
+  const bursts = [...LAND_L.map((tt, i) => [tt, "쿵!", "#2f6f94", -1, i]), ...LAND_R.map((tt, i) => [tt, ["ㅋㅋㅋ", "HA!", "ㅎㅎ"][i], "#c0405f", 1, i])]
+    .map(b => { const e = c05_abs(`font-size:40px;color:${b[2]};z-index:6;-webkit-text-stroke:1px ${INK}`, b[1], SG); return [e, ...b]; });
+  const balance = c05_abs(`left:760px;top:120px;width:400px;text-align:center;padding:8px 0 10px;${c05_card("#fbe3b0", 14)};z-index:5`,
+    `<div style="font-size:36px">⚖ 본문 + 양념 = 균형!</div>`, SG);
+
+  // ---------- Noa balancing on the fulcrum
+  const nw = c05_abs("left:960px;top:300px;width:0;height:0;z-index:7", "", SG);
+  const noa = makeNoa(130); nw.appendChild(noa);
+
+  // ---------- rule stamp
+  const rule = c05_abs(`left:380px;top:170px;width:1100px;padding:28px 44px 30px;${c05_card("#fffaf0", 22)};z-index:10;text-align:center`, `
+    <div style="font-size:26px;letter-spacing:5px;color:#c8372d">HUMOR RULE · 유머의 규칙</div>
+    <div style="font-size:66px;line-height:1.12;margin-top:6px">상황은 비틀고,<br>고객은 놀리지 않는다</div>
+    <div style="font-size:30px;color:#6b5d52;margin-top:6px">Joke about the situation — never the customer</div>
+    <div style="display:flex;gap:24px;margin-top:22px;text-align:left">
+      <div class="ok" style="flex:1;padding:12px 18px;${c05_card("#dff0d6", 14)}"><div style="font-size:30px;color:#2f7a3a">✓ 상황을 비틀기</div><div style="font-size:26px">“렌더링 중… 노아는 커피 2잔째”</div></div>
+      <div class="no" style="flex:1;padding:12px 18px;${c05_card("#fbe0dc", 14)}"><div style="font-size:30px;color:#c8372d">✗ 고객을 놀리기</div><div style="font-size:26px;text-decoration:line-through;text-decoration-thickness:3px">“이것도 모르세요?”</div></div>
+    </div>
+    <div class="bv" style="font-size:26px;color:#6b5d52;margin-top:16px">웃음 = 살짝 어긋났지만, 안전할 때 (양성 위반 · benign violation)</div>`, W);
+  const rOk = rule.querySelector(".ok"), rNo = rule.querySelector(".no"), rBv = rule.querySelector(".bv");
+  const stamp = c05_abs(`left:1330px;top:120px;width:200px;height:200px;border-radius:50%;border:7px double #c8372d;color:#c8372d;background:rgba(255,250,240,.85);
+    display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:12;text-align:center;line-height:1.05`,
+    `<div style="font-size:52px">SAFE</div><div style="font-size:28px">양성 위반</div><div style="font-size:22px">benign ✓</div>`, W);
+  const ruleNoa = makeNoa(150); W.appendChild(ruleNoa);
+
+  // ---------- loading screen example
+  const ld = c05_abs(`left:160px;top:220px;width:980px;height:610px;${c05_card("#fffaf0", 20)};overflow:hidden;z-index:8`, `
+    <div style="height:50px;background:#f6d9a0;border-bottom:3px solid ${INK};display:flex;align-items:center;gap:9px;padding:0 18px">
+      <span style="width:14px;height:14px;border-radius:50%;background:#ff5f57;border:2px solid ${INK}"></span><span style="width:14px;height:14px;border-radius:50%;background:#febc2e;border:2px solid ${INK}"></span><span style="width:14px;height:14px;border-radius:50%;background:#28c840;border:2px solid ${INK}"></span>
+      <span style="margin-left:14px;font-size:22px;color:#6b5d52">예시 · 로딩 화면 · LOADING SCREEN</span></div>
+    <div style="padding:22px 40px">
+      <div class="lt" style="font-size:46px;line-height:1.15;height:54px"></div>
+      <div class="lc" style="font-size:32px;color:#c0405f;margin-top:4px;height:40px"></div>
+      <div style="display:flex;align-items:center;gap:16px;margin-top:18px">
+        <div style="flex:1;height:38px;border:3px solid ${INK};border-radius:19px;background:#f1e4cc;overflow:hidden"><div class="lb" style="height:100%;width:0;border-right:3px solid ${INK};background:repeating-linear-gradient(45deg,#d4623a 0 18px,#ec8a5c 18px 36px)"></div></div>
+        <div class="lp" style="font-size:40px;width:90px;text-align:right">0%</div></div>
+      <div class="ls" style="margin-top:18px"></div>
+    </div>`, R);
+  const STEPS = [["대본 확정", "Claude", 154.7], ["스틸 4장 생성", "Higgsfield", 155.7], ["5초 영상 렌더링", "Higgsfield", 159.4], ["페이지에 배치", "", 99]];
+  const stepRows = STEPS.map(x => c05_abs("position:relative;display:flex;align-items:center;gap:16px;height:52px;font-size:32px",
+    `<svg width="36" height="36" viewBox="0 0 36 36" style="flex:none"><circle cx="18" cy="18" r="15" fill="#fff" stroke="${INK}" stroke-width="3"/>
+       <path class="ck" d="M9 18 L16 25 L28 11" stroke="#2f7a3a" stroke-width="5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+       <path class="sp" d="M18 5 A13 13 0 0 1 31 18" stroke="#d4623a" stroke-width="5" fill="none" stroke-linecap="round"/></svg>
+     <span class="nm">${x[0]}</span><span style="font-size:24px;color:#6b5d52">${x[1] ? "· " + x[1] : ""}</span>`, ld.querySelector(".ls")));
+  const lt = ld.querySelector(".lt"), lc = ld.querySelector(".lc"), lb = ld.querySelector(".lb"), lp = ld.querySelector(".lp");
+  // desk + Noa + coffee
+  const deskNoa = makeNoa(200); R.appendChild(deskNoa);
+  const desk = c05_abs("left:1170px;top:560px;width:620px;height:330px;z-index:31", `<svg width="620" height="330" overflow="visible">
+    <rect x="60" y="250" width="22" height="80" fill="#b77a45" stroke="${INK}" stroke-width="4"/><rect x="538" y="250" width="22" height="80" fill="#b77a45" stroke="${INK}" stroke-width="4"/>
+    <rect x="20" y="222" width="580" height="34" rx="8" fill="#d9a06a" stroke="${INK}" stroke-width="4"/>
+    <path d="M40 232 H580" stroke="#fff" stroke-opacity=".4" stroke-width="4"/>
+    <g class="cups"></g></svg>`, R);
+  const cupSvg = (fill = "#fffaf0") => `<path d="M-22 -40 L22 -40 L18 0 L-18 0 Z" fill="${fill}" stroke="${INK}" stroke-width="4" stroke-linejoin="round"/>
+    <path d="M20 -32 q16 2 12 14 q-3 8 -14 6" fill="none" stroke="${INK}" stroke-width="4"/><path d="M-18 -26 H18" stroke="#8a5a2b" stroke-width="5"/>`;
+  const cupsG = desk.querySelector(".cups");
+  cupsG.innerHTML = [0, 1, 2].map(i => `<g class="c${i}">${cupSvg("#f4efe6")}</g>`).join("");
+  const cups = [0, 1, 2].map(i => cupsG.querySelector(".c" + i));
+  const mug = c05_abs("left:0;top:0;width:0;height:0;z-index:32", `<svg width="80" height="120" style="position:absolute;left:-40px;top:-100px;overflow:visible">
+    <g transform="translate(40 100)"><g class="steam" stroke="#9a8f80" stroke-width="4" fill="none" stroke-linecap="round">
+      <path class="st0" d="M-10 -52 q-8 -12 0 -24 q8 -12 0 -24"/><path class="st1" d="M8 -52 q-8 -12 0 -24 q8 -12 0 -24"/></g>
+      ${cupSvg("#c8372d")}<text x="0" y="-12" text-anchor="middle" font-size="16" fill="#fff" font-family="GaeguLat">NOA</text></g></svg>`, R);
+  const steams = [mug.querySelector(".st0"), mug.querySelector(".st1")];
+  const cnt = c05_abs(`left:1560px;top:400px;padding:6px 18px 8px;${c05_card("#fff3c4", 30)};font-size:44px;z-index:33;transform-origin:50% 50%`, "", R);
+  const noteA = c05_abs(`left:720px;top:720px;padding:8px 18px 10px;${c05_card("#e3f2f8", 12)};font-size:32px;color:#2f6f94;z-index:34`, "← 과정 공개 = 전문성", R);
+  const noteB = c05_abs(`left:1190px;top:440px;padding:8px 18px 10px;${c05_card("#fde6ec", 12)};font-size:32px;color:#c0405f;z-index:34`, "커피 = 유머 ↓", R);
+
   return t => {
-    const S = seg(t, 134.2, 134.8) * (1 - seg(t, 148.6, 149));
-    sc.style.opacity = S;
-    const wl = lItems.filter((_, i) => t > 137.3 + i * 1.6).length, wr = rItems.filter((_, i) => t > 143.2 + i * 1.4).length;
-    const target = (wr - wl) * 5;  // degrees: heavier side goes down
-    beam.style.transform = `rotate(${target + 1.5 * Math.sin(t * 2.2) * seg(t, 137, 140)}deg)`;
-    const inv = `rotate(${-target}deg)`; panL.style.transform = inv; panR.style.transform = inv;
-    lItems.forEach((e, i) => pop(e, t, 137.3 + i * 1.6, .5, -30));
-    rItems.forEach((e, i) => pop(e, t, 143.2 + i * 1.4, .5, -30));
-    const ru = back(seg(t, 149, 149.6));
-    rule.style.opacity = clamp(ru) * (1 - seg(t, 153, 153.5)); rule.style.transform = `scale(${0.8 + 0.2 * ru}) rotate(${-2 * (1 - clamp(ru))}deg)`;
-    const LD = seg(t, 153.5, 154.1);
-    ld.style.opacity = LD; ld.style.transform = `translateY(${30 * (1 - LD)}px)`;
-    ld.querySelector(".lb").style.width = (100 * ease(seg(t, 154, 159.5)) * .82) + "%";
-    ld.querySelector(".lc").textContent = t > 157.5 ? "(커피 3잔째… 거의 다 됐어요 ☕☕☕)" : "(커피 2잔째 ☕)";
-    ld.querySelector(".ls").innerHTML = STEPS.map((x, i) => `<div style="opacity:${seg(t, 154.3 + i * .8, 154.7 + i * .8)};color:${x[0] === "✓" ? "#1e3a33" : x[0] === "●" ? "var(--terra)" : "#9a8f80"}">${x}</div>`).join("");
-    poseNoa(ldNoa, t, { x: 780, y: 260, s: .9, talk: false, look: -1, mood: t > 157.5 ? "pout" : "happy" });
+    head.style.opacity = 1 - seg(t, 153.2, 153.6);
+    // ================= scale (134.2–149.3)
+    const exit = ease(seg(t, 148.9, 149.4));
+    SG.style.opacity = seg(t, 134.2, 134.5) * (1 - exit);
+    SG.style.transform = `translateY(${80 * exit}px) scale(${1 - 0.08 * exit})`; SG.style.transformOrigin = "960px 600px";
+    // post rises, beam drops in
+    const pr = out(seg(t, 134.2, 134.9));
+    P.post.setAttribute("transform", `translate(0 872) scale(1 ${Math.max(.001, pr)}) translate(0 -872)`);
+    const bd = seg(t, 134.6, 135.15), beamY = -520 * (1 - bd * bd);
+    // beam angle: sum of damped steps (left items tip left, right items tip right) + landing wobble
+    let th = 7 * c05_kick(t - 135.15);
+    LAND_L.forEach(tt => th -= 3.4 * c05_spring(t - tt));
+    LAND_R.forEach(tt => th += 3.4 * c05_spring(t - tt));
+    const rad = th * Math.PI / 180, cs = Math.cos(rad), sn = Math.sin(rad);
+    P.beam.setAttribute("transform", `translate(0 ${beamY}) rotate(${th} 960 300)`);
+    const ends = [[PIV[0] - ARM * cs, PIV[1] - ARM * sn + beamY], [PIV[0] + ARM * cs, PIV[1] + ARM * sn + beamY]];
+    // pans sway on each landing (pendulum)
+    const sway = side => { let f = 5 * c05_kick(t - 135.15, 1.8, 5);
+      (side ? LAND_R : LAND_L).forEach(tt => f += 3 * c05_kick(t - tt, 2.2, 6)); return f * Math.PI / 180; };
+    const pans = ends.map(([ex, ey], k) => { const f = sway(k); return [ex + DROP * Math.sin(f), ey + DROP * Math.cos(f)]; });
+    [P.sL, P.sR].forEach((sp, k) => { const [ex, ey] = ends[k], [px, py] = pans[k];
+      sp.setAttribute("d", `M${px - 226} ${py} L${ex} ${ey} L${px + 226} ${py} M${ex} ${ey} L${px} ${py - 4}`); });
+    P.panL.setAttribute("transform", `translate(${pans[0][0]} ${pans[0][1]})`);
+    P.panR.setAttribute("transform", `translate(${pans[1][0]} ${pans[1][1]})`);
+    [tagL, tagR].forEach((g, k) => { const [px, py] = pans[k], p = back(seg(t, 135.2 + k * .25, 135.7 + k * .25));
+      g.style.left = (px - 150) + "px"; g.style.top = (py + 58) + "px"; g.style.opacity = clamp(p * 2);
+      g.style.transform = `scale(${0.6 + 0.4 * p}) rotate(${(k ? 2 : -2) + 3 * Math.sin(t * 1.6 + k)}deg)`; });
+    // items: fall, land with squash, then ride the pan
+    const stackItem = (e, i, land, hs, k) => {
+      const [px, py] = pans[k]; let below = 0; for (let j = 0; j < i; j++) below += hs[j] + 6;
+      const p = seg(t, land - .45, land), fall = -620 * (1 - p * p), tau = t - land;
+      const sq = tau > 0 ? 0.14 * Math.exp(-7 * tau) * Math.cos(20 * tau) : 0;
+      e.style.left = (px - 210) + "px"; e.style.top = (py + 8 - below - hs[i] + fall) + "px";
+      e.style.opacity = t > land - .45 ? 1 : 0;
+      e.style.transform = `scale(${1 + sq * .6}, ${1 - sq}) rotate(${(k ? 1 : -1) * (i % 2 ? 1.2 : -1) + (tau < 0 ? 6 * (1 - p) : 0)}deg)`;
+    };
+    lItems.forEach((e, i) => stackItem(e, i, LAND_L[i], ITEM_H, 0));
+    rItems.forEach((e, i) => stackItem(e, i, LAND_R[i], ITEM_HR, 1));
+    bursts.forEach(([e, tt, , , side, i]) => {
+      const tau = t - tt, [px, py] = pans[side > 0 ? 1 : 0], hs = side > 0 ? ITEM_HR : ITEM_H;
+      let h = 0; for (let j = 0; j <= i; j++) h += hs[j] + 6;
+      const p = seg(tau, 0, .9);
+      e.style.opacity = tau > 0 ? Math.sin(p * Math.PI) : 0;
+      e.style.left = (px + side * (190 + 40 * p) - 40) + "px"; e.style.top = (py - h - 20 - 70 * out(p)) + "px";
+      e.style.transform = `scale(${0.6 + 0.6 * back(clamp(p * 2.5))}) rotate(${side * 10}deg)`;
+    });
+    const bp = back(seg(t, 147.3, 147.8));
+    balance.style.opacity = clamp(bp * 2) * (1 - seg(t, 148.6, 148.9)); balance.style.transform = `translateY(${-20 * (1 - bp)}px) scale(${0.7 + 0.3 * bp}) rotate(-1.5deg)`;
+    // Noa: drops onto the pivot, then balances with arms out
+    const nd = seg(t, 135.4, 135.85), nY = -560 * (1 - nd * nd), nt = t - 135.85;
+    const nsq = nt > 0 ? 0.2 * Math.exp(-6 * nt) * Math.cos(16 * nt) : 0;
+    const tilted = Math.abs(th) > 6.5;
+    nw.style.transform = `translate(0px, ${beamY}px) rotate(${th * .8}deg)`;
+    nw.style.opacity = t > 135.4 ? 1 : 0;
+    poseNoa(noa, t, { x: -65, y: -140 + nY, s: 1, mood: tilted ? "shock" : "happy", talk: t > 136.3 && t < 137.2, look: -th / 8, hop: t > 147 && t < 148.4 ? (t - 147) / .7 % 1 : 0 });
+    noa.P.b.setAttribute("transform", `translate(100 200) scale(${1 + nsq} ${1 - nsq}) rotate(${-th * .6} 0 0) translate(-100 -200)`);
+    if (!tilted) {
+      const cheer = t > 147 && t < 148.6, flap = 16 * Math.sin(t * 5.2) * (0.4 + Math.min(1, Math.abs(th) / 6));
+      noa.P.al.setAttribute("transform", `rotate(${(cheer ? 55 : 0) + flap - th * 2} 46 118)`);
+      noa.P.ar.setAttribute("transform", `rotate(${(cheer ? -55 : 0) + flap - th * 2} 154 118)`);
+    }
+    // ================= rule stamp (149–153.5)
+    const sl = seg(t, 149.0, 149.32), impact = t - 149.32;
+    const ro = t < 149 ? 0 : clamp(sl * 5) * (1 - seg(t, 153.1, 153.5));
+    rule.style.opacity = ro;
+    const ringR = impact > 0 ? 0.05 * Math.exp(-7 * impact) * Math.cos(22 * impact) : 0;
+    rule.style.transform = `translateY(${-160 * seg(t, 153.1, 153.5)}px) scale(${(impact < 0 ? 2.3 - 1.3 * sl * sl : 1) * (1 + ringR)}) rotate(-2deg)`;
+    const shake = impact > 0 ? Math.exp(-6 * impact) * Math.sin(48 * impact) : 0;
+    const st2 = t - 151.95, shake2 = st2 > 0 ? .6 * Math.exp(-7 * st2) * Math.sin(50 * st2) : 0;
+    W.style.transform = `translate(${14 * (shake + shake2)}px, ${9 * Math.abs(shake + shake2)}px)`;
+    pop(rOk, t, 150.3, .45, 20); pop(rNo, t, 150.9, .45, 20);
+    rNo.style.transform += ` rotate(${1.5 * c05_kick(t - 151.2, 3, 14)}deg)`;
+    pop(rBv, t, 152.4, .5, 12);
+    const sp = seg(t, 151.65, 151.95);
+    stamp.style.opacity = t < 151.65 ? 0 : clamp(sp * 4) * (1 - seg(t, 153.1, 153.5));
+    stamp.style.transform = `translateY(${-160 * seg(t, 153.1, 153.5)}px) rotate(-14deg) scale(${st2 < 0 ? 3 - 2 * sp * sp : 1 + 0.08 * c05_kick(st2, 6, 20)})`;
+    const rn = seg(t, 149.5, 150.1);
+    poseNoa(ruleNoa, t, { x: 1560, y: 560 + 200 * (1 - out(rn)), s: 1, mood: t < 150.9 || t > 151.5 ? "happy" : "shock", talk: t > 150.2 && t < 150.9 || t > 152.3 && t < 153,
+      look: -1, hop: t > 152 && t < 152.6 ? (t - 152) / .6 : 0, op: out(rn) * (1 - seg(t, 153.1, 153.4)) });
+    // ================= loading screen (153.5–160)
+    const L = back(seg(t, 153.5, 154.1));
+    ld.style.opacity = clamp(L * 3); ld.style.transform = `translateY(${120 * (1 - L)}px) rotate(${-1.2 * (1 - L)}deg)`;
+    lt.textContent = type("노아가 브랜드 필름을 렌더링하는 중…", seg(t, 153.8, 155.0));
+    const third = t > 157.6;
+    lc.textContent = t < 155 ? "" : third ? "(커피 3잔째… 거의 다 됐어요 ☕)" : "(커피 2잔째 ☕)";
+    lc.style.transform = `scale(${third ? 1 + 0.12 * c05_kick(t - 157.6, 5, 14) : 1})`; lc.style.transformOrigin = "0 50%";
+    const prog = t < 154.2 ? 0 : t < 154.7 ? .25 * ease(seg(t, 154.2, 154.7)) : t < 155.7 ? .25 + .25 * ease(seg(t, 154.9, 155.7)) : .5 + .38 * ease(seg(t, 155.9, 159.4));
+    lb.style.width = (100 * prog) + "%"; lb.style.backgroundPosition = `${t * 70}px 0`;
+    lp.textContent = Math.round(prog * 100) + "%";
+    stepRows.forEach((r, i) => {
+      const [, , done] = STEPS[i], appear = 154.2 + i * .35, active = t > (i ? STEPS[i - 1][2] : 154.2) && t < done;
+      const p = back(seg(t, appear, appear + .4));
+      r.style.opacity = clamp(p * 2); r.style.transform = `translateX(${-30 * (1 - clamp(p))}px)`;
+      const ck = r.querySelector(".ck"), spn = r.querySelector(".sp");
+      const cp = seg(t, done, done + .25);
+      ck.setAttribute("stroke-dasharray", "40"); ck.setAttribute("stroke-dashoffset", 40 * (1 - cp));
+      spn.style.opacity = active ? 1 : 0; spn.setAttribute("transform", `rotate(${t * 400} 18 18)`);
+      r.querySelector(".nm").style.color = t > done ? "#2f7a3a" : active ? "#d4623a" : "#9a8f80";
+    });
+    // desk scene
+    const D = out(seg(t, 153.9, 154.5));
+    desk.style.opacity = D; desk.style.transform = `translateX(${200 * (1 - D)}px)`;
+    const sipPh = ((t - 154.6) % 2.6 + 2.6) % 2.6, sip = t < 154.6 ? 0 : ease(seg(sipPh, .2, .6)) * (1 - ease(seg(sipPh, 1.3, 1.7)));
+    poseNoa(deskNoa, t, { x: 1330 + 200 * (1 - D), y: 530, s: 1, look: sip > .5 ? 0 : -1, mood: sip > .6 ? "pout" : "happy", op: D });
+    deskNoa.P.ar.setAttribute("transform", `rotate(${-70 * sip} 154 118)`);
+    const mx = lerp(1570, 1478, sip), my = lerp(772, 668, sip);
+    mug.style.left = (mx + 200 * (1 - D)) + "px"; mug.style.top = my + "px"; mug.style.opacity = D;
+    mug.style.transform = `rotate(${-24 * sip}deg)`;
+    steams.forEach((e, i) => { const k = ((t * .9 + i * .5) % 1); e.setAttribute("opacity", (1 - sip) * Math.sin(k * Math.PI) * .9);
+      e.setAttribute("transform", `translate(0 ${-14 * k})`); });
+    cups.forEach((c, i) => { const ap = i < 2 ? 1 : seg(t, 157.35, 157.6), bb = i < 2 ? 0 : 0.3 * c05_kick(t - 157.6, 5, 16);
+      c.setAttribute("transform", `translate(${90 + i * 62} ${222 - 260 * (1 - ap * ap)}) scale(${1 + bb} ${1 - bb})`);
+      c.setAttribute("opacity", i < 2 ? 1 : ap > 0 ? 1 : 0); });
+    cnt.textContent = third ? "☕ × 3" : "☕ × 2";
+    const cp = back(seg(t, 155.0, 155.5));
+    cnt.style.opacity = D * clamp(cp * 2); cnt.style.transform = `rotate(6deg) scale(${(0.6 + 0.4 * cp) * (third ? 1 + 0.35 * c05_kick(t - 157.6, 4, 12) : 1)})`;
+    [[noteA, 156.3], [noteB, 156.8]].forEach(([n, a]) => { const p = back(seg(t, a, a + .45));
+      n.style.opacity = clamp(p * 2); n.style.transform = `scale(${0.5 + 0.5 * p}) rotate(${n === noteA ? -3 : 3}deg)`; });
   };
 });
-
