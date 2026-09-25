@@ -197,6 +197,26 @@ table.tbl td.num{text-align:right;white-space:nowrap}
 .recent button:hover{border-color:var(--accent)}
 .recent span{color:var(--text-3);font-size:11px;white-space:nowrap}
 .hidden{display:none!important}
+.ghost{opacity:0!important}
+/* members / fancam */
+.members-row{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:10px;padding-top:10px;border-top:1px solid var(--border)}
+.members-bar{display:flex;gap:6px;flex-wrap:wrap;flex:1 1 100%;order:-1;min-width:0}
+.members-row #export{margin-left:auto}
+.mchip{display:inline-flex;align-items:center;gap:6px;background:var(--surface-2);border:1px solid var(--border-2);border-radius:999px;padding:3px 10px 3px 6px;font-size:11.5px;font-weight:700;cursor:pointer;color:var(--text-2)}
+.mchip i{width:10px;height:10px;border-radius:50%;background:var(--mc)}
+.mchip span{font-family:var(--mono);font-weight:500;color:var(--text-4);font-size:10.5px}
+.mchip.on{border-color:var(--mc);color:var(--text);box-shadow:0 0 0 2px color-mix(in srgb,var(--mc) 25%,transparent)}
+.dot{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:6px}
+.link{background:none;border:0;cursor:pointer;font-weight:700;color:var(--text);display:inline-flex;align-items:center;white-space:nowrap}
+.tblwrap{overflow-x:auto}
+table.mem td,table.mem th{padding:6px 6px}
+table.mem tr.sel td{background:var(--accent-bg)}
+table.mem td.best{color:var(--accent);font-weight:800}
+.syncbox{display:grid;grid-template-columns:auto 1fr;gap:16px;align-items:center;background:var(--surface-2);border:1px solid var(--border);border-radius:12px;padding:12px 14px}
+.syncbox .k{font-size:10.5px;color:var(--text-3);font-weight:700;text-transform:uppercase;letter-spacing:.06em}
+.syncbox .s{font-size:11.5px;color:var(--text-2)}
+.syncbox svg{width:100%;height:60px}
+@media (max-width:520px){.syncbox{grid-template-columns:1fr}}
 </style>
 </head>
 <body data-theme="dark">
@@ -256,6 +276,11 @@ table.tbl td.num{text-align:right;white-space:nowrap}
         <button class="btn sm" id="mirror" title="Flip the video like a mirror">⇋ Mirror</button>
         <button class="btn sm on" id="skel" title="Show the tracked skeleton">🦴 Skeleton</button>
       </div>
+      <div class="members-row hidden" id="members-row">
+        <div class="seg" id="view"><button data-v="full" class="on">Full stage</button><button data-v="9:16">🎥 Fancam 9:16</button><button data-v="16:9">🎥 Fancam 16:9</button></div>
+        <div class="members-bar" id="members-bar"></div>
+        <button class="btn sm" id="export" disabled>⬇ Export fancam</button>
+      </div>
       <div class="fetch" id="fetch">
         <div id="fetch-title"><b>YouTube video loaded for viewing.</b> To analyze it, the frames must be available locally.</div>
         <div class="row">
@@ -293,12 +318,14 @@ table.tbl td.num{text-align:right;white-space:nowrap}
     <div class="card">
       <div class="tabs" role="tablist">
         <button class="tab on" data-tab="breakdown">Breakdown</button>
+        <button class="tab" data-tab="members">Members</button>
         <button class="tab" data-tab="plan">Practice plan</button>
         <button class="tab" data-tab="practice">Practice mode</button>
         <button class="tab" data-tab="coach">AI coach</button>
       </div>
 
       <div class="pane on" id="pane-breakdown"><div class="placeholder" id="bd-empty">Run an analysis to see how the dance is built.</div><div id="bd"></div></div>
+      <div class="pane" id="pane-members"><div class="placeholder" id="mem-empty">Group videos: every member is tracked separately — compare styles, sync (칼군무) and timing here.</div><div id="mem"></div></div>
       <div class="pane" id="pane-plan"><div class="placeholder" id="plan-empty">The practice plan appears after analysis.</div><div id="plan"></div></div>
 
       <div class="pane" id="pane-practice">

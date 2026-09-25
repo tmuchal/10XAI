@@ -13,7 +13,9 @@ const ease = (x) => 1 - Math.pow(1 - Math.max(0, Math.min(1, x)), 3);
 // Arm shapes: [shoulder angle from straight down (rad, + = outward/up), elbow bend (rad)]
 const SHAPES = [[0.2, 0.3], [1.57, 0], [2.8, 0.1], [0.9, 1.6], [2.2, -1.2], [0.5, 2.4], [3.0, 0], [1.2, -0.4]];
 
-export function generateDance({ style = "sharp", bpm = 120, duration = 32, fps = 15, seed = 7, aspect = 16 / 9 } = {}) {
+// x0: horizontal centre (image-height units), size: body scale, delay: seconds late
+// vs the beat grid (to simulate a member who is behind), path(t) → extra x offset.
+export function generateDance({ style = "sharp", bpm = 120, duration = 32, fps = 15, seed = 7, aspect = 16 / 9, x0 = null, size = 1, delay = 0, path = null } = {}) {
   const rand = rng(seed);
   const beat = 60 / bpm;
   const nBeats = Math.ceil(duration / beat) + 2;
@@ -24,10 +26,11 @@ export function generateDance({ style = "sharp", bpm = 120, duration = 32, fps =
     const R = rand() < 0.5 ? L : SHAPES[Math.floor(rand() * SHAPES.length)];
     plan.push({ L, R, step: Math.floor(b / 4) % 2 ? 1 : -1 });
   }
-  const cx = aspect / 2, T = 0.18;
+  const cx0 = x0 ?? aspect / 2, T = 0.18;
   const frames = [];
-  for (let i = 0; i * (1 / fps) < duration; i++) {
-    const t = i / fps;
+  for (let i = 0; i / fps < duration; i++) {
+    const tt = i / fps, t = Math.max(0, tt - delay);
+    const cx = cx0 + (path ? path(tt) : 0);
     const bi = Math.floor(t / beat), ph = (t - bi * beat) / beat;
     const SNAP = 0.11; // sharp style: start moving 110 ms early so the shape lands ON the beat
     let aL, aR, hipDrop, travel, sway;
@@ -68,10 +71,31 @@ export function generateDance({ style = "sharp", bpm = 120, duration = 32, fps =
       set(side + "k", (hx + ax) / 2 + sgn * bend * 0.8, (hy + ay) / 2);
       set(side + "a", ax, ay);
     }
+    // Scale the body about its floor point (feet at y = 0.75).
+    for (let k = 0; k < p.length; k += 2) { p[k] = cx + (p[k] - cx) * size; p[k + 1] = 0.75 + (p[k + 1] - 0.75) * size; }
     for (let k = 0; k < p.length; k++) p[k] = Math.round((p[k] + (rand() - 0.5) * 0.002) * 10000) / 10000;
-    frames.push({ t: Math.round(t * 1000) / 1000, p, v: JOINTS.map(() => 0.99), n: 1 });
+    frames.push({ t: Math.round(tt * 1000) / 1000, p, v: JOINTS.map(() => 0.99), n: 1 });
   }
   const beats = [];
   for (let b = 0; b * beat <= duration; b++) beats.push(Math.round(b * beat * 1000) / 1000);
   return { frames, beats, bpm, duration, style };
+}
+
+// A 4-member group: same choreography (one member 120 ms late, one slightly
+// smaller at the back), plus one member on a different routine. Two members
+// swap places mid-song to exercise the tracker.
+export function generateGroup({ bpm = 124, duration = 40, fps = 15 } = {}) {
+  const swap = (dir) => (t) => { const u = Math.max(0, Math.min(1, (t - 18) / 3)); return dir * 0.5 * (0.5 - 0.5 * Math.cos(Math.PI * u)); };
+  const specs = [
+    { name: "A", x0: 0.45, seed: 7, style: "sharp" },
+    { name: "B", x0: 0.7, seed: 7, style: "sharp", delay: 0.12, size: 0.9, path: swap(1) },
+    { name: "C", x0: 1.2, seed: 7, style: "sharp", path: swap(-1) },
+    { name: "D", x0: 1.45, seed: 11, style: "smooth" },
+  ];
+  const members = specs.map((s) => ({ ...s, frames: generateDance({ style: s.style, bpm, duration, fps, seed: s.seed, x0: s.x0, delay: s.delay || 0, size: s.size || 0.85, path: s.path }).frames }));
+  const beats = [];
+  for (let b = 0; (b * 60) / bpm <= duration; b++) beats.push(Math.round(((b * 60) / bpm) * 1000) / 1000);
+  // Shuffle detection order each frame, like a pose model would.
+  const samples = members[0].frames.map((f, i) => ({ t: f.t, dets: members.map((m) => m.frames[i]).sort(() => Math.sin(i * 7.3) ) }));
+  return { members, beats, bpm, duration, samples };
 }

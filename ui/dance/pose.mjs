@@ -1,6 +1,7 @@
 // Dance Lab — MediaPipe Pose Landmarker wrapper (browser only).
 // Everything runs locally in the browser; frames never leave the machine.
-import { fromMediaPipe, MP_INDEX } from "./analyze.mjs";
+import { fromMediaPipe, MP_INDEX, J } from "./analyze.mjs";
+import { createTracker } from "./tracker.mjs";
 
 const VISION = "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.14";
 const MODELS = {
@@ -10,7 +11,7 @@ const MODELS = {
 };
 
 let visionMod = null, fileset = null;
-export async function createLandmarker({ model = "full", numPoses = 4, delegate = "GPU" } = {}) {
+export async function createLandmarker({ model = "full", numPoses = 6, delegate = "GPU" } = {}) {
   visionMod ||= await import(`${VISION}/vision_bundle.mjs`);
   fileset ||= await visionMod.FilesetResolver.forVisionTasks(`${VISION}/wasm`);
   const opts = (d) => ({
@@ -51,8 +52,8 @@ function seek(video, t) {
 }
 
 /**
- * Sample the video at `fps` and return pose frames.
- *   onProgress(fraction, frame) per sample; signal.aborted stops early.
+ * Sample the video at `fps` and track every dancer: returns { samples: [{ t, people: [{id,p,v}] }], aspect }.
+ *   onProgress(fraction, sample) per sample; signal.aborted stops early.
  *   onSlowGpu() → Promise<landmarker>: called once if GPU inference is slower
  *   than 250 ms/frame (software GL); should return a CPU landmarker.
  * Uses playback + requestVideoFrameCallback when available (no per-frame
@@ -61,24 +62,42 @@ function seek(video, t) {
 export async function extractPoses(video, landmarker, { fps = 15, start = 0, end = null, onProgress, signal, onSlowGpu } = {}) {
   const stop = Math.min(end ?? video.duration, video.duration);
   const aspect = video.videoWidth / video.videoHeight;
-  const frames = [];
-  let prev = null, ts = 0, lm = landmarker, detMs = [], swapped = false, lastSeen = -Infinity;
+  let ts = 0, lm = landmarker, detMs = [], swapped = false;
+
+  const tracker = createTracker();
+  const samples = [];
+  const colorCanvas = document.createElement("canvas");
+  const CW = 160, CH = Math.round(CW / aspect);
+  colorCanvas.width = CW; colorCanvas.height = CH;
+  const cctx = colorCanvas.getContext("2d", { willReadFrequently: true });
+  // Outfit colour signature: mean RGB of the torso box and the thigh box.
+  const signature = (img, f) => {
+    const box = (a, b) => {
+      const xs = a.map((j) => f.p[2 * j] / aspect * CW), ys = b.map((j) => f.p[2 * j + 1] * CH);
+      let x0 = Math.max(0, Math.floor(Math.min(...xs))), x1 = Math.min(CW - 1, Math.ceil(Math.max(...xs)));
+      let y0 = Math.max(0, Math.floor(Math.min(...ys))), y1 = Math.min(CH - 1, Math.ceil(Math.max(...ys)));
+      const dx = Math.floor((x1 - x0) * 0.2), dy = Math.floor((y1 - y0) * 0.15);
+      x0 += dx; x1 -= dx; y0 += dy; y1 -= dy;
+      let r = 0, g = 0, bl = 0, n = 0;
+      for (let y = y0; y <= y1; y++) for (let x = x0; x <= x1; x++) { const k = 4 * (y * CW + x); r += img[k]; g += img[k + 1]; bl += img[k + 2]; n++; }
+      return n ? [r / n / 255, g / n / 255, bl / n / 255] : [0.5, 0.5, 0.5];
+    };
+    return [...box([J.ls, J.rs, J.lh, J.rh], [J.ls, J.rs, J.lh, J.rh]), ...box([J.lh, J.rh, J.lk, J.rk], [J.lh, J.rh, J.lk, J.rk])];
+  };
 
   const detect = async (t) => {
     const a = performance.now();
     ts = Math.max(ts + 1, Math.round(performance.now()));
     const res = lm.detectForVideo(video, ts);
     detMs.push(performance.now() - a);
-    const poses = res.landmarks || [];
-    let pick = poses.length ? pickPerson(poses, aspect, prev) : null;
-    // Our dancer briefly lost (occluded, spinning) → skip the frame rather than
-    // jump to another member; re-acquire whoever is central after 1 s.
-    if (pick && prev && pick.d > 0.3 && t - lastSeen < 1.0) pick = null;
-    if (pick) lastSeen = t;
-    const f = pick ? { ...fromMediaPipe(pick.lm, aspect, t), n: poses.length } : { t: Math.round(t * 1000) / 1000, p: null, v: null, n: 0 };
-    if (pick) prev = pick.c;
-    frames.push(f);
-    onProgress && onProgress(Math.min(1, (t - start) / (stop - start)), f);
+    const poses = (res.landmarks || []).map((l) => fromMediaPipe(l, aspect, t));
+    let img = null;
+    if (poses.length > 1) { cctx.drawImage(video, 0, 0, CW, CH); img = cctx.getImageData(0, 0, CW, CH).data; }
+    const people = tracker.update(t, poses.map((f) => ({ f, col: img ? signature(img, f) : null })))
+      .map(({ id, f, col }) => ({ id, p: f.p, v: f.v, ...(col ? { col: col.map((x) => Math.round(x * 100) / 100) } : {}) }));
+    const sample = { t: Math.round(t * 1000) / 1000, people };
+    samples.push(sample);
+    onProgress && onProgress(Math.min(1, (t - start) / (stop - start)), sample);
     if (!swapped && onSlowGpu && lm.delegate === "GPU" && detMs.length === 4 && detMs.slice(1).reduce((x, y) => x + y, 0) / 3 > 250) {
       swapped = true;
       lm = await onSlowGpu();
@@ -94,7 +113,7 @@ export async function extractPoses(video, landmarker, { fps = 15, start = 0, end
       await seek(video, t);
       await detect(t);
     }
-    return { frames, aspect };
+    return { samples, aspect };
   }
 
   const was = { muted: video.muted, rate: video.playbackRate, loop: video.loop };
@@ -140,7 +159,7 @@ export async function extractPoses(video, landmarker, { fps = 15, start = 0, end
     video.play().catch(finish);
   });
   video.muted = was.muted; video.playbackRate = was.rate; video.loop = was.loop;
-  return { frames, aspect };
+  return { samples, aspect };
 }
 
 export async function openWebcam(videoEl) {

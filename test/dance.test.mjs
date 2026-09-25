@@ -141,3 +141,59 @@ test("server routes: page, assets, reports, input validation", async () => {
     fs.rmSync(ws, { recursive: true, force: true });
   }
 });
+
+test("tracker keeps member identities through a position swap", async () => {
+  const { generateGroup } = await import("../ui/dance/synth.mjs");
+  const { createTracker, buildMembers } = await import("../ui/dance/tracker.mjs");
+  const g = generateGroup({ duration: 30 });
+  const tr = createTracker();
+  const samples = g.samples.map((s) => ({ t: s.t, people: tr.update(s.t, s.dets.map((f) => ({ f }))).map(({ id, f }) => ({ id, p: f.p, v: f.v })) }));
+  const members = buildMembers(samples);
+  assert.equal(members.length, 4);
+  // Each tracked member must be the same synthetic dancer from start to end.
+  for (const m of members) {
+    const src = g.members.map((gm) => m.frames.filter((f, i) => f.p && f.p[0] === gm.frames[i].p[0]).length);
+    assert.equal(Math.max(...src), m.frames.filter((f) => f.p).length, `member ${m.id} switched identity`);
+  }
+});
+
+test("fancam crop follows one member, stays in frame, and is smooth", async () => {
+  const { generateGroup } = await import("../ui/dance/synth.mjs");
+  const { cropPath } = await import("../ui/dance/fancam.mjs");
+  const g = generateGroup({ duration: 30 });
+  const m = g.members[1]; // travels across the stage
+  const path = cropPath(m.frames, { outAspect: 9 / 16, videoAspect: 16 / 9 });
+  assert.equal(path.length, m.frames.length);
+  for (const [i, c] of path.entries()) {
+    const w = c.h * 9 / 16;
+    assert.ok(c.cx - w / 2 >= -1e-9 && c.cx + w / 2 <= 16 / 9 + 1e-9 && c.cy - c.h / 2 >= -1e-9 && c.cy + c.h / 2 <= 1 + 1e-9, "crop inside frame");
+    const hx = (m.frames[i].p[2 * 7] + m.frames[i].p[2 * 8]) / 2;
+    assert.ok(Math.abs(hx - c.cx) < w / 2, "member stays in the crop");
+  }
+  const jumps = path.slice(1).map((c, i) => Math.abs(c.cx - path[i].cx));
+  assert.ok(Math.max(...jumps) < 0.05, "no camera jerks");
+});
+
+test("group sync finds the late member and the off-choreo member", async () => {
+  const { generateGroup } = await import("../ui/dance/synth.mjs");
+  const { groupSync } = await import("../ui/dance/analyze.mjs");
+  const g = generateGroup({ duration: 30 });
+  const r = groupSync(g.members.map((m, i) => ({ id: i + 1, frames: m.frames })));
+  assert.ok(r.perMember[2].lagMs >= 60, `B late: ${r.perMember[2].lagMs}`);
+  assert.ok(r.perMember[4].sync < r.perMember[1].sync - 10, "D dances something else");
+  assert.ok(r.perMember[1].sync > r.perMember[4].sync && r.overall > 0);
+});
+
+test("fragmented tracks of one dancer are stitched back together", async () => {
+  const { generateDance } = await import("../ui/dance/synth.mjs");
+  const { buildMembers } = await import("../ui/dance/tracker.mjs");
+  const d = generateDance({ duration: 20 });
+  // Same dancer, three ids (lost behind someone twice), plus a passer-by for 15% of the time.
+  const samples = d.frames.map((f, i) => ({ t: f.t, people: [
+    ...(i % 100 > 90 ? [] : [{ id: i < 100 ? 1 : i < 200 ? 2 : 3, p: f.p, v: f.v, col: [0.8, 0.2, 0.3, 0.1, 0.1, 0.1] }]),
+    ...(i < 45 ? [{ id: 9, p: f.p.map((x, k) => (k % 2 ? x : x - 0.6)), v: f.v, col: [0.2, 0.2, 0.9, 0.5, 0.5, 0.5] }] : []),
+  ] }));
+  const ms = buildMembers(samples);
+  assert.equal(ms.length, 1);
+  assert.ok(ms[0].coverage > 0.85 && ms[0].main);
+});

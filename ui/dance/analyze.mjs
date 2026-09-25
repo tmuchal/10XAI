@@ -43,10 +43,10 @@ function angleAt(a, b, c) { // interior angle at b, degrees
   if (!d) return 180;
   return (Math.acos(clamp((v1[0] * v2[0] + v1[1] * v2[1]) / d, -1, 1)) * 180) / Math.PI;
 }
-function torso(f) { return dist(mid(f, J.ls, J.rs), mid(f, J.lh, J.rh)); }
+export function torso(f) { return dist(mid(f, J.ls, J.rs), mid(f, J.lh, J.rh)); }
 // Body scale that survives bending (torso foreshortens, shoulders don't) and
 // turning sideways (shoulders narrow, torso doesn't). ≈ torso length when upright.
-function bodyScale(f) { return Math.max(torso(f), 1.4 * dist(pt(f, J.ls), pt(f, J.rs))); }
+export function bodyScale(f) { return Math.max(torso(f), 1.4 * dist(pt(f, J.ls), pt(f, J.rs))); }
 
 // Convert one MediaPipe pose (33 normalized landmarks) into our compact frame.
 export function fromMediaPipe(landmarks, aspect, t) {
@@ -546,3 +546,42 @@ export function matchWithTiming(user, refFrames, t, { mirror = true, window = 0.
 
 export function summarizeFrame(f) { return f && f.p ? { t: f.t, torso: torso(f) } : null; }
 export const _internals = { segmentFrames, signalsFor, findAccents, motionTempo, quantile, median };
+
+// ── 5. group sync (칼군무): how identical members are, and who leads/lags ────
+// members: [{ id, frames }]. Members doing the same choreography face the
+// camera, so poses are compared un-mirrored.
+export function groupSync(members, { step = 1 / 10, window = 0.3 } = {}) {
+  const ms = members.filter((m) => m.frames.some((f) => f.p));
+  if (ms.length < 2) return null;
+  const t0 = Math.max(...ms.map((m) => m.frames.find((f) => f.p).t));
+  const t1 = Math.min(...ms.map((m) => [...m.frames].reverse().find((f) => f.p).t));
+  const per = Object.fromEntries(ms.map((m) => [m.id, { scores: [], lags: [] }]));
+  const timeline = [];
+  for (let t = t0; t <= t1; t += step) {
+    const here = ms.map((m) => ({ m, f: frameAt(m.frames, t) })).filter((x) => x.f);
+    if (here.length < 2) continue;
+    const pairScores = [];
+    for (let i = 0; i < here.length; i++) {
+      for (let k = i + 1; k < here.length; k++) {
+        const s = comparePoses(here[i].f, here[k].f, { mirror: false }).score;
+        pairScores.push(s);
+        per[here[i].m.id].scores.push(s); per[here[k].m.id].scores.push(s);
+      }
+      // Timing vs every other member (positive = behind them).
+      for (const o of here) {
+        if (o === here[i]) continue;
+        const r = matchWithTiming(here[i].f, o.m.frames, t, { mirror: false, window });
+        if (r && r.bestScore >= 70) per[here[i].m.id].lags.push(r.lagMs);
+      }
+    }
+    timeline.push([Math.round(t * 100) / 100, Math.round(mean(pairScores))]);
+  }
+  if (!timeline.length) return null;
+  const perMember = Object.fromEntries(Object.entries(per).map(([id, x]) => [id, {
+    sync: x.scores.length ? Math.round(mean(x.scores)) : null,
+    lagMs: x.lags.length ? Math.round(median(x.lags)) : null,
+  }]));
+  const overall = Math.round(mean(timeline.map((x) => x[1])));
+  const unison = mean(timeline.map((x) => (x[1] >= 75 ? 1 : 0)));
+  return { overall, unison: Math.round(unison * 100) / 100, perMember, timeline };
+}

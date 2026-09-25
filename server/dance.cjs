@@ -162,10 +162,10 @@ module.exports = function createDanceRoutes({ root, workspace }) {
       }
       if (req.method === "POST" && p === "/api/dance/reports") {
         const body = await readBody(req);
-        if (!body || !body.analysis || !Array.isArray(body.frames)) return json(res, 400, { error: "analysis and frames required" }), true;
+        if (!body || !body.analysis || !(Array.isArray(body.frames) || Array.isArray(body.members))) return json(res, 400, { error: "analysis and frames/members required" }), true;
         fs.mkdirSync(REPORTS, { recursive: true });
         const id = crypto.randomBytes(6).toString("hex");
-        const doc = { id, createdAt: new Date().toISOString(), source: body.source || {}, beats: body.beats || [], analysis: body.analysis, plan: body.plan || null, frames: body.frames };
+        const doc = { id, createdAt: new Date().toISOString(), source: body.source || {}, beats: body.beats || [], analysis: body.analysis, plan: body.plan || null, ...(Array.isArray(body.members) ? { members: body.members } : { frames: body.frames }) };
         fs.writeFileSync(path.join(REPORTS, id + ".json"), JSON.stringify(doc));
         return json(res, 200, { id }), true;
       }

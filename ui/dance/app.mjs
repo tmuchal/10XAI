@@ -1,8 +1,10 @@
 // Dance Lab — page controller.
-import { analyzePose, AXES, BONES, J, frameAt, matchWithTiming } from "./analyze.mjs";
+import { analyzePose, groupSync, AXES, BONES, J, frameAt, matchWithTiming } from "./analyze.mjs";
 import { buildPracticePlan, fmtTime } from "./drills.mjs";
 import { detectBeatsFromMedia } from "./beat.mjs";
-import { generateDance } from "./synth.mjs";
+import { generateGroup } from "./synth.mjs";
+import { buildMembers } from "./tracker.mjs";
+import { cropPath, cropAt, toCrop, drawCrop, recordFancam } from "./fancam.mjs";
 
 const $ = (id) => document.getElementById(id);
 const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
@@ -21,7 +23,14 @@ const S = {
   loop: null, rate: 1, mirror: false, skeleton: true,
   busy: null,          // AbortController while analyzing
   tools: { ytdlp: false, claude: false },
+  members: [],         // [{ id, name, color, coverage, frames, analysis, plan, paths }]
+  sel: null,           // selected member id
+  sync: null,          // groupSync result
+  view: "full",        // 'full' | 'fancam'
+  fanAspect: 9 / 16,
 };
+const COLORS = ["#79D86C", "#F472B6", "#7FB5FF", "#FBBF24", "#A78BFA", "#FB923C", "#2DD4BF", "#F87171", "#E5E7EB"];
+const selMember = () => S.members.find((m) => m.id === S.sel) || null;
 
 // A clock that behaves like a <video> for skeleton-only playback
 // (demo dancer, or a saved report whose video file isn't available).
@@ -54,6 +63,7 @@ applyTheme(store.get("dance-theme") || "dark");
 // ── sources ─────────────────────────────────────────────────────────────────
 function resetAnalysis() {
   S.frames = []; S.beats = []; S.bpm = null; S.analysis = null; S.plan = null; S.reportId = null; S.loop = null;
+  S.members = []; S.sel = null; S.sync = null;
   renderAll();
 }
 
@@ -130,14 +140,13 @@ $("fetch-go").onclick = async () => {
 };
 
 $("demo").onclick = () => {
-  const style = S.source && S.source.kind === "demo" && S.source.style === "sharp" ? "smooth" : "sharp";
   resetAnalysis();
-  const d = generateDance({ style, bpm: style === "sharp" ? 124 : 96, duration: 40 });
-  S.source = { kind: "demo", style, title: `Demo dancer · ${style === "sharp" ? "sharp 124 BPM" : "smooth 96 BPM"}` };
-  useSkeletonPlayer(d.duration);
-  S.frames = d.frames; S.beats = d.beats; S.bpm = d.bpm; S.aspect = 16 / 9;
-  finishAnalysis(false);
-  setStatus(`Demo loaded (${style}). Click “✨ Demo dancer” again for the ${style === "sharp" ? "smooth" : "sharp"} routine.`);
+  const g = generateGroup({ bpm: 124, duration: 40 });
+  S.source = { kind: "demo", title: "Demo group · 4 members · 124 BPM" };
+  useSkeletonPlayer(g.duration);
+  S.beats = g.beats; S.bpm = g.bpm; S.aspect = 16 / 9;
+  finishMembers(g.members.map((m, i) => ({ id: i + 1, coverage: 1, frames: m.frames })), false);
+  setStatus("Demo group loaded: member 2 dances ~120 ms late and member 4 dances a different routine — see the Members tab. Switch to 🎥 Fancam to follow one member.");
 };
 
 function useSkeletonPlayer(duration) {
@@ -183,26 +192,30 @@ $("analyze").onclick = async () => {
     if (!(end > start + 2)) throw new Error("Pick a range of at least a few seconds.");
     // Beat tracking in parallel (audio decode) — optional, analysis still works without it.
     const beatsP = detectBeatsFromMedia(S.source.file || v.currentSrc).catch(() => null);
-    setStatus(`Tracking the dancer at ${fps} fps… (~${Math.round((end - start) * fps)} frames)`);
+    setStatus(`Tracking every member at ${fps} fps… (~${Math.round((end - start) * fps)} frames)`);
     const t0 = performance.now();
     const { extractPoses } = await import("./pose.mjs");
-    const { frames, aspect } = await extractPoses(v, lm, {
+    let n = 0;
+    const { samples, aspect } = await extractPoses(v, lm, {
       fps, start, end, signal: ctrl.signal,
       onSlowGpu: () => { setStatus("GPU inference is slow here — switching the pose model to CPU…"); return getLandmarker("CPU"); },
-      onProgress: (fr, f) => {
+      onProgress: (fr, sample) => {
         $("prog").style.width = Math.round(fr * 100) + "%";
-        S.frames.push(f);
+        S.live = sample;
         const eta = ((performance.now() - t0) / 1000) * (1 - fr) / Math.max(fr, 1e-3);
-        if (S.frames.length % 10 === 0) setStatus(`Tracking… ${Math.round(fr * 100)}% · ~${Math.round(eta)} s left`);
+        if (++n % 10 === 0) setStatus(`Tracking… ${Math.round(fr * 100)}% · ${sample.people.length} in frame · ~${Math.round(eta)} s left`);
       },
     });
-    S.frames = frames; S.aspect = aspect;
+    S.live = null;
+    S.aspect = aspect;
+    const members = buildMembers(samples, { aspect });
+    if (!members.length) throw new Error("No dancer was tracked for long enough — try a clearer video or a different range.");
     setStatus("Detecting beats…");
     const beat = await beatsP;
     S.beats = beat && beat.beats.length ? beat.beats : [];
     S.bpm = beat && beat.bpm && beat.confidence >= 0.1 ? beat.bpm : null;
     if (!S.bpm) S.beats = [];
-    finishAnalysis(!ctrl.signal.aborted || frames.length > 30);
+    finishMembers(members, !ctrl.signal.aborted || samples.length > 30);
   } catch (e) {
     setStatus(String(e.message || e), true);
   } finally {
@@ -212,25 +225,51 @@ $("analyze").onclick = async () => {
 };
 $("cancel").onclick = () => S.busy && S.busy.abort();
 
-async function finishAnalysis(save) {
-  const res = analyzePose(S.frames, { beats: S.beats, bpm: S.bpm });
-  if (!res.ok) { S.analysis = null; renderAll(); setStatus(res.reason, true); return; }
-  S.analysis = res;
-  S.plan = buildPracticePlan(res);
-  renderAll();
+// Analyze every member, the group sync, then show the best-covered member.
+async function finishMembers(members, save) {
+  S.members = members.map((m, i) => {
+    const analysis = analyzePose(m.frames, { beats: S.beats, bpm: S.bpm });
+    return { ...m, name: m.name || `Member ${m.id}`, color: COLORS[i % COLORS.length], analysis, plan: analysis.ok ? buildPracticePlan(analysis) : null, paths: {} };
+  });
+  S.sync = groupSync(S.members.filter((m) => m.analysis.ok));
+  const ok = S.members.filter((m) => m.analysis.ok);
+  if (!ok.length) { renderAll(); setStatus(S.members[0].analysis.reason, true); return; }
+  const best = ok.find((m) => m.main) || ok.slice().sort((a, b) => b.coverage - a.coverage)[0];
+  selectMember(S.sel && ok.some((m) => m.id === S.sel) ? S.sel : best.id);
   $("prog").style.width = "100%";
-  const q = res.quality;
-  setStatus(`Done — ${q.analyzedSec}s analyzed, ${q.usablePct}% frames tracked, ${q.cuts} cut${q.cuts === 1 ? "" : "s"}/tracking switch${q.cuts === 1 ? "" : "es"}.` + (S.bpm ? ` Audio tempo ${S.bpm} BPM.` : " No usable audio beat; tempo estimated from motion."));
+  const q = best.analysis.quality;
+  setStatus(`Done — ${S.members.length} member${S.members.length > 1 ? "s" : ""} tracked` + (S.sync ? `, group sync ${S.sync.overall}/100` : "") + `. ${q.analyzedSec}s analyzed for ${best.name}.` + (S.bpm ? ` Audio tempo ${S.bpm} BPM.` : " No usable audio beat; tempo estimated from motion."));
   if (save) {
     try {
       const r = await fetch("/api/dance/reports", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({
         source: { kind: S.source.kind, title: S.source.title, url: S.source.url || null, ytId: S.source.ytId || null, aspect: S.aspect },
-        beats: S.beats, analysis: S.analysis, plan: S.plan, frames: S.frames,
+        beats: S.beats, analysis: S.analysis, plan: S.plan,
+        members: S.members.map((m) => ({ id: m.id, name: m.name, coverage: m.coverage, main: m.main, frames: m.frames })),
       }) });
       const j = await r.json();
       if (j.id) { S.reportId = j.id; history.replaceState(null, "", "#r=" + j.id); loadRecent(); }
     } catch {}
   }
+}
+
+function selectMember(id) {
+  const m = S.members.find((x) => x.id === id);
+  if (!m) return;
+  S.sel = id;
+  S.frames = m.frames;
+  S.analysis = m.analysis.ok ? m.analysis : null;
+  S.plan = m.plan;
+  S.loop = null;
+  $("coach-out").innerHTML = "";
+  renderAll();
+  if (!m.analysis.ok) setStatus(`${m.name}: ${m.analysis.reason}`, true);
+}
+
+function renameMember(id) {
+  const m = S.members.find((x) => x.id === id);
+  if (!m) return;
+  const name = prompt("Member name", m.name);
+  if (name && name.trim()) { m.name = name.trim().slice(0, 24); renderAll(); }
 }
 
 async function openReport(id) {
@@ -240,7 +279,8 @@ async function openReport(id) {
     const doc = await r.json();
     resetAnalysis();
     S.source = { kind: "saved", title: doc.source.title, url: doc.source.url, ytId: doc.source.ytId };
-    S.frames = doc.frames; S.beats = doc.beats || []; S.aspect = doc.source.aspect || 16 / 9;
+    const members = doc.members || [{ id: 1, coverage: 1, frames: doc.frames }];
+    S.beats = doc.beats || []; S.aspect = doc.source.aspect || 16 / 9;
     S.bpm = doc.analysis && doc.analysis.raw.bpmSource === "audio" ? doc.analysis.raw.bpm : null;
     S.reportId = id;
     let hasVideo = false;
@@ -248,10 +288,10 @@ async function openReport(id) {
       const m = await (await fetch("/api/dance/meta?url=" + encodeURIComponent("https://youtu.be/" + doc.source.ytId))).json().catch(() => ({}));
       if (m.cached) { useVideo(m.src, S.source); hasVideo = true; }
     }
-    if (!hasVideo) useSkeletonPlayer(S.frames.length ? S.frames[S.frames.length - 1].t : 0);
-    const startT = S.frames.length ? S.frames[0].t : 0;
-    if (S.player) S.player.currentTime = startT;
-    await finishAnalysis(false);
+    const f0 = members[0].frames;
+    if (!hasVideo) useSkeletonPlayer(f0.length ? f0[f0.length - 1].t : 0);
+    if (S.player) S.player.currentTime = f0.length ? f0[0].t : 0;
+    await finishMembers(members, false);
     history.replaceState(null, "", "#r=" + id);
     setStatus(hasVideo ? "Saved analysis loaded." : "Saved analysis loaded (skeleton playback — upload the video again to see it underneath).");
   } catch (e) { setStatus(String(e.message || e), true); }
@@ -276,6 +316,7 @@ function renderAll() {
   $("coach-empty").classList.toggle("hidden", has); $("coach").classList.toggle("hidden", !has);
   $("timeline-card").classList.toggle("hidden", !has);
   if (!has) $("coach-out").innerHTML = "";
+  renderMembers();
   wirePlan();
   drawTimeline();
   updateLoopChip();
@@ -337,6 +378,71 @@ function breakdownHTML(a) {
     </div>
     <div class="footnote">Tracking: ${q.usablePct}% of ${q.frames} frames usable · ${q.cuts} camera cut(s) or tracking switch(es) · ${q.analyzedSec}s analyzed${q.maxPeople > 1 ? ` · up to ${q.maxPeople} people in frame (following the most central dancer)` : ""}.
     TL = torso-lengths (≈ 50 cm), so numbers are comparable across camera distances. Scores map raw values onto fixed reference ranges; the raw values are the evidence.</div>`;
+}
+
+// ── rendering: members ──────────────────────────────────────────────────────
+function syncLabel(x) {
+  return x >= 80 ? "칼군무 — razor-sharp unison" : x >= 68 ? "Tight unison" : x >= 55 ? "Loose unison / some solo parts" : "Mostly different parts per member";
+}
+function renderMembers() {
+  const bar = $("members-bar"), ms = S.members;
+  $("members-row").classList.toggle("hidden", !ms.length);
+  $("export").disabled = !(S.player instanceof HTMLVideoElement && selMember());
+  $("export").title = S.player instanceof HTMLVideoElement ? "Record the selected member's fancam as a video file" : "Needs the video (not available for the demo / skeleton playback)";
+  bar.innerHTML = ms.map((m) => `<button class="mchip${m.id === S.sel ? " on" : ""}" data-id="${m.id}" style="--mc:${m.color}" title="Click to focus · double-click to rename"><i></i>${esc(m.name)}<span>${m.analysis.ok ? Math.round(m.coverage * 100) + "%" : "–"}</span></button>`).join("");
+  bar.querySelectorAll(".mchip").forEach((b) => { b.onclick = () => selectMember(+b.dataset.id); b.ondblclick = () => renameMember(+b.dataset.id); });
+  const has = ms.some((m) => m.analysis.ok);
+  $("mem-empty").classList.toggle("hidden", has);
+  $("mem").innerHTML = has ? membersHTML() : "";
+  $("mem").querySelectorAll("[data-sel]").forEach((el) => (el.onclick = () => selectMember(+el.dataset.sel)));
+  $("mem").querySelectorAll("[data-fancam]").forEach((el) => (el.onclick = () => { selectMember(+el.dataset.fancam); $("view").querySelector('[data-v="9:16"]').click(); }));
+}
+function membersHTML() {
+  const ok = S.members.filter((m) => m.analysis.ok), sy = S.sync;
+  const cols = [["power", "Power"], ["sharpness", "Sharp"], ["flow", "Flow"], ["groove", "Groove"], ["extension", "Lines"], ["footwork", "Feet"], ["rhythm", "Rhythm"]];
+  const best = Object.fromEntries(cols.map(([k]) => [k, Math.max(...ok.map((m) => m.analysis.axes[k]))]));
+  const syncOf = (m) => (sy && sy.perMember[m.id]) || {};
+  const bestSync = Math.max(...ok.map((m) => syncOf(m).sync ?? -1));
+  const rows = S.members.map((m) => {
+    const a = m.analysis;
+    if (!a.ok) return `<tr><td><span class="dot" style="background:${m.color}"></span>${esc(m.name)}</td><td colspan="${cols.length + 4}" style="color:var(--text-4)">${esc(a.reason)}</td></tr>`;
+    const ps = syncOf(m);
+    const lag = ps.lagMs == null ? "–" : Math.abs(ps.lagMs) < 40 ? "on time" : ps.lagMs > 0 ? `${ps.lagMs} ms late` : `${-ps.lagMs} ms early`;
+    return `<tr class="${m.id === S.sel ? "sel" : ""}">
+      <td><button class="link" data-sel="${m.id}"><span class="dot" style="background:${m.color}"></span>${esc(m.name)}</button></td>
+      <td class="num">${Math.round(m.coverage * 100)}%</td>
+      <td style="white-space:nowrap">${esc(a.archetype.primary.name.replace(/ \(.+\)/, ""))}</td>
+      ${cols.map(([k]) => `<td class="num${a.axes[k] === best[k] && ok.length > 1 ? " best" : ""}">${a.axes[k]}</td>`).join("")}
+      <td class="num${ps.sync === bestSync && ok.length > 1 ? " best" : ""}">${ps.sync ?? "–"}</td>
+      <td class="num ${ps.lagMs != null && Math.abs(ps.lagMs) >= 80 ? "bad" : ""}">${lag}</td>
+      <td><button class="btn sm" data-fancam="${m.id}">🎥</button></td></tr>`;
+  }).join("");
+  const top = (label, fn, fmt) => {
+    const c = ok.map((m) => [m, fn(m)]).filter(([, v]) => v != null).sort((a, b) => b[1] - a[1])[0];
+    return c ? `<div class="stat"><div class="k">${label}</div><div class="n" style="color:${c[0].color};font-size:14px">${esc(c[0].name)}</div><div class="s">${fmt(c[1], c[0])}</div></div>` : "";
+  };
+  const stand = ok.length > 1 ? `<div class="stats">
+    ${top("Sharpest hits", (m) => m.analysis.axes.sharpness, (v, m) => `${Math.round(m.analysis.raw.hitRatio * 100)}% sharp stops`)}
+    ${top("Most power", (m) => m.analysis.raw.energy, (v) => `${v} TL/s`)}
+    ${top("Longest lines", (m) => m.analysis.raw.extension, (v) => `${Math.round(v * 100)}% arm reach`)}
+    ${top("Deepest groove", (m) => m.analysis.raw.bounceAmp, (v) => `${v} TL bounce`)}
+    ${top("Most on the beat", (m) => m.analysis.axes.rhythm, (v) => `rhythm ${v}/100`)}
+    ${sy ? top("Most in sync", (m) => syncOf(m).sync, (v) => `${v}/100 vs group`) : ""}
+    ${sy ? top("Furthest off the count", (m) => (syncOf(m).lagMs == null ? null : Math.abs(syncOf(m).lagMs)), (v, m) => `${syncOf(m).lagMs > 0 ? "late" : "early"} by ${v} ms`) : ""}
+  </div>` : "";
+  let syncHTML = "";
+  if (sy) {
+    const X = (i) => (i / Math.max(1, sy.timeline.length - 1)) * 1000;
+    const sm = sy.timeline.map((_, i) => { const w = sy.timeline.slice(Math.max(0, i - 5), i + 6); return [0, w.reduce((a, x) => a + x[1], 0) / w.length]; });
+    const pts = sm.map(([, v], i) => `${X(i).toFixed(1)},${(58 - (v / 100) * 54).toFixed(1)}`).join(" ");
+    syncHTML = `<div class="syncbox">
+      <div><div class="k">Group sync</div><div class="big" style="font-size:36px">${sy.overall}<small>/100</small></div><div class="s">${syncLabel(sy.overall)} · in unison ${Math.round(sy.unison * 100)}% of the time</div></div>
+      <svg viewBox="0 0 1000 60" preserveAspectRatio="none"><line x1="0" x2="1000" y1="${58 - 0.75 * 54}" y2="${58 - 0.75 * 54}" stroke="var(--border-2)" stroke-dasharray="4 4"/><polyline points="${pts}" fill="none" stroke="var(--pink)" stroke-width="1.6" vector-effect="non-scaling-stroke"/></svg>
+    </div>`;
+  }
+  return `${syncHTML}${stand}
+    <div class="block"><h4>Member comparison</h4><div class="tblwrap"><table class="tbl mem"><thead><tr><th>Member</th><th class="num">Seen</th><th>Style</th>${cols.map(([, l]) => `<th class="num">${l}</th>`).join("")}<th class="num">Sync</th><th class="num">Timing</th><th></th></tr></thead><tbody>${rows}</tbody></table></div>
+    <div class="footnote">Click a member to switch every tab (Breakdown, Practice plan, Practice mode, AI coach) to them; 🎥 opens their fancam. Sync = average pose match with the other members (100 = identical); timing = median offset against the others. Members are numbered left→right; double-click a chip above the stage to rename.</div></div>`;
 }
 
 // ── rendering: plan ─────────────────────────────────────────────────────────
@@ -428,22 +534,45 @@ function drawTimeline() {
 
 // ── render loop: skeleton overlay, time, loop ───────────────────────────────
 const overlay = $("overlay");
-function drawSkeleton(ctx, f, rect, aspect, style) {
-  const P = (j) => [rect.x + (f.p[2 * j] / aspect) * rect.w, rect.y + f.p[2 * j + 1] * rect.h];
+// map(x, y) → canvas px for a point in video units.
+function drawSkeleton(ctx, f, map, style) {
+  const P = (j) => map(f.p[2 * j], f.p[2 * j + 1]);
   ctx.lineCap = "round";
+  ctx.globalAlpha = style.alpha ?? 1;
   ctx.strokeStyle = style.color; ctx.lineWidth = style.width;
   ctx.shadowColor = style.glow || "transparent"; ctx.shadowBlur = style.glow ? 12 : 0;
   for (const [a, b] of BONES) { const A = P(J[a]), B = P(J[b]); ctx.beginPath(); ctx.moveTo(A[0], A[1]); ctx.lineTo(B[0], B[1]); ctx.stroke(); }
-  const head = P(J.nose), sh = [(P(J.ls)[0] + P(J.rs)[0]) / 2, (P(J.ls)[1] + P(J.rs)[1]) / 2];
+  const head = P(J.nose), ls = P(J.ls), rs = P(J.rs), sh = [(ls[0] + rs[0]) / 2, (ls[1] + rs[1]) / 2];
   ctx.beginPath(); ctx.moveTo(sh[0], sh[1]); ctx.lineTo(head[0], head[1]); ctx.stroke();
   ctx.fillStyle = style.joint || style.color;
   for (let j = 0; j < 13; j++) { const q = P(j); ctx.beginPath(); ctx.arc(q[0], q[1], style.width * 0.9, 0, 7); ctx.fill(); }
-  ctx.beginPath(); ctx.arc(head[0], head[1], style.width * 2.6, 0, 7); ctx.stroke();
-  ctx.shadowBlur = 0;
+  const hr = Math.max(style.width * 2.6, Math.hypot(ls[0] - rs[0], ls[1] - rs[1]) * 0.35);
+  ctx.beginPath(); ctx.arc(head[0], head[1], hr, 0, 7); ctx.stroke();
+  ctx.shadowBlur = 0; ctx.globalAlpha = 1;
+  if (style.label) {
+    ctx.save();
+    ctx.translate(head[0], head[1] - hr - 8);
+    if (S.mirror) ctx.scale(-1, 1); // text stays readable when the stage is mirrored
+    ctx.font = "700 11px Pretendard, sans-serif"; ctx.textAlign = "center";
+    const w = ctx.measureText(style.label).width + 10;
+    ctx.fillStyle = "rgba(10,15,22,0.8)"; ctx.fillRect(-w / 2, -13, w, 16);
+    ctx.fillStyle = style.color; ctx.fillText(style.label, 0, 0);
+    ctx.restore();
+  }
 }
 function fitRect(W, H, aspect) {
   const w = Math.min(W, H * aspect), h = w / aspect;
   return { x: (W - w) / 2, y: (H - h) / 2, w, h };
+}
+const fullMap = (rect, aspect) => (x, y) => [rect.x + (x / aspect) * rect.w, rect.y + y * rect.h];
+function memberPath(m) {
+  const key = S.fanAspect.toFixed(3);
+  return (m.paths[key] ||= cropPath(m.frames, { outAspect: S.fanAspect, videoAspect: S.aspect }));
+}
+function skelStyle(m, selected, big) {
+  return selected
+    ? { color: m.color, width: big ? 5 : 3.5, glow: m.color, joint: "#fff", label: S.members.length > 1 ? m.name : null }
+    : { color: m.color, width: big ? 3 : 2, alpha: 0.55, label: m.name };
 }
 function frameLoop() {
   const p = S.player;
@@ -453,22 +582,53 @@ function frameLoop() {
   const ctx = overlay.getContext("2d");
   ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
   ctx.clearRect(0, 0, W, H);
+  const isVideo = p instanceof HTMLVideoElement;
+  const m = selMember();
+  const fancam = S.view === "fancam" && m;
+  $("vid").classList.toggle("ghost", !!(fancam && isVideo));
   if (p) {
     let t = p.currentTime;
     if (S.loop && (t >= S.loop.end || t < S.loop.start - 0.5)) { p.currentTime = S.loop.start; t = S.loop.start; }
-    const skeletonOnly = p instanceof SkeletonClock;
-    if (skeletonOnly) {
-      ctx.fillStyle = "#0b0f15"; ctx.fillRect(0, 0, W, H);
-      // floor line + beat flash for the skeleton-only stage
-      const rect = fitRect(W, H, S.aspect);
-      ctx.strokeStyle = "rgba(121,216,108,0.18)"; ctx.lineWidth = 1;
-      ctx.beginPath(); ctx.moveTo(rect.x, rect.y + rect.h * 0.78); ctx.lineTo(rect.x + rect.w, rect.y + rect.h * 0.78); ctx.stroke();
-      const nb = S.beats.length ? Math.min(...S.beats.map((b) => Math.abs(b - t))) : 1;
-      if (nb < 0.06) { ctx.fillStyle = "rgba(244,114,182,0.08)"; ctx.fillRect(0, 0, W, H); }
-    }
-    if ((S.skeleton || skeletonOnly) && S.frames.length) {
-      const f = frameAt(S.frames, t);
-      if (f) drawSkeleton(ctx, f, fitRect(W, H, S.aspect), S.aspect, skeletonOnly ? { color: "#79D86C", width: 5, glow: "rgba(121,216,108,0.6)", joint: "#EAF1E8" } : { color: "rgba(121,216,108,0.9)", width: 3, joint: "#F472B6" });
+    const skeletonOnly = !isVideo;
+    if (skeletonOnly || fancam) { ctx.fillStyle = "#0b0f15"; ctx.fillRect(0, 0, W, H); }
+    if (fancam) {
+      const crop = cropAt(memberPath(m), t);
+      const rect = fitRect(W, H, S.fanAspect);
+      ctx.fillStyle = "#121a25"; ctx.fillRect(rect.x, rect.y, rect.w, rect.h);
+      if (crop) {
+        if (isVideo && p.readyState >= 2) drawCrop(ctx, p, crop, S.fanAspect, rect);
+        const map = toCrop(crop, S.fanAspect, rect);
+        ctx.save(); ctx.beginPath(); ctx.rect(rect.x, rect.y, rect.w, rect.h); ctx.clip();
+        if (skeletonOnly) {
+          for (const o of S.members) { if (o === m) continue; const f = frameAt(o.frames, t); if (f) drawSkeleton(ctx, f, map, { ...skelStyle(o, false, true), label: null, alpha: 0.25 }); }
+        }
+        if (S.skeleton || skeletonOnly) { const f = frameAt(m.frames, t); if (f) drawSkeleton(ctx, f, map, { ...skelStyle(m, true, true), label: null }); }
+        ctx.restore();
+        // Minimap: whole stage with the virtual camera box.
+        const mmW = Math.min(170, (W - rect.w) / 2 - 16 > 90 ? (W - rect.w) / 2 - 16 : 120), mm = { x: W - mmW - 10, y: 10, w: mmW, h: mmW / S.aspect };
+        ctx.globalAlpha = 0.9;
+        ctx.fillStyle = "#000"; ctx.fillRect(mm.x - 2, mm.y - 2, mm.w + 4, mm.h + 4);
+        if (isVideo && p.readyState >= 2) ctx.drawImage(p, mm.x, mm.y, mm.w, mm.h);
+        const mmap = fullMap(mm, S.aspect);
+        for (const o of S.members) { const f = frameAt(o.frames, t); if (f) drawSkeleton(ctx, f, mmap, { color: o.color, width: 1, alpha: o === m ? 1 : 0.5 }); }
+        const cw = crop.h * S.fanAspect, a = mmap(crop.cx - cw / 2, crop.cy - crop.h / 2), b = mmap(crop.cx + cw / 2, crop.cy + crop.h / 2);
+        ctx.strokeStyle = m.color; ctx.lineWidth = 1.5; ctx.strokeRect(a[0], a[1], b[0] - a[0], b[1] - a[1]);
+        ctx.globalAlpha = 1;
+      }
+    } else {
+      const rect = fitRect(W, H, S.aspect), map = fullMap(rect, S.aspect);
+      if (skeletonOnly) {
+        ctx.strokeStyle = "rgba(121,216,108,0.18)"; ctx.lineWidth = 1;
+        ctx.beginPath(); ctx.moveTo(rect.x, rect.y + rect.h * 0.78); ctx.lineTo(rect.x + rect.w, rect.y + rect.h * 0.78); ctx.stroke();
+        const nb = S.beats.length ? Math.min(...S.beats.map((b) => Math.abs(b - t))) : 1;
+        if (nb < 0.06) { ctx.fillStyle = "rgba(244,114,182,0.08)"; ctx.fillRect(0, 0, W, H); }
+      }
+      if (S.live) {
+        for (const pp of S.live.people) drawSkeleton(ctx, pp, map, { color: COLORS[(pp.id - 1) % COLORS.length], width: 2.5, label: "#" + pp.id });
+      } else if ((S.skeleton || skeletonOnly) && S.members.length) {
+        for (const o of S.members) { if (o === m) continue; const f = frameAt(o.frames, t); if (f) drawSkeleton(ctx, f, map, skelStyle(o, false, skeletonOnly)); }
+        if (m) { const f = frameAt(m.frames, t); if (f) drawSkeleton(ctx, f, map, skelStyle(m, true, skeletonOnly)); }
+      }
     }
     $("time").textContent = `${fmtTime(t)} / ${fmtTime(p.duration || 0)}`;
     $("play").textContent = p.paused ? "▶ Play" : "❚❚ Pause";
@@ -479,6 +639,73 @@ function frameLoop() {
   requestAnimationFrame(frameLoop);
 }
 requestAnimationFrame(frameLoop);
+
+// Click a dancer on the stage (full view) to select them.
+$("stage").addEventListener("click", (e) => {
+  if (S.view !== "full" || S.members.length < 2 || !S.player) return;
+  const box = overlay.getBoundingClientRect();
+  let x = e.clientX - box.left; const y = e.clientY - box.top;
+  if (S.mirror) x = box.width - x;
+  const rect = fitRect(box.width, box.height, S.aspect);
+  const ux = ((x - rect.x) / rect.w) * S.aspect, uy = (y - rect.y) / rect.h;
+  const t = S.player.currentTime;
+  let best = null, bd = Infinity;
+  for (const m of S.members) {
+    const f = frameAt(m.frames, t);
+    if (!f) continue;
+    const hx = (f.p[2 * J.lh] + f.p[2 * J.rh]) / 2, hy = (f.p[2 * J.ls + 1] + f.p[2 * J.lh + 1]) / 2;
+    const d = Math.hypot(hx - ux, hy - uy);
+    if (d < bd) { bd = d; best = m; }
+  }
+  if (best && bd < 0.25) selectMember(best.id);
+});
+
+// ── fancam view + export ────────────────────────────────────────────────────
+document.querySelectorAll("#view button").forEach((b) => (b.onclick = () => {
+  const v = b.dataset.v;
+  S.view = v === "full" ? "full" : "fancam";
+  if (v !== "full") S.fanAspect = v === "9:16" ? 9 / 16 : 16 / 9;
+  document.querySelectorAll("#view button").forEach((x) => x.classList.toggle("on", x === b));
+}));
+
+let exporting = null;
+$("export").onclick = async () => {
+  if (exporting) { exporting.abort(); return; }
+  const m = selMember(), v = S.player;
+  if (!m || !(v instanceof HTMLVideoElement)) return;
+  const known = m.frames.filter((f) => f.p);
+  const start = known[0].t, end = known[known.length - 1].t;
+  const outAspect = S.fanAspect;
+  const path = memberPath(m);
+  exporting = new AbortController();
+  $("export").textContent = "■ Stop export";
+  setStatus(`Recording ${m.name}'s fancam in real time (${Math.round(end - start)} s)…`);
+  try {
+    const blob = await recordFancam(v, {
+      outAspect, start, end, signal: exporting.signal,
+      onProgress: (fr) => { $("prog").style.width = Math.round(fr * 100) + "%"; },
+      draw: (ctx, t, W, H) => {
+        ctx.fillStyle = "#000"; ctx.fillRect(0, 0, W, H);
+        const crop = cropAt(path, t);
+        if (crop) drawCrop(ctx, v, crop, outAspect, { x: 0, y: 0, w: W, h: H });
+        ctx.font = `700 ${Math.round(H / 40)}px Pretendard, sans-serif`;
+        ctx.fillStyle = "rgba(255,255,255,0.85)"; ctx.textAlign = "left";
+        ctx.fillText(`${m.name} FOCUS`, Math.round(W / 30), H - Math.round(H / 30));
+      },
+    });
+    const ext = blob.type.includes("mp4") ? "mp4" : "webm";
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = `${(S.source.title || "dance").replace(/[^\w가-힣-]+/g, "_").slice(0, 40)}_${m.name.replace(/\s+/g, "_")}_fancam.${ext}`;
+    document.body.appendChild(a); a.click(); a.remove();
+    setStatus(`Fancam saved: ${a.download} (${(blob.size / 1e6).toFixed(1)} MB). Zoomed crops are upscaled — a 1080p+ source looks best.`);
+  } catch (e) {
+    setStatus("Export failed: " + (e.message || e), true);
+  } finally {
+    exporting = null;
+    $("export").textContent = "⬇ Export fancam";
+  }
+};
 
 // Soft click on each beat for the demo dancer.
 let audioCtx = null, lastBeatIdx = -1;
@@ -538,7 +765,7 @@ function onUserFrame(uf) {
   const cam = $("cam");
   const aspect = cam.videoWidth / cam.videoHeight || 16 / 9;
   if (!uf) return;
-  drawSkeleton(ctx, uf, fitRect(W, H, aspect), aspect, { color: "rgba(244,114,182,0.95)", width: 3, joint: "#fff" });
+  drawSkeleton(ctx, uf, fullMap(fitRect(W, H, aspect), aspect), { color: "rgba(244,114,182,0.95)", width: 3, joint: "#fff" });
   if (!S.player || !S.frames.length) return;
   const t = S.player.currentTime;
   // Displayed mirrored → learner copies the same anatomical side → compare un-mirrored.
@@ -637,7 +864,7 @@ $("coach-go").onclick = async () => {
   try {
     const r = await fetch("/api/dance/coach", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({
       lang: $("coach-lang").value,
-      report: { source: { title: S.source && S.source.title }, ...S.analysis, plan: S.plan },
+      report: { source: { title: S.source && S.source.title }, member: selMember() && selMember().name, groupSync: S.sync && selMember() ? { overall: S.sync.overall, member: S.sync.perMember[S.sel] } : null, ...S.analysis, plan: S.plan },
     }) });
     const j = await r.json();
     if (!r.ok) throw new Error(j.error || "coach failed");
