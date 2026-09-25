@@ -12,6 +12,7 @@ const FFMPEG = process.env.FFMPEG || "ffmpeg";
   const browser = await chromium.launch();
   const page = await browser.newPage({ viewport: { width: 1920, height: 1080 } });
   await page.goto("file://" + path.join(__dirname, process.argv[4] || "explainer.html") + "?render");
+  await page.evaluate(() => window.READY || null);
   const duration = await page.evaluate(() => window.DURATION);
   const total = Math.round(duration * FPS);
 
