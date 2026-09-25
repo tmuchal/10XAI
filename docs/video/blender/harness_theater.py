@@ -284,11 +284,10 @@ def curtain_mesh(name, x0, x1, z0, z1, y, folds, amp, m):
     return ob
 
 
-def stage(width=16.0, curtains=True, backdrop=True):
+def stage(width=16.0, curtains=True, backdrop=True, valance_z=7.2):
     floor = cube((0, -5.5, -0.25), (width + 8, 20, 0.5), None)
     fm = stripes_material("#eaa865", "#e39c57", scale=5.0, name="planks")
     floor.data.materials.append(fm)
-    cube((0, -4.45, -0.25), (width + 4, 0.12, 0.5), mat("#c98543", 0.6))
     if backdrop:
         bpy.ops.mesh.primitive_plane_add(size=1, location=(0, 4.2, 5.0), rotation=(math.pi / 2, 0, 0))
         bd = bpy.context.object
@@ -300,7 +299,7 @@ def stage(width=16.0, curtains=True, backdrop=True):
         half = width / 2
         curtain_mesh("curtainL", -half - 3.5, -half + 1.2, -0.1, 16, 2.6, 5, 0.18, cm)
         curtain_mesh("curtainR", half - 1.2, half + 3.5, -0.1, 16, 2.6, 5, 0.18, cm)
-        curtain_mesh("valance", -half - 4, half + 4, 7.2, 16, 2.3, 26, 0.12, mat("#c9362f", 0.75))
+        curtain_mesh("valance", -half - 4, half + 4, valance_z, valance_z + 9, 2.3, 26, 0.12, mat("#c9362f", 0.75))
         for sx in (-1, 1):
             torus((sx * (half - 0.9), 2.3, 3.3), 0.32, 0.09, mat(C["gold"], 0.35), rot=(math.pi / 2, 0, 0))
 
@@ -666,7 +665,7 @@ def shot_hero_wheel():
 
 def shot_reel_cover():
     """9:16 cover: hamster + RISK meter + hook text."""
-    stage(width=8.0)
+    stage(width=8.0, valance_z=10.4)
     meter((1.5, 0.8, 0), 72, 1.1)
     hamster((-0.8, -1.2, 0), 1.6, math.radians(10), "cheer", "grin")
     title3d("IT SAID", (0, -0.2, 7.6), 0.95)
@@ -678,7 +677,7 @@ def shot_reel_cover():
 
 def shot_card_cover():
     """4:5 card-news cover: hamster with sunglasses pushed up, board behind."""
-    stage(width=9.0)
+    stage(width=9.0, valance_z=9.6)
     kanban((0, 2.4, 3.6), cards={0: ["Clone repo"], 1: ["Install SDK"], 2: [("Run shell", "risk", "72")], 3: [("Export", "ok", "OK")]}, scale=0.75, hl=2)
     hamster((0, -1.3, 0), 1.7, 0, "wave", "o", glasses="up")
     agent((-2.6, -0.9, 0), C["verify"], 0.9, "worried", "risk 72", rot_z=0.3)

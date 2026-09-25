@@ -78,7 +78,7 @@ The Kanban board appears in **every format**. It's the show's "mission control":
 | | Instagram Reel / YouTube Short | YouTube long-form | Card news |
 |---|---|---|---|
 | Canvas | 1080×1920 (logical 540×960) | 1920×1080 (logical 960×540) | 1080×1350 4:5 (logical 540×675) |
-| Length | 30–60 s (this one: 45 s) | 12–16 min (this one: about 14 min) | 8–10 slides (this one: 10) |
+| Length | 30–60 s (this one: 30 s) | 12–16 min (this one: about 14 min) | 8–10 slides (this one: 10) |
 | Safe zone | Text in y 220–1530 px, x 60–960 px (logical y 110–765, x 30–480). Keep clear of the right-hand icon column and the bottom UI. | Standard title safe | Key content in the central 1010 px (the grid crops to 3:4). At least 60 px sides and 80 px top/bottom. |
 | Hook | First 1 s: claim or contradiction. Show the payoff frame first. 3+ visual changes in the first 3 s. | Cold open under 30 s. One open loop by 2:00. Re-hook every 2–3 min. | Cover: 15 Korean characters or fewer, English headline, mascot. |
 | Pace | Visual change every 2–4 s. Loopable ending. | Chapters. Switch between animation and screen recording every 30–60 s. | One idea per slide. Swipe cue. Page counter. |
