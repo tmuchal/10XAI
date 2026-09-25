@@ -13,7 +13,7 @@
  * frame is a pure function of t and the film can be rendered frame by frame.
  */
 (function (root) {
-  const W = 1280, H = 720, FLOOR = 598;
+  const W = 1280, H = 720, FLOOR = 598, STAND = 548;   // characters stand on STAND, above the subtitle bar
   const INK = '#4a2e1f';
   const HAND = "Gaegu, 'Gowun Dodum', sans-serif";
   const C = {
@@ -130,7 +130,7 @@
     // scarf
     if (o.scarf !== false) g += `<path d="M-52,-40 Q0,-24 52,-40 L50,-28 Q0,-12 -50,-28 Z" fill="${C.scarf}" stroke="${INK}" stroke-width="2.4" stroke-linejoin="round"/><path d="M18,-24 L30,4 L20,6 L12,-20 Z" fill="${C.scarf}" stroke="${INK}" stroke-width="2.2" stroke-linejoin="round"/><path d="M22,3 l-1,5 M26,2 l0,5" stroke="${C.scarf2}" stroke-width="2"/>`;
     // paws per pose
-    const P = { idle: [[-36, -30], [36, -30]], wave: [[-36, -30], [74, -110]], point: [[-36, -30], [88, -70]], cheer: [[-70, -118], [70, -118]], stamp: [[-36, -30], [58, -132]], shrug: [[-78, -64], [78, -64]], think: [[-36, -30], [14, -54]] }[o.pose || 'idle'];
+    const P = { idle: [[-36, -30], [36, -30]], wave: [[-36, -30], [74, -110]], point: [[-36, -30], [88, -70]], cheer: [[-84, -100], [84, -100]], stamp: [[-36, -30], [58, -132]], shrug: [[-78, -64], [78, -64]], think: [[-36, -30], [14, -54]] }[o.pose || 'idle'];
     P.forEach(([px, py]) => { g += `<ellipse cx="${px}" cy="${py}" rx="12" ry="10" fill="${C.fur}" stroke="${INK}" stroke-width="2.6"/><path d="M${px - 5},${py - 4} l0,4 M${px},${py - 5} l0,4 M${px + 5},${py - 4} l0,4" stroke="${INK}" stroke-width="1.4" stroke-linecap="round"/>`; });
     if (o.hat) g += partyHat(20, -122);
     if (o.extra) g += o.extra;
@@ -194,6 +194,7 @@
     else g += `<path d="M-6,-73 Q0,-67 6,-73" fill="none" stroke="${INK}" stroke-width="2.2" stroke-linecap="round"/>`;
     if (o.sweat) g += `<path d="M24,-104 C28,-98 28,-93 24,-93 C20,-93 20,-98 24,-104 Z" fill="#9ad3ee" stroke="${INK}" stroke-width="1.4"/>`;
     if (o.bang) g += T(40, -118, '!!', 30, { f: C.red, stroke: '#fff', sw: 4, r: 12 });
+    if (o.crown) g += `<path d="M-18,-142 L-18,-160 L-9,-151 L0,-165 L9,-151 L18,-160 L18,-142 Z" fill="${C.yellow}" stroke="${INK}" stroke-width="2.2" stroke-linejoin="round"/>`;
     const fl = o.flip ? -1 : 1;
     return `<g transform="translate(${n(x)},${n(y)}) scale(${n(fl * s * 1000) / 1000},${n(s * 1000) / 1000})">${g}</g>`;
   }
@@ -219,9 +220,13 @@
   }
   function wrap(s, max) {
     if (!s) return [];
-    const words = String(s).split(' '), out = [''];
-    words.forEach((wd) => { if ((out[out.length - 1] + ' ' + wd).trim().replace(/\*/g, '').length > max) out.push(wd); else out[out.length - 1] = (out[out.length - 1] + ' ' + wd).trim(); });
-    return out;
+    const plain = String(s).replace(/\*/g, '');
+    if (plain.length <= max) return [String(s)];
+    // two balanced lines: break at the space closest to the middle of the visible text
+    const words = String(s).split(' ');
+    let best = 1, bestD = 1e9, acc = 0;
+    for (let i = 0; i < words.length - 1; i++) { acc += words[i].replace(/\*/g, '').length + 1; const d = Math.abs(acc - plain.length / 2); if (d < bestD) { bestD = d; best = i + 1; } }
+    return [words.slice(0, best).join(' '), words.slice(best).join(' ')];
   }
   function panel(x, y, w, h, o) {
     o = o || {};
@@ -304,5 +309,5 @@
     return `<path d="M${x1},${y1} L${n(x2 - 14 * Math.cos(a))},${n(y2 - 14 * Math.sin(a))}" stroke="${o.c || INK}" stroke-width="${o.w || 3.4}" ${o.dash === false ? '' : 'stroke-dasharray="10 7"'} stroke-linecap="round" fill="none"/><path d="M${n(x2 - 18 * Math.cos(a - .5))},${n(y2 - 18 * Math.sin(a - .5))} L${x2},${y2} L${n(x2 - 18 * Math.cos(a + .5))},${n(y2 - 18 * Math.sin(a + .5))}" fill="none" stroke="${o.c || INK}" stroke-width="${o.w || 3.4}" stroke-linecap="round" stroke-linejoin="round"/>`;
   }
 
-  root.Kit = { W, H, FLOOR, INK, C, HAND, esc, n, clamp, k, ease, back, pop, bob, rng, tw, T, R, at, cloud, sparkle, backdrop, curtains, audience, noa, crew, uchu, partyHat, prop, chapterTag, source, subtitle, wrap, panel, bubble, card, kanban, KCOLS, meter, gate, stampMark, star, burst, confetti, browser, chip, arrow };
+  root.Kit = { W, H, FLOOR, STAND, INK, C, HAND, esc, n, clamp, k, ease, back, pop, bob, rng, tw, T, R, at, cloud, sparkle, backdrop, curtains, audience, noa, crew, uchu, partyHat, prop, chapterTag, source, subtitle, wrap, panel, bubble, card, kanban, KCOLS, meter, gate, stampMark, star, burst, confetti, browser, chip, arrow };
 })(window);
