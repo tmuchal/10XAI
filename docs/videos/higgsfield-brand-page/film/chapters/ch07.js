@@ -22,19 +22,19 @@ scene(184, 192, (R, s) => {
   // hanging title banner
   const ban = c07_abs("left:260px;top:0;width:1400px;height:300px;transform-origin:700px -60px;z-index:5", `
     <svg width="1400" height="80" style="position:absolute;left:0;top:-60px;overflow:visible"><path d="M160 0 L240 80 M1240 0 L1160 80" stroke="${INK}" stroke-width="4"/></svg>
-    <div style="position:absolute;left:40px;top:36px;width:1320px;padding:12px 0 16px;text-align:center;${c07_card("#fbe3b0", 20)};white-space:nowrap">
+    <div style="position:absolute;left:40px;top:66px;width:1320px;padding:12px 0 16px;text-align:center;${c07_card("#fbe3b0", 20)};white-space:nowrap">
       <div style="font-size:28px;letter-spacing:6px;color:#c8372d">CLAUDE × HIGGSFIELD · CURTAIN CALL</div>
       <div style="font-size:90px;line-height:1.05;margin-top:2px">사람을 붙잡는 브랜드 페이지</div>
       <div style="font-size:38px;color:#6b5d52">Brand pages that hold people</div></div>`, R);
   // recap chips
   const CH = [["업종 무관", "#fbe0c0"], ["고객이 주인공", "#f8d3df"], ["Soul ID 일관성", "#e3f2f8"], ["3초 · 스크롤 · 영상", "#fff3c4"], ["전문성 + 유머", "#d8ecd3"], ["버튼 → 매출", "#fde6ec"]];
-  const chipRow = c07_abs("left:100px;top:272px;width:1720px;display:flex;justify-content:center;gap:14px;z-index:6", "", R);
+  const chipRow = c07_abs("left:100px;top:300px;width:1720px;display:flex;justify-content:center;gap:14px;z-index:6", "", R);
   const chips = CH.map(([c, bg], i) => el("div", `padding:4px 18px 6px;font-size:34px;white-space:nowrap;${c07_card(bg, 999)};box-shadow:4px 5px 0 rgba(43,35,32,.22)`, c, chipRow));
   // URL marquee with light bulbs
   const MW = 1160, MH = 128, bl = [];
   for (let x = 40; x <= MW - 40; x += 72) { bl.push([x, 8]); bl.push([x, MH - 8]); }
   for (let y = 40; y <= MH - 40; y += 48) { bl.push([8, y]); bl.push([MW - 8, y]); }
-  const mq = c07_abs(`left:${960 - MW / 2}px;top:350px;width:${MW}px;height:${MH}px;${c07_card("#c8372d", 22)};z-index:6`, `
+  const mq = c07_abs(`left:${960 - MW / 2}px;top:378px;width:${MW}px;height:${MH}px;${c07_card("#c8372d", 22)};z-index:6`, `
     <div style="position:absolute;left:20px;top:18px;right:20px;bottom:18px;border-radius:14px;background:#fffaf0;border:3px solid ${INK};display:flex;align-items:center;justify-content:center;font-size:70px;white-space:nowrap">
       <span>noainostory</span><span style="color:#d4623a">.higgsfield.app</span></div>
     ${bl.map(k => `<div class="bulb" style="position:absolute;left:${k[0] - 7}px;top:${k[1] - 7}px;width:14px;height:14px;border-radius:50%;border:2px solid ${INK}"></div>`).join("")}`, R);
@@ -84,7 +84,7 @@ scene(184, 192, (R, s) => {
       noa.P.p1.style.display = ""; noa.P.p1.setAttribute("cx", 80); noa.P.p1.setAttribute("cy", 98); noa.P.p1.setAttribute("r", 7);
       noa.P.p2.style.display = "none"; noa.P.e2.setAttribute("d", "M110 99 Q120 106 130 99"); noa.P.e2.setAttribute("fill", "none"); }
     const sp = seg(t, 186.2, 186.7);
-    spark.style.opacity = sp > 0 && sp < 1 ? Math.sin(sp * Math.PI) : 0; spark.style.transform = `translate(${1010}px, ${650}px) scale(${0.6 + 1.2 * sp}) rotate(${sp * 180}deg)`;
+    spark.style.opacity = sp > 0 && sp < 1 ? Math.sin(sp * Math.PI) : 0; spark.style.transform = `translate(${1010}px, ${655}px) scale(${0.6 + 1.2 * sp}) rotate(${sp * 180}deg)`;
     const pf = t > 186.85 && t < 187.45 ? seg(t, 186.85, 187.45) : t > 190.05 && t < 190.65 ? seg(t, 190.05, 190.65) : -1;
     puffs.forEach((e, i) => { const a = i / 8 * 6.283, d = 60 + 200 * out(clamp(pf));
       e.style.opacity = pf < 0 ? 0 : 1 - pf; e.style.transform = `translate(${960 + Math.cos(a) * d}px, ${690 + Math.sin(a) * d * .6}px) scale(${1.8 - 1.2 * clamp(pf)})`; });
@@ -96,7 +96,7 @@ scene(184, 192, (R, s) => {
       poseNoa(n, t + i * .3, { x: xx, y: 626, s: 1, look: -from * .5, flip: from > 0 && walking, hop: walking ? ((t - a) * 3.2) % 1 : (t > 186.9 && t < 187.5 ? (t - 186.9) / .6 : 0), wave: t > 190.2 && i % 2 === 0, op: seg(t, a, a + .2) });
       c07_bow(n, bw);
     });
-    sayBubble(bub, t, 185.95, 186.85, "고마워요! 😎", 1130, 470);
+    sayBubble(bub, t, 185.95, 186.85, "고마워요! 😎", 1130, 500);
     // roses land at the cast's feet
     roses.forEach((r, i) => {
       const a = 188.3 + i * .22, p = seg(t, a, a + .7), tx = [300, 1500, 1680][i], sx = [700, 1200, 1300][i];

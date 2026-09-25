@@ -27,7 +27,7 @@ for sx in (-1, 1):
     box('side', (0.2, D, H), (sx * (W / 2 - 0.1), 0, H / 2), TEAL, rig, OL, bevel=0.03)
 box('roof', (W + 0.2, D + 0.2, 0.2), (0, 0, H + 0.1), TEAL2, rig, OL, bevel=0.04)
 box('base', (W + 0.1, D + 0.1, 0.25), (0, 0, 0.125), TEAL2, rig, OL, bevel=0.04)
-box('front_low', (W, 0.14, 1.05), (0, -D / 2 + 0.07, 0.25 + 0.525), TEAL, rig, OL, bevel=0.03)
+box('front_low', (W, 0.14, 0.85), (0, -D / 2 + 0.07, 0.25 + 0.425), TEAL, rig, OL, bevel=0.03)
 box('lintel', (W, 0.14, 0.5), (0, -D / 2 + 0.07, H - 0.25), TEAL, rig, OL, bevel=0.03)
 # polka dots on the inside back wall
 dotm = flat('dot', "#f7cf8f")
@@ -37,11 +37,11 @@ for i in range(5):
         if abs(x) < 1.0:
             c = cylinder('pd', 0.07, 0.01, (x, D / 2 - 0.08, z), dotm, rig, 0, rot=(math.pi / 2, 0, 0), seg=16)
 # slot on the front panel
-box('slotplate', (0.7, 0.05, 0.16), (0.55, -D / 2 - 0.01, 0.55), toon('slotp', "#e9e1cf"), rig, OL * 0.7, bevel=0.02)
-box('slot', (0.52, 0.06, 0.05), (0.55, -D / 2 - 0.02, 0.55), INKF, rig, 0)
+box('slotplate', (0.7, 0.05, 0.16), (0.55, -D / 2 - 0.01, 0.45), toon('slotp', "#e9e1cf"), rig, OL * 0.7, bevel=0.02)
+box('slot', (0.52, 0.06, 0.05), (0.55, -D / 2 - 0.02, 0.45), INKF, rig, 0)
 # stripes on the lower panel
 for i in range(3):
-    box('stripe', (W - 0.02, 0.02, 0.07), (0, -D / 2 - 0.005, 0.9 + i * 0.16),
+    box('stripe', (W - 0.02, 0.02, 0.07), (0, -D / 2 - 0.005, 0.72 + i * 0.12),
         toon('strp', "#fff1d6" if i % 2 == 0 else "#f2c14e", paper=0.03), rig, 0)
 # half curtain (left, tied)
 def cur_fn(u, v):
@@ -76,13 +76,14 @@ cylinder('lens', 0.1, 0.06, (0.3, -0.17, 0.0), toon('lensm', "#1f1b1a", hi="#6a8
          rot=(math.pi / 2, 0, 0), seg=24)
 
 # stool + Noa
-cylinder('stool', 0.32, 0.5, (0, 0.1, 0.5), toon('stoolm', "#c98d5a"), rig, OL)
+cylinder('stool', 0.32, 0.4, (0, 0.15, 0.45), toon('stoolm', "#c98d5a"), rig, OL)
 NOA = hamster('noa', glasses=True, ol=0.024)
 NOA['root'].parent = rig
+NOA_SCALE = 1.2
 NOA['shadow'].hide_render = True
 
 # photo strip: 3 frames; hangs from the slot, grows downward
-strip = empty('strip', (0.55, -D / 2 - 0.05, 0.55), rig)
+strip = empty('strip', (0.55, -D / 2 - 0.05, 0.45), rig)
 SL = 1.55
 paper_m = toon('stripm', "#fffaf0", shadow="#efe3cc", paper=0.03)
 cardS = empty('cardS', (0, 0, 0), strip)
@@ -104,10 +105,11 @@ STRIP = strip
 # flash pop sprites (in front of everything)
 STAR = star_mesh('flashstar', 1.7, 0.28, 4, flat('fs', "#ffffff", alpha=0.95), None, (0, -D / 2 - 0.6, H - 0.3))
 STAR2 = star_mesh('flashstar2', 1.1, 0.2, 4, flat('fs2', "#fffbe6", alpha=0.9), None, (0, -D / 2 - 0.62, H - 0.3))
-HALO_M = flat('halo', "#ffffff", alpha=0.0)
-HALO = cylinder('halo', 4.5, 0.01, (0, -3.2, 1.8), HALO_M, None, 0, rot=(math.pi / 2, 0, 0), seg=48)
+HALO_M = flat('halo', "#fffdf2", alpha=0.0)
+HALOS = [cylinder('halo%d' % i, r, 0.01, (0, -3.2 - 0.05 * i, 2.2), HALO_M, None, 0, rot=(math.pi / 2, 0, 0), seg=48)
+         for i, r in enumerate((2.3, 1.7, 1.1))]
 
-cam = camera((2.2, -7.6, 2.4), (0.15, 0, 1.75), lens=40)
+cam = camera((2.0, -8.2, 2.3), (0.12, 0, 1.45), lens=46)
 FLASHES = (0.62, 1.22, 1.82)
 
 
@@ -136,7 +138,8 @@ def setup(f):
         armR = lerp(1.3, 0.3, out(k)); armL = 0.4; tilt = lerp(0.3, 0.0, out(k)); lean = lerp(0.18, 0, out(k))
         turn = lerp(-0.25, 0.35, out(seg(t, 2.1, 2.6)))   # looks down at the strip
     sq *= 1 - 0.08 * sum(math.exp(-12 * max(0, t - fa)) * (t > fa) for fa in FLASHES)
-    pose(NOA, f, loc=(0, 0.1, 0.72 + zj), turn=turn, squash=sq, armL=armL, armR=armR, head_tilt=tilt, lean=lean)
+    pose(NOA, f, loc=(0, 0.15, 0.62 + zj), turn=turn, squash=sq, armL=armL, armR=armR, head_tilt=tilt, lean=lean)
+    NOA['root'].scale = tuple(v * NOA_SCALE for v in NOA['root'].scale)
     # flashes
     fl_amt = 0.0
     for fa in FLASHES:
@@ -146,8 +149,8 @@ def setup(f):
     s = fl_amt
     STAR.scale = (s * 1.2,) * 3; STAR.rotation_euler = (0, t * 2, 0)
     STAR2.scale = (s,) * 3; STAR2.rotation_euler = (0, 0.78 + t * 2, 0)
-    set_alpha(HALO_M, 0.6 * fl_amt)
-    HALO.hide_render = fl_amt < 0.02
+    set_alpha(HALO_M, 0.3 * fl_amt)
+    for h in HALOS: h.hide_render = fl_amt < 0.02
     STAR.hide_render = STAR2.hide_render = fl_amt < 0.02
     # bulbs chase
     for i, b in enumerate(BULBS):

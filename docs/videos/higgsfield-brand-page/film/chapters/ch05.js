@@ -105,7 +105,7 @@ scene(134, 160, (R, s) => {
 
   // ---------- Noa balancing on the fulcrum
   const nw = c05_abs("left:960px;top:300px;width:0;height:0;z-index:7", "", SG);
-  const noa = makeNoa(130); nw.appendChild(noa);
+  const noa = makeNoa(170); nw.appendChild(noa);
 
   // ---------- rule stamp
   const rule = c05_abs(`left:380px;top:230px;width:1100px;padding:28px 44px 30px;${c05_card("#fffaf0", 22)};z-index:10;text-align:center`, `
@@ -190,7 +190,7 @@ scene(134, 160, (R, s) => {
   };
   return t => {
     cookU(t);
-    head.style.opacity = 1 - seg(t, 153.2, 153.6);
+    head.style.opacity = seg(t, 136.6, 137.0) * (1 - seg(t, 153.2, 153.6));
     wipe(t, 153.05, .8);
     // ================= scale (134.2–149.3)
     const exit = ease(seg(t, 148.9, 149.4));
@@ -251,7 +251,7 @@ scene(134, 160, (R, s) => {
     const tilted = Math.abs(th) > 5.6;
     nw.style.transform = `translate(0px, ${beamY}px) rotate(${th * .8}deg)`;
     nw.style.opacity = t > 137.3 ? 1 : 0;
-    poseNoa(noa, t, { x: -65, y: -140 + nY, s: 1, mood: tilted ? "shock" : "happy", talk: t > 137.8 && t < 138.2, look: -th / 8, hop: t > 147 && t < 148.4 ? (t - 147) / .7 % 1 : 0 });
+    poseNoa(noa, t, { x: -85, y: -180 + nY, s: 1, mood: tilted ? "shock" : "happy", talk: t > 137.8 && t < 138.2, look: -th / 8, hop: t > 147 && t < 148.4 ? (t - 147) / .7 % 1 : 0 });
     noa.P.b.setAttribute("transform", `translate(100 200) scale(${1 + nsq} ${1 - nsq}) rotate(${-th * .6} 0 0) translate(-100 -200)`);
     if (!tilted) {
       const cheer = t > 147 && t < 148.6, flap = 16 * Math.sin(t * 5.2) * (0.4 + Math.min(1, Math.abs(th) / 6));

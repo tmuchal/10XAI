@@ -113,9 +113,9 @@ scene(10, 40, (R, s) => {
   const dFol = D.querySelector(".fol"), dStamp = D.querySelector(".stamp");
 
   // reference reveal ------------------------------------------------------
-  const ref = refWindow(cam, 150, 150, 1230, 720);
+  const ref = refWindow(cam, 180, 150, 1200, 720);
   ref.style.transformOrigin = "50% 0";
-  const tada = el("div", `left:96px;top:104px;z-index:12;padding:8px 22px 10px;background:#c8372d;color:#fffaf0;border:4px solid ${INK1};border-radius:14px;font-size:36px;box-shadow:6px 7px 0 rgba(43,35,32,.25);white-space:nowrap;transform-origin:0 50%`, "짠! 제가 만든 페이지", cam); tada.className = "abs";
+  const tada = el("div", `left:170px;top:104px;z-index:12;padding:8px 22px 10px;background:#c8372d;color:#fffaf0;border:4px solid ${INK1};border-radius:14px;font-size:36px;box-shadow:6px 7px 0 rgba(43,35,32,.25);white-space:nowrap;transform-origin:0 50%`, "짠! 제가 만든 페이지", cam); tada.className = "abs";
   const COLS = ["#f7d774", "#e0607e", "#3e8fb8", "#9fd3a8", "#e8894f"];
   const conf = Array.from({ length: 44 }, (_, i) => { const d = el("div", `left:0;top:0;width:${12 + c01_rnd(i) * 10}px;height:${8 + c01_rnd(i + 50) * 10}px;background:${COLS[i % 5]};border:2px solid ${INK1};border-radius:2px;z-index:15;opacity:0`, "", cam); d.className = "abs"; return d; });
   const toot = el("div", `left:0;top:0;z-index:16;font-size:40px;color:#c8372d;opacity:0;white-space:nowrap`, "뿌우~!", cam); toot.className = "abs";
@@ -304,18 +304,18 @@ scene(10, 40, (R, s) => {
       if (dt < 0 || dt > 3) { d.style.opacity = 0; return; }
       const a = side ? -Math.PI * (0.62 + 0.3 * c01_rnd(i + 7)) : -Math.PI * (0.08 + 0.3 * c01_rnd(i + 7));
       const v = 700 + 700 * c01_rnd(i + 3), k = (1 - Math.exp(-2.2 * dt)) / 2.2;
-      const x = (side ? 1370 : 160) + Math.cos(a) * v * k + 14 * Math.sin(dt * 7 + i);
+      const x = (side ? 1370 : 190) + Math.cos(a) * v * k + 14 * Math.sin(dt * 7 + i);
       const y = 180 + Math.sin(a) * v * k + 170 * dt * dt;
       d.style.opacity = 1 - seg(dt, 2.3, 3);
       d.style.transform = `translate(${x}px, ${y}px) rotate(${dt * (300 + 500 * c01_rnd(i))}deg) scaleX(${Math.cos(dt * 8 + i)})`;
     });
 
     // ---- Noa ----
-    let nx = 660, ny = 716, hop = 0, mood = "happy", wave = false, talk = false, look = 1, flip = true, arm = null, sq = 0, gl = 0, nrot = 0;
+    let nx = 180, ny = 716, hop = 0, mood = "happy", wave = false, talk = false, look = 1, flip = false, arm = null, sq = 0, gl = 0, nrot = 0;
     if (t < 32.4) {
       // hops in from the right, then works the wheel: crouch → swipe → watch → celebrate
       const pin = seg(t, 11.0, 11.6);
-      if (t < 11.6) { nx = lerp(1000, 660, ease(pin)); ny = 716 - 120 * Math.sin(pin * Math.PI); mood = "happy"; }
+      if (t < 11.6) { nx = lerp(-160, 180, ease(pin)); ny = 716 - 120 * Math.sin(pin * Math.PI); mood = "happy"; }
       sq = t > 11.6 ? 0.14 * c01_settle(t - 11.6, 2.6, 6) : 0;
       SPIN.forEach(([s0, e0], i) => {
         if (t > s0 - 0.35 && t < s0) sq = 0.14 * seg(t, s0 - 0.35, s0 - 0.1);
@@ -329,7 +329,7 @@ scene(10, 40, (R, s) => {
     } else {
       // leaps over to the right of the page, blows the horn, glints at camera, then points at the page
       const p = seg(t, 32.6, 33.4);
-      nx = lerp(660, 1470, ease(p)); ny = lerp(716, 714, p) - 260 * Math.sin(p * Math.PI); nrot = p > 0 && p < 1 ? -360 * ease(p) : 0;
+      flip = true; nx = lerp(180, 1470, ease(p)); ny = lerp(716, 714, p) - 260 * Math.sin(p * Math.PI); nrot = p > 0 && p < 1 ? 360 * ease(p) : 0;
       sq = t > 33.4 ? 0.15 * c01_settle(t - 33.4, 2.5, 5) : 0; look = 1; flip = true;
       mood = t > 32.6 && t < 33.4 ? "shock" : "happy";
       if (t > 35.0 && t < 35.5) { flip = false; look = 0; gl = seg(t, 35.0, 35.15) * (1 - seg(t, 35.3, 35.5)); }
@@ -350,7 +350,7 @@ scene(10, 40, (R, s) => {
     tube.setAttribute("width", 90 * blow); curl.setAttribute("opacity", blow < 0.12 ? 1 : 0);
     toot.style.opacity = blow > 0.5 ? 1 : 0;
     toot.style.transform = `translate(${nx - 150}px, ${ny - 30}px) rotate(-10deg) scale(${0.9 + 0.2 * blow})`;
-    sayBubble(bubS, t, 21.4, 22.7, "나도 볼에 담았다!", nx - 120, ny - 80);
+    sayBubble(bubS, t, 21.4, 22.7, "나도 볼에 담았다!", nx + 70, ny - 80);
     sayBubble(bub, t, 35.3, 39.6, "이게 실제로 만든 페이지야 👀", 1420, 470);
   };
 });
