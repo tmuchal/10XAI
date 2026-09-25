@@ -60,6 +60,7 @@
     <div style="font-size:112px;font-weight:800;line-height:1.04;margin-top:18px;overflow:hidden"><div data-a="0.3 .6 rise">3분기 실적,</div></div>
     <div style="font-size:112px;font-weight:800;line-height:1.04;overflow:hidden"><div class="grad" data-a="0.5 .6 rise">30초 요약.</div></div>
     <div class="muted" style="font-size:28px;margin-top:22px;font-weight:500" data-a="0.9 .5 up">매출 · 채널 · 주간 추이 · 4분기 전망</div>
+    <div style="margin-top:26px" data-a="1.2 .45 pop"><span class="pill" style="background:var(--lime);color:#0B0C10;font-size:30px;padding:12px 24px">3분기 매출 482억 · ▲18%</span></div>
   </div>
   <div class="lbl" data-anchor="hero:hammyHead" data-a="1.0 .5 pop" style="margin-top:-10px"><span class="pill" style="background:rgba(12,14,22,.7);border:1px solid rgba(198,244,50,.5);backdrop-filter:blur(10px);font-size:22px"><i style="width:10px;height:10px;border-radius:50%;background:var(--lime);display:inline-block"></i>우추 · Growth Analyst</span></div>
 </section>
@@ -68,7 +69,7 @@
 <section class="scene" id="B" data-t="3.2 9.55">
   <div class="panel" style="left:96px;top:96px;height:132px;padding:18px 30px;display:flex;align-items:center;gap:30px" data-a="3.35 .5 up">
     <div><div class="kick">Past · 과거 7개 분기</div><div class="muted" style="font-size:22px;margin-top:6px;font-weight:600">3분기 매출</div></div>
-    <div style="font-size:78px;font-weight:800;line-height:1"><span data-count="5.2 1.4 482 0">0</span><span style="font-size:38px;font-weight:700"> 억 원</span></div>
+    <div style="font-size:78px;font-weight:800;line-height:1"><span data-count="3.5 1.6 482 0">0</span><span style="font-size:38px;font-weight:700"> 억 원</span></div>
     <div style="display:flex;flex-direction:column;gap:8px">
       <span class="pill" style="background:var(--lime);color:#0B0C10" data-a="6.3 .4 pop">▲ 18.1% YoY</span>
       <span class="pill" style="background:rgba(124,92,255,.22);color:#CFC6FF;border:1px solid rgba(124,92,255,.5)" data-a="3.8 .4 pop">6분기 연속 성장 · 25.1Q 대비 +31%</span>
@@ -101,6 +102,7 @@
     </table>
   </div>
   <div class="abs" id="onGlow" style="left:100px;top:690px;width:1252px;height:54px;border:2px solid var(--lime);border-radius:12px;box-shadow:0 0 30px rgba(198,244,50,.35)"></div>
+  <div class="abs" id="big93" style="left:960px;top:118px;text-align:right"><div style="font-size:150px;font-weight:900;line-height:.9;color:var(--lime);text-shadow:0 0 60px rgba(198,244,50,.45)">93%</div><div style="font-size:26px;font-weight:700">성장분 중 온라인 기여</div></div>
 </section>
 
 <!-- D · FUTURE (3D road) -->
@@ -121,6 +123,10 @@
 
 <!-- E · DECISION -->
 <section class="scene" id="E" data-t="25.3 30">
+  <svg class="abs" style="left:0;top:0" width="1920" height="1080" id="rings"></svg>
+  <div class="abs" id="flash" style="inset:0;background:radial-gradient(circle at 310px 630px,rgba(198,244,50,.55),transparent 55%);opacity:0"></div>
+  <div id="burst"></div>
+  <div class="abs" id="stamp" style="left:560px;top:560px;padding:10px 26px;border:6px solid var(--lime);border-radius:16px;color:var(--lime);font-size:64px;font-weight:900;letter-spacing:.06em;opacity:0">APPROVED</div>
   <div class="abs" style="left:120px;top:150px;width:1100px">
     <div class="kick" data-a="25.4 .4 up">Decision · 결정 요청</div>
     <div style="font-size:104px;font-weight:800;line-height:1.05;margin-top:14px;overflow:hidden"><div data-a="25.5 .55 rise">선급금 12억 원</div></div>
@@ -129,9 +135,9 @@
     <div id="approve" class="abs" style="left:0;top:420px;width:380px;height:84px;border-radius:999px;background:var(--lime);color:#0B0C10;font-size:30px;font-weight:800;display:flex;align-items:center;justify-content:center;gap:12px;box-shadow:0 0 50px rgba(198,244,50,.45)" data-a="26.4 .45 pop"><span id="apTxt">승인하기 →</span></div>
   </div>
   <div class="abs" style="left:120px;top:700px;display:flex;gap:20px">
-    <div class="panel" style="position:relative;width:300px;padding:20px 24px" data-a="26.6 .45 up"><div style="font-size:44px;font-weight:800">482억</div><div class="muted" style="font-size:20px">3분기 매출 · +18%</div></div>
-    <div class="panel" style="position:relative;width:300px;padding:20px 24px" data-a="26.75 .45 up"><div style="font-size:44px;font-weight:800;color:var(--lime)">93%</div><div class="muted" style="font-size:20px">성장 중 온라인 기여</div></div>
-    <div class="panel" style="position:relative;width:300px;padding:20px 24px" data-a="26.9 .45 up"><div style="font-size:44px;font-weight:800">1,851억</div><div class="muted" style="font-size:20px">FY26 연간 전망 · 102.8%</div></div>
+    <div class="panel" style="position:relative;width:300px;padding:20px 24px" data-a="26.6 .45 up"><div style="font-size:44px;font-weight:800"><span data-count="26.6 .9 482 0">0</span>억</div><div class="muted" style="font-size:20px">3분기 매출 · +18%</div></div>
+    <div class="panel" style="position:relative;width:300px;padding:20px 24px" data-a="26.75 .45 up"><div style="font-size:44px;font-weight:800;color:var(--lime)"><span data-count="26.75 .9 93 0">0</span>%</div><div class="muted" style="font-size:20px">성장 중 온라인 기여</div></div>
+    <div class="panel" style="position:relative;width:300px;padding:20px 24px" data-a="26.9 .45 up"><div style="font-size:44px;font-weight:800"><span data-count="26.9 .9 1851 0">0</span>억</div><div class="muted" style="font-size:20px">FY26 연간 전망 · 102.8%</div></div>
   </div>
 </section>
 
@@ -267,6 +273,13 @@ function seek(f) {
     const cb = (id2, v, t0) => { const p = eo((t - t0) / 0.9); document.getElementById('cb' + id2).style.width = Math.abs(v) / 100 * 360 * p + 'px'; document.getElementById('cv' + id2).textContent = (v < 0 ? '−' : '') + Math.round(Math.abs(v) * p) + '%'; };
     cb('On', 93, 13.3); cb('Pa', 14, 13.5); cb('Di', -7, 13.6);
     const og = document.getElementById('onGlow'); og.style.opacity = eo((t - 13.25) / 0.35) * (0.75 + 0.25 * Math.sin(t * 8));
+    const phase = eo((t - 13.1) / 0.5);  // spotlight: charts first, then the channel table
+    const panels = cur.s.querySelectorAll('.panel');
+    panels[0].style.filter = panels[1].style.filter = `brightness(${1 - 0.45 * phase})`;
+    panels[2].style.filter = `brightness(${0.55 + 0.45 * phase})`;
+    panels[2].style.transform = `translateY(${-14 * phase}px) scale(${1 + 0.02 * phase})`; og.style.transform = `translateY(${-14 * phase}px)`;
+    const b9 = document.getElementById('big93'), br9 = (t - 13.4) / 0.45; b9.style.opacity = clamp(br9 * 3); b9.style.transform = `scale(${br9 <= 0 ? .6 : .6 + .4 * eb(br9)})`; b9.style.transformOrigin = 'right top';
+    cur.s.style.transform = `scale(${1 + 0.025 * eio((t - 9.55) / 6.9)})`; cur.s.style.transformOrigin = '40% 45%';
   }
   if (id === 'D') {
     for (let i = 0; i < 4; i++) { const a = anchor('road', 'gate' + i, f), el = document.getElementById('gl' + i);
@@ -278,6 +291,16 @@ function seek(f) {
     [...document.querySelectorAll('#fc .fcb')].forEach(r => { const i = +r.dataset.i; const p = eb((t - 21.1 - i*0.12) / 0.5); r.style.transformOrigin = 'center bottom'; r.style.transformBox = 'fill-box'; r.style.transform = `scaleY(${p})`; });
   }
   if (id === 'E') {
+    // pulsing rings behind the approve button, flash + particle burst + stamp on the press
+    const rg = document.getElementById('rings'); let rh = '';
+    for (let k = 0; k < 4; k++) { const ph = ((t - 26.4) * 0.6 + k / 4) % 1; if (t > 26.4) rh += `<circle cx="310" cy="632" r="${60 + ph * 520}" fill="none" stroke="#C6F432" stroke-width="2" opacity="${0.5 * (1 - ph)}"/>`; }
+    rg.innerHTML = rh;
+    const pr = t - 29.0;
+    document.getElementById('flash').style.opacity = pr > 0 ? Math.max(0, 1 - pr / 0.5) : 0;
+    const bu = document.getElementById('burst'); if (!bu.childElementCount) for (let k = 0; k < 28; k++) bu.insertAdjacentHTML('beforeend', `<div class="abs" style="width:10px;height:10px;border-radius:3px;background:${['#C6F432','#22D3EE','#9B87FF','#fff'][k % 4]}"></div>`);
+    [...bu.children].forEach((d, k) => { const a = k / 28 * Math.PI * 2 + 0.3, v = 380 + (k * 53 % 5) * 90, q = Math.max(0, pr);
+      d.style.left = (310 + Math.cos(a) * v * eo(q / 0.8)) + 'px'; d.style.top = (632 + Math.sin(a) * v * eo(q / 0.8) + 200 * q * q) + 'px'; d.style.opacity = pr > 0 ? Math.max(0, 1 - q / 0.9) : 0; });
+    const st = document.getElementById('stamp'), sr = (t - 29.15) / 0.3; st.style.opacity = clamp(sr * 3); st.style.transform = `rotate(-8deg) scale(${sr <= 0 ? 2 : 2 - eo(sr)})`;
     const ap = document.getElementById('approve'), tx = document.getElementById('apTxt');
     const press = t >= 29.0; tx.textContent = press ? '✓ 승인 완료' : '승인하기 →';
     if (t > 28.85 && t < 29.1) ap.style.transform = 'scale(.94)';
@@ -285,15 +308,15 @@ function seek(f) {
   }
   // sprite (Hammy over 2D scenes and the road)
   const sp = document.getElementById('sprite');
-  if (id === 'C') Object.assign(sp.style, { display: '', left: '1340px', top: '310px', width: '640px' });
-  else if (id === 'D') Object.assign(sp.style, { display: '', left: '1480px', top: '520px', width: '440px' });
-  else if (id === 'E') Object.assign(sp.style, { display: '', left: '1260px', top: '250px', width: '700px' });
+  if (id === 'C') Object.assign(sp.style, { display: 'block', left: '1300px', top: '300px', width: '720px' });
+  else if (id === 'D') Object.assign(sp.style, { display: 'block', left: '1480px', top: '520px', width: '440px' });
+  else if (id === 'E') Object.assign(sp.style, { display: 'block', left: '1120px', top: '140px', width: '900px' });
   else sp.style.display = 'none';
   if (sp.style.display !== 'none') { const pe = eo((t - cur.a) / 0.4); sp.style.opacity = pe; sp.style.transform = `translateY(${(1-pe)*60}px)`; sp.style.filter = blur ? `blur(${blur}px)` : 'drop-shadow(0 30px 40px rgba(0,0,0,.5))'; }
 
   // Uchu's shock-beat bubbles, anchored next to the narrator's head: [start, end, text, x, y]
   const hb = anchor('chart', 'hammyHead', f);
-  const UB = [[6.35, 9.4, '우와, +18%?!', hb ? hb[0] * 1920 + 40 : 420, hb ? hb[1] * 1080 - 40 : 330], [13.35, 16.3, '온라인 93%?!', 1240, 360], [29.05, 30.1, '승인!', 1180, 300]];
+  const UB = [[6.35, 9.4, '우와, +18%?!', hb ? hb[0] * 1920 + 40 : 420, hb ? hb[1] * 1080 - 40 : 330], [13.35, 16.3, '온라인 93%?!', 1400, 420], [29.05, 30.1, '승인!', 1300, 300]];
   const uw = document.getElementById('uchuWrap'), ub = UB.find(([a, b]) => t >= a && t < b);
   if (ub) {
     const [a, b, txt, x, y] = ub, br = (t - a) / 0.35;
