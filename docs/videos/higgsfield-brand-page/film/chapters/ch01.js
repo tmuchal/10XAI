@@ -19,7 +19,7 @@ scene(10, 40, (R, s) => {
             [33, "그리고 이게, 제가 실제로 만든 페이지", "And this is the page I actually built"]];
   const cam = el("div", "position:absolute;inset:0", "", R);
   const head = chapter(cam, "CHAPTER 01", "누구를 위한 페이지인가");
-  const W = 400, H = 540, TOP = 250, cards = [];
+  const W = 400, H = 540, TOP = 300, cards = [];
   const tag = (txt, bg) => `<div style="position:absolute;left:22px;top:18px;padding:4px 14px 6px;border:3px solid ${INK1};border-radius:10px;background:${bg};font-size:24px;transform:rotate(-2deg)">${txt}</div>`;
   const mk = (i, bg, inner) => {
     const c = el("div", `left:${120 + i * 430}px;top:${TOP}px;width:${W}px;height:${H}px;background:${bg}`, inner, cam); c.className = "card";
@@ -240,7 +240,7 @@ scene(10, 40, (R, s) => {
     if (t < 13) {
       // bounces in from the left onto the agency card
       const p = seg(t, 12.0, 12.9); const P = perch(0);
-      nx = lerp(-150, P.x, p); ny = P.y - 220 * Math.sin(p * Math.PI) + 200 * (1 - p) * 0; hop = p > 0 && p < 1 ? 0.5 : 0;
+      nx = lerp(-150, P.x, ease(p)); ny = lerp(700, P.y, out(p)) - 110 * Math.sin(p * Math.PI); sq = t > 12.9 ? 0.14 * c01_settle(t - 12.9, 2.6, 6) : 0; mood = p > 0.2 && p < 0.8 ? "shock" : "happy";
     } else if (t < 33) {
       const i = active, loc = t - 13 - i * 5, P = perch(i), Q = i > 0 ? perch(i - 1) : P;
       const j = seg(loc, 0.12, 0.62); // hop from the previous card
