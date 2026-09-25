@@ -22,7 +22,7 @@ scene(134, 160, (R, s) => {
   const SG = c05_abs("left:0;top:0;width:1920px;height:1000px", "", W);         // scale group
 
   // ---------- scale: post, beam, strings, pans (SVG)
-  const PIV = [960, 300], ARM = 500, DROP = 330;
+  const PIV = [960, 300], ARM = 500, DROP = 360;
   SG.innerHTML = `<svg width="1920" height="1000" style="position:absolute;left:0;top:0;overflow:visible">
     <g class="post">
       <path d="M850 872 L1070 872 L1036 832 L884 832Z" fill="#c98a4a" stroke="${INK}" stroke-width="4" stroke-linejoin="round"/>
@@ -46,31 +46,30 @@ scene(134, 160, (R, s) => {
   const P = { post: q(".post"), beam: q(".beam"), sL: q(".sL"), sR: q(".sR"), panL: q(".panL"), panR: q(".panR") };
 
   // pan tags (hang under each pan)
-  const mkTag = (col, bg, ko, en, icon) => c05_abs(`width:300px;padding:8px 12px 10px;text-align:center;${c05_card(bg, 14)};z-index:3`,
+  const mkTag = (col, bg, ko, en, icon) => c05_abs(`width:340px;white-space:nowrap;padding:8px 12px 10px;text-align:center;${c05_card(bg, 14)};z-index:3`,
     `<div style="font-size:34px;line-height:1.05;color:${col}">${icon} ${ko}</div><div style="font-size:22px;color:#6b5d52">${en}</div>`, SG);
   const tagL = mkTag("#2f6f94", "#e3f2f8", "전문성 · 본문", "EXPERTISE = the meal", "🍚");
   const tagR = mkTag("#c0405f", "#fde6ec", "유머 · 양념", "HUMOR = the seasoning", "🧂");
 
   // ---------- items dropped onto the pans
   const LI = [
-    [`<div style="font-size:30px;line-height:1.1">과정을 보여준다</div><div style="display:flex;gap:6px;margin:6px 0 2px">${["기획", "촬영", "편집", "완성"].map((x, i) => `<span style="font-size:22px;padding:0 8px;border:2px solid ${INK};border-radius:8px;background:${i < 3 ? "#d8ecd3" : "#fff3c4"}">${x}</span>`).join('<span style="font-size:22px">→</span>')}</div><div style="font-size:22px;color:#6b5d52">노동의 착시 · 과정이 보이면 더 가치 있게</div>`, "#eef7fb"],
-    [`<div style="display:flex;align-items:baseline;gap:12px"><span style="font-size:26px">후기 5개 →</span><span style="font-size:50px;line-height:1;color:#2f6f94">+270%</span></div><div style="font-size:22px;color:#6b5d52">구매 가능성 · <span style="color:#d98c1f">★4.0–4.7</span> 이 ★5.0 보다 잘 팔림</div>`, "#eef7fb"],
+    [`<div style="font-size:30px;line-height:1.1">과정을 보여준다</div><div style="display:flex;gap:6px;margin:6px 0 2px">${["기획", "촬영", "편집", "완성"].map((x, i) => `<span style="font-size:22px;padding:0 8px;border:2px solid ${INK};border-radius:8px;background:${i < 3 ? "#d8ecd3" : "#fff3c4"}">${x}</span>`).join('<span style="font-size:22px">→</span>')}</div><div style="font-size:22px;color:#6b5d52">노동의 착시 · 과정이 보이면 가치 ↑</div>`, "#eef7fb"],
+    [`<div style="display:flex;align-items:baseline;gap:12px"><span style="font-size:26px">후기 5개 →</span><span style="font-size:50px;line-height:1;color:#2f6f94">+270%</span></div><div style="font-size:22px;color:#6b5d52">구매 가능성 · <span style="color:#d98c1f">★4.0–4.7</span> &gt; ★5.0</div>`, "#eef7fb"],
     [`<div style="font-size:30px;line-height:1.1">숫자와 결과로 증명</div><div style="font-size:22px;color:#6b5d52">제작 기간 · 성과 · 고객 수</div>`, "#eef7fb"],
   ];
-  const RI = [["91%", "재밌는 브랜드를 선호"], ["72%", "경쟁사보다 웃긴 브랜드 선택"], ["90%", "웃긴 광고를 기억한다"]];
-  const lItems = LI.map(([h, bg]) => c05_abs(`width:420px;padding:10px 16px 12px;${c05_card(bg, 14)};transform-origin:50% 100%;z-index:4`, h, SG));
+  const RI = [["91%", "재밌는 브랜드가<br>더 좋다"], ["72%", "경쟁사 대신<br>웃긴 브랜드 선택"], ["90%", "웃긴 광고를<br>더 잘 기억"]];
+  const lItems = LI.map(([h, bg]) => c05_abs(`width:440px;white-space:nowrap;padding:10px 16px 12px;${c05_card(bg, 14)};transform-origin:50% 100%;z-index:4`, h, SG));
   const rItems = RI.map(([n, x]) => {
-    const e = c05_abs(`width:420px;padding:8px 18px 10px;${c05_card("#fff", 30)};display:flex;align-items:center;gap:16px;transform-origin:50% 100%;z-index:4`,
-      `<span style="font-size:56px;line-height:1;color:#c0405f">${n}</span><span style="font-size:26px;line-height:1.15">${x}</span>
+    const e = c05_abs(`width:440px;white-space:nowrap;padding:8px 18px 10px;${c05_card("#fff", 30)};display:flex;align-items:center;gap:16px;transform-origin:50% 100%;z-index:4`,
+      `<span style="font-size:56px;line-height:1;color:#c0405f">${n}</span><span style="font-size:26px;line-height:1.1">${x}</span>
        <svg width="34" height="22" style="position:absolute;left:36px;bottom:-21px;overflow:visible"><path d="M0 0 L8 20 L28 0" fill="#fff" stroke="${INK}" stroke-width="3" stroke-linejoin="round"/><path d="M2 -2 H26" stroke="#fff" stroke-width="5"/></svg>`, SG);
     return e;
   });
   const LAND_L = [137.9, 139.5, 141.1], LAND_R = [143.8, 145.3, 146.8];
-  const ITEM_H = [118, 100, 84], ITEM_HR = [82, 82, 82];
-  // impact text: "쿵!" for expertise, laughs for humor
+    // impact text: "쿵!" for expertise, laughs for humor
   const bursts = [...LAND_L.map((tt, i) => [tt, "쿵!", "#2f6f94", -1, i]), ...LAND_R.map((tt, i) => [tt, ["ㅋㅋㅋ", "HA!", "ㅎㅎ"][i], "#c0405f", 1, i])]
-    .map(b => { const e = c05_abs(`font-size:40px;color:${b[2]};z-index:6;-webkit-text-stroke:1px ${INK}`, b[1], SG); return [e, ...b]; });
-  const balance = c05_abs(`left:760px;top:120px;width:400px;text-align:center;padding:8px 0 10px;${c05_card("#fbe3b0", 14)};z-index:5`,
+    .map(b => { const e = c05_abs(`font-size:52px;color:${b[2]};z-index:6;-webkit-text-stroke:1px ${INK}`, b[1], SG); return [e, ...b]; });
+  const balance = c05_abs(`left:720px;top:560px;width:480px;white-space:nowrap;text-align:center;padding:8px 0 10px;${c05_card("#fbe3b0", 14)};z-index:5`,
     `<div style="font-size:36px">⚖ 본문 + 양념 = 균형!</div>`, SG);
 
   // ---------- Noa balancing on the fulcrum
@@ -78,7 +77,7 @@ scene(134, 160, (R, s) => {
   const noa = makeNoa(130); nw.appendChild(noa);
 
   // ---------- rule stamp
-  const rule = c05_abs(`left:380px;top:170px;width:1100px;padding:28px 44px 30px;${c05_card("#fffaf0", 22)};z-index:10;text-align:center`, `
+  const rule = c05_abs(`left:380px;top:230px;width:1100px;padding:28px 44px 30px;${c05_card("#fffaf0", 22)};z-index:10;text-align:center`, `
     <div style="font-size:26px;letter-spacing:5px;color:#c8372d">HUMOR RULE · 유머의 규칙</div>
     <div style="font-size:66px;line-height:1.12;margin-top:6px">상황은 비틀고,<br>고객은 놀리지 않는다</div>
     <div style="font-size:30px;color:#6b5d52;margin-top:6px">Joke about the situation — never the customer</div>
@@ -88,7 +87,7 @@ scene(134, 160, (R, s) => {
     </div>
     <div class="bv" style="font-size:26px;color:#6b5d52;margin-top:16px">웃음 = 살짝 어긋났지만, 안전할 때 (양성 위반 · benign violation)</div>`, W);
   const rOk = rule.querySelector(".ok"), rNo = rule.querySelector(".no"), rBv = rule.querySelector(".bv");
-  const stamp = c05_abs(`left:1330px;top:120px;width:200px;height:200px;border-radius:50%;border:7px double #c8372d;color:#c8372d;background:rgba(255,250,240,.85);
+  const stamp = c05_abs(`left:1330px;top:180px;width:200px;height:200px;border-radius:50%;border:7px double #c8372d;color:#c8372d;background:rgba(255,250,240,.85);
     display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:12;text-align:center;line-height:1.05`,
     `<div style="font-size:52px">SAFE</div><div style="font-size:28px">양성 위반</div><div style="font-size:22px">benign ✓</div>`, W);
   const ruleNoa = makeNoa(150); W.appendChild(ruleNoa);
@@ -106,7 +105,7 @@ scene(134, 160, (R, s) => {
         <div class="lp" style="font-size:40px;width:90px;text-align:right">0%</div></div>
       <div class="ls" style="margin-top:18px"></div>
     </div>`, R);
-  const STEPS = [["대본 확정", "Claude", 154.7], ["스틸 4장 생성", "Higgsfield", 155.7], ["5초 영상 렌더링", "Higgsfield", 159.4], ["페이지에 배치", "", 99]];
+  const STEPS = [["대본 확정", "Claude", 154.7], ["스틸 4장 생성", "Higgsfield", 155.7], ["5초 영상 렌더링", "Higgsfield", 159.4], ["페이지에 배치", "", 999]];
   const stepRows = STEPS.map(x => c05_abs("position:relative;display:flex;align-items:center;gap:16px;height:52px;font-size:32px",
     `<svg width="36" height="36" viewBox="0 0 36 36" style="flex:none"><circle cx="18" cy="18" r="15" fill="#fff" stroke="${INK}" stroke-width="3"/>
        <path class="ck" d="M9 18 L16 25 L28 11" stroke="#2f7a3a" stroke-width="5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
@@ -114,8 +113,8 @@ scene(134, 160, (R, s) => {
      <span class="nm">${x[0]}</span><span style="font-size:24px;color:#6b5d52">${x[1] ? "· " + x[1] : ""}</span>`, ld.querySelector(".ls")));
   const lt = ld.querySelector(".lt"), lc = ld.querySelector(".lc"), lb = ld.querySelector(".lb"), lp = ld.querySelector(".lp");
   // desk + Noa + coffee
-  const deskNoa = makeNoa(200); R.appendChild(deskNoa);
-  const desk = c05_abs("left:1170px;top:560px;width:620px;height:330px;z-index:31", `<svg width="620" height="330" overflow="visible">
+  const deskNoa = makeNoa(240); R.appendChild(deskNoa);
+  const desk = c05_abs("left:1170px;top:568px;width:620px;height:330px;z-index:31", `<svg width="620" height="330" overflow="visible">
     <rect x="60" y="250" width="22" height="80" fill="#b77a45" stroke="${INK}" stroke-width="4"/><rect x="538" y="250" width="22" height="80" fill="#b77a45" stroke="${INK}" stroke-width="4"/>
     <rect x="20" y="222" width="580" height="34" rx="8" fill="#d9a06a" stroke="${INK}" stroke-width="4"/>
     <path d="M40 232 H580" stroke="#fff" stroke-opacity=".4" stroke-width="4"/>
@@ -130,9 +129,9 @@ scene(134, 160, (R, s) => {
       <path class="st0" d="M-10 -52 q-8 -12 0 -24 q8 -12 0 -24"/><path class="st1" d="M8 -52 q-8 -12 0 -24 q8 -12 0 -24"/></g>
       ${cupSvg("#c8372d")}<text x="0" y="-12" text-anchor="middle" font-size="16" fill="#fff" font-family="GaeguLat">NOA</text></g></svg>`, R);
   const steams = [mug.querySelector(".st0"), mug.querySelector(".st1")];
-  const cnt = c05_abs(`left:1560px;top:400px;padding:6px 18px 8px;${c05_card("#fff3c4", 30)};font-size:44px;z-index:33;transform-origin:50% 50%`, "", R);
+  const cnt = c05_abs(`left:1560px;top:430px;padding:6px 18px 8px;${c05_card("#fff3c4", 30)};font-size:44px;z-index:33;transform-origin:50% 50%`, "", R);
   const noteA = c05_abs(`left:720px;top:720px;padding:8px 18px 10px;${c05_card("#e3f2f8", 12)};font-size:32px;color:#2f6f94;z-index:34`, "← 과정 공개 = 전문성", R);
-  const noteB = c05_abs(`left:1190px;top:440px;padding:8px 18px 10px;${c05_card("#fde6ec", 12)};font-size:32px;color:#c0405f;z-index:34`, "커피 = 유머 ↓", R);
+  const noteB = c05_abs(`left:1160px;top:640px;padding:8px 18px 10px;${c05_card("#fde6ec", 12)};font-size:32px;color:#c0405f;z-index:34`, "커피 = 유머 ↓", R);
 
   return t => {
     head.style.opacity = 1 - seg(t, 153.2, 153.6);
@@ -146,8 +145,8 @@ scene(134, 160, (R, s) => {
     const bd = seg(t, 134.6, 135.15), beamY = -520 * (1 - bd * bd);
     // beam angle: sum of damped steps (left items tip left, right items tip right) + landing wobble
     let th = 7 * c05_kick(t - 135.15);
-    LAND_L.forEach(tt => th -= 3.4 * c05_spring(t - tt));
-    LAND_R.forEach(tt => th += 3.4 * c05_spring(t - tt));
+    LAND_L.forEach(tt => th -= 3 * c05_spring(t - tt));
+    LAND_R.forEach(tt => th += 3 * c05_spring(t - tt));
     const rad = th * Math.PI / 180, cs = Math.cos(rad), sn = Math.sin(rad);
     P.beam.setAttribute("transform", `translate(0 ${beamY}) rotate(${th} 960 300)`);
     const ends = [[PIV[0] - ARM * cs, PIV[1] - ARM * sn + beamY], [PIV[0] + ARM * cs, PIV[1] + ARM * sn + beamY]];
@@ -160,21 +159,22 @@ scene(134, 160, (R, s) => {
     P.panL.setAttribute("transform", `translate(${pans[0][0]} ${pans[0][1]})`);
     P.panR.setAttribute("transform", `translate(${pans[1][0]} ${pans[1][1]})`);
     [tagL, tagR].forEach((g, k) => { const [px, py] = pans[k], p = back(seg(t, 135.2 + k * .25, 135.7 + k * .25));
-      g.style.left = (px - 150) + "px"; g.style.top = (py + 58) + "px"; g.style.opacity = clamp(p * 2);
+      g.style.left = (px - 170) + "px"; g.style.top = (py + 56) + "px"; g.style.opacity = clamp(p * 2);
       g.style.transform = `scale(${0.6 + 0.4 * p}) rotate(${(k ? 2 : -2) + 3 * Math.sin(t * 1.6 + k)}deg)`; });
     // items: fall, land with squash, then ride the pan
+    const hsL = lItems.map(e => e.offsetHeight), hsR = rItems.map(e => e.offsetHeight);
     const stackItem = (e, i, land, hs, k) => {
       const [px, py] = pans[k]; let below = 0; for (let j = 0; j < i; j++) below += hs[j] + 6;
       const p = seg(t, land - .45, land), fall = -620 * (1 - p * p), tau = t - land;
       const sq = tau > 0 ? 0.14 * Math.exp(-7 * tau) * Math.cos(20 * tau) : 0;
-      e.style.left = (px - 210) + "px"; e.style.top = (py + 8 - below - hs[i] + fall) + "px";
+      e.style.left = (px - 220) + "px"; e.style.top = (py + 8 - below - hs[i] + fall) + "px";
       e.style.opacity = t > land - .45 ? 1 : 0;
       e.style.transform = `scale(${1 + sq * .6}, ${1 - sq}) rotate(${(k ? 1 : -1) * (i % 2 ? 1.2 : -1) + (tau < 0 ? 6 * (1 - p) : 0)}deg)`;
     };
-    lItems.forEach((e, i) => stackItem(e, i, LAND_L[i], ITEM_H, 0));
-    rItems.forEach((e, i) => stackItem(e, i, LAND_R[i], ITEM_HR, 1));
+    lItems.forEach((e, i) => stackItem(e, i, LAND_L[i], hsL, 0));
+    rItems.forEach((e, i) => stackItem(e, i, LAND_R[i], hsR, 1));
     bursts.forEach(([e, tt, , , side, i]) => {
-      const tau = t - tt, [px, py] = pans[side > 0 ? 1 : 0], hs = side > 0 ? ITEM_HR : ITEM_H;
+      const tau = t - tt, [px, py] = pans[side > 0 ? 1 : 0], hs = side > 0 ? hsR : hsL;
       let h = 0; for (let j = 0; j <= i; j++) h += hs[j] + 6;
       const p = seg(tau, 0, .9);
       e.style.opacity = tau > 0 ? Math.sin(p * Math.PI) : 0;
@@ -186,7 +186,7 @@ scene(134, 160, (R, s) => {
     // Noa: drops onto the pivot, then balances with arms out
     const nd = seg(t, 135.4, 135.85), nY = -560 * (1 - nd * nd), nt = t - 135.85;
     const nsq = nt > 0 ? 0.2 * Math.exp(-6 * nt) * Math.cos(16 * nt) : 0;
-    const tilted = Math.abs(th) > 6.5;
+    const tilted = Math.abs(th) > 5.6;
     nw.style.transform = `translate(0px, ${beamY}px) rotate(${th * .8}deg)`;
     nw.style.opacity = t > 135.4 ? 1 : 0;
     poseNoa(noa, t, { x: -65, y: -140 + nY, s: 1, mood: tilted ? "shock" : "happy", talk: t > 136.3 && t < 137.2, look: -th / 8, hop: t > 147 && t < 148.4 ? (t - 147) / .7 % 1 : 0 });
@@ -212,7 +212,7 @@ scene(134, 160, (R, s) => {
     stamp.style.opacity = t < 151.65 ? 0 : clamp(sp * 4) * (1 - seg(t, 153.1, 153.5));
     stamp.style.transform = `translateY(${-160 * seg(t, 153.1, 153.5)}px) rotate(-14deg) scale(${st2 < 0 ? 3 - 2 * sp * sp : 1 + 0.08 * c05_kick(st2, 6, 20)})`;
     const rn = seg(t, 149.5, 150.1);
-    poseNoa(ruleNoa, t, { x: 1560, y: 560 + 200 * (1 - out(rn)), s: 1, mood: t < 150.9 || t > 151.5 ? "happy" : "shock", talk: t > 150.2 && t < 150.9 || t > 152.3 && t < 153,
+    poseNoa(ruleNoa, t, { x: 1540, y: 620 + 200 * (1 - out(rn)), s: 1.2, mood: t < 150.9 || t > 151.5 ? "happy" : "shock", talk: t > 150.2 && t < 150.9 || t > 152.3 && t < 153,
       look: -1, hop: t > 152 && t < 152.6 ? (t - 152) / .6 : 0, op: out(rn) * (1 - seg(t, 153.1, 153.4)) });
     // ================= loading screen (153.5–160)
     const L = back(seg(t, 153.5, 154.1));
@@ -238,9 +238,9 @@ scene(134, 160, (R, s) => {
     const D = out(seg(t, 153.9, 154.5));
     desk.style.opacity = D; desk.style.transform = `translateX(${200 * (1 - D)}px)`;
     const sipPh = ((t - 154.6) % 2.6 + 2.6) % 2.6, sip = t < 154.6 ? 0 : ease(seg(sipPh, .2, .6)) * (1 - ease(seg(sipPh, 1.3, 1.7)));
-    poseNoa(deskNoa, t, { x: 1330 + 200 * (1 - D), y: 530, s: 1, look: sip > .5 ? 0 : -1, mood: sip > .6 ? "pout" : "happy", op: D });
+    poseNoa(deskNoa, t, { x: 1400 + 200 * (1 - D), y: 575, s: 1, look: sip > .5 ? 0 : -1, mood: sip > .6 ? "pout" : "happy", op: D });
     deskNoa.P.ar.setAttribute("transform", `rotate(${-70 * sip} 154 118)`);
-    const mx = lerp(1570, 1478, sip), my = lerp(772, 668, sip);
+    const mx = lerp(1690, 1548, sip), my = lerp(790, 762, sip);
     mug.style.left = (mx + 200 * (1 - D)) + "px"; mug.style.top = my + "px"; mug.style.opacity = D;
     mug.style.transform = `rotate(${-24 * sip}deg)`;
     steams.forEach((e, i) => { const k = ((t * .9 + i * .5) % 1); e.setAttribute("opacity", (1 - sip) * Math.sin(k * Math.PI) * .9);

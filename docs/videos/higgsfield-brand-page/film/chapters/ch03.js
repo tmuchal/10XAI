@@ -90,11 +90,11 @@ scene(72, 106, (R, s) => {
   const GAG = [["beach", { body: "#9fd3f0" }], ["park", { glasses: true, scarf: "#6fb3d9", beret: "#3f8f7a" }], ["lilac", { spiky: true, body: "#f7c6d4" }]];
   const shots = GAG.map(([pal, v], i) => {
     const f = c03_frame(gag, 150 + i * 560, 300, 500, 290, c03_PAL[pal], `AI SHOT ${i + 1}`, v);
-    f.st = c03_stamp(gag, 150 + i * 560 + 250, 480, "✗ 다른 얼굴", "#c8372d", -10 + i * 5);
+    f.st = c03_stamp(gag, 150 + i * 560 + 250, 528, "✗ 다른 얼굴", "#c8372d", -10 + i * 5);
     return f;
   });
   const real = makeNoa(200); gag.appendChild(real);
-  const qm = [0, 1, 2].map(i => { const q = el("div", `left:${930 + i * 50}px;top:560px;font-size:${58 - i * 8}px;color:#c8372d;z-index:31`, "?", gag); q.className = "abs"; return q; });
+  const qm = [0, 1, 2].map(i => { const q = el("div", `left:${780 - i * 46}px;top:${690 - i * 20}px;font-size:${64 - i * 8}px;color:#c8372d;z-index:31`, "?", gag); q.className = "abs"; return q; });
   const sweat = el("div", "left:1050px;top:650px;z-index:32", `<svg width="30" height="40"><path d="M15 2 Q28 22 24 30 A10 10 0 0 1 6 30 Q2 22 15 2Z" fill="#9fd3f0" stroke="${c03_INK}" stroke-width="3"/></svg>`, gag); sweat.className = "abs";
   const whoB = makeBubble(gag), meB = [0, 1, 2].map(() => makeBubble(gag));
 
@@ -122,10 +122,10 @@ scene(72, 106, (R, s) => {
   });
   const outl = el("div", "position:absolute;left:0;top:0;width:1270px;height:600px;z-index:41;pointer-events:none", `<svg width="1270" height="600" overflow="visible">
     ${VIEWS.map((_, i) => `<rect class="ol" x="${26 + i * 306}" y="62" width="${PW}" height="${PH}" rx="12" fill="none" stroke="${c03_INK}" stroke-width="4" stroke-dasharray="${2 * (PW + PH)}" stroke-dashoffset="${2 * (PW + PH)}"/>`).join("")}
-    <path class="gd" d="M16 205 H1190" stroke="#c8372d" stroke-width="3" stroke-dasharray="14 10" fill="none"/>
-    <path class="gd" d="M16 352 H1190" stroke="#c8372d" stroke-width="3" stroke-dasharray="14 10" fill="none"/></svg>`, sheet);
+    <path class="gd" d="M16 205 H1228" stroke="#c8372d" stroke-width="3" stroke-dasharray="14 10" fill="none"/>
+    <path class="gd" d="M16 352 H1228" stroke="#c8372d" stroke-width="3" stroke-dasharray="14 10" fill="none"/></svg>`, sheet);
   const ols = [...outl.querySelectorAll(".ol")], gds = [...outl.querySelectorAll(".gd")];
-  const gdL = el("div", `position:absolute;left:1196px;top:186px;font-size:24px;color:#c8372d;line-height:1.3;z-index:42`, "머리<br><br><br><br>발", sheet);
+  const gdL = el("div", `position:absolute;left:1234px;top:186px;font-size:24px;color:#c8372d;line-height:1.3;z-index:42`, "머리<br><br><br><br>발", sheet);
   const pencil = el("div", "position:absolute;left:0;top:0;z-index:45", c03_PENCIL, sheet);
   const outfit = el("div", `position:absolute;left:26px;top:470px;right:26px;display:flex;align-items:center;gap:18px;font-size:30px;color:${c03_INK}`, "", sheet);
   const chips = [["#c8372d", "빨간 베레모"], ["#f2c14e", "노란 스카프"], ["#e8894f", "주황 박스 몸"]].map(([c, x]) => {
@@ -172,7 +172,7 @@ scene(72, 106, (R, s) => {
     <div class="ph" style="position:absolute;left:24px;top:44px;width:170px;height:200px;border:4px solid ${c03_INK};border-radius:12px;background:#fbe3b0;overflow:hidden"></div>
     <div style="position:absolute;left:220px;top:36px;font-size:28px;letter-spacing:3px;color:#c8372d">SOUL ID</div>
     <div style="position:absolute;left:218px;top:66px;font-size:78px;line-height:1;color:${c03_INK}">NOA</div>
-    <div style="position:absolute;left:220px;top:160px;font-size:24px;line-height:1.4;color:#6b5d52">사진 20장+ 학습<br>3~5분 · 이름 붙여 저장</div>
+    <div style="position:absolute;left:220px;top:160px;font-size:24px;line-height:1.4;color:#6b5d52">사진 20장+ 학습<br>3~5분 → 이름 저장</div>
     <div class="rt" style="position:absolute;left:150px;top:-34px;padding:4px 18px;border:4px solid ${c03_INK};border-radius:12px;background:#9fd3f0;font-size:28px;color:${c03_INK};white-space:nowrap;opacity:0">Reference Element</div>`;
   const cNoa = makeNoa(150); card.querySelector(".ph").appendChild(cNoa);
   const cardRt = card.querySelector(".rt");
@@ -198,7 +198,7 @@ scene(72, 106, (R, s) => {
     m.gear = m.querySelector(".g"); m.lts = [...m.querySelectorAll(".lt")]; m.ok = m.querySelector(".ok");
     m.chip = c03_box(R, 0, 0, 130, 86, "#fff4d0", "z-index:34;display:flex;align-items:center;gap:6px;padding:0 8px;overflow:hidden");
     m.chip.innerHTML = `<div style="width:46px;height:56px;border:3px solid ${c03_INK};border-radius:8px;background:#e8894f;position:relative"><div style="position:absolute;left:4px;top:-8px;width:36px;height:14px;border-radius:50%;background:#c8372d;border:3px solid ${c03_INK}"></div></div><div style="font-size:26px;color:${c03_INK}">NOA</div>`;
-    m.slot = [x + 180, 214]; m.at = 91.7 + i * .35;
+    m.sl = [x + 180, 214]; m.at = 91.7 + i * .35;
     return m;
   });
 
@@ -329,7 +329,7 @@ scene(72, 106, (R, s) => {
     const gp = ease(seg(t, 84.6, 85.2));
     gds.forEach(g => { g.setAttribute("stroke-dasharray", `14 10`); g.style.clipPath = `inset(0 ${100 - 100 * gp}% 0 0)`; });
     gdL.style.opacity = seg(t, 85.0, 85.3);
-    if (!pen && t > 84.45 && t < 85.3) pen = [16 + 1174 * gp, 205 + 147 * seg(t, 84.9, 85.2)];
+    if (!pen && t > 84.45 && t < 85.3) pen = [16 + 1212 * gp, 205 + 147 * seg(t, 84.9, 85.2)];
     pencil.style.opacity = pen ? 1 : 0;
     if (pen) pencil.style.transform = `translate(${pen[0]}px, ${pen[1] - 150}px) rotate(${4 * Math.sin(t * 30)}deg)`;
     chips.forEach((c, i) => { const p = back(seg(t, 85.2 + i * .18, 85.6 + i * .18)); c.style.opacity = clamp(p * 2); c.style.transform = `translateY(${30 * (1 - p)}px) scale(${.7 + .3 * p})`; });
@@ -373,8 +373,8 @@ scene(72, 106, (R, s) => {
     const cp = back(seg(t, 89.95, 90.4)), dock = ease(seg(t, 91.0, 91.55)), cOut = ease(seg(t, 94.6, 95.05));
     card.style.display = t > 89.9 && t < 95.1 ? "block" : "none";
     card.style.opacity = clamp(cp * 2) * (1 - cOut);
-    const cs = lerp(1, .62, dock) * (.4 + .6 * cp);
-    card.style.transform = `translate(${lerp(0, -560, dock) + 250 * (1 - cs / lerp(1, .62, dock)) }px, ${lerp(0, 120, dock) + 150 * (1 - cp)}px) scale(${cs}) rotate(${lerp(-2, 2, dock)}deg)`;
+    const cs = lerp(1, .72, dock) * (.4 + .6 * cp);
+    card.style.transform = `translate(${lerp(0, -560, dock) + 250 * (1 - cs / lerp(1, .72, dock)) }px, ${lerp(0, 120, dock) + 150 * (1 - cp)}px) scale(${cs}) rotate(${lerp(-2, 2, dock)}deg)`;
     poseNoa(cNoa, t, { x: 10, y: 34, s: 1, wave: t > 90.4 && t < 91.2 });
     c03_slam(saved, t, 90.45); saved.style.opacity = +saved.style.opacity * (1 - dock);
     const rtp = back(seg(t, 91.3, 91.7)); cardRt.style.opacity = clamp(rtp * 2); cardRt.style.transform = `scale(${rtp})`;
@@ -400,7 +400,7 @@ scene(72, 106, (R, s) => {
       const okp = back(seg(t, outAt + .25, outAt + .6)); m.ok.style.opacity = clamp(okp * 2); m.ok.style.transform = `scale(${.6 + .4 * okp})`;
       // flying reference chip: from the docked card into the machine's top slot
       const fp = seg(t, m.at, arrive), fe = ease(fp);
-      const sx = 290, sy = 470, [tx, ty] = m.slot;
+      const sx = 290, sy = 470, [tx, ty] = m.sl;
       const cx = lerp(sx, tx, fe) - 65, cy = lerp(sy, ty, fe) - 260 * Math.sin(Math.PI * fe) - 43 - 30 * seg(t, arrive - .1, arrive);
       m.chip.style.opacity = fp > 0 && t < arrive ? 1 : 0;
       m.chip.style.transform = `translate(${cx}px, ${cy}px) rotate(${360 * fe}deg) scale(${1 - .35 * seg(fp, .8, 1)})`;
