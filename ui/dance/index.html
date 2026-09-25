@@ -197,6 +197,39 @@ table.tbl td.num{text-align:right;white-space:nowrap}
 .recent button:hover{border-color:var(--accent)}
 .recent span{color:var(--text-3);font-size:11px;white-space:nowrap}
 .hidden{display:none!important}
+/* trends */
+.trends{max-width:980px;margin:16px auto 0}
+.trends-hd{display:flex;gap:10px;align-items:center;flex-wrap:wrap;font-size:12.5px;margin-bottom:8px}
+.trends-hd .asof{font-size:11px;color:var(--text-4)}
+.trends-hd .tgt{margin-left:auto;display:flex;gap:6px;align-items:center;font-size:11.5px;color:var(--text-3)}
+.trends-hd select{background:var(--surface);border:1px solid var(--border-2);border-radius:7px;padding:4px 6px;font-size:11.5px;color:var(--text-2);max-width:220px}
+.trend-cards{display:grid;grid-auto-flow:column;grid-auto-columns:minmax(240px,1fr);gap:10px;overflow-x:auto;padding-bottom:6px;scroll-snap-type:x mandatory}
+.tcard{scroll-snap-align:start;background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:11px 12px;display:flex;flex-direction:column;gap:6px;min-width:0}
+.tcard.on{border-color:var(--pink);box-shadow:0 0 0 2px var(--pink-bg)}
+.tcard .nm{font-weight:800;font-size:13px}
+.tcard .ko{font-size:11px;color:var(--pink);font-weight:700}
+.tcard .sum{font-size:11.5px;color:var(--text-2);display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+.tcard .pm{font-size:11px;color:var(--text-3)}
+.tcard .prof{display:grid;grid-template-columns:repeat(4,1fr);gap:3px 8px}
+.tcard .prof div{font-size:9.5px;color:var(--text-3);display:grid;grid-template-columns:1fr;gap:1px}
+.tcard .prof i{display:block;height:3px;background:var(--surface-3);border-radius:2px;overflow:hidden}
+.tcard .prof i b{display:block;height:100%;background:var(--pink)}
+.tcard .ex{font-size:11px;color:var(--text-2)}
+.tcard .ex a{text-decoration:none}
+.stag{font-size:9.5px;font-weight:700;padding:1px 6px;border-radius:999px;background:var(--surface-2);color:var(--text-3);margin-left:4px}
+.stag.ok{background:var(--accent-bg);color:var(--accent)}
+.tcard .acts{display:flex;gap:6px;margin-top:auto;flex-wrap:wrap}
+.recent-cb{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px;font-size:11px;color:var(--text-3);align-items:center}
+.recent-cb a{background:var(--surface-2);border:1px solid var(--border);border-radius:999px;padding:2px 9px;text-decoration:none;color:var(--text-2)}
+.recent-cb a:hover{border-color:var(--accent)}
+.tfit{display:grid;gap:6px;margin-top:14px}
+.tfit .row{display:grid;grid-template-columns:minmax(0,190px) 1fr 38px auto;gap:8px;align-items:center;font-size:12px}
+.tfit .row .track{height:7px;background:var(--surface-3);border-radius:4px;overflow:hidden}
+.tfit .row .track i{display:block;height:100%;background:var(--pink)}
+.tfit .row .nm{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tfit .row.tgt .nm{color:var(--pink);font-weight:800}
+.gaps{font-size:11.5px;color:var(--text-2);margin-top:4px}
+.gaps span{display:inline-block;margin:2px 6px 2px 0;padding:1px 7px;border-radius:6px;background:var(--amber-bg);color:var(--amber);font-family:var(--mono);font-size:11px}
 .ghost{opacity:0!important}
 /* members / fancam */
 .members-row{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:10px;padding-top:10px;border-top:1px solid var(--border)}
@@ -251,6 +284,16 @@ table.mem td.best{color:var(--accent);font-weight:800}
       <span class="chip" id="chip-yt">yt-dlp: …</span>
       <span class="chip" id="chip-coach">AI coach: …</span>
     </div>
+  </div>
+  <div class="trends" id="trends">
+    <div class="trends-hd">
+      <b>🔥 K-pop dance trends now</b>
+      <span class="asof" id="trends-asof"></span>
+      <label class="tgt">🎯 Target <select id="trend-target"><option value="">closest trend (auto)</option></select></label>
+      <button class="btn sm" id="trends-refresh" title="Re-research the latest trends on the web with your local claude CLI">↻ Refresh trends</button>
+    </div>
+    <div class="trend-cards" id="trend-cards"></div>
+    <div class="recent-cb" id="recent-cb"></div>
   </div>
 </section>
 

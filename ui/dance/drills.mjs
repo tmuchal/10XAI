@@ -74,6 +74,21 @@ function resolve(d, raw) {
   return { id: d.id, name: d.name, minutes: d.minutes, how: typeof d.how === "function" ? d.how(raw) : d.how, target: d.target(raw) };
 }
 
+export const DRILL_BY_ID = Object.fromEntries(Object.entries(DRILLS).flatMap(([axis, list]) => list.map((d) => [d.id, { ...d, axis }])));
+
+// Target a trend: close the biggest axis gaps first, then the trend's own drills.
+export function trendPlan(res, fit) {
+  const t = fit.trend, r = res.raw;
+  const ids = [];
+  for (const g of fit.gaps) if (g.delta > 0 && DRILLS[g.axis]) ids.push(DRILLS[g.axis][0].id);
+  for (const id of t.drills || []) ids.push(id);
+  const drills = [...new Set(ids)].filter((id) => DRILL_BY_ID[id]).slice(0, 4).map((id) => {
+    const d = DRILL_BY_ID[id], g = fit.gaps.find((x) => x.axis === d.axis);
+    return { ...resolve(d, r), axis: d.axis, why: g ? `${t.name}: ${d.axis} ${g.have} → ${g.want}` : `Core drill for ${t.name}.` };
+  });
+  return { trend: t, fit: fit.fit, gaps: fit.gaps, drills, cues: t.cues || [] };
+}
+
 export function buildPracticePlan(res) {
   const r = res.raw, axes = res.axes;
   const bpm = r.bpm || null;

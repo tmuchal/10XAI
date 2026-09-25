@@ -197,3 +197,23 @@ test("fragmented tracks of one dancer are stitched back together", async () => {
   assert.equal(ms.length, 1);
   assert.ok(ms[0].coverage > 0.85 && ms[0].main);
 });
+
+test("trend catalog validates and trend fit ranks the right style", async () => {
+  const { BUNDLED, validateTrends, rankTrends } = await import("../ui/dance/trends.mjs");
+  const { trendPlan } = await import("../ui/dance/drills.mjs");
+  const clean = validateTrends(BUNDLED);
+  assert.equal(clean.trends.length, BUNDLED.trends.length);
+  assert.throws(() => validateTrends({ trends: [{ name: "x", profile: { power: 50 } }] }), /profile/);
+  const dirty = validateTrends({ trends: [{ id: "A B<script>", name: "n", profile: { power: 500, flow: -3, groove: "70", bogus: 9 }, examples: [{ artist: "a", song: "s", source: "javascript:alert(1)" }] }] });
+  assert.equal(dirty.trends[0].id, "a-b-script-");
+  assert.deepEqual(dirty.trends[0].profile, { power: 100, flow: 0, groove: 70 });
+  assert.equal(dirty.trends[0].examples[0].source, "");
+  // A smooth, groovy, flowing dancer should not rank "Predator drop & freeze" first.
+  const d = generateDance({ style: "smooth" });
+  const a = analyzePose(d.frames, { beats: d.beats, bpm: d.bpm });
+  const rk = rankTrends(a.axes, BUNDLED);
+  assert.notEqual(rk[0].id, "drop-freeze");
+  assert.ok(rk[0].fit >= rk[rk.length - 1].fit);
+  const tp = trendPlan(a, rk.find((x) => x.id === "drop-freeze"));
+  assert.ok(tp.drills.length >= 2 && tp.gaps.some((g) => g.axis === "sharpness" && g.delta > 0));
+});

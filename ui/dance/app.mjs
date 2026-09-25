@@ -1,6 +1,7 @@
 // Dance Lab — page controller.
 import { analyzePose, groupSync, AXES, BONES, J, frameAt, matchWithTiming } from "./analyze.mjs";
-import { buildPracticePlan, fmtTime } from "./drills.mjs";
+import { buildPracticePlan, trendPlan, fmtTime } from "./drills.mjs";
+import { BUNDLED, rankTrends, youtubeSearch } from "./trends.mjs";
 import { detectBeatsFromMedia } from "./beat.mjs";
 import { generateGroup } from "./synth.mjs";
 import { buildMembers } from "./tracker.mjs";
@@ -28,6 +29,8 @@ const S = {
   sync: null,          // groupSync result
   view: "full",        // 'full' | 'fancam'
   fanAspect: 9 / 16,
+  trends: BUNDLED,     // trend catalog (server copy replaces it)
+  target: "",          // targeted trend id ("" = closest)
 };
 const COLORS = ["#79D86C", "#F472B6", "#7FB5FF", "#FBBF24", "#A78BFA", "#FB923C", "#2DD4BF", "#F87171", "#E5E7EB"];
 const selMember = () => S.members.find((m) => m.id === S.sel) || null;
@@ -318,6 +321,7 @@ function renderAll() {
   if (!has) $("coach-out").innerHTML = "";
   renderMembers();
   wirePlan();
+  document.querySelectorAll("#bd [data-trend]").forEach((b) => (b.onclick = () => setTarget(S.target === b.dataset.trend ? "" : b.dataset.trend)));
   drawTimeline();
   updateLoopChip();
 }
@@ -371,6 +375,7 @@ function breakdownHTML(a) {
       </div>
     </div>
     <div class="axes">${axesHTML}</div>
+    ${trendFitHTML(a)}
     <div class="stats">${stats}</div>
     <div class="two">
       <div><div class="sub">What makes it work</div><div class="list">${li(a.strengths)}</div></div>
@@ -378,6 +383,70 @@ function breakdownHTML(a) {
     </div>
     <div class="footnote">Tracking: ${q.usablePct}% of ${q.frames} frames usable · ${q.cuts} camera cut(s) or tracking switch(es) · ${q.analyzedSec}s analyzed${q.maxPeople > 1 ? ` · up to ${q.maxPeople} people in frame (following the most central dancer)` : ""}.
     TL = torso-lengths (≈ 50 cm), so numbers are comparable across camera distances. Scores map raw values onto fixed reference ranges; the raw values are the evidence.</div>`;
+}
+
+// ── trends ──────────────────────────────────────────────────────────────────
+const AXIS_SHORT = { power: "Power", sharpness: "Sharp", flow: "Flow", groove: "Groove", extension: "Lines", footwork: "Feet", levels: "Levels", rhythm: "Rhythm" };
+async function loadTrends() {
+  try { const r = await fetch("/api/dance/trends"); if (r.ok) S.trends = await r.json(); } catch {}
+  renderTrends();
+}
+function trendRank(analysis) { return analysis && analysis.ok !== false && analysis.axes ? rankTrends(analysis.axes, S.trends) : []; }
+function targetFit(analysis) {
+  const rk = trendRank(analysis);
+  return (S.target && rk.find((x) => x.id === S.target)) || rk[0] || null;
+}
+function renderTrends() {
+  const T = S.trends;
+  $("trends-asof").innerHTML = `as of ${esc(T.asOf)} · ${T.origin === "researched" ? "researched by claude" : "bundled snapshot"}${T.note ? ` · <span title="${esc(T.note)}">ⓘ</span>` : ""}`;
+  const sel = $("trend-target");
+  sel.innerHTML = '<option value="">closest trend (auto)</option>' + T.trends.map((t) => `<option value="${esc(t.id)}"${t.id === S.target ? " selected" : ""}>${esc(t.name)}${t.nameKo ? " · " + esc(t.nameKo) : ""}</option>`).join("");
+  $("trend-cards").innerHTML = T.trends.map((t) => {
+    const prof = Object.entries(t.profile).map(([k, v]) => `<div>${AXIS_SHORT[k] || k} ${v}<i><b style="width:${v}%"></b></i></div>`).join("");
+    const ex = (t.examples || []).map((e) => `<div class="ex">🎵 <b>${esc(e.artist)}</b> – ${esc(e.song)} <span class="stag${e.status === "confirmed release" ? " ok" : ""}">${e.status === "confirmed release" ? "confirmed" : "reported"}</span>${e.date ? ` · ${esc(e.date)}` : ""} · <a href="${youtubeSearch(`${e.artist} ${e.song} dance practice`)}" target="_blank" rel="noopener">▶ practice video</a>${e.source ? ` · <a href="${esc(e.source)}" target="_blank" rel="noopener">src</a>` : ""}</div>`).join("");
+    return `<div class="tcard${t.id === S.target ? " on" : ""}" data-id="${esc(t.id)}">
+      <div><div class="nm">${esc(t.name)}</div>${t.nameKo ? `<div class="ko">${esc(t.nameKo)}</div>` : ""}</div>
+      <div class="sum" title="${esc(t.summary)}">${esc(t.summary)}</div>
+      ${t.pointMove ? `<div class="pm">✦ ${esc(t.pointMove)}</div>` : ""}
+      <div class="prof">${prof}</div>
+      ${ex}
+      <div class="acts"><button class="btn sm" data-target="${esc(t.id)}">${t.id === S.target ? "✓ Targeted" : "🎯 Target this"}</button>
+      <a class="btn sm" href="${youtubeSearch(`kpop ${t.name} dance challenge 2026`)}" target="_blank" rel="noopener">▶ Examples</a></div>
+    </div>`;
+  }).join("");
+  $("trend-cards").querySelectorAll("[data-target]").forEach((b) => (b.onclick = () => setTarget(S.target === b.dataset.target ? "" : b.dataset.target)));
+  $("recent-cb").innerHTML = (T.recent || []).length ? "Recent comebacks to analyze: " + T.recent.map((r) => `<a href="${youtubeSearch(`${r.artist} ${r.song} dance practice`)}" target="_blank" rel="noopener" title="Search the dance practice video on YouTube, then paste its link above">${esc(r.artist)} – ${esc(r.song)}${r.date ? ` <span style="color:var(--text-4)">${esc(r.date.slice(5) || r.date)}</span>` : ""}</a>`).join("") : "";
+}
+function setTarget(id) {
+  S.target = id;
+  store.set("dance-target", id);
+  renderTrends();
+  renderAll();
+}
+$("trend-target").onchange = (e) => setTarget(e.target.value);
+$("trends-refresh").onclick = async () => {
+  const b = $("trends-refresh");
+  b.disabled = true; b.textContent = "↻ Researching… (1–3 min)";
+  try {
+    const r = await fetch("/api/dance/trends/refresh", { method: "POST" });
+    const j = await r.json();
+    if (!r.ok) throw new Error(j.error || "refresh failed");
+    S.trends = j; renderTrends(); renderAll();
+    setStatus(`Trends refreshed (${j.trends.length} styles, as of ${j.asOf}).`);
+  } catch (e) { setStatus(String(e.message || e), true); }
+  finally { b.disabled = false; b.textContent = "↻ Refresh trends"; }
+};
+
+function trendFitHTML(a) {
+  const rk = trendRank(a);
+  if (!rk.length) return "";
+  const tf = targetFit(a);
+  const rows = rk.slice(0, 3);
+  if (S.target && !rows.some((x) => x.id === S.target)) rows.push(rk.find((x) => x.id === S.target));
+  const gaps = tf.gaps.length ? tf.gaps.slice(0, 4).map((g) => `<span>${AXIS_SHORT[g.axis]} ${g.have}→${g.want} (${g.delta > 0 ? "+" : ""}${g.delta})</span>`).join("") : "Already on-profile — polish the point move and timing.";
+  return `<div class="block"><h4>Trend fit · K-pop ${esc(S.trends.asOf)}</h4>
+    <div class="tfit">${rows.map((x) => `<div class="row${x.id === tf.id ? " tgt" : ""}"><span class="nm" title="${esc(x.trend.nameKo || "")}">${esc(x.trend.name)}</span><span class="track"><i style="width:${x.fit}%"></i></span><span class="num">${x.fit}%</span><button class="btn sm" data-trend="${esc(x.id)}">${x.id === S.target ? "✓" : "🎯"}</button></div>`).join("")}</div>
+    <div class="gaps"><b>${S.target ? "To hit your target" : "To lean into the closest trend"} (${esc(tf.trend.name)}):</b> ${gaps}</div></div>`;
 }
 
 // ── rendering: members ──────────────────────────────────────────────────────
@@ -405,7 +474,7 @@ function membersHTML() {
   const bestSync = Math.max(...ok.map((m) => syncOf(m).sync ?? -1));
   const rows = S.members.map((m) => {
     const a = m.analysis;
-    if (!a.ok) return `<tr><td><span class="dot" style="background:${m.color}"></span>${esc(m.name)}</td><td colspan="${cols.length + 4}" style="color:var(--text-4)">${esc(a.reason)}</td></tr>`;
+    if (!a.ok) return `<tr><td><span class="dot" style="background:${m.color}"></span>${esc(m.name)}</td><td colspan="${cols.length + 5}" style="color:var(--text-4)">${esc(a.reason)}</td></tr>`;
     const ps = syncOf(m);
     const lag = ps.lagMs == null ? "–" : Math.abs(ps.lagMs) < 40 ? "on time" : ps.lagMs > 0 ? `${ps.lagMs} ms late` : `${-ps.lagMs} ms early`;
     return `<tr class="${m.id === S.sel ? "sel" : ""}">
@@ -415,6 +484,7 @@ function membersHTML() {
       ${cols.map(([k]) => `<td class="num${a.axes[k] === best[k] && ok.length > 1 ? " best" : ""}">${a.axes[k]}</td>`).join("")}
       <td class="num${ps.sync === bestSync && ok.length > 1 ? " best" : ""}">${ps.sync ?? "–"}</td>
       <td class="num ${ps.lagMs != null && Math.abs(ps.lagMs) >= 80 ? "bad" : ""}">${lag}</td>
+      <td style="white-space:nowrap">${(() => { const f = targetFit(a); return f ? `${esc(f.trend.name)} <b class="num">${f.fit}%</b>` : "–"; })()}</td>
       <td><button class="btn sm" data-fancam="${m.id}">🎥</button></td></tr>`;
   }).join("");
   const top = (label, fn, fmt) => {
@@ -441,7 +511,7 @@ function membersHTML() {
     </div>`;
   }
   return `${syncHTML}${stand}
-    <div class="block"><h4>Member comparison</h4><div class="tblwrap"><table class="tbl mem"><thead><tr><th>Member</th><th class="num">Seen</th><th>Style</th>${cols.map(([, l]) => `<th class="num">${l}</th>`).join("")}<th class="num">Sync</th><th class="num">Timing</th><th></th></tr></thead><tbody>${rows}</tbody></table></div>
+    <div class="block"><h4>Member comparison</h4><div class="tblwrap"><table class="tbl mem"><thead><tr><th>Member</th><th class="num">Seen</th><th>Style</th>${cols.map(([, l]) => `<th class="num">${l}</th>`).join("")}<th class="num">Sync</th><th class="num">Timing</th><th>Trend fit</th><th></th></tr></thead><tbody>${rows}</tbody></table></div>
     <div class="footnote">Click a member to switch every tab (Breakdown, Practice plan, Practice mode, AI coach) to them; 🎥 opens their fancam. Sync = average pose match with the other members (100 = identical); timing = median offset against the others. Members are numbered left→right; double-click a chip above the stage to rename.</div></div>`;
 }
 
@@ -456,8 +526,15 @@ function planHTML(p) {
   const drills = p.drills.map((d) => `<div class="drill"><div class="top"><b>${esc(d.name)}</b><span>${d.minutes} min</span></div><div class="why">${esc(d.why)}</div><ol>${d.how.map((h) => `<li>${esc(h)}</li>`).join("")}</ol><div class="target">🎯 ${esc(d.target)}</div></div>`).join("");
   const session = p.session.map((b) => `<tr><td><b>${esc(b.block)}</b></td><td>${esc(b.detail)}</td><td class="num">${b.minutes} min</td></tr>`).join("");
   const weeks = p.weeks.map((w) => `<tr><td><b>Week ${w.week}</b><br><span style="color:var(--text-3)">${esc(w.goal)}</span></td><td colspan="2">${esc(w.detail)}</td></tr>`).join("");
-  return `
-    <div class="block" style="margin-top:0"><h4>How to get this feel</h4><div class="cues">${cues}</div></div>
+  const tf = targetFit(a);
+  const tp = tf ? trendPlan(a, tf) : null;
+  const trendBlock = tp ? `<div class="block" style="margin-top:0"><h4>🎯 Trend target · ${esc(tp.trend.name)}${tp.trend.nameKo ? " · " + esc(tp.trend.nameKo) : ""} · fit ${tp.fit}%</h4>
+      <div style="font-size:12px;color:var(--text-2);margin-bottom:8px">${esc(tp.trend.summary)}${tp.trend.pointMove ? ` <b>Point move:</b> ${esc(tp.trend.pointMove)}` : ""}</div>
+      ${tp.gaps.length ? `<div class="gaps" style="margin-bottom:8px">${tp.gaps.map((g) => `<span>${AXIS_SHORT[g.axis]} ${g.have}→${g.want}</span>`).join("")}</div>` : ""}
+      ${tp.cues.length ? `<div class="cues" style="margin-bottom:10px">${tp.cues.map((c) => `<div class="cue"><b>Trend cue</b><span>${esc(c)}</span></div>`).join("")}</div>` : ""}
+      <div class="drills">${tp.drills.map((d) => `<div class="drill"><div class="top"><b>${esc(d.name)}</b><span>${d.minutes} min</span></div><div class="why">${esc(d.why)}</div><ol>${d.how.map((h) => `<li>${esc(h)}</li>`).join("")}</ol><div class="target">🎯 ${esc(d.target)}</div></div>`).join("")}</div></div>` : "";
+  return `${trendBlock}
+    <div class="block"${tp ? "" : ' style="margin-top:0"'}><h4>How to get this feel</h4><div class="cues">${cues}</div></div>
     <div class="block"><h4>Tempo ladder ${p.bpm ? `· ${Math.round(p.bpm)} BPM (${p.bpmSource})` : ""}</h4><div class="ladder">${ladder}</div>
       <div class="footnote" style="margin-top:6px">Click a rung to set the playback speed. Move up only when your Practice-mode match score is ≥ 70.</div></div>
     <div class="block"><h4>Start here — killing-part candidates</h4><div class="focus">${focus}</div></div>
@@ -864,7 +941,7 @@ $("coach-go").onclick = async () => {
   try {
     const r = await fetch("/api/dance/coach", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({
       lang: $("coach-lang").value,
-      report: { source: { title: S.source && S.source.title }, member: selMember() && selMember().name, groupSync: S.sync && selMember() ? { overall: S.sync.overall, member: S.sync.perMember[S.sel] } : null, ...S.analysis, plan: S.plan },
+      report: { source: { title: S.source && S.source.title }, member: selMember() && selMember().name, trendFit: trendRank(S.analysis).slice(0, 3).map((x) => ({ trend: x.trend.name, fit: x.fit, gaps: x.gaps })), trendTarget: S.target || null, groupSync: S.sync && selMember() ? { overall: S.sync.overall, member: S.sync.perMember[S.sel] } : null, ...S.analysis, plan: S.plan },
     }) });
     const j = await r.json();
     if (!r.ok) throw new Error(j.error || "coach failed");
@@ -874,7 +951,9 @@ $("coach-go").onclick = async () => {
 };
 
 // ── boot ────────────────────────────────────────────────────────────────────
+S.target = store.get("dance-target") || "";
 loadTools();
+loadTrends();
 loadRecent();
 renderAll();
 const m = location.hash.match(/r=([a-f0-9]{12})/);

@@ -30,6 +30,7 @@ Write a practice brief with these sections (Markdown, short paragraphs and bulle
 2. **What makes it look good** — the strengths, each tied to a measured number.
 3. **Where it's weaker / what not to copy** — trade-offs and watch-outs, honestly.
 4. **How to get this feel** — 4–6 body cues a learner can apply today (stance, bounce direction, stops, arms, focus).
-5. **7-day plan** — one line per day, using the tempo ladder (0.5x → 0.75x → 1x) and the killing-part timestamps.
+5. **Trend angle** — using `trendFit` (and `trendTarget` if set): which current K-pop trend this dance is closest to, and the 2–3 concrete changes (from `gaps`) to make it read as that trend.
+6. **7-day plan** — one line per day, using the tempo ladder (0.5x → 0.75x → 1x) and the killing-part timestamps.
 
-Stay under 450 words. No medical claims; mention warming up knees before level changes if `levels` ≥ 50.
+Stay under 520 words. No medical claims; mention warming up knees before level changes if `levels` ≥ 50.

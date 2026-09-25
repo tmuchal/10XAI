@@ -14,6 +14,8 @@
  *   GET  /api/dance/reports/:id     → one saved analysis
  *   POST /api/dance/reports         → save an analysis
  *   POST /api/dance/coach           → { report, lang } → Markdown brief
+ *   GET  /api/dance/trends          → K-pop trend catalog (researched copy or bundled snapshot)
+ *   POST /api/dance/trends/refresh  → re-research trends with the claude CLI (WebSearch)
  */
 const fs = require("fs");
 const path = require("path");
@@ -90,6 +92,41 @@ module.exports = function createDanceRoutes({ root, workspace }) {
     return p;
   }
 
+  // Trend catalog: a claude-researched copy in workspace wins over the bundled snapshot.
+  const TRENDS_FILE = path.join(DATA, "trends.json");
+  let trendsMod = null;
+  const loadTrendsMod = async () => (trendsMod ||= await import(require("url").pathToFileURL(path.join(UI_DIR, "trends.mjs")).href));
+  let refreshing = null;
+  function refreshTrends() {
+    if (refreshing) return refreshing;
+    refreshing = (async () => {
+      const mod = await loadTrendsMod();
+      let prompt = "";
+      try { prompt = fs.readFileSync(path.join(root, "agents", "dance-trend-agent.md"), "utf-8").replace(/^---[\s\S]*?---\s*/, ""); } catch {}
+      prompt += "\n\nToday is " + new Date().toISOString().slice(0, 10) + ". Allowed axis keys: " + mod.AXIS_KEYS.join(", ") +
+        ". Allowed drill ids: hit-freeze, accent-map, full-out-8s, plie-drops, waves, slow-motion, bounce, groove-walk, lines, step-ladder, level-changes, count-clap, weak-side, chest-iso." +
+        "\nCurrent catalog for reference (update, don't just copy):\n```json\n" + JSON.stringify(mod.BUNDLED) + "\n```";
+      const out = await new Promise((resolve, reject) => {
+        const env = Object.assign({}, process.env); delete env.ANTHROPIC_API_KEY;
+        const proc = spawn("claude", ["-p", "--model", "sonnet", "--no-session-persistence", "--allowedTools", "WebSearch,WebFetch"], { cwd: root, env, stdio: ["pipe", "pipe", "pipe"] });
+        let o = "", e = "";
+        const timer = setTimeout(() => proc.kill(), 6 * 60 * 1000);
+        proc.stdout.on("data", (d) => (o += d)); proc.stderr.on("data", (d) => (e += d));
+        proc.on("error", (err) => { clearTimeout(timer); reject(err); });
+        proc.on("close", (code) => { clearTimeout(timer); o.trim() ? resolve(o) : reject(new Error(e.trim().slice(-300) || "claude exited " + code)); });
+        proc.stdin.end(prompt);
+      });
+      const m = out.match(/```(?:json)?\s*([\s\S]*?)```/);
+      const raw = (m ? m[1] : out).trim();
+      const obj = JSON.parse(raw.slice(raw.indexOf("{"), raw.lastIndexOf("}") + 1));
+      const clean = mod.validateTrends({ ...obj, origin: "researched" });
+      fs.mkdirSync(DATA, { recursive: true });
+      fs.writeFileSync(TRENDS_FILE, JSON.stringify(clean, null, 2));
+      return clean;
+    })().finally(() => { refreshing = null; });
+    return refreshing;
+  }
+
   function coach(report, lang) {
     return new Promise((resolve, reject) => {
       let prompt = "";
@@ -123,6 +160,15 @@ module.exports = function createDanceRoutes({ root, workspace }) {
         return serveFile(res, path.join(UI_DIR, rel)) || (json(res, 404, { error: "not found" }), true);
       }
       if (req.method === "GET" && p === "/api/dance/status") return json(res, 200, tools), true;
+      if (req.method === "GET" && p === "/api/dance/trends") {
+        const mod = await loadTrendsMod();
+        try { return json(res, 200, mod.validateTrends(JSON.parse(fs.readFileSync(TRENDS_FILE, "utf-8")))), true; }
+        catch { return json(res, 200, mod.BUNDLED), true; }
+      }
+      if (req.method === "POST" && p === "/api/dance/trends/refresh") {
+        if (!tools.claude) return json(res, 501, { error: "Refreshing trends needs the local claude CLI (it researches the web). Showing the bundled snapshot." }), true;
+        return json(res, 200, await refreshTrends()), true;
+      }
       if (req.method === "GET" && p === "/api/dance/meta") {
         const id = youtubeId(url.searchParams.get("url"));
         if (!id) return json(res, 400, { error: "Not a YouTube URL" }), true;
