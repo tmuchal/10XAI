@@ -223,7 +223,7 @@ function makeNoa(size = 200, v = {}) {
       ${bk ? `<circle class="tl" cx="100" cy="190" r="10" fill="${c.body}" ${S} stroke-width="4"/><path d="M95 186 Q99 183 103 185" stroke="#fff" stroke-opacity=".5" stroke-width="2.5" fill="none" stroke-linecap="round"/>` : ""}
       <g class="pwl"><rect x="28" y="152" width="30" height="20" rx="10" fill="${c.body}" ${S} stroke-width="4.5"/><path d="M32 158 v8 M37 158 v9" stroke="${INK}" stroke-width="2" opacity=".5"/></g>
       <g class="pwr"><rect x="142" y="152" width="30" height="20" rx="10" fill="${c.body}" ${S} stroke-width="4.5"/><path d="M168 158 v8 M163 158 v9" stroke="${INK}" stroke-width="2" opacity=".5"/></g>
-      ${bk && shades ? `<g class="sgb" fill="none" stroke="#211c1b" stroke-linecap="round"><path d="M30 104 Q44 92 60 82" stroke-width="6"/><path d="M170 104 Q156 92 140 82" stroke-width="6"/>
+      ${bk && shades ? `<g class="sgb" fill="none" stroke="#211c1b" stroke-linecap="round"><path d="M28 104 Q38 86 56 74" stroke-width="7"/><path d="M172 104 Q162 86 144 74" stroke-width="7"/>
         <path d="M26 100 L34 96 L36 108 L28 110Z M174 100 L166 96 L164 108 L172 110Z" fill="#211c1b" stroke-width="3"/></g>` : ""}
       <g class="face"${bk ? ` style="display:none"` : ""}>
         <ellipse cx="100" cy="126" rx="28" ry="18" fill="${c.belly}"/>

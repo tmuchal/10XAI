@@ -127,17 +127,17 @@ scene(72, 106, (R, s) => {
   const VIEWS = [["얼굴 클로즈업 · 정면", "HEADSHOT"], ["전신 · 앞", "FULL BODY FRONT"], ["전신 · 뒤", "FULL BODY BACK"]];
   const panels = VIEWS.map((v, i) => {
     const p = el("div", `position:absolute;left:${PX[i]}px;top:${PY}px;width:${PWS[i]}px;height:${PH}px;border-radius:12px;overflow:hidden;background:#d6d6d6`, "", sheet);
-    p.n = makeNoa(i === 0 ? 540 : 230, i === 2 ? { back: true } : {}); p.appendChild(p.n);
+    p.n = makeNoa(i === 0 ? 540 : 260, i === 2 ? { back: true } : {}); p.appendChild(p.n);
     p.lb = el("div", `position:absolute;left:50%;bottom:8px;transform:translateX(-50%);padding:2px 14px 4px;border-radius:10px;background:rgba(255,250,240,.9);text-align:center;line-height:1.05;white-space:nowrap;font-size:26px;color:${c03_INK};z-index:40`, `${v[0]}<br><span style="font-size:17px;letter-spacing:2px;color:#6b5d52">${v[1]}</span>`, p);
     return p;
   });
-  const HT = PY + 59 + 48 * 1.15, FT = PY + 59 + 204 * 1.15;   // head-top / feet lines of the full-body Noas
+  const HT = PY + 8 + 48 * 1.3, FT = PY + 8 + 204 * 1.3;   // head-top / feet lines of the full-body Noas
   const outl = el("div", "position:absolute;left:0;top:0;width:1270px;height:600px;z-index:41;pointer-events:none", `<svg width="1270" height="600" overflow="visible">
     ${VIEWS.map((_, i) => `<rect class="ol" x="${PX[i]}" y="${PY}" width="${PWS[i]}" height="${PH}" rx="12" fill="none" stroke="${c03_INK}" stroke-width="4" stroke-dasharray="${2 * (PWS[i] + PH)}" stroke-dashoffset="${2 * (PWS[i] + PH)}"/>`).join("")}
-    <path class="gd" d="M456 ${HT} H1214" stroke="#c8372d" stroke-width="3" stroke-dasharray="14 10" fill="none"/>
-    <path class="gd" d="M456 ${FT} H1214" stroke="#c8372d" stroke-width="3" stroke-dasharray="14 10" fill="none"/></svg>`, sheet);
+    <path class="gd" d="M456 ${HT} H1206" stroke="#c8372d" stroke-width="3" stroke-dasharray="14 10" fill="none"/>
+    <path class="gd" d="M456 ${FT} H1206" stroke="#c8372d" stroke-width="3" stroke-dasharray="14 10" fill="none"/></svg>`, sheet);
   const ols = [...outl.querySelectorAll(".ol")], gds = [...outl.querySelectorAll(".gd")];
-  const gdL = el("div", `position:absolute;left:1220px;top:${HT - 16}px;height:${FT - HT + 32}px;display:flex;flex-direction:column;justify-content:space-between;font-size:24px;color:#c8372d;z-index:42`, "<div>머리</div><div>발</div>", sheet);
+  const gdL = el("div", `position:absolute;left:1212px;top:${HT - 16}px;height:${FT - HT + 32}px;display:flex;flex-direction:column;justify-content:space-between;font-size:24px;color:#c8372d;z-index:42`, "<div>머리</div><div>발</div>", sheet);
   const pencil = el("div", "position:absolute;left:0;top:0;z-index:45", c03_PENCIL, sheet);
   const outfit = el("div", `position:absolute;left:26px;top:438px;right:26px;display:flex;align-items:center;gap:18px;font-size:30px;color:${c03_INK}`, "", sheet);
   const chips = [["#211c1b", "까만 선글라스"], ["#f2c14e", "노란 스카프"], ["#e9a257", "주황 햄스터 털"]].map(([c, x]) => {
@@ -350,7 +350,7 @@ scene(72, 106, (R, s) => {
       p.style.opacity = seg(t, DR[i] + .15, DR[i] + .45);
       const np = back(seg(t, DR[i] + .35, DR[i] + .75));
       if (i === 0) poseNoa(p.n, t, { x: -60, y: -108 + 60 * (1 - np), s: np, look: 0, blink: false });
-      else poseNoa(p.n, t, { x: 65, y: 59 + 40 * (1 - np), s: np, look: 0, arms: "down", blink: false });
+      else poseNoa(p.n, t, { x: 50, y: 8 + 40 * (1 - np), s: np, look: 0, arms: "down", blink: false });
       p.lb.style.opacity = seg(t, DR[i] + .5, DR[i] + .8);
     });
     const gp = ease(seg(t, 84.6, 85.2));

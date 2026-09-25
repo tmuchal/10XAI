@@ -18,7 +18,7 @@ window.CAPTIONS = [
   {"start": 67.69, "end": 70.38, "en": "Chin up, Noa. Guides get the best lines.", "ko": "힘내, 노아. 명대사는 원래 길잡이 몫이야."},
   {"start": 73.0, "end": 77.5, "en": "Ever generated three shots and gotten three different faces? Noa has.", "ko": "세 컷 뽑았더니 얼굴이 세 개? 노아가 그랬어요."},
   {"start": 77.9, "end": 81.76, "en": "Blue Noa. Nerdy Noa. Spiky Noa. Who are these hamsters?", "ko": "파란 노아, 범생이 노아, 삐죽머리 노아. 이 햄스터들 누구야?"},
-  {"start": 82.2, "end": 85.76, "en": "Fix one: a character sheet. Four angles, one outfit.", "ko": "해법 하나, 캐릭터 시트. 네 가지 각도, 의상은 하나."},
+  {"start": 82.2, "end": 86.62, "en": "One: a character sheet on grey. Face close-up, full body front and back.", "ko": "하나, 회색 배경 캐릭터 시트. 얼굴 클로즈업, 앞·뒤 전신."},
   {"start": 86.7, "end": 91.47, "en": "Two: Soul ID. Twenty-plus photos, three to five minutes, one saved face.", "ko": "둘, Soul ID. 사진 20장 이상, 3~5분이면 얼굴이 저장돼요."},
   {"start": 91.52, "end": 95.66, "en": "Three: reuse that face in Kling or Seedance with Reference Element.", "ko": "셋, Reference Element로 Kling·Seedance에 재사용."},
   {"start": 95.71, "end": 99.53, "en": "Four: lock outfit and hair. Five: references beat seeds.", "ko": "넷, 의상과 헤어 고정. 다섯, 시드보다 레퍼런스."},

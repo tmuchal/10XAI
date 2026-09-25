@@ -33,7 +33,7 @@
 ## 03 · 사람(캐릭터) 일관성 (1:12–1:46)
 - **개그**: 영상 3컷을 뽑았더니 노아가 컷마다 다른 얼굴(파란 몸, 안경, 삐죽 머리). 진짜 노아: "…누구세요?" 셋이 동시에 "나야."
 - **해결 5단계** (화면에 차례로):
-  1. **캐릭터 시트**: 정면·3/4·측면·클로즈업 4컷, 의상 하나로 고정
+  1. **캐릭터 시트** (Higgsfield Cinema Studio 기준): 회색 무지 배경 한 장에 3컷. ① 얼굴 클로즈업(얼굴+어깨, 정면, 차분한 시선)이 얼굴을 고정하고, ② 전신 앞(머리부터 신발까지, 똑바로 선 자세, 팔은 편하게, 카메라 정면) ③ 전신 뒤(같은 자세, 뒤돌아선 모습)가 의상과 비율을 고정. 이 레퍼런스 한 장이 수십 컷에 걸쳐 얼굴·의상·비율을 유지시킨다. 건너뛰면 새로 생성할 때마다 인물이 새로 만들어진다. 출처: [Higgsfield Academy · Character sheets in Soul Cinema](https://higgsfield.ai/academy/courses/santiago-cinematic/character-sheets-in-soul-cinema)
   2. **Soul ID**: 같은 사람 사진 20장 이상 → 약 3~5분 학습 → 이름 붙여 저장
   3. **Reference Element**: 저장한 얼굴을 Kling 3.0·Seedance 2.0 영상에 그대로 재사용
   4. **의상·헤어 고정**: 프롬프트마다 반복 + 네거티브 프롬프트로 변형 차단
@@ -79,6 +79,7 @@ node render.cjs 30 immersive.mp4 immersive-film.html
 - Lindgaard, G. et al. (2006). *Attention web designers: You have 50 milliseconds to make a good first impression!* Behaviour & IT 25(2). https://www.tandfonline.com/doi/abs/10.1080/01449290500330448
 - StoryBrand SB7 framework (Donald Miller). https://umbrex.com/resources/frameworks/marketing-frameworks/storybrand-sb7-framework/
 - Scrollytelling 체류시간·스크롤 깊이 (Infogram × DC Thomson 2015, 인용). https://scrollytelling.ai/what-is-scrollytelling/
+- Higgsfield Academy, Character sheets in Soul Cinema (회색 배경 3컷 캐릭터 시트). https://higgsfield.ai/academy/courses/santiago-cinematic/character-sheets-in-soul-cinema
 - Higgsfield Soul ID. https://higgsfield.ai/blog/Soul-ID-AI-Character-Consistency · https://higgsfield.ai/blog/sould-id-best-character-consistency
 - Kling 3.0 캐릭터 일관성 (레퍼런스 4컷, Elements, 시드 vs 레퍼런스). https://www.atlascloud.ai/blog/guides/how-to-use-kling-3.0-for-character-consistency · https://www.neolemon.com/blog/kling-ai-grok-ai-character-consistency-tips/
 - Google 모바일 로딩 속도와 이탈. https://www.marketingdive.com/news/google-53-of-mobile-users-abandon-sites-that-take-over-3-seconds-to-load/426070/
