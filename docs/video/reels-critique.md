@@ -303,3 +303,73 @@ Durations are unchanged: R01 1 · R02 1 · R03 1 · R04 2.5 · R05 3 · R06 2.5 
 - draw:
   - Put the paw on the glass, not the board: move `paw(118, 330, 1.8, -12)` to `paw(150, 470, 2.2, -12)` so it sits over the stage and hamster zone, below the board and in front of everything. Add a white smudge: `<ellipse cx="150" cy="485" rx="46" ry="30" fill="#fff" opacity=".35"/>`.
   - Uchu stays at x 412 (the right side). With REMAKE R01's mirror fix, he is on the right in both frames, so the cut is seamless.
+
+---
+
+# Round 3: re-score after the Round 2 fixes
+
+I re-rendered all 13 frames at 540×960 and viewed each one. Hard limits were checked in code against the raw `SHOTS` strings and the rendered subtitle rects. Fonts fell back again because Google Fonts was blocked, so the fallback is slightly wider than Gaegu.
+
+## Hard-limit audit
+
+| Check | Result |
+|---|---|
+| Runtime | **30.0 s** (13 shots) ✓ |
+| KO ≤ 16 characters incl. spaces | 13/13 ✓ (R06 and R09 at exactly 16) |
+| Subtitle strip inside x 30–480 | 13/13 ✓ (widest 59–451) |
+| Strip above y 765 | 13/13 ✓ (bottom 757) |
+| EN↔KO highlight pairs | **13/13 ✓**. R12 is now `Ship SKILL.md. Next *free* post?` ↔ `다음 *공짜* 글, 재볼까?` |
+| ~햄 count | 2 (R02, R10) ✓ |
+| Words per second | max 2.4 ✓ |
+| EN ≤ 33 characters | 13/13 ✓ |
+
+## Scorecard (Round 1 → Round 2 → Round 3)
+
+| # | Criterion (weight) | R1 | R2 | R3 | Round 3 justification |
+|---|---|---|---|---|---|
+| 1 | Hook ×2 | 5 | 8 | **9** | The three seconds are now verdict (~~FREE~~ → $0.40, deadpan hamster, shocked Uchu) → squad sprinting on a direction arrow with a running clock → rewind with both leads on screen. One flaw: Uchu's "!!" butts against the sign and reads as "FREE!!". |
+| 2 | Pacing ×1 | 7 | 7 | **8** | The R05 low angle, R06 close-up and R08b split screen break the board-on-top template. R09, R10 and R12 still share it. |
+| 3 | Clarity ×1.5 | 4 | 7 | **8** | The seatbelts are now drawn, and HARNESS ①→④ runs as a series. A non-developer can follow "tags = ontology, safety kit = harness". The R07 `kind: step` chip is the one jargon holdout. |
+| 4 | Kanban ×1 | 3 | 8 | **8** | The board is in 12/13 frames. The R06 single-column close-up makes the board the stage for once. The rest still use it as a backdrop. |
+| 5 | Hamster ×1 | 6 | 7 | **7** | The face is freed in R09, and the R01, R11 and R12 beats are strong. But he is a 0.5-scale figure in the corner of R08a, still small in R04, and passive in R08b. |
+| 6 | English VO ×1 | 5 | 7 | **7** | The lines are unchanged since Round 2. They're speakable but slide-shaped ("Harness = …", "Claimed: … Measured: …"). |
+| 7 | Korean ×1.5 | 6 | 8 | **9** | Every limit is met, every highlight pairs up, and the tone is native (5분 컷, 사람 도장 필수, 재볼까?). |
+| 8 | Composition ×1 | 6 | 7 | **7** | Every strip is safe. Three frames still collide on key information: the R09 HUMAN ONLY stamp covers the meter's **70** threshold label, the R08a belts cross the agents' faces, and the R01 "!!" merges with the sign. |
+| 9 | Fun ×1 | 6 | 7 | **8** | Uchu now has an arc: shocked (R01) → cheering "공짜!!" (R04) → doubtful sweat (R11) → hooked again (R12). Add the heroic Orchestrator low angle and the mic drop. |
+| 10 | Loop ×1 | 7 | 8 | **9** | Uchu stays on the right across the cut, R12's FREE!! card flows into R01's FREE?, the thud carries over, and the KO line loops ("재볼까?" → "공짜라며?!"). |
+
+**Overall:** (9×2 + 8 + 8×1.5 + 8 + 7 + 7 + 9×1.5 + 7 + 8 + 9) / 12 = 97.5 / 12 = **8.1 / 10 — Grade B+**
+Round 1: 5.4 (C) → Round 2: 7.5 (B−) → **Round 3: 8.1 (B+)**
+
+**The Reel passes the 8.0 bar. It is ready to go to the Blender build.** The items below are polish, not blockers.
+
+## Per-shot table (R1 → R2 → R3)
+
+| id | R1 | R2 | R3 | Remaining issue |
+|---|---|---|---|---|
+| R01 | 5 | 8 | **8** | Uchu's "!!" merges with the sign ("FREE!!"). The "uchu" lettering touches the right curtain tie-back. |
+| R02 | 4 | 6 | **8** | Reads as a sprint now. |
+| R03 | 5 | 7 | **8** | Both leads are on screen. Uchu is static during a rewind; he could be sliding back. |
+| R04 | 7 | 7 | **8** | Uchu cheering "공짜!!" lands. The hamster is still small. |
+| R05 | 7 | 7 | **8** | The low angle is a real upgrade. The three working agents are small and far back. |
+| R06 | 6 | 8 | **9** | The best frame. It is legible, the board is the stage, and the gap cards read instantly. |
+| R07 | 7 | 7 | **7** | Unchanged concept frame. The `kind: step` chip is jargon, and the ghost board is still faintly visible. |
+| R08a | 3 | 6 | **7** | Seatbelts read now, but they cross the faces. The hamster is a tiny corner figure, and the pull-line crosses the Verified card. |
+| R08b | — | 7 | **8** | The split screen works. |
+| R09 | 5 | 6 | **7** | The face is fixed, but the HUMAN ONLY stamp covers the meter's "70", which is the rule the shot is about. The RISK label box is half under the left curtain. |
+| R10 | 4 | 8 | **8** | Clean. |
+| R11 | 8 | 8 | **9** | Uchu's doubtful beat gives the reveal a reaction. |
+| R12 | 5 | 7 | **8** | Highlights match and the loop works. |
+
+## Optional polish (non-blocking, durations unchanged, 30.0 s)
+
+1. **R09:** move `stampMark(250, 420, …)` to `stampMark(305, 428, 'HUMAN ONLY', -8)` so the dashed-70 label at (174, 468) is visible. Shift `Th.meter` from x 120 to x 130 so the RISK box clears the curtain.
+2. **R08a:**
+   - Turn the diagonal belts into lap belts below the face: for each agent, `M(x-35),648 L(x+35),652` with the buckle at `(x-8, 642)`.
+   - Enlarge the hamster to `Th.doc(440, 212, .65, …)`.
+   - Route the pull-line outside the board: from (440, 212) around x 470 down to the buckle.
+3. **R01:** set `bang: false` on `Th.uchu` (the O mouth already sells the shock), or move the sign 20 px left.
+4. **English VO punch-up (highlights stay matched):**
+   - R08a: `*Harness*? Seatbelts for agents.` (30)
+   - R11: `Said *free*. Cost *$0.40*.` (23), which pairs with `*공짜*라며? 실측 *$0.40*`
+5. **R07:** replace the `kind: step` pill with a `type: step` label, or remove it.
