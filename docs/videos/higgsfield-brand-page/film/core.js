@@ -487,10 +487,10 @@ function makeUchu(size = 180, v = {}) {
     </g></svg>`;
   if (c.tag !== false) {
     e.tag = el("div", `position:absolute;left:50%;top:${-size * .52}px;width:${size * 1.1}px;height:${size * .5}px;margin-left:${-size * .55}px;transform-origin:50% 100%;opacity:0`,
-      `<svg viewBox="0 0 220 100" width="100%" height="100%" overflow="visible">
-        <text x="110" y="74" text-anchor="middle" font-family="GaeguLat, sans-serif" font-weight="700" font-size="84" fill="#e0322b" stroke="#e0322b" stroke-width="9" stroke-dasharray="1.2 3.2" stroke-linecap="round" stroke-linejoin="round">uchu</text>
-        <text x="110" y="74" text-anchor="middle" font-family="GaeguLat, sans-serif" font-weight="700" font-size="84" fill="#e0322b" stroke="#ff6b5e" stroke-width="2" stroke-dasharray="2 3">uchu</text>
-        <text x="113" y="77" text-anchor="middle" font-family="GaeguLat, sans-serif" font-weight="700" font-size="84" fill="none" stroke="${INK}" stroke-width="1.5" opacity=".35">uchu</text></svg>`, e);
+      `<svg viewBox="-10 0 240 100" width="100%" height="100%" overflow="visible">
+        <text x="110" y="74" text-anchor="middle" font-family="GaeguLat, sans-serif" font-weight="700" font-size="76" fill="#e0322b" stroke="#e0322b" stroke-width="9" stroke-dasharray="1.2 3.2" stroke-linecap="round" stroke-linejoin="round">uchal</text>
+        <text x="110" y="74" text-anchor="middle" font-family="GaeguLat, sans-serif" font-weight="700" font-size="76" fill="#e0322b" stroke="#ff6b5e" stroke-width="2" stroke-dasharray="2 3">uchal</text>
+        <text x="113" y="77" text-anchor="middle" font-family="GaeguLat, sans-serif" font-weight="700" font-size="76" fill="none" stroke="${INK}" stroke-width="1.5" opacity=".35">uchal</text></svg>`, e);
   }
   const q = x => e.querySelector(x);
   e.P = { b: q(".b"), hd: q(".hd"), al: q(".al"), ar: q(".ar"), anl: q(".anl"), anr: q(".anr"), pdl: q(".pdl"), pdr: q(".pdr"),
