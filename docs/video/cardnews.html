@@ -1,0 +1,485 @@
+<title>Harness Theater Cards</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Gaegu:wght@400;700&family=Gowun+Dodum&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="series.css">
+<style>
+.viewer{max-width:500px;margin:0 auto}
+.track{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;scroll-behavior:smooth;border:3px solid var(--ink);border-radius:16px;box-shadow:5px 6px 0 var(--ink);background:#fff4dc;scrollbar-width:none;overscroll-behavior-x:contain}
+.track::-webkit-scrollbar{display:none}
+.slide{flex:0 0 100%;scroll-snap-align:center;scroll-snap-stop:always}
+.slide svg{display:block;width:100%;height:auto}
+.vctl{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:16px}
+.navbtn{width:48px;height:48px;flex:none;border-radius:50%;border:3px solid var(--ink);background:var(--yellow);box-shadow:2px 3px 0 var(--ink);font-family:var(--hand);font-weight:700;font-size:26px;line-height:1;display:grid;place-items:center}
+.navbtn:disabled{background:var(--card);color:var(--muted);box-shadow:none;cursor:default}
+.dots{display:flex;flex-wrap:wrap;justify-content:center;gap:2px}
+.dots button{width:26px;height:26px;border:0;background:none;padding:0;display:grid;place-items:center}
+.dots button::before{content:"";width:12px;height:12px;border-radius:50%;border:2px solid var(--ink);background:var(--card)}
+.dots button[aria-current="true"]::before{background:var(--pink);transform:scale(1.25)}
+.vcount{text-align:center;font-family:var(--mono);font-size:13px;color:var(--ink-2);margin-top:6px}
+.shot .frame{cursor:pointer}
+.shot-meta .tag{font-family:var(--mono);font-size:11px;border:2px solid var(--ink);border-radius:999px;padding:1px 8px;color:var(--ink)}
+.copy{white-space:pre-wrap;font-family:var(--body);font-size:14px;background:var(--paper-2);border:2px dashed var(--line);border-radius:10px;padding:12px 14px;margin:8px 0 0}
+.tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+.tags code{border:1.5px solid var(--ink)}
+.note3d{background:#eef7ff;border-style:dashed}
+</style>
+
+<header class="top">
+  <div class="wrap">
+    <nav class="series-nav" aria-label="Harness Theater formats">
+      <a href="reels.html">Reel</a>
+      <a href="youtube.html">Long-form</a>
+      <a href="cardnews.html" aria-current="page">Card news</a>
+    </nav>
+    <div class="eyebrow">Harness Theater #1 · Ontology + harness engineering · with Dr. Harness</div>
+    <h1><span class="hl">10-Slide</span> Card News<small>An Instagram carousel about the 10XAI multi-agent Kanban board</small></h1>
+    <p class="logline">A viral post says "free, 5 minutes, one prompt." Dr. Harness, a hamster in sunglasses, pastes it onto a Kanban board run by AI agents. The ontology gives every card typed fields, the harness checks them, and the carousel ends on claimed vs. measured numbers.</p>
+    <div class="facts">
+      <span><b>10</b> slides</span><span><b>4:5</b> · 1080×1350 PNG</span><span>grid-safe center <b>3:4</b></span><span>EN headline + <b>KR</b> line</span><span>host: <b>Dr. Harness</b> (hamster)</span>
+    </div>
+  </div>
+</header>
+
+<main class="wrap">
+  <section id="viewer" aria-labelledby="viewer-h">
+    <h2 id="viewer-h">Swipe through it</h2>
+    <p class="lede">This is how the carousel reads on a phone. Swipe, use the arrow buttons, or press ← and → when the viewer has focus. Every measured number on these slides is an example until the creator's dry run.</p>
+    <div class="viewer">
+      <div class="track" id="track" tabindex="0" role="region" aria-roledescription="carousel" aria-label="Card news slides"></div>
+      <div class="vctl">
+        <button class="navbtn" id="prev" aria-label="Previous slide">←</button>
+        <div class="dots" id="dots" role="tablist" aria-label="Choose slide"></div>
+        <button class="navbtn" id="next" aria-label="Next slide">→</button>
+      </div>
+      <div class="vcount" id="vcount" aria-live="polite">1 / 10</div>
+    </div>
+  </section>
+
+  <section id="slides" aria-labelledby="slides-h">
+    <h2 id="slides-h">All ten slides</h2>
+    <p class="lede">One idea per slide. Each slide has its own accent color from the agent palette and its own composition: a hero cover, a dialogue, a split, a zoom-in, a board map, a stage scene, a chalkboard, a shelf, a checklist, and a curtain call. Click a frame to open it in the viewer.</p>
+    <div class="shots square" id="grid"></div>
+  </section>
+
+  <section id="notes" aria-labelledby="notes-h">
+    <h2 id="notes-h">Publishing notes</h2>
+    <div class="cols">
+      <div class="panel">
+        <h3>Caption &amp; hashtags</h3>
+        <p class="src">Copy-ready. Korean first for the feed, English below.</p>
+        <div class="copy" id="caption">'무료'라더니, 재보니? 🐹
+SNS에서 본 AI 워크플로, 그대로 따라 해도 될까요?
+10XAI는 게시물을 칸반 보드로 쪼개고, 에이전트 팀이 빠진 단계를 채우고, 위험 70점 이상은 사람이 승인하고, 샌드박스에서 실제 비용과 시간을 잽니다.
+에이전트 = 모델 + 하네스. 온톨로지 = 명사, 연결, 동사.
+📌 저장해 두고, 바이럴 프롬프트를 그대로 붙여넣는 팀원에게 공유하세요.
+
+It said FREE. We measured.
+10XAI turns a viral AI post into a Kanban board run by agents: decompose, fill the gaps, gate the risky steps for a human, then measure cost and time in a sandbox.
+Save this. Send it to the teammate who pastes viral prompts.
+Repo: github.com/tmuchal/10XAI · 하네스 극장 #1</div>
+        <div class="tags" aria-label="Hashtags">
+          <code>#카드뉴스</code><code>#AI자동화</code><code>#AI에이전트</code><code>#하네스엔지니어링</code><code>#온톨로지</code><code>#프롬프트</code><code>#바이브코딩</code><code>#개발자</code><code>#칸반</code><code>#AIagents</code><code>#HarnessEngineering</code><code>#Ontology</code><code>#ClaudeCode</code><code>#멀티에이전트</code>
+        </div>
+      </div>
+
+      <div class="panel">
+        <h3>Why this works</h3>
+        <ul>
+          <li><b>8–10 slides.</b> Ten slides tells one story in one sitting, and Instagram now allows up to 20 per carousel, so there is room without padding.</li>
+          <li><b>Cover hook of 15 Korean characters or fewer.</b> "'무료'라더니, 재보니?" is 13 characters. The cover works as the thumbnail, the way 고구마팜 treats it.</li>
+          <li><b>Mascot-led voice.</b> Dr. Harness carries every slide, in the spirit of 뉴닉's explainer mascot.</li>
+          <li><b>Big type, one tip per slide.</b> The Ruben Hassid pattern: a 30–44 px (logical) headline, then a single visual.</li>
+          <li><b>Step-by-step flow.</b> Slides 5 to 8 follow the board left to right, the way ByteByteGo draws a pipeline.</li>
+          <li><b>Save/share CTA.</b> The last slide asks for a save and a send to one specific teammate, which gives the reader a reason to act.</li>
+          <li><b>4:5 with a 3:4 grid-safe center.</b> The profile grid crops 4:5 posts to 3:4, so all key content sits in the central 505 logical px.</li>
+        </ul>
+        <p class="src">Sources: Instagram creator announcements on the 3:4 profile grid (2025) and 20-slide carousels; safe-zone guides from outfy, kreatli and veeso; style references 뉴닉, 고구마팜, 캐릿, ByteByteGo, Ruben Hassid and Brij Kishore Pandey. Facts on the slides: Mitchell Hashimoto (Agent = Model + Harness, Feb 2026), Birgitta Böckeler / Thoughtworks on martinfowler.com (guides and sensors), Anthropic's multi-agent research system post (90.2% on its internal eval), Palantir ontology docs (objects, links, actions), and the 10XAI README and <code>lib/model/card.cjs</code> (threshold 70, hard flags).</p>
+      </div>
+
+      <div class="panel">
+        <h3>Export</h3>
+        <p>The PNGs live in <code>docs/video/cardnews/</code> as <code>slide-01.png</code> to <code>slide-10.png</code>, each 1080×1350. To rebuild them from the repo root:</p>
+        <div class="copy">NODE_PATH=$(npm root -g) node docs/video/tools/render-cardnews.cjs</div>
+        <p>The script opens this page in headless Chromium, reads <code>window.CARD_SLIDES</code>, and screenshots each slide alone on a 540×675 page at device scale 2. It waits for Gaegu, Gowun Dodum and IBM Plex Mono and prints whether they loaded. If Google Fonts is unreachable, the PNGs fall back to system fonts, so re-run it on your own machine before posting.</p>
+        <p>Upload order is slide 1 to 10. Every measured number is marked as an example on the slide; replace them with your dry-run results first.</p>
+      </div>
+
+      <div class="panel note3d">
+        <h3>3D cover variant</h3>
+        <p>The video formats are Blender 3D motion graphics. For the carousel, the cover (slide 1) and the curtain call (slide 10) can later be swapped for Blender hero renders of Dr. Harness and the board. Keep the same 4:5 frame, the header band, and the headline panel position, so the carousel still reads as one series. Slides 2 to 9 stay as 2D watercolor.</p>
+      </div>
+    </div>
+  </section>
+
+  <footer>Harness Theater #1 · card news for <a href="https://github.com/tmuchal/10XAI">github.com/tmuchal/10XAI</a>. Drawn with <code>theater.js</code>. Measured numbers are examples until the creator's dry run.</footer>
+</main>
+
+<script src="theater.js"></script>
+<script>
+Theater.install();
+(function () {
+  const { T, n, INK } = Theater;
+  const W = 540, H = 675, FY = 598;
+  const HAND = "Gaegu, 'Gowun Dodum', sans-serif", BODY = "'Gowun Dodum', Gaegu, sans-serif", MONO = "'IBM Plex Mono', monospace";
+  const KR = '#d4432f';
+  const tx = (x, y, s, z, o) => { o = o || {}; const f = o.body ? { font: BODY, w: 400 } : o.mono ? { font: MONO, w: 500 } : {}; return T(x, y, s, z, Object.assign(f, o)); };
+
+  /* ---------- slide helpers ---------- */
+  function panel(x, y, w, h, o) {
+    o = o || {}; const r = o.rx || 14;
+    let g = `<rect x="${x + 4}" y="${y + 5}" width="${w}" height="${h}" rx="${r}" fill="${INK}" opacity=".85"/><rect x="${x}" y="${y}" width="${w}" height="${h}" rx="${r}" fill="${o.fill || '#fffdf5'}" stroke="${INK}" stroke-width="3"${o.dash ? ' stroke-dasharray="8 6"' : ''}/>`;
+    if (o.accent) g += `<path d="M${x + 1.5},${y + 14} Q${x + 1.5},${y + 1.5} ${x + 14},${y + 1.5} L${x + w - 14},${y + 1.5} Q${x + w - 1.5},${y + 1.5} ${x + w - 1.5},${y + 14} Z" fill="${o.accent}"/><line x1="${x}" y1="${y + 14}" x2="${x + w}" y2="${y + 14}" stroke="${INK}" stroke-width="2"/>`;
+    return g;
+  }
+  function header(i, accent) {
+    let g = `<rect x="34" y="37" width="476" height="32" rx="16" fill="${INK}" opacity=".85"/><rect x="30" y="33" width="476" height="32" rx="16" fill="#fffdf5" stroke="${INK}" stroke-width="3"/>`;
+    g += `<rect x="30" y="33" width="136" height="32" rx="16" fill="${accent}" stroke="${INK}" stroke-width="3"/>` + tx(98, 55, '하네스 극장 #1', 16, { body: true, f: '#fff', stroke: INK, sw: 3 });
+    g += tx(178, 54.5, 'with Dr. Harness', 15, { a: 'start', mono: true, f: '#6b4a36' });
+    g += tx(492, 55, `${i}/10`, 16, { a: 'end', mono: true });
+    return g;
+  }
+  /* EN headline (ink) + KR line (vermilion) on a paper panel with an accent top strip. */
+  function headline(en, ko, o) {
+    o = o || {}; const z = o.z || 40, kz = o.kz || Math.round(z * .65), x = o.x || 30, w = o.w || 480, y = o.y || 80;
+    const a = o.align === 'start' ? 'start' : 'middle', cx = a === 'start' ? x + 20 : x + w / 2;
+    let yy = y + 14 + 10 + z * .82, lines = '';
+    en.forEach((l, i) => { lines += tx(cx, yy, l, z, { a }); if (i < en.length - 1) yy += z * 1.08; });
+    if (ko) { yy += kz * 1.45; lines += tx(cx, yy, ko, kz, { a, f: KR }); }
+    const h = yy - y + (o.padB || 16);
+    return { g: panel(x, y, w, h, { accent: o.accent }) + lines + (o.extra || ''), bottom: y + h };
+  }
+  function foot(text) {
+    const w = Math.min(350, text.length * 7.6 + 26);
+    return `<rect x="30" y="607" width="${n(w)}" height="26" rx="13" fill="#fffdf5" stroke="${INK}" stroke-width="2"/>` + tx(43, 625, text, 14, { a: 'start', mono: true, w: 400, f: '#6b4a36' });
+  }
+  /* Swipe cue: Dr. Harness peeking in from the right edge, pointing at a "→" pill. */
+  function peek(accent) {
+    let g = `<rect x="382" y="596" width="104" height="34" rx="17" fill="${INK}" opacity=".85" transform="translate(3,4)"/><rect x="382" y="596" width="104" height="34" rx="17" fill="${accent}" stroke="${INK}" stroke-width="3"/>` + tx(434, 619, '넘겨보기 →', 17, { body: true, f: '#fff', stroke: INK, sw: 3.5 });
+    g += `<g transform="rotate(-38 572 668)">${Theater.doc(572, 668, .74, { m: 'grin', la: [-40, -70] })}</g>`;
+    return g;
+  }
+  function seed(x, y, s, rot) { // sunflower seed = the cost coin
+    s = s || 1;
+    return `<g transform="translate(${x},${y}) rotate(${rot || 0}) scale(${s})"><path d="M0,-16 C10,-12 11,6 0,16 C-11,6 -10,-12 0,-16 Z" fill="#3a3a44" stroke="${INK}" stroke-width="2"/><path d="M0,-13 C3,-6 3,6 0,13" stroke="#e9e4d8" stroke-width="2.4" fill="none"/><path d="M-5,-8 C-6,-2 -6,4 -4,9 M5,-8 C6,-2 6,4 4,9" stroke="#e9e4d8" stroke-width="1.4" fill="none" opacity=".8"/></g>`;
+  }
+  function pouches(x, fy, sc, labels) { // cheek pouches stuffed with cards
+    const cy = fy - 99 * sc; let g = '';
+    [[-1, labels[0]], [1, labels[1]]].forEach(([d, t]) => {
+      const cx = x + d * 27 * sc;
+      g += `<g transform="rotate(${d * -18} ${n(cx + d * 12 * sc)} ${n(cy - 8 * sc)})">${Theater.card(cx + d * 10 * sc - 18 * sc, cy - 26 * sc, 36 * sc, 20 * sc, t, { kind: d < 0 ? 'gap' : 'risk', small: true, z: 9 * sc + 2 })}</g>`;
+      g += `<ellipse cx="${n(cx)}" cy="${n(cy)}" rx="${n(19 * sc)}" ry="${n(15 * sc)}" fill="#fff1d6" stroke="${INK}" stroke-width="2.4"/><ellipse cx="${n(cx)}" cy="${n(cy + 3 * sc)}" rx="${n(7 * sc)}" ry="${n(4 * sc)}" fill="#f07f86" opacity=".55"/>`;
+    });
+    return g;
+  }
+  function wheel(x, cy, r) { // hamster wheel = the harness that turns effort into direction
+    let g = `<path d="M${x - r * .7},${cy + r + 30} L${x},${cy} L${x + r * .7},${cy + r + 30}" fill="none" stroke="#8a5a2b" stroke-width="9" stroke-linecap="round" stroke-linejoin="round"/>`;
+    g += `<circle cx="${x}" cy="${cy}" r="${r}" fill="#fff8e6" fill-opacity=".55" stroke="${INK}" stroke-width="4"/><circle cx="${x}" cy="${cy}" r="${r - 9}" fill="none" stroke="#39b3b0" stroke-width="5"/>`;
+    for (let i = 0; i < 16; i++) { const a = i / 16 * Math.PI * 2; g += `<line x1="${n(x + (r - 9) * Math.cos(a))}" y1="${n(cy + (r - 9) * Math.sin(a))}" x2="${n(x + r * Math.cos(a))}" y2="${n(cy + r * Math.sin(a))}" stroke="${INK}" stroke-width="2"/>`; }
+    for (let i = 0; i < 6; i++) { const a = i / 6 * Math.PI * 2 + .3; g += `<line x1="${x}" y1="${cy}" x2="${n(x + (r - 12) * Math.cos(a))}" y2="${n(cy + (r - 12) * Math.sin(a))}" stroke="#39b3b0" stroke-width="2.5" opacity=".6"/>`; }
+    return g + `<circle cx="${x}" cy="${cy}" r="7" fill="#ffc23d" stroke="${INK}" stroke-width="2.5"/>`;
+  }
+  const stamp = (x, y, text, r, c) => { c = c || '#c9362f'; const w = text.length * 17 + 36; return `<g transform="rotate(${r || -8} ${x} ${y})"><rect x="${x - w / 2}" y="${y - 26}" width="${w}" height="52" rx="8" fill="#fffdf5" fill-opacity=".92" stroke="${c}" stroke-width="4"/><rect x="${x - w / 2 + 6}" y="${y - 20}" width="${w - 12}" height="40" rx="5" fill="none" stroke="${c}" stroke-width="1.8"/>${tx(x, y + 10, text, 30, { f: c })}</g>`; };
+  const check = (x, y, c) => `<rect x="${x}" y="${y}" width="22" height="22" rx="5" fill="#fffdf5" stroke="${INK}" stroke-width="2.5"/><path d="M${x + 4},${y + 11} l6,6 l11,-15" fill="none" stroke="${c}" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>`;
+  const scene = (draw) => Theater.scene({ w: W, h: H, noCurtains: true, st: { floorY: FY }, draw });
+
+  /* ---------- the ten slides ---------- */
+  const ACC = ['#f2c14e', '#f08a3e', '#39b3b0', '#4f8ef7', '#f25a6e', '#e5533f', '#2fbf8a', '#a86af2', '#f7a928', '#f062a8'];
+
+  const DRAW = [
+    // 1 · cover (hero)
+    () => scene(() => {
+      const a = ACC[0]; let g = header(1, a);
+      g += panel(30, 80, 480, 190, { accent: a });
+      g += Theater.hook(['It said FREE.', 'We measured.'], { w: W, z: 44, y: 142, sw: 9 });
+      g += `<rect x="112" y="196" width="316" height="42" rx="21" fill="#e5533f" stroke="${INK}" stroke-width="3"/>` + tx(270, 226, "'무료'라더니, 재보니?", 28, { f: '#fff', stroke: INK, sw: 3 });
+      g += tx(270, 259, '온톨로지 + 하네스 엔지니어링, 10장으로', 15, { body: true, f: '#6b4a36' });
+      // Hype Box with its FREE sign
+      g += Theater.sign(142, 292, 196, ['FREE!', '5 min · 1 prompt'], { z: 34, z2: 19, f: '#c9362f', f2: INK, stick: [142, 470], r: -4 });
+      g += Theater.box(142, FY, 128, Object.assign({ mood: 'star', label: 'VIRAL POST' }, Theater.PAL.gold));
+      g += Theater.burst(236, 318, 26, 'WOW', { z: 13, fill: '#f062a8', f: '#fff' });
+      // the red RISK 72 card
+      g += `<g transform="rotate(5 405 390)">${panel(318, 300, 176, 168, { fill: '#fffdf5' })}<rect x="318" y="300" width="14" height="168" rx="6" fill="#e5533f"/><rect x="318" y="300" width="176" height="168" rx="14" fill="none" stroke="#c9362f" stroke-width="4"/>`;
+      g += tx(412, 334, 'RISK', 24, { f: '#c9362f' }) + tx(412, 410, '72', 78, { f: '#e5533f', stroke: INK, sw: 5 }) + tx(412, 440, 'Deploy from chat', 16) + tx(412, 459, '운영 키로 바로 배포', 14, { body: true, f: KR }) + '</g>';
+      g += `<rect x="370" y="286" width="94" height="24" rx="12" fill="#e5533f" stroke="${INK}" stroke-width="2.5" transform="rotate(5 405 390)"/>` + tx(417, 303, 'GATED', 15, { f: '#fff', r: 5, mono: true });
+      g += Theater.doc(300, FY, .72, { m: 'o', ra: [46, -70], bang: true });
+      g += peek(a);
+      return g;
+    }),
+    // 2 · the problem (speech-bubble dialogue)
+    () => scene(() => {
+      const a = ACC[1]; let g = header(2, a);
+      const hd = headline(['Viral AI workflows', 'hide three things'], 'SNS 속 AI 꿀팁이 숨기는 3가지', { z: 38, accent: a }); g += hd.g;
+      const rows = [
+        ['"Just paste this prompt!"', 'Where is the .env? The API key?', '빠진 단계: .env, 키, 설치 순서'],
+        ['"100% free!"', 'Free until the token limit.', '숨은 비용: 무료는 한도까지만'],
+        ['"It deploys itself!"', 'With your prod keys? Hold on.', '위험한 실행: 셸 명령, 운영 키']
+      ];
+      rows.forEach(([hype, reply, ko], i) => {
+        const y = 236 + i * 100;
+        // hype bubble (left, gold) and hamster reply (right, white)
+        g += `<rect x="34" y="${y}" width="232" height="40" rx="20" fill="#fff0a8" stroke="${INK}" stroke-width="3"/><polygon points="60,${y + 38} 82,${y + 38} 54,${y + 56}" fill="#fff0a8" stroke="${INK}" stroke-width="3" stroke-linejoin="round"/><rect x="61" y="${y + 33}" width="20" height="6" fill="#fff0a8"/>` + tx(150, y + 27, hype, 19, { f: '#9c5a12' });
+        g += `<rect x="190" y="${y + 46}" width="318" height="48" rx="16" fill="#fffdf5" stroke="${INK}" stroke-width="3"/><polygon points="486,${y + 92} 506,${y + 92} 500,${y + 108}" fill="#fffdf5" stroke="${INK}" stroke-width="3" stroke-linejoin="round"/><rect x="484" y="${y + 88}" width="22" height="5" fill="#fffdf5"/>`;
+        g += `<circle cx="212" cy="${y + 70}" r="13" fill="${a}" stroke="${INK}" stroke-width="2.5"/>` + tx(212, y + 76, String(i + 1), 17, { f: '#fff' });
+        g += tx(234, y + 66, reply, 17, { a: 'start' }) + tx(234, y + 86, ko, 14, { a: 'start', body: true, f: KR });
+      });
+      g += Theater.box(104, FY, 92, Object.assign({ mood: 'star', label: 'HYPE' }, Theater.PAL.gold));
+      g += Theater.card(170, 548, 70, 26, '.env ?', { kind: 'gap' }) + Theater.card(40, 494, 64, 24, 'keys ?', { kind: 'gap' });
+      g += Theater.doc(330, FY, .62, { m: 'flat', q: true });
+      g += peek(a);
+      return g;
+    }),
+    // 3 · Agent = Model + Harness (split slide + hamster wheel)
+    () => scene(() => {
+      const a = ACC[2]; let g = header(3, a);
+      const hd = headline(['Agent = Model + Harness'], '에이전트 = 모델 + 하네스', { z: 36, kz: 26, accent: a }); g += hd.g;
+      const y0 = hd.bottom + 14, h = 162;
+      // split: guides | sensors
+      g += panel(30, y0, 480, h, {});
+      g += `<rect x="30" y="${y0}" width="240" height="${h}" rx="14" fill="#e3f6f5" stroke="${INK}" stroke-width="3"/><rect x="270" y="${y0}" width="240" height="${h}" rx="14" fill="#fff4d6" stroke="${INK}" stroke-width="3"/>`;
+      g += `<circle cx="270" cy="${y0 + h / 2}" r="22" fill="${a}" stroke="${INK}" stroke-width="3"/>` + tx(270, y0 + h / 2 + 8, '+', 30, { f: '#fff' });
+      // reins icon
+      g += `<path d="M52,${y0 + 30} q20,-22 40,0 q20,22 40,0" fill="none" stroke="#8a5a2b" stroke-width="5" stroke-linecap="round"/>`;
+      g += tx(144, y0 + 38, 'GUIDES', 24, { a: 'start' });
+      g += tx(52, y0 + 64, 'feedforward: before the run', 14, { a: 'start', mono: true, w: 400, f: '#2b7a78' });
+      g += tx(52, y0 + 92, '미리 알려주는 고삐', 18, { a: 'start', body: true, f: KR });
+      g += tx(52, y0 + 120, 'rules · checklists', 17, { a: 'start' }) + tx(52, y0 + 142, 'prompts · specs', 17, { a: 'start' });
+      // bell icon
+      g += `<path d="M302,${y0 + 38} Q302,${y0 + 16} 314,${y0 + 16} Q326,${y0 + 16} 326,${y0 + 38} Z" fill="#ffd23f" stroke="${INK}" stroke-width="2.5"/><circle cx="314" cy="${y0 + 41}" r="3.5" fill="${INK}"/>`;
+      g += tx(338, y0 + 38, 'SENSORS', 24, { a: 'start' });
+      g += tx(296, y0 + 64, 'feedback: after the run', 14, { a: 'start', mono: true, w: 400, f: '#9c5a12' });
+      g += tx(296, y0 + 92, '결과를 알려주는 종', 18, { a: 'start', body: true, f: KR });
+      g += tx(296, y0 + 120, 'tests · linters', 17, { a: 'start' }) + tx(296, y0 + 142, 'an LLM judge', 17, { a: 'start' });
+      // stage: hamster wheel powers the 10XAI machine
+      const wy = 500;
+      g += `<path d="M150,${wy} C230,${wy - 40} 300,${wy - 40} 370,${wy - 10}" fill="none" stroke="#2c2e47" stroke-width="6" stroke-linecap="round" stroke-dasharray="14 8"/>`;
+      g += wheel(150, wy, 66);
+      g += Theater.doc(150, wy + 56, .42, { m: 'grin', la: [-40, -60], ra: [40, -30] });
+      g += `<g transform="translate(378,${FY}) scale(.5) translate(-378,-${FY})">${Theater.machine(378, FY, 'AGENT')}</g>`;
+      g += `<rect x="232" y="${wy + 20}" width="106" height="44" rx="10" fill="#fffdf5" stroke="${INK}" stroke-width="2.5"/>` + tx(285, wy + 38, 'model = engine', 14, { mono: true, w: 400 }) + tx(285, wy + 57, '하네스 = 방향', 14, { body: true, f: KR });
+      g += foot('Hashimoto 2026 · Böckeler, Thoughtworks');
+      g += peek(a);
+      return g;
+    }),
+    // 4 · ontology (zoom-in detail)
+    () => scene(() => {
+      const a = ACC[3]; let g = header(4, a);
+      const hd = headline(['Ontology = nouns,', 'links, verbs'], '온톨로지 = 명사 · 연결 · 동사', { z: 38, accent: a }); g += hd.g;
+      // mini board with the zoomed card
+      const bx = 40, by = 262;
+      g += `<rect x="${bx}" y="${by}" width="130" height="92" rx="8" fill="#fffaf0" stroke="${INK}" stroke-width="2.5"/>`;
+      Theater.COLS.forEach(([t, c], i) => { g += `<rect x="${bx + 6 + i * 31}" y="${by + 6}" width="27" height="80" rx="4" fill="${c}" opacity=".35"/>`; for (let j = 0; j < 3 - (i % 2); j++) g += `<rect x="${bx + 9 + i * 31}" y="${by + 14 + j * 22}" width="21" height="15" rx="2" fill="#fffdf6" stroke="${INK}" stroke-width="1.2"/>`; });
+      g += `<circle cx="${bx + 81}" cy="${by + 21}" r="14" fill="none" stroke="${a}" stroke-width="3.5"/>`;
+      g += `<path d="M${bx + 95},${by + 12} L200,246 M${bx + 90},${by + 33} L200,452" stroke="${a}" stroke-width="2.5" stroke-dasharray="7 5"/>`;
+      g += tx(105, by + 118, 'ZOOM', 16, { mono: true, f: a });
+      // Dr. Harness with cheek pouches stuffed with cards
+      g += Theater.doc(104, FY, .68, { m: 'flat' }) + pouches(104, FY, .68, ['gap', 'risk']);
+      // the zoomed card
+      const cx = 196, cy = 246, cw = 314, ch = 206;
+      g += panel(cx, cy, cw, ch, {}) + `<rect x="${cx}" y="${cy}" width="14" height="${ch}" rx="6" fill="#e5533f"/>`;
+      g += `<rect x="${cx + 26}" y="${cy + 14}" width="170" height="30" rx="6" fill="#dfeaff" stroke="${INK}" stroke-width="2"/>` + tx(cx + 36, cy + 35, 'Card #4 · deploy', 18, { a: 'start' });
+      const fields = [['kind', 'step'], ['claim', '"free, 5 min"'], ['measured', '$0.40 · 12 min'], ['risk', '72'], ['gate', 'human']];
+      fields.forEach(([k, v], i) => { const yy = cy + 70 + i * 26; g += tx(cx + 30, yy, k, 15, { a: 'start', mono: true, f: '#6b4a36' }) + tx(cx + 120, yy, v, 15, { a: 'start', mono: true, w: 400, f: k === 'risk' ? '#c9362f' : INK }); });
+      g += tx(cx + cw - 14, cy + 122, 'example', 13, { a: 'end', mono: true, w: 400, f: '#8d6f5a' });
+      // callouts: name tag (noun), rope (link), buttons (verbs)
+      g += `<g transform="rotate(8 470 256)"><rect x="420" y="238" width="86" height="34" rx="6" fill="#ffd23f" stroke="${INK}" stroke-width="2.5"/><circle cx="430" cy="255" r="4" fill="${INK}"/>${tx(468, 261, 'NOUN', 18)}</g>`;
+      g += Theater.rope(cx + 290, cy + 66, cx + 290, cy + 118, '', -6);
+      g += `<rect x="430" y="${cy + 130}" width="74" height="24" rx="12" fill="#fffdf5" stroke="${INK}" stroke-width="2"/>` + tx(467, cy + 147, 'LINK', 15, { mono: true });
+      ['verify', 'run', 'approve'].forEach((t, i) => { const x = cx + 26 + i * 94; g += `<rect x="${x}" y="${cy + ch + 12}" width="84" height="32" rx="16" fill="${a}" stroke="${INK}" stroke-width="2.5"/>` + tx(x + 42, cy + ch + 34, t + '()', 16, { f: '#fff', mono: true }); });
+      g += tx(cx + 158, cy + ch + 68, 'VERBS = the only way agents act', 15, { mono: true, w: 400 }) + tx(cx + 158, cy + ch + 88, '에이전트는 동사(액션)로만 움직여요', 14, { body: true, f: KR });
+      g += foot('Palantir: objects, links, actions');
+      g += peek(a);
+      return g;
+    }),
+    // 5 · mission control (board map)
+    () => scene(() => {
+      const a = ACC[4]; let g = header(5, a);
+      const hd = headline(['Mission control:', 'agents run the board'], '에이전트 팀이 움직이는 칸반', { z: 36, kz: 24, accent: a, align: 'start', w: 480 }); g += hd.g;
+      g += Theater.agent('orchestrator', 444, hd.bottom - 22, 66, { noLabel: true });
+      g += `<rect x="404" y="${hd.bottom - 18}" width="84" height="20" rx="10" fill="#fffdf5" stroke="${INK}" stroke-width="2"/>` + tx(446, hd.bottom - 3, 'Orchestrator', 13, { mono: true });
+      // board map
+      const bx = 30, by = hd.bottom + 16, bw = 480, bh = FY - 22 - by, pad = 8, cw = (bw - pad * 5) / 4;
+      g += `<rect x="${bx + 5}" y="${by + 7}" width="${bw}" height="${bh}" rx="12" fill="${INK}" opacity=".85"/><rect x="${bx}" y="${by}" width="${bw}" height="${bh}" rx="12" fill="#fffaf0" stroke="${INK}" stroke-width="3"/>`;
+      const who = [
+        [['decompose', 'Decompose', '카드로 분해'], ['gapfill', 'Gap-fill', '빠진 단계 추가']],
+        [['verify', 'Verify', '위험 0–100점'], ['router', 'Router', '카드 유형 지정']],
+        [['human', 'You', '사람이 승인']],
+        [['runner', 'Exec runner', '샌드박스 측정'], ['repair', 'Repair', '실패 수리'], ['deploy', 'Deploy', '모듈로 내보내기']]
+      ];
+      Theater.COLS.forEach(([t, c], i) => {
+        const x = bx + pad + i * (cw + pad);
+        g += `<rect x="${n(x)}" y="${by + pad}" width="${n(cw)}" height="${bh - pad * 2}" rx="8" fill="${c}" opacity=".2" stroke="${c}" stroke-width="2"/><rect x="${n(x)}" y="${by + pad}" width="${n(cw)}" height="26" rx="8" fill="${c}"/>` + tx(x + cw / 2, by + pad + 19, t, 14, { f: '#fff', stroke: INK, sw: 2.5 });
+        const list = who[i], slot = (bh - 44) / 3;
+        list.forEach(([role, name, ko], j) => {
+          const cxm = x + cw / 2, fy = by + 44 + slot * j + slot - 38;
+          if (role === 'human') { g += Theater.doc(cxm, fy + 4, .42, { m: 'flat' }) + Theater.gate(x + 10, fy + 60, false, cw - 20).replace('<g filter', '<g opacity=".95" filter'); }
+          else g += Theater.agent(role, cxm, fy, 46, { noLabel: true, arms: 'down' });
+          g += tx(cxm, fy + 18, name, 14, { mono: true }) + tx(cxm, fy + 35, ko, 14, { body: true, f: KR });
+        });
+        if (i < 3) g += `<path d="M${n(x + cw - 4)},${by + 20} l14,0" stroke="${INK}" stroke-width="3"/><path d="M${n(x + cw + 6)},${by + 14} l6,6 l-6,6" fill="none" stroke="${INK}" stroke-width="3" stroke-linejoin="round"/>`;
+      });
+      g += foot('Anthropic reports +90.2% with subagents');
+      g += peek(a);
+      return g;
+    }),
+    // 6 · the gate (stage scene)
+    () => scene(() => {
+      const a = ACC[5]; let g = header(6, a);
+      const hd = headline(['Risk ≥ 70?', 'A human decides.'], '위험 70점 이상은 사람이 승인', { z: 40, kz: 26, accent: a }); g += hd.g;
+      g += Theater.meter(92, hd.bottom + 64, 72, { H: 128 });
+      // hard flags
+      const px = 176, py = hd.bottom + 14, pw = 334, ph = 176;
+      g += panel(px, py, pw, ph, { accent: a });
+      g += tx(px + 18, py + 42, 'Always gated: hard flags', 20, { a: 'start' }) + tx(px + 18, py + 64, '이 단어가 보이면 무조건 멈춤', 15, { a: 'start', body: true, f: KR });
+      const flags = [['secret', 'credential', 'api key'], ['prod', 'payment', 'delete', 'rm -rf']];
+      flags.forEach((row, r) => { let x = px + 18; row.forEach((f) => { const w = f.length * 9 + 20; g += `<rect x="${x}" y="${py + 80 + r * 34}" width="${w}" height="26" rx="13" fill="#ffe3de" stroke="#c9362f" stroke-width="2"/>` + tx(x + w / 2, py + 98 + r * 34, f, 15, { mono: true, f: '#a62a1c' }); x += w + 7; }); });
+      g += tx(px + 18, py + 164, 'Safe cards run on their own.', 15, { a: 'start', mono: true, w: 400 });
+      // gate + waiting card + stamp
+      g += Theater.gate(196, FY, false, 180);
+      g += Theater.agent('verify', 440, FY, 72, { carry: 'prod deploy', carryKind: 'risk', mood: 'worried' });
+      g += stamp(328, 452, 'APPROVED?', -7);
+      g += Theater.doc(92, FY, .6, { m: 'flat', ra: [44, -64] });
+      g += `<g transform="rotate(-20 126 540)"><rect x="112" y="522" width="26" height="22" rx="3" fill="#8a5a2b" stroke="${INK}" stroke-width="2"/><rect x="104" y="542" width="42" height="12" rx="3" fill="#c9362f" stroke="${INK}" stroke-width="2"/></g>`;
+      g += foot('RISK_GATE_THRESHOLD = 70');
+      g += peek(a);
+      return g;
+    }),
+    // 7 · sandbox + claimed vs measured (chalkboard)
+    () => scene(() => {
+      const a = ACC[6]; let g = header(7, a);
+      const hd = headline(['Claimed vs. measured'], '말한 숫자 vs 재본 숫자', { z: 40, kz: 26, accent: a }); g += hd.g;
+      const by = hd.bottom + 14;
+      g += Theater.board(30, by, 480, 204, [
+        ['CLAIMED   free · 5 min', '#ffe98a', 26],
+        ['MEASURED  $0.40 · 12 min', '#9ff0c8', 26],
+        ['+ hidden card: "upgrade to paid"', '#ffb8ad', 21],
+        ['주장은 무료, 실측은 유료 (예시)', '#f3ecdc', 18]
+      ], false);
+      g += `<g transform="rotate(-10 452 ${by + 34})"><rect x="404" y="${by + 20}" width="94" height="28" rx="4" fill="none" stroke="#ffe98a" stroke-width="2.5"/>${tx(451, by + 40, 'EXAMPLE', 16, { mono: true, f: '#ffe98a' })}</g>`;
+      // seeds = cost
+      [0, 1, 2, 3].forEach((i) => { g += seed(430 + i * 18, by + 104 + (i % 2) * 6, .8, 20 - i * 14); });
+      // sandbox with the runner
+      g += `<rect x="30" y="${by + 216}" width="300" height="52" rx="12" fill="#fffdf5" stroke="${INK}" stroke-width="3"/>` + tx(46, by + 238, 'Every run gets its own git worktree.', 15, { a: 'start', mono: true, w: 400 }) + tx(46, by + 259, '실행마다 격리된 샌드박스, 내 PC는 안전', 14, { a: 'start', body: true, f: KR });
+      g += Theater.sandbox(250, FY - 4, 250);
+      g += Theater.agent('runner', 250, FY - 14, 70, { mood: 'happy' });
+      g += Theater.stopwatch(318, FY - 76);
+      g += Theater.doc(420, FY, .66, { m: 'o', eyes: true, la: [-46, -70] });
+      g += foot('numbers: placeholder until dry run');
+      g += peek(a);
+      return g;
+    }),
+    // 8 · export (library shelf)
+    () => scene(() => {
+      const a = ACC[7]; let g = header(8, a);
+      const hd = headline(['Verified steps', 'become a module'], '검증된 단계만 모듈로 포장', { z: 40, kz: 26, accent: a }); g += hd.g;
+      const py = hd.bottom + 14;
+      g += panel(30, py, 480, 84, {});
+      g += `<circle cx="54" cy="${py + 26}" r="11" fill="#2fbf8a" stroke="${INK}" stroke-width="2"/>` + tx(54, py + 31, '✓', 14, { f: '#fff' }) + tx(74, py + 31, 'Safe steps run automatically', 18, { a: 'start' }) + tx(300, py + 31, '안전 단계는 자동', 15, { a: 'start', body: true, f: KR });
+      g += `<circle cx="54" cy="${py + 60}" r="11" fill="#e5533f" stroke="${INK}" stroke-width="2"/>` + tx(54, py + 65, '!', 15, { f: '#fff' }) + tx(74, py + 65, 'Risky steps keep a manual OK', 18, { a: 'start' }) + tx(300, py + 65, '위험 단계는 수동 승인', 15, { a: 'start', body: true, f: KR });
+      // bookcase
+      const sx = 172, sy = py + 104, sw = 338, sh = FY - sy;
+      g += `<rect x="${sx + 5}" y="${sy + 6}" width="${sw}" height="${sh}" rx="6" fill="${INK}" opacity=".3"/><rect x="${sx}" y="${sy}" width="${sw}" height="${sh}" rx="6" fill="#b87a46" stroke="${INK}" stroke-width="3"/><rect x="${sx + 10}" y="${sy + 10}" width="${sw - 20}" height="${sh - 10}" fill="#f3d9b0" stroke="${INK}" stroke-width="2"/>`;
+      const plank = sy + 118;
+      g += `<rect x="${sx}" y="${plank}" width="${sw}" height="12" fill="#8f5b3a" stroke="${INK}" stroke-width="2.5"/>`;
+      g += Theater.pkg(sx + 64, plank, 96, 'SKILL.md') + Theater.pkg(sx + 170, plank, 96, 'JSON') + Theater.pkg(sx + 276, plank, 96, 'CLI');
+      const bc = ['#4f8ef7', '#f7a928', '#2fbf8a', '#f062a8', '#a86af2', '#39b3b0'];
+      bc.forEach((c, i) => { g += `<rect x="${sx + 20 + i * 20}" y="${plank + 20 + (i % 3) * 4}" width="17" height="${FY - plank - 22 - (i % 3) * 4}" rx="2" fill="${c}" stroke="${INK}" stroke-width="2"/>`; });
+      g += `<rect x="${sx + 158}" y="${plank + 22}" width="156" height="40" rx="8" fill="#fffdf5" stroke="${INK}" stroke-width="2.5"/>` + tx(sx + 236, plank + 41, 'LIBRARY', 18, { mono: true }) + tx(sx + 236, plank + 58, '라이브러리', 14, { body: true, f: KR });
+      g += Theater.agent('deploy', 92, FY, 80, { mood: 'happy' });
+      g += Theater.doc(100, FY - 96, .44, { m: 'grin', ra: [40, -70] });
+      g += Theater.star(sx + 20, sy - 6, 12, '#ffd23f') + Theater.star(sx + sw - 16, sy + 4, 9, '#ffd23f');
+      g += foot('export: SKILL.md · JSON · CLI');
+      g += peek(a);
+      return g;
+    }),
+    // 9 · build your own (checklist)
+    () => scene(() => {
+      const a = ACC[8]; let g = header(9, a);
+      const hd = headline(['Build your own', 'content harness'], '나만의 콘텐츠 하네스, 5단계', { z: 40, kz: 26, accent: a }); g += hd.g;
+      const items = [
+        ['Name the nouns', 'card · claim · evidence · risk', '명사부터 정하기'],
+        ['Write the guides', 'rules and checklists up front', '실행 전 규칙과 체크리스트'],
+        ['Add the sensors', 'tests, linters, an LLM judge', '테스트, 린터, LLM 심판'],
+        ['Gate the risky', 'score ≥ 70 waits for a human', '70점 이상은 사람이 승인'],
+        ['Measure in a sandbox', 'claimed vs. measured, in numbers', '주장 vs 실측, 숫자로']
+      ];
+      const py = hd.bottom + 12, ph = 5 * 54 + 16;
+      g += panel(30, py, 480, ph, {});
+      items.forEach(([t, d, ko], i) => {
+        const y = py + 14 + i * 54;
+        g += check(46, y + 4, a) + tx(80, y + 21, `${i + 1}. ${t}`, 20, { a: 'start' }) + tx(80, y + 43, ko, 15, { a: 'start', body: true, f: KR });
+        g += tx(494, y + 21, d, 14, { a: 'end', mono: true, w: 400, f: '#6b4a36' });
+        if (i < 4) g += `<line x1="46" y1="${y + 52}" x2="494" y2="${y + 52}" stroke="#e8d3b4" stroke-width="2" stroke-dasharray="5 5"/>`;
+      });
+      g += Theater.box(120, FY, 78, Object.assign({ mood: 'happy', harness: true, label: 'HYPE' }, Theater.PAL.gold));
+      g += Theater.doc(300, FY, .56, { m: 'grin', ra: [42, -66] }) + seed(330, FY - 106, .9, 30);
+      g += foot('save it before you build');
+      g += peek(a);
+      return g;
+    }),
+    // 10 · CTA (curtain call)
+    () => Theater.scene({ w: W, h: H, st: { floorY: FY, spots: [270] }, draw: () => {
+      const a = ACC[9]; let g = header(10, a);
+      const hd = headline(['Save this.', 'Send it to the teammate', 'who pastes viral prompts.'], '저장하고 팀에 공유하세요', { z: 34, kz: 26, accent: a, x: 50, w: 440, y: 82 }); g += hd.g;
+      const y = hd.bottom + 14;
+      // save + share buttons
+      g += panel(50, y, 212, 60, { fill: '#fff0a8' }) + `<path d="M72,${y + 14} h22 v32 l-11,-8 l-11,8 Z" fill="#f062a8" stroke="${INK}" stroke-width="2.5" stroke-linejoin="round"/>` + tx(106, y + 30, 'Save', 22, { a: 'start' }) + tx(106, y + 50, '저장', 15, { a: 'start', body: true, f: KR });
+      g += panel(278, y, 212, 60, { fill: '#dff7ee' }) + `<path d="M298,${y + 32} L332,${y + 14} L322,${y + 48} L314,${y + 36} Z" fill="#4f8ef7" stroke="${INK}" stroke-width="2.5" stroke-linejoin="round"/>` + tx(342, y + 30, 'Share', 22, { a: 'start' }) + tx(342, y + 50, '팀에 공유', 15, { a: 'start', body: true, f: KR });
+      const ry = y + 76;
+      g += panel(50, ry, 440, 62, {}) + tx(270, ry + 28, 'github.com/tmuchal/10XAI', 20, { mono: true }) + tx(270, ry + 50, 'runs locally on your Claude CLI · 로컬 실행', 14, { body: true, f: '#6b4a36' });
+      g += Theater.confetti(30, 7, [40, ry + 70, 500, FY - 20]);
+      const roles = ['orchestrator', 'decompose', 'gapfill', 'verify', 'router', 'runner', 'repair', 'deploy'];
+      roles.forEach((r, i) => { const x = i < 4 ? 62 + i * 50 : 328 + (i - 4) * 50; g += Theater.agent(r, x, FY, 44, { noLabel: true, mood: i % 2 ? 'star' : 'happy' }); });
+      g += Theater.doc(270, FY, .66, { m: 'grin', la: [-44, -72], ra: [44, -72] });
+      g += `<rect x="180" y="608" width="180" height="28" rx="14" fill="${a}" stroke="${INK}" stroke-width="3"/>` + tx(270, 628, 'Harness Theater #1', 15, { mono: true, f: '#fff' });
+      return g;
+    } })
+  ];
+
+  const META = [
+    { name: 'Cover', layout: 'hero', en: 'It said FREE. We measured.', ko: "'무료'라더니, 재보니?", purpose: 'Stop the scroll. The cover doubles as the grid thumbnail.', design: 'Yellow hook type with ink outline. The Hype Box (star eyes) holds the FREE sign; a red RISK 72 card is tagged GATED. Dr. Harness gasps. The KR hook is 13 characters.' },
+    { name: 'The problem', layout: 'dialogue', en: 'Viral AI workflows hide three things', ko: 'SNS 속 AI 꿀팁이 숨기는 3가지', purpose: 'Name the pain: skipped steps, hidden costs, risky actions.', design: 'Speech-bubble dialogue. Gold hype bubbles on the left, the hamster’s numbered replies on the right, with gray gap cards falling out of the Hype Box.' },
+    { name: 'Agent = Model + Harness', layout: 'split', en: 'Agent = Model + Harness', ko: '에이전트 = 모델 + 하네스', purpose: 'Define the harness as guides (before) plus sensors (after).', design: 'Split panel: reins for guides, a bell for sensors. Below, the hamster runs a wheel that drives the AGENT machine: the model is the engine, the harness gives it direction. Credits Hashimoto and Böckeler.' },
+    { name: 'Ontology', layout: 'zoom-in', en: 'Ontology = nouns, links, verbs', ko: '온톨로지 = 명사 · 연결 · 동사', purpose: 'Show the typed fields on a 10XAI card: kind, claim, measured, risk, gate.', design: 'A loupe zooms from a tiny board into one card. Name tag = noun, rope = link, buttons = verbs. The hamster’s cheek pouches are stuffed with cards. The measured value is an example.' },
+    { name: 'Mission control', layout: 'board map', en: 'Mission control: agents run the board', ko: '에이전트 팀이 움직이는 칸반', purpose: 'Map every agent to its column on the Kanban board.', design: 'The board is the map. Decompose and Gap-fill in Decomposed, Verify and Router in Verifying, the hamster at the gate, Runner, Repair and Deploy in Verified. The Orchestrator conducts from the headline.' },
+    { name: 'The gate', layout: 'stage scene', en: 'Risk ≥ 70? A human decides.', ko: '위험 70점 이상은 사람이 승인', purpose: 'State the safety contract: risky cards wait for a person.', design: 'RISK meter at 72, a hard-flag list from card.cjs, the closed gate barrier, and the Verify agent holding a "prod deploy" card. The hamster holds the stamp.' },
+    { name: 'Claimed vs. measured', layout: 'chalkboard', en: 'Claimed vs. measured', ko: '말한 숫자 vs 재본 숫자', purpose: 'Show the product output: numbers from a sandbox run.', design: 'Chalkboard rows marked EXAMPLE ($0.40 and 12 min are placeholders). Sunflower seeds stand in for cost. The runner works in the sandbox; the hamster pushes his sunglasses up for the reveal.' },
+    { name: 'Export', layout: 'shelf', en: 'Verified steps become a module', ko: '검증된 단계만 모듈로 포장', purpose: 'Show the deliverable: SKILL.md, JSON or CLI in the Library.', design: 'Bookcase with three gift-wrapped packages. The Deploy agent carries the hamster on its head. Two rules: safe steps auto-run, risky steps keep a manual OK.' },
+    { name: 'Build your own', layout: 'checklist', en: 'Build your own content harness', ko: '나만의 콘텐츠 하네스, 5단계', purpose: 'Give a takeaway the reader can save and reuse.', design: 'Five checked items, EN step + KR line + mono detail. The Hype Box now wears a harness and smiles.' },
+    { name: 'Save & share', layout: 'curtain call', en: 'Save this. Send it to the teammate who pastes viral prompts.', ko: '저장하고 팀에 공유하세요', purpose: 'Ask for the save and the share; point to the repo.', design: 'Spotlight, confetti, all eight agents take a bow around the hamster. Save and Share buttons, the repo URL, and the series tag. No swipe cue.' }
+  ];
+
+  window.CARD_SLIDES = DRAW.map((f) => f());
+  const gridSvgs = DRAW.map((f) => f());
+
+  /* ---------- viewer ---------- */
+  const track = document.getElementById('track'), dots = document.getElementById('dots'), vcount = document.getElementById('vcount');
+  const prev = document.getElementById('prev'), next = document.getElementById('next');
+  track.innerHTML = window.CARD_SLIDES.map((s, i) => `<div class="slide" role="group" aria-roledescription="slide" aria-label="${i + 1} of 10: ${META[i].name}">${s}</div>`).join('');
+  dots.innerHTML = META.map((m, i) => `<button role="tab" aria-label="Slide ${i + 1}: ${m.name}"></button>`).join('');
+  let cur = 0;
+  function show(i) {
+    cur = Math.max(0, Math.min(9, i));
+    [...dots.children].forEach((d, j) => d.setAttribute('aria-current', j === cur ? 'true' : 'false'));
+    prev.disabled = cur === 0; next.disabled = cur === 9; vcount.textContent = `${cur + 1} / 10 · ${META[cur].name}`;
+  }
+  function go(i) { i = Math.max(0, Math.min(9, i)); track.scrollTo({ left: i * track.clientWidth }); show(i); }
+  prev.onclick = () => go(cur - 1); next.onclick = () => go(cur + 1);
+  [...dots.children].forEach((d, i) => d.onclick = () => go(i));
+  let t; track.addEventListener('scroll', () => { clearTimeout(t); t = setTimeout(() => show(Math.round(track.scrollLeft / track.clientWidth)), 60); });
+  document.getElementById('viewer').addEventListener('keydown', (e) => { if (e.key === 'ArrowRight') { e.preventDefault(); go(cur + 1); } else if (e.key === 'ArrowLeft') { e.preventDefault(); go(cur - 1); } });
+  show(0);
+
+  /* ---------- grid ---------- */
+  const esc = Theater.esc;
+  document.getElementById('grid').innerHTML = META.map((m, i) => `<article class="shot">
+    <button class="frame" data-i="${i}" aria-label="Open slide ${i + 1} in the viewer">${gridSvgs[i]}<span class="hint">open in viewer</span></button>
+    <div class="shot-meta"><span class="id">${String(i + 1).padStart(2, '0')}</span><span>${esc(m.name)}</span><span class="tag" style="background:${ACC[i]}">${m.layout}</span></div>
+    <dl>
+      <dt>Purpose</dt><dd>${esc(m.purpose)}</dd>
+      <dt>Copy</dt><dd class="vo">${esc(m.en)}<small>${esc(m.ko)}</small></dd>
+      <dt>Design</dt><dd>${esc(m.design)}</dd>
+    </dl></article>`).join('');
+  document.querySelectorAll('#grid .frame').forEach((b) => b.onclick = () => { document.getElementById('viewer').scrollIntoView({ behavior: 'smooth' }); go(+b.dataset.i); track.focus({ preventScroll: true }); });
+})();
+</script>
