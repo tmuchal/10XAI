@@ -2396,11 +2396,21 @@ checkClaudeCLI();
 sweepStaleLocks();
 clearStaleExecClaims();   // a crashed board may have left an execClaim with a dead pid
 watchTasks();
+server.on("error", (e) => {
+  if (e && e.code === "EADDRINUSE") {
+    console.error("\n  ✖ Port " + PORT + " is already in use by another program.");
+    console.error("    Start on another port:  PORT=8090 npm start   (Windows PowerShell: $env:PORT=8090; npm start)");
+    console.error("    then open http://localhost:8090/dance\n");
+    process.exit(1);
+  }
+  throw e;
+});
 server.listen(PORT, () => {
   console.log("");
   console.log("  " + PROJECT_NAME);
   console.log("  ─────────────────────────");
   console.log("  http://localhost:" + PORT);
+  console.log("  Dance Lab: http://localhost:" + PORT + "/dance");
   console.log("  Tasks:   " + TASKS_DIR);
   console.log("  Board:   " + BOARD_DIR + (AGGREGATE_DIRS ? "  (aggregate view: " + AGGREGATE_DIRS.join(", ") + ")" : ""));
   console.log("  App repo:" + REPO_PATH);
