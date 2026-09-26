@@ -135,3 +135,14 @@ python3 make3.py near3 near-v4.mp4   # 최종 MP4 (1280×720, 30fps). 약 5,000�
 - [ ] `p_near3.html`에서 겹침과 잘림 없음, 한국어 자막이 깨지지 않음
 - [ ] `near-v4.mp4` 렌더링 후 확인용 프레임 몇 장 점검
 - [ ] 결과는 영어 음성과 영어·한국어 자막, 밝은 톤, 날씬한 캐릭터
+
+## 10. 추가로 들어 있는 것
+- `deliverables/`: 완성 영상 6편
+  - `near-v3.mp4`, `ondo-v3.mp4`: 최신판
+  - `near-worlds.mp4`, `ondo-worlds.mp4`: v3 이전, 장면마다 배경을 바꾼 버전
+  - `near-30s-uchay-v2.mp4`, `ondo-blackrock-uchay-v2.mp4`: 30초판과 Ondo 초기판
+- `archive-v1-v2/`: v3 이전 파이프라인 소스. 참고용이며 이번 작업에는 쓰지 않음.
+  - `near-case.html`: NEAR 1:41 풀버전
+  - `cut_engine*.js`, `build30.py`, `build_ondo.py`, `ondo_*.js`, `bg.js`(챕터별 배경), `make_video.py`, `rec.js`
+  - `*-backup.html`: 초기 버전 백업
+- 사용자가 준 참고 영상 `theater-final-preview.mp4`는 없음. 필요하면 `deliverables/`에 넣어 달라고 요청.

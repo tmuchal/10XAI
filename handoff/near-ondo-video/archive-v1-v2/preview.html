@@ -1,0 +1,1643 @@
+<title>The Case of NEAR's +80% Week</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Gochi+Hand&family=Gaegu:wght@400;700&family=Nunito+Sans:opsz,wght@6..12,400;6..12,600;6..12,800&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+  /* Bright warm-paper theme, chosen on purpose to match the sunny stage. */
+  :root{
+    color-scheme: light;
+    --bg:#FFF7EA; --panel:#FFFFFF; --line:#EADBC4; --text:#2A1E1A; --muted:#7A6A5C;
+    --yellow:#F8C94A; --red:#C8372D; --green:#2E7D3E; --amber:#B7791F; --lred:#B3261E; --navy:#26324E; --ink:#2A1E1A;
+    --f-hand:'Gochi Hand', 'Comic Sans MS', 'Chalkboard SE', cursive;
+    --f-ko:'Gaegu', 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif;
+    --f-body:'Nunito Sans', system-ui, -apple-system, 'Segoe UI', sans-serif;
+    --f-mono:'IBM Plex Mono', ui-monospace, Menlo, Consolas, monospace;
+  }
+  body{ background:var(--bg); color:var(--text); font:16px/1.6 var(--f-body); margin:0; }
+  .wrap{ max-width:1180px; margin:0 auto; padding-inline:clamp(16px,4vw,40px); padding-block:36px 80px; display:flex; flex-direction:column; gap:56px; }
+  a{ color:var(--red); }
+  :focus-visible{ outline:3px solid var(--navy); outline-offset:3px; }
+  .intro{ display:flex; flex-direction:column; gap:8px; max-width:800px; }
+  .eyebrow{ font:500 12px/1 var(--f-mono); letter-spacing:.14em; text-transform:uppercase; color:var(--red); }
+  h1{ font:400 clamp(40px,6.4vw,72px)/1 var(--f-hand); margin:0; text-wrap:balance; }
+  h1 em{ font-style:normal; color:var(--red); }
+  .ko{ font-family:var(--f-ko); }
+  .dek{ color:var(--muted); margin:0; max-width:64ch; }
+  .dek.ko{ font-size:19px; line-height:1.35; }
+  h2{ font:400 clamp(30px,4vw,42px)/1.05 var(--f-hand); margin:0; text-wrap:balance; }
+  .sec-head{ display:flex; flex-direction:column; gap:8px; max-width:740px; }
+  .sec-head p{ margin:0; color:var(--muted); }
+
+  .player{ display:flex; flex-direction:column; border-radius:18px; overflow:hidden; background:var(--panel); border:3px solid var(--ink); box-shadow:0 8px 0 var(--ink); }
+  .stagewrap{ position:relative; container-type:inline-size; overflow:hidden; perspective:1300px; background:#B32E25; }
+  .cam{ position:relative; transform-origin:50% 50%; will-change:transform; }
+  #gl{ position:absolute; inset:0; width:100%; height:100%; pointer-events:none; display:block; }
+  #stage{ display:block; width:100%; height:auto; aspect-ratio:16/9; max-width:100%; background:#FDE3A8; }
+  .banner{ position:absolute; left:23%; right:2.5%; bottom:2.2%; display:flex; justify-content:center; pointer-events:none; }
+  .cap{ display:flex; flex-direction:column; align-items:center; gap:.2cqw; background:var(--navy); border:max(2px,.28cqw) solid #1A1310; border-radius:1.1cqw; box-shadow:0 .45cqw 0 #1A1310; padding:.45cqw 1.5cqw .65cqw; text-align:center; max-width:100%; }
+  .cap:has(#subEn:empty){ display:none; }
+  #subEn{ color:#FCD967; font:400 max(12px,2.1cqw)/1.12 var(--f-hand); text-wrap:balance; }
+  #subKo{ color:#FFFFFF; font:700 max(11px,1.8cqw)/1.15 var(--f-ko); text-wrap:balance; word-break:keep-all; }
+  .overlay{ position:absolute; inset:0; display:flex; align-items:flex-end; justify-content:center; padding-bottom:9%; pointer-events:none; }
+  .overlay > *{ pointer-events:auto; }
+  .startCard{ display:flex; flex-direction:column; align-items:center; gap:1cqw; background:#FFF6E6; border:max(3px,.35cqw) solid var(--ink); border-radius:1.6cqw; box-shadow:0 .6cqw 0 var(--ink); padding:1.4cqw 2.4cqw; }
+  .bigplay{ font:400 max(18px,2.8cqw)/1.1 var(--f-hand); color:var(--ink); background:var(--yellow); border:max(3px,.3cqw) solid var(--ink); border-radius:999px; padding:.7cqw 2.6cqw; cursor:pointer; box-shadow:0 .4cqw 0 var(--ink); display:flex; flex-direction:column; align-items:center; }
+  .bigplay small{ font:700 max(12px,1.7cqw)/1.2 var(--f-ko); }
+  .bigplay:active{ transform:translateY(.3cqw); box-shadow:0 .1cqw 0 var(--ink); }
+  .quiet{ font:600 max(12px,1.4cqw)/1.2 var(--f-body); background:none; border:0; color:var(--muted); text-decoration:underline; cursor:pointer; }
+  .jury{ position:absolute; left:50%; top:13%; transform:translateX(-50%); width:min(92%, 620px); display:flex; flex-direction:column; gap:1cqw; background:#FFF6E6; border:max(3px,.35cqw) solid var(--ink); border-radius:1.6cqw; box-shadow:0 .6cqw 0 var(--ink); padding:1.2cqw 1.6cqw; }
+  .jq{ margin:0; font:400 max(18px,2.7cqw)/1.05 var(--f-hand); text-align:center; }
+  .jq span{ display:block; font:700 max(13px,1.9cqw)/1.2 var(--f-ko); color:var(--muted); }
+  .jwho{ margin:0; text-align:center; font:500 max(11px,1.2cqw)/1.2 var(--f-mono); color:var(--red); letter-spacing:.06em; text-transform:uppercase; }
+  .jbtns{ display:flex; gap:.8cqw; justify-content:center; flex-wrap:wrap; }
+  .jbtns button{ flex:1 1 0; min-width:0; font:400 max(16px,2.2cqw)/1 var(--f-hand); border:max(2px,.28cqw) solid var(--ink); border-radius:1cqw; padding:.7cqw .6cqw; cursor:pointer; box-shadow:0 .35cqw 0 var(--ink); display:flex; flex-direction:column; align-items:center; gap:.2cqw; color:var(--ink); }
+  .jbtns button small{ font:700 max(12px,1.5cqw)/1 var(--f-ko); }
+  .jbtns [data-v="strong"]{ background:#A7DDB0; } .jbtns [data-v="mixed"]{ background:#F8D98A; } .jbtns [data-v="weak"]{ background:#F4A99D; }
+  .jbar{ height:max(4px,.5cqw); background:#EADBC4; border-radius:99px; overflow:hidden; }
+  .jbar i{ display:block; height:100%; width:100%; background:var(--navy); transform-origin:left; }
+  .toast{ position:absolute; left:50%; top:13%; transform:translateX(-50%); width:min(92%, 640px); display:flex; flex-direction:column; align-items:center; gap:.3cqw; background:#FFF6E6; border:max(3px,.35cqw) solid var(--ink); border-radius:1.4cqw; box-shadow:0 .6cqw 0 var(--ink); padding:1cqw 1.6cqw; text-align:center; pointer-events:none; }
+  .toast b{ font:400 max(17px,2.5cqw)/1.05 var(--f-hand); }
+  .toast .en{ font:600 max(12px,1.45cqw)/1.3 var(--f-body); }
+  .toast .ko{ font:700 max(12px,1.6cqw)/1.25 var(--f-ko); color:var(--muted); }
+  .score{ position:absolute; left:2.5%; top:4%; background:var(--yellow); border:max(3px,.3cqw) solid var(--ink); border-radius:1cqw; box-shadow:0 .4cqw 0 var(--ink); padding:.5cqw 1.2cqw; font:400 max(15px,2.2cqw)/1.1 var(--f-hand); text-align:center; pointer-events:none; }
+  .score small{ display:block; font:700 max(11px,1.4cqw)/1.2 var(--f-ko); }
+  .controls{ display:flex; flex-wrap:wrap; align-items:center; gap:10px 14px; padding:12px 16px; background:var(--panel); border-top:3px solid var(--ink); }
+  .btn{ font:800 14px/1 var(--f-body); color:var(--ink); background:var(--yellow); border:2px solid var(--ink); border-radius:999px; padding:9px 16px; cursor:pointer; min-width:84px; }
+  .btn:hover{ filter:brightness(1.04); }
+  .btn.ghost{ background:var(--panel); min-width:0; font-weight:700; }
+  .btn[aria-pressed="true"]{ background:#A7DDB0; }
+  .tc{ font:500 13px/1 var(--f-mono); color:var(--muted); font-variant-numeric:tabular-nums; }
+  #scrub{ flex:1 1 200px; accent-color:var(--red); min-width:0; }
+  .chips{ display:flex; flex-wrap:wrap; gap:6px; padding:0 16px 14px; background:var(--panel); }
+  .chip{ font:500 12px/1 var(--f-mono); color:var(--muted); background:var(--bg); border:1px solid var(--line); border-radius:999px; padding:7px 11px; cursor:pointer; }
+  .chip[aria-current="true"]{ color:var(--ink); background:var(--yellow); border-color:var(--ink); }
+
+  .sheet{ display:grid; grid-template-columns:minmax(0,1fr); gap:20px; }
+  @media (min-width:860px){ .sheet{ grid-template-columns:minmax(0,5fr) minmax(0,7fr); } }
+  .bio{ display:flex; flex-direction:column; gap:12px; background:var(--panel); border:2px solid var(--line); border-radius:14px; padding:22px; }
+  .bio h3{ font:400 38px/1 var(--f-hand); margin:0; }
+  .bio .tag{ font:400 22px/1.2 var(--f-hand); color:var(--red); margin:0; }
+  .bio dl{ display:grid; grid-template-columns:max-content minmax(0,1fr); gap:8px 16px; margin:0; font-size:15px; }
+  .bio dt{ font:500 11px/2 var(--f-mono); letter-spacing:.1em; text-transform:uppercase; color:var(--muted); }
+  .bio dd{ margin:0; }
+  .swatches{ display:flex; flex-wrap:wrap; gap:8px; }
+  .sw{ display:flex; align-items:center; gap:6px; font:12px/1 var(--f-mono); color:var(--muted); }
+  .sw i{ width:18px; height:18px; border-radius:5px; display:block; border:2px solid var(--ink); }
+  .poses{ display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px; align-content:start; align-items:start; }
+  @media (min-width:560px){ .poses{ grid-template-columns:repeat(4,minmax(0,1fr)); } }
+  .pose{ display:flex; flex-direction:column; gap:6px; background:var(--panel); border:2px solid var(--line); border-radius:12px; padding:10px 10px 12px; }
+  .pose svg{ width:100%; height:auto; aspect-ratio:1/1; display:block; background:#FDE3A8; border-radius:8px; }
+  .pose b{ font:400 22px/1 var(--f-hand); }
+  .pose span{ font-size:13px; color:var(--muted); line-height:1.4; }
+
+  .board{ display:flex; flex-direction:column; gap:18px; }
+  .shot{ display:grid; grid-template-columns:minmax(0,1fr); gap:18px; background:var(--panel); border:2px solid var(--line); border-radius:14px; padding:18px; }
+  @media (min-width:880px){ .shot{ grid-template-columns:minmax(0,5fr) minmax(0,6fr); } }
+  .shot-vis{ display:flex; flex-direction:column; gap:10px; }
+  .shot-vis .thumb{ width:100%; height:auto; aspect-ratio:16/9; display:block; border-radius:8px; border:2px solid var(--ink); background:#FDE3A8; }
+  .shot-top{ display:flex; align-items:baseline; justify-content:space-between; gap:10px; flex-wrap:wrap; }
+  .shot-no{ font:400 30px/1 var(--f-hand); }
+  .shot-no small{ font:500 13px/1 var(--f-mono); color:var(--muted); margin-left:8px; }
+  .verdict{ font:400 18px/1 var(--f-hand); padding:5px 10px 6px; border:2px solid currentColor; border-radius:4px; transform:rotate(-3deg); }
+  .v-strong{ color:var(--green); } .v-med{ color:var(--amber); } .v-low{ color:var(--lred); } .v-none{ color:var(--muted); }
+  .shot dl{ display:grid; grid-template-columns:minmax(0,1fr); gap:10px; margin:0; }
+  .shot dt{ font:500 11px/1.4 var(--f-mono); letter-spacing:.12em; text-transform:uppercase; color:var(--red); }
+  .shot dd{ margin:2px 0 0; font-size:15px; line-height:1.55; }
+  .shot dd.vo{ border-left:3px solid var(--yellow); padding-left:12px; }
+  .shot dd.vo p{ margin:0 0 8px; font:400 19px/1.25 var(--f-hand); }
+  .shot dd.vo p small{ font:500 12px/1 var(--f-mono); color:var(--muted); margin-right:6px; }
+  .shot dd.vo p .ko{ display:block; font:700 16px/1.3 var(--f-ko); color:var(--muted); }
+  .shot .src{ font-size:13px; color:var(--muted); }
+  .play-from{ align-self:flex-start; }
+
+  .notes{ display:grid; grid-template-columns:minmax(0,1fr); gap:14px; }
+  @media (min-width:760px){ .notes{ grid-template-columns:repeat(3,minmax(0,1fr)); } }
+  .note{ background:var(--panel); border:2px solid var(--line); border-radius:12px; padding:16px 18px; }
+  .note h3{ font:400 24px/1.1 var(--f-hand); margin:0 0 6px; color:var(--red); }
+  .note p{ margin:0; font-size:14.5px; }
+  .sources ol{ margin:0; padding-left:1.3em; display:grid; gap:4px; font-size:14px; color:var(--muted); }
+  @media (min-width:760px){ .sources ol{ grid-template-columns:repeat(2,minmax(0,1fr)); column-gap:32px; } }
+  .fine{ font-size:13px; color:var(--muted); margin:0; }
+  svg .hand{ font-family:var(--f-hand); }
+  svg .mono{ font-family:var(--f-mono); }
+  .grainRect{ mix-blend-mode:multiply; }
+  [hidden]{ display:none !important; }
+</style>
+
+<main class="wrap">
+  <header class="intro">
+    <span class="eyebrow">A paper-theatre case file · voiced · EN/KO captions · jury mode</span>
+    <h1>The case of NEAR’s <em>+80%</em> week</h1>
+    <p class="dek">Inspector Hash, a golden hamster detective, puts on a puppet show. Five hamster suspects and two hamster accomplices go on stage, and each one leaves with a stamped verdict on how well the evidence supports it. Every number comes from news coverage published Sep 14–24, 2026. Before each verdict, you vote as the jury and then see if you agree with Hash.</p>
+    <p class="dek ko">햄스터 탐정 해시의 종이 인형극. 용의자 다섯과 공범 둘을 심문합니다. 판결 직전마다 여러분이 배심원이 되어 먼저 투표해 보세요.</p>
+  </header>
+
+  <section class="player" aria-label="Animated explainer">
+    <div class="stagewrap">
+      <div class="cam" id="camEl">
+      <svg id="stage" viewBox="0 0 1600 900" role="img" aria-label="Inspector Hash explains the NEAR price rally on a paper theatre stage">
+        <defs>
+          <radialGradient id="wash" cx="50%" cy="34%" r="70%">
+            <stop offset="0" stop-color="#FFF4C2"/>
+            <stop offset=".45" stop-color="#FFE196"/>
+            <stop offset=".8" stop-color="#FBC79C"/>
+            <stop offset="1" stop-color="#F7B3A6"/>
+          </radialGradient>
+          <linearGradient id="floorG" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0" stop-color="#C98A4E"/><stop offset=".3" stop-color="#E2AE72"/><stop offset="1" stop-color="#D89C5E"/>
+          </linearGradient>
+          <filter id="blotch" x="0" y="0" width="100%" height="100%">
+            <feTurbulence type="fractalNoise" baseFrequency="0.005 0.008" numOctaves="3" seed="7"/>
+            <feColorMatrix type="matrix" values="0 0 0 0 0.93  0 0 0 0 0.52  0 0 0 0 0.50  1.8 0 0 0 -0.75"/>
+          </filter>
+          <filter id="grain" x="0" y="0" width="100%" height="100%">
+            <feTurbulence type="fractalNoise" baseFrequency=".8" numOctaves="2" stitchTiles="stitch"/>
+            <feColorMatrix type="saturate" values="0"/>
+            <feComponentTransfer><feFuncA type="table" tableValues="0 .55"/></feComponentTransfer>
+          </filter>
+          <filter id="boil" x="-4%" y="-4%" width="108%" height="108%">
+            <feTurbulence id="boilT" type="fractalNoise" baseFrequency="0.035" numOctaves="1" seed="1" result="n"/>
+            <feDisplacementMap in="SourceGraphic" in2="n" scale="3.6" xChannelSelector="R" yChannelSelector="G"/>
+          </filter>
+        </defs>
+
+        <rect width="1600" height="720" fill="url(#wash)"/>
+        <g id="rays" opacity=".32"></g>
+        <rect width="1600" height="720" filter="url(#blotch)" opacity=".28"/>
+        <g id="floor"></g>
+
+        <g id="fg" filter="url(#boil)">
+          <g id="s0"></g><g id="s1"></g><g id="s2"></g><g id="s3"></g><g id="s4"></g>
+          <g id="s5"></g><g id="s6"></g><g id="s7"></g><g id="s8"></g>
+        </g>
+
+        <g id="curL"></g>
+        <g id="curR"></g>
+        <g id="valance"></g>
+        <g id="top" filter="url(#boil)"></g>
+        <rect id="flash" width="1600" height="900" fill="#FFFDF5" opacity="0" pointer-events="none"/>
+        <rect class="grainRect" width="1600" height="900" filter="url(#grain)" opacity=".16" pointer-events="none"/>
+      </svg>
+      <canvas id="gl" aria-hidden="true"></canvas>
+      </div>
+      <div class="banner" aria-live="polite"><div class="cap"><span id="subEn"></span><span id="subKo"></span></div></div>
+      <div class="score" id="score" hidden></div>
+      <div class="jury" id="jury" hidden role="dialog" aria-label="Jury vote">
+        <p class="jq">Jury, your verdict?<span>배심원 여러분, 판결은?</span></p>
+        <p class="jwho" id="jWho"></p>
+        <div class="jbtns">
+          <button type="button" data-v="strong">Strong<small>강함</small></button>
+          <button type="button" data-v="mixed">Mixed<small>애매함</small></button>
+          <button type="button" data-v="weak">Weak / late<small>약함·늦음</small></button>
+        </div>
+        <div class="jbar"><i id="jBar"></i></div>
+      </div>
+      <div class="toast" id="toast" hidden><b id="tHead"></b><span class="en" id="tEn"></span><span class="ko" id="tKo"></span></div>
+      <div class="overlay" id="startOv">
+        <div class="startCard">
+          <button class="bigplay" id="startVoice" type="button">Play with voice ▶<small>음성과 함께 재생</small></button>
+          <button class="quiet" id="startSilent" type="button">Play silently · 무음으로 재생</button>
+        </div>
+      </div>
+    </div>
+    <div class="controls">
+      <button class="btn" id="playBtn" type="button">Play</button>
+      <button class="btn ghost" id="restartBtn" type="button">Restart</button>
+      <button class="btn ghost" id="voiceBtn" type="button" aria-pressed="false">Voice</button>
+      <button class="btn ghost" id="juryBtn" type="button" aria-pressed="true">Jury mode</button>
+      <span class="tc" id="tcOut">0:00 / 1:41</span>
+      <input id="scrub" type="range" min="0" max="101" step="0.05" value="0" aria-label="Seek">
+    </div>
+    <div class="chips" id="chips" role="group" aria-label="Jump to shot"></div>
+  </section>
+
+  <section class="sheet" aria-labelledby="charHead">
+    <div class="bio">
+      <span class="eyebrow">Character sheet</span>
+      <h3 id="charHead">Inspector Hash</h3>
+      <p class="tag">“Numbers, not opinions.”</p>
+      <dl>
+        <dt>Who</dt><dd>A golden hamster detective with puffy cheek pouches, a fedora, a # badge and a magnifying glass. Hash's eyes are cheerful ^ ^ arcs until something smells off.</dd>
+        <dt>Voice</dt><dd>Dry, precise, a little theatrical. Short sentences. Every claim gets a number and a date.</dd>
+        <dt>Tells</dt><dd>When a source is shaky, the eyes switch to suspicious dots and one eyebrow goes up. Hash points the magnifier at evidence and tips the hat and bows when the curtain falls.</dd>
+        <dt>Cast</dt><dd>Everyone is a hamster, each with their own fur colour and scarf: the party-hat crowd, a cinnamon pump hamster, two reporters in PRESS hats, a grey Ondo hamster with a blue scarf and a suitcase, and the BTC and ZEC accomplices in sunglasses. Only the RALLY train engine is still a machine.</dd>
+        <dt>Look</dt><dd>Watercolor wash on grainy paper with thick brown-black ink lines. The lines "boil" (redraw slightly, 8 times a second) like hand-drawn cel animation.</dd>
+        <dt>Palette</dt><dd><div class="swatches">
+          <span class="sw"><i style="background:#F2B36B"></i>Fur #F2B36B</span>
+          <span class="sw"><i style="background:#C8372D"></i>Curtain #C8372D</span>
+          <span class="sw"><i style="background:#F8D26A"></i>Lamp #F8D26A</span>
+          <span class="sw"><i style="background:#3E9CA3"></i>Pump #3E9CA3</span>
+          <span class="sw"><i style="background:#26324E"></i>Banner #26324E</span>
+        </div></dd>
+      </dl>
+    </div>
+    <div class="poses" id="poses"></div>
+  </section>
+
+  <section class="board" aria-labelledby="sbHead">
+    <div class="sec-head">
+      <span class="eyebrow">Storyboard</span>
+      <h2 id="sbHead">Nine shots, one stage</h2>
+      <p>Each thumbnail is a frame captured from the animation above. The notes list the set, the motion, what the cast does, the exact caption lines, and where every number comes from.</p>
+    </div>
+    <div id="board" class="board"></div>
+  </section>
+
+  <section class="board" aria-labelledby="pnHead">
+    <div class="sec-head">
+      <span class="eyebrow">Production notes</span>
+      <h2 id="pnHead">How the stage works</h2>
+    </div>
+    <div class="notes">
+      <div class="note"><h3>A camera and a 3D layer</h3><p>A virtual camera swoops, dollies and rolls across the paper stage. It pushes in on the snapshot, the padlock and the balloon, and pans to follow Ondo. In front of the stage, a real-time 3D layer adds toon-shaded coins, confetti, water spray, stamp shock rings, floating dust, and a 3D Hash the hamster who tumbles past the camera at every curtain change, holding a sign with the next exhibit number.</p></div>
+      <div class="note"><h3>Every prop is a metaphor</h3><p>A pump inflates the price thermometer, a padlock is the $3.33 condition, a balloon is TVL, a train is the rally that left before Ondo arrived, and cardboard waves are the market.</p></div>
+      <div class="note"><h3>Verdicts are stamps</h3><p>Each suspect ends with an ink stamp: green for strong evidence, amber for mixed, red for too late. The same colours are used on the final podium, which ranks the suspects.</p></div>
+    </div>
+  </section>
+
+  <section class="sources" aria-labelledby="srcHead">
+    <div class="sec-head" style="margin-bottom:14px">
+      <span class="eyebrow">Evidence locker</span>
+      <h2 id="srcHead">Sources</h2>
+      <p>All figures are as reported by these outlets. They were not re-checked against raw on-chain or exchange data. This is not investment advice.</p>
+    </div>
+    <ol>
+      <li><a href="https://www.prnewswire.com/news-releases/nearcoms-confidential-tvl-reaches-70-million-triggering-the-near3-33-snapshot-amid-industry-wide-privacy-wave-302881903.html">PR Newswire: $70M confidential TVL triggers NEAR@3.33</a></li>
+      <li><a href="https://crypto.news/near-crosses-70-million-in-confidential-tvl-unlocking-first-incentive-drop/">crypto.news: first incentive drop</a></li>
+      <li><a href="https://www.cryptotimes.io/2026/09/17/near-price-jumps-14-3-to-2-87-as-70m-confidential-tvl-triggers-near-3-33-snapshot/">The Crypto Times: +14.3% to $2.87</a></li>
+      <li><a href="https://panews.io/articles/01a0c35f-5440-74b7-a3cb-c4a5f0bf1dc5">PANews: option-style airdrop logic</a></li>
+      <li><a href="https://www.tradingview.com/news/coindar:bdd26a9a4094b:0-near-launches-near-3-33-milestone-incentive-program/">TradingView/Coindar: NEAR@3.33 program</a></li>
+      <li><a href="https://cryptobriefing.com/near-protocol-intents-30-billion-volume-record/">Crypto Briefing: Intents pass $30B (Dune)</a></li>
+      <li><a href="https://en.cryptonomist.ch/2026/09/18/near-protocol-crypto-analysis-fee-surge/">The Cryptonomist: fee surge</a></li>
+      <li><a href="https://parameter.io/near-protocol-near-explodes-45-in-three-days-key-drivers-behind-the-surge/">Parameter: +45% in three days</a></li>
+      <li><a href="https://www.altcoinbuzz.io/near-s-confidential-perpetuals-cover-50-hyperliquid-markets">Altcoin Buzz: confidential perps, 50+ markets</a></li>
+      <li><a href="https://cryptobriefing.com/near-surges-confidential-futures-trading/">Crypto Briefing: confidential futures launch</a></li>
+      <li><a href="https://coingape.com/markets/near-protocol-price-prediction-as-tvl-surpasses-207m-after-70-weekly-surge/">CoinGape: TVL passes $207M</a></li>
+      <li><a href="https://bitcoinethereumnews.com/finance/near-protocol-tvl-approaches-300-million-tvl-fueled-by-ondo-partnership/">BEN: chain TVL $191M → $350M+ (DefiLlama)</a></li>
+      <li><a href="https://www.fxstreet.com/cryptocurrencies/news/near-partners-with-ondo-to-bring-tokenized-us-stocks-etfs-with-confidential-execution-202609231154">FXStreet: Ondo partnership, Sep 23</a></li>
+      <li><a href="https://cointelegraph.com/markets/near-price-surge-intents-zcash-privacy">Cointelegraph: +80% as Intents near $30B</a></li>
+      <li><a href="https://www.cryptotimes.io/2026/09/24/inside-bitcoins-september-2026-rally-btc-reclaiming-87k-2b-in-etf-inflows-and-a-short-squeeze/">The Crypto Times: Bitcoin short squeeze</a></li>
+      <li><a href="https://investinglive.com/education/crypto-open-interest-jumped-as-650m-of-shorts-were-squeezed-where-the-data-comes-from/">investingLive: ~$650M shorts squeezed</a></li>
+      <li><a href="https://fortune.com/2026/09/23/zcash-record-high-1600-token-privacy-narrative-investors/">Fortune: Zcash record $1,600</a></li>
+      <li><a href="https://www.kucoin.com/blog/privacy-coins-surge-to-33-6b-market-cap-as-zec-soars-2496-2026-s-top-crypto-sector">KuCoin: privacy sector $33.6B</a></li>
+      <li><a href="https://bex.co/blog/2026/01/26/berachain-one-year-later-proof-of-liquidity-reality-check">bex.co: Berachain TVL −88% from peak</a></li>
+    </ol>
+  </section>
+  <p class="fine">This is an explainer, not investment advice.</p>
+</main>
+
+<script src="three128/dist/gsap.min.js"></script>
+<script src="three128/build/three.min.js"></script>
+<script>
+(function(){
+  const NS = 'http://www.w3.org/2000/svg';
+  const $ = id => document.getElementById(id);
+  const INK = '#2A1E1A';
+  const K = { cream:'#FFF6E6', wood:'#E7BD86', woodD:'#B9854F', orange:'#E8783E', orangeL:'#F6A56E', orangeD:'#C9582A',
+              red:'#C8372D', redD:'#8E2119', yellow:'#F8D26A', pink:'#F29BB2', teal:'#3E9CA3', tealL:'#6CC0C2', green:'#5DA34E',
+              greenS:'#6DBF7A', amberS:'#F2B84B', redS:'#E06A5A', navy:'#26324E', brown:'#7A5236', blue1:'#7FBEDA', blue2:'#4E98C2', blue3:'#2F6E99' };
+  function el(tag, attrs, parent, text){
+    const e = document.createElementNS(NS, tag);
+    for (const k in (attrs||{})) e.setAttribute(k, attrs[k]);
+    if (text != null) e.textContent = text;
+    if (parent) parent.appendChild(e);
+    return e;
+  }
+  function place(parent, x, y, rot, sc){
+    const o = el('g', {transform:`translate(${x},${y})` + (rot ? ` rotate(${rot})` : '') + (sc ? ` scale(${sc})` : '')}, parent);
+    return el('g', {}, o);
+  }
+  const hand = (p, x, y, s, size, fill, anchor, extra) => el('text', Object.assign({x, y, 'font-size':size, fill:fill||INK, class:'hand', 'text-anchor':anchor||'middle'}, extra||{}), p, s);
+  function sign(p, x, y, w, h, lines, size, color){
+    const g = place(p, x, y);
+    el('rect', {x:-w/2, y:-h/2, width:w, height:h, rx:10, fill:K.wood, stroke:INK, 'stroke-width':5}, g);
+    el('path', {d:`M${-w/2+10} ${-h/2+h*.34} H${w/2-14} M${-w/2+16} ${h/2-h*.3} H${w/2-10}`, stroke:K.woodD, 'stroke-width':3, opacity:.5, fill:'none'}, g);
+    const lh = size*1.05, y0 = -((lines.length-1)*lh)/2 + size*.34;
+    lines.forEach((l, i) => hand(g, 0, y0 + i*lh, l, size, color||INK));
+    return g;
+  }
+  function paper(p, x, y, w, h, rot){
+    const g = place(p, x, y, rot);
+    el('rect', {x:-w/2, y:-h/2, width:w, height:h, rx:6, fill:K.cream, stroke:INK, 'stroke-width':4}, g);
+    el('rect', {x:-30, y:-h/2-12, width:60, height:22, fill:K.yellow, opacity:.8, transform:'rotate(-4)'}, g);
+    return g;
+  }
+  function stampV(p, x, y, w, s, color){
+    const g = place(p, x, y, -8);
+    g.__pos = [x, y];
+    el('rect', {x:-w/2, y:-40, width:w, height:80, rx:8, fill:K.cream, 'fill-opacity':.85, stroke:color, 'stroke-width':6}, g);
+    el('rect', {x:-w/2+8, y:-32, width:w-16, height:64, rx:4, fill:'none', stroke:color, 'stroke-width':2}, g);
+    hand(g, 0, 13, s, 38, color);
+    return g;
+  }
+  function bubble(p, x, y, w, h, s, size, tail){
+    const g = place(p, x, y);
+    const tx = tail === 'r' ? w/2 - 30 : -w/2 + 30;
+    el('path', {d:`M${-w/2+16} ${-h/2} H${w/2-16} Q${w/2} ${-h/2} ${w/2} ${-h/2+16} V${h/2-16} Q${w/2} ${h/2} ${w/2-16} ${h/2} H${tx+14} L${tx - (tail==='r'?-10:10)} ${h/2+26} L${tx-8} ${h/2} H${-w/2+16} Q${-w/2} ${h/2} ${-w/2} ${h/2-16} V${-h/2+16} Q${-w/2} ${-h/2} ${-w/2+16} ${-h/2} Z`, fill:K.cream, stroke:INK, 'stroke-width':4, 'stroke-linejoin':'round'}, g);
+    hand(g, 0, size*.34, s, size);
+    return g;
+  }
+  // Hamster character (the whole cast). Same interface as the old box: {inner (GSAP-safe), bob (procedural), outer, top}.
+  const FURS = ['#F2B36B', '#EBD3AE', '#C9C2B8', '#D99A5B', '#F5E6CF', '#E3A35F'];
+  let furIdx = 0;
+  function box(p, x, y, o){
+    o = Object.assign({w:118, h:84, color:K.orange, s:1, hat:null, label:null, shades:false}, o||{});
+    if (o.kind === 'box') return boxShape(p, x, y, o);
+    const fur = o.fur || FURS[furIdx++ % FURS.length];
+    const outer = el('g', {transform:`translate(${x},${y}) scale(${o.s})`}, p);
+    const inner = el('g', {}, outer);
+    el('ellipse', {cx:0, cy:2, rx:o.w*.5, ry:8, fill:'#6B3F1F', opacity:.28}, inner);
+    const bob = el('g', {}, inner);
+    const w = o.w, h = o.h, top = -h - 10;
+    const ry = (h + 8)/2, cy = -ry - 3, er = Math.max(9, w*.13);
+    // ears
+    [-1, 1].forEach(sx => {
+      el('circle', {cx:sx*w*.3, cy:top + h*.14, r:er, fill:fur, stroke:INK, 'stroke-width':4}, bob);
+      el('circle', {cx:sx*w*.3, cy:top + h*.15, r:er*.55, fill:'#F4A3A8'}, bob);
+    });
+    // tail + body
+    el('ellipse', {cx:w*.47, cy:cy + ry*.55, rx:8, ry:6, fill:fur, stroke:INK, 'stroke-width':3}, bob);
+    el('ellipse', {cx:0, cy, rx:w/2, ry, fill:fur, stroke:INK, 'stroke-width':5}, bob);
+    el('path', {d:`M${-w*.34} ${cy - ry*.62} Q${-w*.1} ${cy - ry*.98} ${w*.14} ${cy - ry*.9}`, stroke:'#fff', 'stroke-width':7, fill:'none', 'stroke-linecap':'round', opacity:.35}, bob);
+    el('ellipse', {cx:0, cy:cy + ry*.38, rx:w*.3, ry:ry*.48, fill:'#FFF1DC'}, bob);
+    // cheeks, blush, whiskers
+    const ey = top + h*.42, ex = w*.18;
+    [-1, 1].forEach(sx => {
+      el('ellipse', {cx:sx*w*.3, cy:ey + 15, rx:w*.17, ry:w*.13, fill:'#FFF1DC', stroke:INK, 'stroke-width':3}, bob);
+      el('ellipse', {cx:sx*w*.31, cy:ey + 18, rx:w*.08, ry:w*.045, fill:'#F2839A', opacity:.55}, bob);
+      el('path', {d:`M${sx*w*.4} ${ey + 10} L${sx*(w*.4 + 18)} ${ey + 6} M${sx*w*.4} ${ey + 16} L${sx*(w*.4 + 19)} ${ey + 17}`, stroke:INK, 'stroke-width':2, 'stroke-linecap':'round'}, bob);
+    });
+    // scarf in the character's accent colour
+    el('path', {d:`M${-w*.22} ${ey + 30} Q0 ${ey + 40} ${w*.22} ${ey + 30} L${w*.06} ${ey + 52} L0 ${ey + 44} Z`, fill:o.color, stroke:INK, 'stroke-width':3, 'stroke-linejoin':'round'}, bob);
+    // eyes / shades
+    if (o.shades){
+      el('path', {d:`M${-ex-15} ${ey-8} H${ex+15} V${ey+1} Q${ex+15} ${ey+10} ${ex+5} ${ey+10} H${ex-7} Q${ex-12} ${ey+10} ${ex-14} ${ey+1} H${-ex+14} Q${-ex+12} ${ey+10} ${-ex+7} ${ey+10} H${-ex-5} Q${-ex-15} ${ey+10} ${-ex-15} ${ey+1} Z`, fill:INK}, bob);
+      el('path', {d:`M${-ex-8} ${ey-4} l6 0 M${ex-8} ${ey-4} l6 0`, stroke:'#fff', 'stroke-width':2.5, 'stroke-linecap':'round', opacity:.8}, bob);
+    } else {
+      el('path', {d:`M${-ex-8} ${ey+3} L${-ex} ${ey-6} L${-ex+8} ${ey+3} M${ex-8} ${ey+3} L${ex} ${ey-6} L${ex+8} ${ey+3}`, stroke:INK, 'stroke-width':4.5, fill:'none', 'stroke-linecap':'round', 'stroke-linejoin':'round'}, bob);
+    }
+    // nose + mouth + teeth
+    el('ellipse', {cx:0, cy:ey + 9, rx:5, ry:4, fill:'#E8828C', stroke:INK, 'stroke-width':2.5}, bob);
+    el('path', {d:`M-8 ${ey + 16} Q-4 ${ey + 21} 0 ${ey + 15} Q4 ${ey + 21} 8 ${ey + 16}`, stroke:INK, 'stroke-width':3, fill:'none', 'stroke-linecap':'round'}, bob);
+    el('rect', {x:-3.5, y:ey + 16, width:7, height:5, rx:1, fill:'#fff', stroke:INK, 'stroke-width':1.5}, bob);
+    // paws + feet
+    [-1, 1].forEach(sx => {
+      el('ellipse', {cx:sx*w*.26, cy:cy + ry*.2, rx:w*.08, ry:w*.065, fill:'#F4A3A8', stroke:INK, 'stroke-width':3}, bob);
+      el('ellipse', {cx:sx*w*.22, cy:-3, rx:w*.13, ry:6, fill:'#F4A3A8', stroke:INK, 'stroke-width':3.5}, bob);
+    });
+    if (o.label) hand(bob, 0, cy + ry*.62, o.label, Math.min(22, w*.26), INK);
+    if (o.hat === 'party'){
+      const hx = w*.1;
+      el('path', {d:`M${hx-20} ${top+6} L${hx} ${top-50} L${hx+20} ${top+6} Z`, fill:K.pink, stroke:INK, 'stroke-width':4, 'stroke-linejoin':'round'}, bob);
+      el('circle', {cx:hx-4, cy:top-14, r:3.5, fill:K.yellow}, bob);
+      el('circle', {cx:hx+5, cy:top-30, r:3.5, fill:K.yellow}, bob);
+      el('circle', {cx:hx, cy:top-52, r:8, fill:K.yellow, stroke:INK, 'stroke-width':3}, bob);
+    }
+    if (o.hat === 'press'){
+      el('ellipse', {cx:0, cy:top+4, rx:w*.46, ry:9, fill:K.brown, stroke:INK, 'stroke-width':4}, bob);
+      el('path', {d:`M${-w*.28} ${top+4} Q${-w*.3} ${top-34} ${-w*.1} ${top-36} H${w*.1} Q${w*.3} ${top-34} ${w*.28} ${top+4} Z`, fill:'#8C6242', stroke:INK, 'stroke-width':4}, bob);
+      el('rect', {x:w*.02, y:top-22, width:34, height:16, fill:K.cream, stroke:INK, 'stroke-width':2}, bob);
+      hand(bob, w*.02+17, top-9, 'PRESS', 11, INK);
+    }
+    return {outer, inner, bob, top};
+  }
+  // Plain box shape, kept only for machines (the RALLY train engine).
+  function boxShape(p, x, y, o){
+    o = Object.assign({w:118, h:84, color:K.orange, light:K.orangeL, s:1, hat:null, label:null, shades:false}, o||{});
+    const outer = el('g', {transform:`translate(${x},${y}) scale(${o.s})`}, p);
+    const inner = el('g', {}, outer);
+    el('ellipse', {cx:0, cy:2, rx:o.w*.52, ry:8, fill:'#6B3F1F', opacity:.28}, inner);
+    const bob = el('g', {}, inner);
+    const w = o.w, h = o.h, top = -24 - h;
+    [-.36,-.16,.06,.26].forEach(f => el('rect', {x:w*f, y:-26, width:12, height:26, rx:3, fill:o.color, stroke:INK, 'stroke-width':4}, bob));
+    el('rect', {x:-w/2-16, y:top+h*.42, width:22, height:12, rx:6, fill:o.color, stroke:INK, 'stroke-width':4, transform:`rotate(-28 ${-w/2} ${top+h*.48})`}, bob);
+    el('rect', {x:w/2-6, y:top+h*.42, width:22, height:12, rx:6, fill:o.color, stroke:INK, 'stroke-width':4, transform:`rotate(28 ${w/2} ${top+h*.48})`}, bob);
+    el('rect', {x:-w/2, y:top, width:w, height:h, rx:8, fill:o.color, stroke:INK, 'stroke-width':5}, bob);
+    el('rect', {x:-w/2+8, y:top+7, width:w*.62, height:h*.22, rx:7, fill:o.light, opacity:.75}, bob);
+    const ey = top + h*.42, ex = w*.2;
+    if (o.shades){
+      el('path', {d:`M${-ex-18} ${ey-8} H${ex+18} V${ey+2} Q${ex+18} ${ey+12} ${ex+6} ${ey+12} H${ex-8} Q${ex-14} ${ey+12} ${ex-16} ${ey+2} H${-ex+16} Q${-ex+14} ${ey+12} ${-ex+8} ${ey+12} H${-ex-6} Q${-ex-18} ${ey+12} ${-ex-18} ${ey+2} Z`, fill:INK}, bob);
+    } else {
+      el('path', {d:`M${-ex-9} ${ey+4} L${-ex} ${ey-6} L${-ex+9} ${ey+4} M${ex-9} ${ey+4} L${ex} ${ey-6} L${ex+9} ${ey+4}`, stroke:INK, 'stroke-width':4.5, fill:'none', 'stroke-linecap':'round', 'stroke-linejoin':'round'}, bob);
+    }
+    el('path', {d:`M-9 ${ey+14} Q0 ${ey+22} 9 ${ey+14}`, stroke:INK, 'stroke-width':4, fill:'none', 'stroke-linecap':'round'}, bob);
+    if (o.label) hand(bob, 0, top + h*.9, o.label, 22, INK);
+    if (o.hat === 'party'){
+      const hx = w*.12;
+      el('path', {d:`M${hx-22} ${top+2} L${hx} ${top-56} L${hx+22} ${top+2} Z`, fill:K.pink, stroke:INK, 'stroke-width':4, 'stroke-linejoin':'round'}, bob);
+      el('circle', {cx:hx-4, cy:top-18, r:3.5, fill:K.yellow}, bob);
+      el('circle', {cx:hx+6, cy:top-34, r:3.5, fill:K.yellow}, bob);
+      el('circle', {cx:hx, cy:top-58, r:8, fill:K.yellow, stroke:INK, 'stroke-width':3}, bob);
+    }
+    if (o.hat === 'press'){
+      el('ellipse', {cx:0, cy:top, rx:w*.46, ry:9, fill:K.brown, stroke:INK, 'stroke-width':4}, bob);
+      el('path', {d:`M${-w*.28} ${top} Q${-w*.3} ${top-38} ${-w*.1} ${top-40} H${w*.1} Q${w*.3} ${top-38} ${w*.28} ${top} Z`, fill:'#8C6242', stroke:INK, 'stroke-width':4}, bob);
+      el('rect', {x:w*.02, y:top-26, width:34, height:16, fill:K.cream, stroke:INK, 'stroke-width':2}, bob);
+      hand(bob, w*.02+17, top-13, 'PRESS', 11, INK);
+    }
+    return {outer, inner, bob, top};
+  }
+
+  // ---------- Real-time 3D layer (toon-shaded, ink-outlined, driven by the same timeline) ----------
+  function build3D(){
+    if (!window.THREE || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return null;
+    const canvas = $('gl');
+    let renderer;
+    try { renderer = new THREE.WebGLRenderer({canvas, alpha:true, antialias:true}); } catch(e){ return null; }
+    renderer.setPixelRatio(Math.min(2, window.devicePixelRatio || 1));
+    renderer.setClearColor(0x000000, 0);
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(40, 16/9, .1, 200);
+    camera.position.set(0, 0, 10);
+    scene.add(new THREE.HemisphereLight(0xFFF4D6, 0xD39A5E, 1.0));
+    const dl = new THREE.DirectionalLight(0xffffff, .75); dl.position.set(3, 5, 6); scene.add(dl);
+    const grad = new THREE.DataTexture(new Uint8Array([95, 175, 255]), 3, 1, THREE.LuminanceFormat);
+    grad.minFilter = grad.magFilter = THREE.NearestFilter; grad.needsUpdate = true;
+    const toon = c => new THREE.MeshToonMaterial({color:c, gradientMap:grad});
+    const inkBack = new THREE.MeshBasicMaterial({color:0x2A1E1A, side:THREE.BackSide});
+    const VH = 2*10*Math.tan(20*Math.PI/180), VW = VH*16/9;
+    const W = (sx, sy) => [(sx/1600 - .5)*VW, -(sy/900 - .5)*VH];
+    const rnd = (i, k) => { const x = Math.sin(i*127.1 + k*311.7)*43758.5453; return x - Math.floor(x); };
+    const dm = new THREE.Object3D();
+    const hide = (mesh, i) => { dm.position.set(0, -99, 0); dm.scale.setScalar(0); dm.updateMatrix(); mesh.setMatrixAt(i, dm.matrix); };
+
+    // Confetti
+    const BURSTS = [
+      {t:4.0, sx:690, sy:330, n:110}, {t:29.7, sx:1210, sy:650, n:70}, {t:40.5, sx:1150, sy:650, n:50, green:true},
+      {t:97.1, sx:800, sy:430, n:140}, {t:98.3, sx:430, sy:300, n:60}, {t:99.2, sx:1180, sy:300, n:60}
+    ];
+    let CN = 0; BURSTS.forEach(b => { b.i0 = CN; CN += b.n; });
+    const conf = new THREE.InstancedMesh(new THREE.PlaneGeometry(.14, .24), new THREE.MeshLambertMaterial({side:THREE.DoubleSide}), CN);
+    conf.instanceMatrix.setUsage(THREE.DynamicDrawUsage);
+    const pal = [0xF8D26A, 0xE8783E, 0xF29BB2, 0x3E9CA3, 0x7CC48A, 0xC8372D, 0xFFFFFF].map(c => new THREE.Color(c));
+    const greens = [0x7CC48A, 0x4E9A5A, 0xB7E4B0].map(c => new THREE.Color(c));
+    BURSTS.forEach(b => { for (let j = 0; j < b.n; j++) conf.setColorAt(b.i0 + j, (b.green ? greens : pal)[j % (b.green ? 3 : 7)]); });
+    conf.frustumCulled = false; scene.add(conf);
+
+    // Coins (toon gold + inverted-hull ink outline)
+    const COINS = [{t:4.05, sx:690, sy:330, n:26, mode:'burst'}, {t:23.8, n:64, mode:'rain'}, {t:97.2, sx:800, sy:420, n:34, mode:'burst'}];
+    let KN = 0; COINS.forEach(c => { c.i0 = KN; KN += c.n; });
+    const coinGeo = new THREE.CylinderGeometry(.32, .32, .08, 28);
+    const coins = new THREE.InstancedMesh(coinGeo, toon(0xF2C14E), KN);
+    const coinsInk = new THREE.InstancedMesh(coinGeo, inkBack, KN);
+    [coins, coinsInk].forEach(m => { m.instanceMatrix.setUsage(THREE.DynamicDrawUsage); m.frustumCulled = false; scene.add(m); });
+
+    // Water droplets for the market wave
+    const DROPS = {t:83.0, n:90};
+    const drops = new THREE.InstancedMesh(new THREE.IcosahedronGeometry(.075, 1), toon(0x7FBEDA), DROPS.n);
+    drops.instanceMatrix.setUsage(THREE.DynamicDrawUsage); drops.frustumCulled = false; scene.add(drops);
+
+    // Exhibit cube: a 3D Hash-block that tumbles past the camera at every curtain change
+    const faceCanvas = document.createElement('canvas'); faceCanvas.width = faceCanvas.height = 256;
+    const faceTex = new THREE.CanvasTexture(faceCanvas);
+    let faceN = -1;
+    function drawFace(n){
+      const c = faceCanvas.getContext('2d');
+      c.fillStyle = '#E7BD86'; c.fillRect(0, 0, 256, 256);
+      c.strokeStyle = '#B9854F'; c.lineWidth = 4; c.beginPath(); c.moveTo(20, 90); c.lineTo(236, 90); c.moveTo(20, 176); c.lineTo(236, 176); c.stroke();
+      c.strokeStyle = '#2A1E1A'; c.lineWidth = 12; c.strokeRect(6, 6, 244, 244);
+      c.fillStyle = '#2A1E1A'; c.textAlign = 'center';
+      c.font = 'bold 40px "Gochi Hand", "Comic Sans MS", cursive'; c.fillText('EXHIBIT', 128, 72);
+      c.fillStyle = '#C8372D'; c.font = 'bold 86px "Gochi Hand", "Comic Sans MS", cursive'; c.fillText(n + '/9', 128, 162);
+      c.fillStyle = '#2A1E1A'; c.font = 'bold 40px "Gaegu", sans-serif'; c.fillText('증거 ' + n, 128, 222);
+      faceTex.needsUpdate = true; faceN = n;
+    }
+    const fur = toon(0xF2B36B), cream = toon(0xFFF1DC), pink = toon(0xF4A3A8), black = new THREE.MeshBasicMaterial({color:0x2A1E1A});
+    const inked = (mesh, k) => { const ink = new THREE.Mesh(mesh.geometry, inkBack); ink.scale.setScalar(k || 1.06); mesh.add(ink); return mesh; };
+    const cube = new THREE.Group();
+    const body = inked(new THREE.Mesh(new THREE.SphereGeometry(1.1, 32, 24), fur)); body.scale.set(1, .95, .92); cube.add(body);
+    const belly = new THREE.Mesh(new THREE.SphereGeometry(.7, 24, 18), cream); belly.position.set(0, -.35, .62); belly.scale.set(1, .8, .5); cube.add(belly);
+    [-1, 1].forEach(sx => {
+      const cheek = inked(new THREE.Mesh(new THREE.SphereGeometry(.38, 20, 16), cream), 1.08); cheek.position.set(sx*.62, .02, .72); cube.add(cheek);
+      const ear = inked(new THREE.Mesh(new THREE.SphereGeometry(.3, 20, 16), fur), 1.08); ear.scale.set(1, 1, .5); ear.position.set(sx*.72, .82, .1); cube.add(ear);
+      const earIn = new THREE.Mesh(new THREE.SphereGeometry(.17, 16, 12), pink); earIn.scale.set(1, 1, .4); earIn.position.set(sx*.72, .82, .22); cube.add(earIn);
+      const eye = new THREE.Mesh(new THREE.SphereGeometry(.11, 16, 12), black); eye.position.set(sx*.34, .34, .96); cube.add(eye);
+      const glint = new THREE.Mesh(new THREE.SphereGeometry(.035, 8, 6), new THREE.MeshBasicMaterial({color:0xffffff})); glint.position.set(sx*.34 + .04, .38, 1.06); cube.add(glint);
+      const paw = inked(new THREE.Mesh(new THREE.SphereGeometry(.17, 14, 10), pink)); paw.position.set(sx*.42, -.52, 1.0); cube.add(paw);
+    });
+    const nose = new THREE.Mesh(new THREE.SphereGeometry(.09, 12, 8), toon(0xE8828C)); nose.position.set(0, .16, 1.04); cube.add(nose);
+    const signMat = new THREE.MeshToonMaterial({map:faceTex, gradientMap:grad}), wood = toon(0xE7BD86);
+    const signB = inked(new THREE.Mesh(new THREE.BoxGeometry(1.7, 1.2, .1), [wood, wood, wood, wood, signMat, wood]), 1.05);
+    signB.position.set(0, -.62, 1.2); signB.rotation.x = -.12; cube.add(signB);
+    const hat = new THREE.Group();
+    const brim = new THREE.Mesh(new THREE.CylinderGeometry(1.2, 1.2, .12, 32), toon(0x7A5236));
+    const crown = new THREE.Mesh(new THREE.CylinderGeometry(.66, .78, .7, 32), toon(0x8C6242));
+    const band = new THREE.Mesh(new THREE.CylinderGeometry(.79, .79, .17, 32), toon(0xF8D26A));
+    crown.position.y = .4; band.position.y = .14;
+    [brim, crown, band].forEach(m => { hat.add(m); inked(m); });
+    hat.position.y = 1.02; hat.rotation.z = -.14; cube.add(hat);
+    cube.visible = false; scene.add(cube);
+    const TR = SC.slice(1).map((sc, i) => ({t0:sc.t - .8, t1:sc.t + .8, n:i + 2}));
+
+    // Stamp shock rings
+    const ringMats = [], rings = [];
+    for (let i = 0; i < 3; i++){
+      const m = new THREE.MeshBasicMaterial({color:i % 2 ? 0xF8D26A : 0x2A1E1A, transparent:true});
+      const r = new THREE.Mesh(new THREE.TorusGeometry(1, .05, 8, 48), m);
+      r.visible = false; scene.add(r); rings.push(r); ringMats.push(m);
+    }
+
+    // Floating dust motes for depth
+    const DN = 70, dust = new Float32Array(DN*3);
+    const dustGeo = new THREE.BufferGeometry(); dustGeo.setAttribute('position', new THREE.BufferAttribute(dust, 3));
+    const dustPts = new THREE.Points(dustGeo, new THREE.PointsMaterial({color:0xFFF3D0, size:.07, transparent:true, opacity:.75, depthWrite:false}));
+    scene.add(dustPts);
+
+    let cw = 0, ch = 0;
+    function render(t, w){
+      const rw = canvas.clientWidth, rh = canvas.clientHeight;
+      if (rw && (rw !== cw || rh !== ch)){ cw = rw; ch = rh; renderer.setSize(rw, rh, false); }
+      // confetti
+      BURSTS.forEach(b => {
+        const a = t - b.t, [ox, oy] = W(b.sx, b.sy);
+        for (let j = 0; j < b.n; j++){
+          const i = b.i0 + j;
+          if (a < 0 || a > 3.4){ hide(conf, i); continue; }
+          const vx = (rnd(i, 1) - .5)*7, vy = 3.5 + rnd(i, 2)*5.5, vz = rnd(i, 3)*7;
+          const drag = (1 - Math.exp(-1.6*a))/1.6;
+          dm.position.set(ox + vx*drag + Math.sin(a*7 + i)*.18, oy + vy*drag - 2.2*a*a, vz*drag);
+          dm.rotation.set(rnd(i, 4)*12*a, rnd(i, 5)*12*a, rnd(i, 6)*8*a);
+          dm.scale.setScalar(a > 2.7 ? Math.max(0, (3.4 - a)/.7) : 1);
+          dm.updateMatrix(); conf.setMatrixAt(i, dm.matrix);
+        }
+      });
+      conf.instanceMatrix.needsUpdate = true;
+      // coins
+      COINS.forEach(c => {
+        const a = t - c.t;
+        for (let j = 0; j < c.n; j++){
+          const i = c.i0 + j;
+          if (a < 0 || a > 3.6){ hide(coins, i); hide(coinsInk, i); continue; }
+          if (c.mode === 'rain'){
+            const d = a - rnd(i, 7)*1.2; if (d < 0){ hide(coins, i); hide(coinsInk, i); continue; }
+            dm.position.set((rnd(i, 1) - .5)*VW*1.1, VH/2 + 1 - d*(5 + rnd(i, 2)*3) - d*d*2, -3 + rnd(i, 3)*8);
+          } else {
+            const [ox, oy] = W(c.sx, c.sy);
+            const vx = (rnd(i, 1) - .5)*8, vy = 4 + rnd(i, 2)*5, vz = 1 + rnd(i, 3)*6;
+            dm.position.set(ox + vx*a, oy + vy*a - 4.9*a*a, vz*a);
+          }
+          dm.rotation.set(Math.PI/2 + a*(3 + rnd(i, 4)*6), a*(2 + rnd(i, 5)*4), rnd(i, 6)*2);
+          dm.scale.setScalar(1);
+          dm.updateMatrix(); coins.setMatrixAt(i, dm.matrix);
+          dm.scale.setScalar(1.16); dm.updateMatrix(); coinsInk.setMatrixAt(i, dm.matrix);
+        }
+      });
+      coins.instanceMatrix.needsUpdate = true; coinsInk.instanceMatrix.needsUpdate = true;
+      // droplets
+      {
+        const a = t - DROPS.t;
+        for (let i = 0; i < DROPS.n; i++){
+          const d = a - rnd(i, 8)*1.4;
+          if (d < 0 || d > 1.5 || t > 87){ hide(drops, i); continue; }
+          const [ox, oy] = W(430 + rnd(i, 1)*1000, 700);
+          dm.position.set(ox + (rnd(i, 2) - .5)*d*2, oy + (3 + rnd(i, 3)*4)*d - 6*d*d, rnd(i, 4)*4*d);
+          dm.rotation.set(0, 0, 0); dm.scale.setScalar(.8 + rnd(i, 5)*1.2);
+          dm.updateMatrix(); drops.setMatrixAt(i, dm.matrix);
+        }
+        drops.instanceMatrix.needsUpdate = true;
+      }
+      // exhibit cube
+      const tr = TR.find(r => t >= r.t0 && t <= r.t1);
+      if (tr){
+        if (faceN !== tr.n) drawFace(tr.n);
+        const p = (t - tr.t0)/(tr.t1 - tr.t0);
+        cube.visible = true;
+        cube.position.set(-3.2 + p*5.2 + Math.sin(p*Math.PI)*.6, Math.sin(p*Math.PI)*.7 - .4, -26 + p*37);
+        cube.rotation.set((p - .5)*Math.PI*.5 + Math.sin(p*Math.PI*3)*.15, (p - .5)*Math.PI*1.3, Math.sin(p*Math.PI*2)*.35);
+      } else cube.visible = false;
+      // rings
+      rings.forEach(r => r.visible = false);
+      RINGS.forEach((rg, k) => {
+        const a = t - rg.t; if (a < 0 || a > .7) return;
+        const [x, y] = W(rg.sx, rg.sy);
+        for (let q = 0; q < 2; q++){
+          const r = rings[(k*2 + q) % 3]; const aa = Math.max(0, a - q*.08);
+          r.visible = true; r.position.set(x, y, .5);
+          r.rotation.set(1.1, 0, 0);
+          r.scale.setScalar(.4 + aa*5.5);
+          r.material.opacity = Math.max(0, 1 - aa/.62);
+        }
+      });
+      // dust
+      for (let i = 0; i < DN; i++){
+        dust[i*3] = ((rnd(i, 1) - .5)*VW*1.1 + Math.sin(w*.3 + i)*.4);
+        dust[i*3+1] = (((rnd(i, 2)*VH + w*(.08 + rnd(i, 3)*.12)) % VH) - VH/2);
+        dust[i*3+2] = 1 + rnd(i, 4)*5;
+      }
+      dustGeo.attributes.position.needsUpdate = true;
+      renderer.render(scene, camera);
+    }
+    return {render};
+  }
+
+  // ---------- Sound: tiny synthesized effects (only after the viewer presses play with voice) ----------
+  let AC = null, sfxOn = false;
+  function initAudio(){ try { AC = AC || new (window.AudioContext || window.webkitAudioContext)(); AC.resume && AC.resume(); } catch(e){ AC = null; } }
+  function noiseBuf(dur){ const b = AC.createBuffer(1, AC.sampleRate*dur, AC.sampleRate); const d = b.getChannelData(0); for (let i = 0; i < d.length; i++) d[i] = Math.random()*2 - 1; return b; }
+  function sfx(kind){
+    if (!sfxOn || !AC || tl.paused()) return;
+    const n = AC.currentTime, g = AC.createGain(); g.connect(AC.destination);
+    if (kind === 'pop'){ const o = AC.createOscillator(); o.type = 'sine'; o.frequency.setValueAtTime(520, n); o.frequency.exponentialRampToValueAtTime(1250, n+.07); g.gain.setValueAtTime(.12, n); g.gain.exponentialRampToValueAtTime(.001, n+.12); o.connect(g); o.start(n); o.stop(n+.13); }
+    if (kind === 'thump'){ const o = AC.createOscillator(); o.type = 'sine'; o.frequency.setValueAtTime(150, n); o.frequency.exponentialRampToValueAtTime(45, n+.25); g.gain.setValueAtTime(.55, n); g.gain.exponentialRampToValueAtTime(.001, n+.3); o.connect(g); o.start(n); o.stop(n+.32);
+      const s = AC.createBufferSource(); s.buffer = noiseBuf(.08); const f = AC.createBiquadFilter(); f.type = 'lowpass'; f.frequency.value = 900; const g2 = AC.createGain(); g2.gain.setValueAtTime(.35, n); g2.gain.exponentialRampToValueAtTime(.001, n+.08); s.connect(f); f.connect(g2); g2.connect(AC.destination); s.start(n); }
+    if (kind === 'whoosh'){ const s = AC.createBufferSource(); s.buffer = noiseBuf(.6); const f = AC.createBiquadFilter(); f.type = 'bandpass'; f.Q.value = 1.2; f.frequency.setValueAtTime(350, n); f.frequency.exponentialRampToValueAtTime(1800, n+.45); g.gain.setValueAtTime(.001, n); g.gain.exponentialRampToValueAtTime(.16, n+.15); g.gain.exponentialRampToValueAtTime(.001, n+.55); s.connect(f); f.connect(g); s.start(n); }
+    if (kind === 'flash'){ const s = AC.createBufferSource(); s.buffer = noiseBuf(.15); const f = AC.createBiquadFilter(); f.type = 'highpass'; f.frequency.value = 2500; g.gain.setValueAtTime(.3, n); g.gain.exponentialRampToValueAtTime(.001, n+.14); s.connect(f); f.connect(g); s.start(n); }
+    if (kind === 'ding' || kind === 'buzz'){ const fr = kind === 'ding' ? [880, 1320] : [180, 150]; fr.forEach((f, i) => { const o = AC.createOscillator(); o.type = kind === 'ding' ? 'sine' : 'square'; o.frequency.value = f; const gg = AC.createGain(); gg.gain.setValueAtTime(.001, n + i*.09); gg.gain.exponentialRampToValueAtTime(kind === 'ding' ? .14 : .05, n + i*.09 + .02); gg.gain.exponentialRampToValueAtTime(.001, n + i*.09 + .35); o.connect(gg); gg.connect(AC.destination); o.start(n + i*.09); o.stop(n + i*.09 + .4); }); }
+  }
+
+  // ---------- Static set: rays, floor, curtains, valance ----------
+  (function(){
+    const rays = $('rays');
+    for (let i = 0; i < 18; i++){
+      const a0 = (i/18)*Math.PI*2, a1 = a0 + Math.PI/36;
+      el('path', {d:`M800 330 L${800+1400*Math.cos(a0)} ${330+1400*Math.sin(a0)} L${800+1400*Math.cos(a1)} ${330+1400*Math.sin(a1)} Z`, fill:'#FFF6D0'}, rays);
+    }
+    const f = $('floor');
+    el('rect', {x:0, y:700, width:1600, height:200, fill:'url(#floorG)'}, f);
+    for (let x = -600; x <= 2200; x += 110){
+      const xf = 800 + (x-800)*1.9;
+      el('line', {x1:x, y1:700, x2:xf, y2:900, stroke:'#8A5530', 'stroke-width':3, opacity:.55}, f);
+    }
+    [742, 796, 862].forEach(y => el('line', {x1:0, x2:1600, y1:y, y2:y, stroke:'#8A5530', 'stroke-width':2.5, opacity:.4}, f));
+    el('line', {x1:0, x2:1600, y1:700, y2:700, stroke:INK, 'stroke-width':5}, f);
+    el('rect', {x:0, y:884, width:1600, height:16, fill:'#8A5530'}, f);
+
+    const panel = g => {
+      el('path', {d:'M0 0 H840 C822 200 858 400 832 600 C822 700 848 760 838 790 H0 Z', fill:K.red}, g);
+      [110,230,350,470,590,700,790].forEach((x, i) => el('path', {d:`M${x} 0 C${x-14} 200 ${x+16} 420 ${x-6} 600 C${x-12} 700 ${x+6} 760 ${x} 790`, fill:'none', stroke:K.redD, 'stroke-width':i%2?9:6, opacity:.55}, g));
+      [170,410,650].forEach(x => el('path', {d:`M${x} 0 C${x-10} 220 ${x+12} 420 ${x-4} 790`, fill:'none', stroke:'#E0584B', 'stroke-width':8, opacity:.45}, g));
+      el('path', {d:'M840 0 C822 200 858 400 832 600 C822 700 848 760 838 790 H0', fill:'none', stroke:INK, 'stroke-width':6}, g);
+      el('rect', {x:790, y:430, width:70, height:26, rx:13, fill:K.yellow, stroke:INK, 'stroke-width':4}, g);
+    };
+    panel($('curL'));
+    panel(el('g', {transform:'translate(1600,0) scale(-1,1)'}, $('curR')));
+    let d = 'M0 0 H1600 V42';
+    for (let x = 1600; x > 0; x -= 100) d += ` Q${x-50} 92 ${x-100} 42`;
+    el('path', {d:d + ' Z', fill:'#B32E25', stroke:INK, 'stroke-width':5}, $('valance'));
+    el('path', {d:'M0 22 H1600', stroke:K.yellow, 'stroke-width':5, opacity:.8}, $('valance'));
+  })();
+
+  // ---------- Inspector Hash (top layer) ----------
+  const top = $('top');
+  const H = {};
+  (function(){
+    const FUR = '#F2B36B', FURL = '#F8CD8F', CREAM = '#FFF1DC', PINK = '#F4A3A8';
+    H.pos = el('g', {id:'hashPos', transform:'translate(-300,800) scale(1.3)'}, top);
+    el('ellipse', {cx:0, cy:2, rx:92, ry:10, fill:'#6B3F1F', opacity:.3}, H.pos);
+    H.bob = el('g', {}, H.pos);
+    const b = H.bob;
+    // ears (behind the head)
+    [[-74,-146],[74,-146]].forEach(([x, y]) => {
+      el('circle', {cx:x, cy:y, r:24, fill:FUR, stroke:INK, 'stroke-width':5}, b);
+      el('circle', {cx:x, cy:y+2, r:13, fill:PINK}, b);
+    });
+    // tail
+    el('ellipse', {cx:86, cy:-30, rx:12, ry:8, fill:FUR, stroke:INK, 'stroke-width':4}, b);
+    // body
+    el('path', {d:'M0 -176 C62 -176 96 -130 96 -82 C96 -30 60 -6 0 -6 C-60 -6 -96 -30 -96 -82 C-96 -130 -62 -176 0 -176 Z', fill:FUR, stroke:INK, 'stroke-width':5}, b);
+    el('path', {d:'M-70 -140 C-50 -168 -10 -172 20 -166', stroke:FURL, 'stroke-width':14, fill:'none', 'stroke-linecap':'round', opacity:.8}, b);
+    el('ellipse', {cx:0, cy:-50, rx:58, ry:42, fill:CREAM}, b);
+    // cheek pouches
+    el('ellipse', {cx:-58, cy:-84, rx:32, ry:26, fill:CREAM, stroke:INK, 'stroke-width':3.5}, b);
+    el('ellipse', {cx:58, cy:-84, rx:32, ry:26, fill:CREAM, stroke:INK, 'stroke-width':3.5}, b);
+    el('ellipse', {cx:-60, cy:-80, rx:15, ry:8, fill:'#F2839A', opacity:.55}, b);
+    el('ellipse', {cx:60, cy:-80, rx:15, ry:8, fill:'#F2839A', opacity:.55}, b);
+    el('path', {d:'M-70 -92 L-104 -98 M-70 -84 L-106 -82 M70 -92 L104 -98 M70 -84 L106 -82', stroke:INK, 'stroke-width':2.5, 'stroke-linecap':'round'}, b);
+    // feet
+    el('ellipse', {cx:-36, cy:-4, rx:20, ry:9, fill:PINK, stroke:INK, 'stroke-width':4}, b);
+    el('ellipse', {cx:36, cy:-4, rx:20, ry:9, fill:PINK, stroke:INK, 'stroke-width':4}, b);
+    // left paw
+    el('ellipse', {cx:-62, cy:-44, rx:14, ry:11, fill:PINK, stroke:INK, 'stroke-width':4}, b);
+    // detective badge on the belly
+    el('circle', {cx:30, cy:-40, r:13, fill:K.yellow, stroke:INK, 'stroke-width':3}, b);
+    hand(b, 30, -33, '#', 20, INK);
+    // eyes
+    H.eyesHappy = el('path', {d:'M-46 -112 L-34 -126 L-22 -112 M22 -112 L34 -126 L46 -112', stroke:INK, 'stroke-width':5, fill:'none', 'stroke-linecap':'round', 'stroke-linejoin':'round'}, b);
+    H.eyesDot = el('g', {opacity:0}, b);
+    el('circle', {cx:-34, cy:-116, r:9, fill:INK}, H.eyesDot);
+    el('circle', {cx:34, cy:-116, r:9, fill:INK}, H.eyesDot);
+    el('circle', {cx:-31, cy:-120, r:3, fill:'#fff'}, H.eyesDot);
+    el('circle', {cx:37, cy:-120, r:3, fill:'#fff'}, H.eyesDot);
+    H.browL = el('path', {d:'M-48 -138 L-22 -138', stroke:INK, 'stroke-width':5, 'stroke-linecap':'round'}, H.eyesDot);
+    H.browR = el('path', {d:'M22 -138 L48 -138', stroke:INK, 'stroke-width':5, 'stroke-linecap':'round'}, H.eyesDot);
+    // nose + mouth
+    el('ellipse', {cx:0, cy:-98, rx:8, ry:6, fill:'#E8828C', stroke:INK, 'stroke-width':3}, b);
+    H.mSmile = el('path', {d:'M-13 -86 Q-6.5 -78 0 -87 Q6.5 -78 13 -86', stroke:INK, 'stroke-width':3.5, fill:'none', 'stroke-linecap':'round', 'stroke-linejoin':'round'}, b);
+    H.mTalk = el('ellipse', {cx:0, cy:-80, rx:10, ry:8, fill:'#7A2418', stroke:INK, 'stroke-width':3.5, opacity:0}, b);
+    el('rect', {x:-6, y:-91, width:12, height:8, rx:2, fill:'#fff', stroke:INK, 'stroke-width':2}, b);
+    // right arm holding the magnifier
+    const ag = el('g', {transform:'translate(78,-70)'}, b);
+    H.arm = el('g', {}, ag);
+    el('rect', {x:-6, y:-9, width:34, height:18, rx:9, fill:FUR, stroke:INK, 'stroke-width':4}, H.arm);
+    el('line', {x1:30, y1:0, x2:56, y2:0, stroke:K.brown, 'stroke-width':9, 'stroke-linecap':'round'}, H.arm);
+    el('circle', {cx:30, cy:0, r:10, fill:PINK, stroke:INK, 'stroke-width':3.5}, H.arm);
+    el('circle', {cx:80, cy:0, r:25, fill:'#CFEFF5', 'fill-opacity':.55, stroke:INK, 'stroke-width':8}, H.arm);
+    el('circle', {cx:80, cy:0, r:25, fill:'none', stroke:'#F2C14E', 'stroke-width':3}, H.arm);
+    el('path', {d:'M67 -9 Q72 -16 82 -16', stroke:'#fff', 'stroke-width':4, fill:'none', 'stroke-linecap':'round'}, H.arm);
+    // fedora
+    H.hat = el('g', {}, b);
+    el('ellipse', {cx:0, cy:-171, rx:96, ry:13, fill:K.brown, stroke:INK, 'stroke-width':5}, H.hat);
+    el('path', {d:'M-56 -174 Q-62 -232 -22 -236 L26 -236 Q62 -232 56 -174 Z', fill:'#8C6242', stroke:INK, 'stroke-width':5}, H.hat);
+    el('path', {d:'M-59 -191 H59 L57 -177 H-57 Z', fill:K.yellow, stroke:INK, 'stroke-width':3}, H.hat);
+    el('path', {d:'M-16 -234 Q0 -221 16 -234', stroke:INK, 'stroke-width':3, fill:'none'}, H.hat);
+  })();
+
+  // Plaque
+  const plaqueG = place(top, 290, 96);
+  el('path', {d:'M-80 -52 L-70 -24 M80 -52 L70 -24', stroke:INK, 'stroke-width':3}, plaqueG);
+  el('rect', {x:-110, y:-26, width:220, height:52, rx:10, fill:K.wood, stroke:INK, 'stroke-width':5}, plaqueG);
+  const plaqueT = hand(plaqueG, 0, 10, 'EXHIBIT 1 / 9', 28, INK);
+
+  // ---------- Timeline scaffolding ----------
+  const D = 101;
+  const SC = [
+    {t:0,  chip:'Cold open'}, {t:9, chip:'Timeline'}, {t:18, chip:'NEAR@3.33'}, {t:33, chip:'Intents'},
+    {t:45, chip:'Perps'}, {t:55, chip:'TVL'}, {t:66, chip:'Ondo'}, {t:75, chip:'Market'}, {t:87, chip:'Verdict'}
+  ];
+  const KEY = [7.6, 16.6, 31.8, 44.0, 54.0, 64.8, 73.8, 85.8, 95.9];
+  const KO = ["누군가 NEAR를 단 일주일 만에 80%나 끌어올렸습니다.", "저는 해시 형사. 의견 말고 숫자로. 범인을 찾아봅시다.", "사건 현장: 9월 14일 $2.20, 23일엔 $4.29.", "NEAR 내부 용의자 다섯, 외부 공범 둘. 시작합니다.", "용의자 1: NEAR@3.33 프로그램. 비공개 예치금이 계속 밀려들었죠.", "9월 17일, 7천만 달러 돌파. 찰칵! 스냅샷. 그날 가격은 14% 급등.", "잠긴 토큰 333,333개. 100달러 이상 + 비공개 스왑 1회 이상 사용자 대상. 지갑당 최대 2%.", "반전: 3일 평균가가 $3.33 이상이어야만 풀립니다. 그래서 모든 보유자가 가격 상승을 원하죠.", "용의자 2: 실제 사용량. Dune 기준 NEAR Intents 누적 거래액 약 314억 달러.", "비공개 경로는 6%뿐. 대부분은 에어드롭 파밍이 아닙니다.", "주간 수수료도 약 200만 달러로 두 배. 진짜 수요입니다.", "용의자 3: 하이퍼리퀴드 기반 비공개 무기한 선물. 최대 40배, 50개+ 시장, 포지션 비공개.", "하지만 알리바이가 흔들립니다. 출시일이 17일? 21일? 매체마다 달라요.", "거래량 +120%라는 수치는? 출처가 어디에도 없습니다.", "용의자 4: TVL. 일주일 만에 1억 9,100만 → 3억 5,000만 달러 이상으로 부풀었죠.", "하지만 TVL은 달러 기준. NEAR가 80% 오르면 안에 든 NEAR 가치도 같이 오릅니다.", "즉 이 풍선의 일부는 랠리 그 자체. 원인이 아니라 결과입니다.", "용의자 5: 미국 주식 토큰화 Ondo 제휴. 분명 좋은 소식이죠.", "하지만 발표는 9월 23일. 랠리 기차는 이미 떠난 뒤였습니다.", "이제 공범들. 21일 숏스퀴즈로 비트코인 숏 6억 4,800만 달러 청산, BTC는 8만 5천 달러 돌파.", "한편 이달 가장 뜨거운 테마는 프라이버시 코인. 지캐시는 사상 최고 $1,600.", "프라이버시를 내세운 NEAR도 같은 파도를 탔습니다.", "최종 순위. 인센티브가 불을 붙이고, 실사용과 시장 전체의 파도가 불길을 키웠습니다.", "주의할 점: 보상은 가격이 $3.33을 지킬 때만. 그 뒤엔 보유자들이 팔 수 있습니다.", "사건 종결. 그리고 이건 투자 조언이 아닙니다."];
+  const CUES = [
+    [2.9,  "Someone pumped NEAR up 80% in a single week."],
+    [5.6,  "I'm Inspector Hash. Numbers, not opinions. Let's find out who did it."],
+    [9.8,  "The crime scene: $2.20 on September 14th. $4.29 by the 23rd."],
+    [13.6, "Five suspects inside NEAR. Two accomplices outside. Let's go."],
+    [18.6, "Suspect one: the NEAR@3.33 program. Private deposits kept pumping in."],
+    [22.7, "At $70 million, on September 17th, snap! A snapshot. The price jumped 14% that day."],
+    [25.3, "333,333 locked tokens, for users with $100 or more and one private swap. Max 2% per wallet."],
+    [28.5, "The twist: they only unlock if the 3-day average price holds $3.33. So every holder wants the price up."],
+    [33.5, "Suspect two: people actually using it. NEAR Intents has moved about $31.4 billion, per Dune."],
+    [37.6, "Only 6% went through the private side. Most of this isn't airdrop farming."],
+    [41.2, "And weekly fees roughly doubled, to about $2 million. That's real demand."],
+    [45.5, "Suspect three: private perpetual futures on Hyperliquid. Up to 40x, 50-plus markets, positions hidden."],
+    [50.3, "But the alibi is shaky. Did it launch on the 17th, or the 21st? Depends who you ask."],
+    [52.8, "And that +120% volume figure? No source anywhere."],
+    [55.5, "Suspect four: total value locked. $191 million, blown up to over $350 million in a week."],
+    [59.6, "But TVL is counted in dollars. When NEAR rises 80%, the NEAR inside rises with it."],
+    [63.4, "So part of this balloon is the rally itself. A result, not a cause."],
+    [66.5, "Suspect five: the Ondo deal for tokenized US stocks. Genuinely good news."],
+    [70.3, "But it showed up on September 23rd. The rally train had already left."],
+    [75.5, "Now the accomplices. On the 21st, a squeeze wiped out $648 million of bitcoin shorts. BTC went past $85,000."],
+    [80.3, "Meanwhile, privacy coins were the hottest trade of the month. Zcash hit a record $1,600."],
+    [83.4, "NEAR was selling itself on privacy, so it rode the same wave."],
+    [87.5, "The ranking. The incentive lit the fuse. Real usage and a market-wide wave kept it burning."],
+    [92.4, "One thing to watch: those rewards only pay while the price holds $3.33. After that, holders can sell."],
+    [96.9, "Case closed. And no, this isn't investment advice."]
+  ].map(([t, s], i) => ({t, s, ko:KO[i]}));
+  const CPS = 40;
+
+  const S = [...Array(9)].map((_, i) => $('s' + i));
+  const counters = [], bounces = [], pumps = [], sways = [], spinners = [], waves = [], walkers = [];
+  const counter = (elm, t0, t1, from, to, fmt) => { counters.push({elm, t0, t1, from, to, fmt}); elm.textContent = fmt(from); };
+  const bounce = (g, t0, t1, amp, f, ph) => bounces.push({g, t0, t1, amp, f, ph:ph||0});
+  const pose = {x:-300, y:800, s:1.3, hop:0, walk:0, arm:40, hatY:0, hatR:-4, eye:0, bL:0, bR:0, lean:0};
+
+  const tl = gsap.timeline({paused:true});
+  const pop = (t, at, dy) => tl.fromTo(t, {opacity:0, y:dy==null?30:dy}, {opacity:1, y:0, duration:.5, ease:'back.out(1.6)'}, at);
+  const popScale = (t, at) => (tl.call(sfx, ['pop'], at), tl.fromTo(t, {opacity:0, scale:.3}, {opacity:1, scale:1, duration:.5, ease:'back.out(2.4)', smoothOrigin:false, transformOrigin:'50% 50%'}, at));
+  const drop = (t, at) => tl.fromTo(t, {opacity:0, y:-420}, {opacity:1, y:0, duration:.8, ease:'bounce.out'}, at);
+  const fadeOut = (t, at) => tl.to(t, {opacity:0, duration:.35}, at);
+  const shake = at => { tl.to($('fg'), {x:-12, duration:.04}, at); tl.to($('fg'), {x:0, duration:.5, ease:'elastic.out(1.2,0.3)'}, at + .04); };
+  const RINGS = [];
+  const STAMPS = [], SWINGS = [];
+  const stamp = (g, at) => { RINGS.push({t:at + .24, sx:g.__pos[0], sy:g.__pos[1]}); STAMPS.push({g, t:at}); g.setAttribute('opacity', 0); tl.call(sfx, ['thump'], at + .22); shake(at + .24); };
+  function draw(path, at, dur){
+    const len = path.getTotalLength();
+    path.setAttribute('stroke-dasharray', len);
+    tl.fromTo(path, {attr:{'stroke-dashoffset':len}}, {attr:{'stroke-dashoffset':0}, duration:dur, ease:'power1.inOut'}, at);
+  }
+  // Thermometer prop
+  function thermo(p, x, bulbY, tubeTop, label, liquid, bulbColor){
+    const g = el('g', {}, p);
+    sign(g, x, tubeTop - 44, 250, 54, [label], 30);
+    el('rect', {x:x-28, y:tubeTop, width:56, height:bulbY-tubeTop, rx:28, fill:K.cream, stroke:INK, 'stroke-width':5}, g);
+    for (let i = 1; i < 8; i++){ const y = tubeTop + i*(bulbY-tubeTop)/8.4; el('line', {x1:x+10, x2:x+24, y1:y, y2:y, stroke:INK, 'stroke-width':3}, g); }
+    const liq = el('rect', {x:x-13, y:tubeTop+14, width:26, height:bulbY-tubeTop-4, rx:13, fill:liquid}, g);
+    el('circle', {cx:x, cy:bulbY+26, r:60, fill:bulbColor, stroke:INK, 'stroke-width':5}, g);
+    el('ellipse', {cx:x-22, cy:bulbY+6, rx:16, ry:10, fill:'#fff', opacity:.35}, g);
+    const txt = hand(g, x, bulbY+38, '', 34, INK);
+    return {g, liq, txt};
+  }
+  function pump(p, x, baseY, bulbX, bulbY, boxColor){
+    const g = el('g', {}, p);
+    el('path', {d:`M${x+30} ${baseY-12} C${x+110} ${baseY+50} ${bulbX-120} ${baseY+50} ${bulbX-56} ${bulbY+40}`, fill:'none', stroke:INK, 'stroke-width':9, 'stroke-linecap':'round'}, g);
+    el('rect', {x:x-70, y:baseY-14, width:140, height:18, rx:6, fill:'#5B5F6B', stroke:INK, 'stroke-width':4}, g);
+    const handle = el('g', {}, g);
+    el('rect', {x:x-5, y:baseY-360, width:10, height:170, fill:'#9AA0AA', stroke:INK, 'stroke-width':3}, handle);
+    el('rect', {x:x-62, y:baseY-372, width:124, height:18, rx:9, fill:'#3B3F4A', stroke:INK, 'stroke-width':4}, handle);
+    const rider = box(handle, x, baseY-372, {w:110, h:78, color:boxColor||K.orange, fur:'#D99A5B'});
+    el('rect', {x:x-32, y:baseY-220, width:64, height:210, rx:10, fill:K.teal, stroke:INK, 'stroke-width':5}, g);
+    el('rect', {x:x-22, y:baseY-208, width:14, height:180, rx:7, fill:K.tealL, opacity:.7}, g);
+    el('rect', {x:x-38, y:baseY-232, width:76, height:18, rx:6, fill:'#2C6E73', stroke:INK, 'stroke-width':4}, g);
+    return {g, handle, rider};
+  }
+
+  // ---------- Shot 1: cold open ----------
+  let titleOuter;
+  (function(){
+    const s = S[0];
+    // Title sign lives in the top layer so it hangs in front of the closed curtains.
+    titleOuter = el('g', {}, top);
+    const tIn = el('g', {}, titleOuter);
+    el('path', {d:'M470 0 V130 M1130 0 V130', stroke:INK, 'stroke-width':5}, tIn);
+    el('rect', {x:390, y:120, width:820, height:290, rx:18, fill:K.wood, stroke:INK, 'stroke-width':6}, tIn);
+    el('path', {d:'M410 210 H1190 M410 318 H1190', stroke:K.woodD, 'stroke-width':3, opacity:.5}, tIn);
+    hand(tIn, 800, 186, 'CASE FILE No. 0925', 30, K.redD, 'middle', {'letter-spacing':4});
+    hand(tIn, 800, 280, 'The Week NEAR', 96, INK);
+    hand(tIn, 800, 374, 'Went +80%!', 96, K.red);
+    tl.to(tIn, {y:-470, duration:.7, ease:'back.in(1.4)'}, 2.1);
+
+    const th = thermo(s, 1200, 640, 230, 'NEAR PRICE', K.red, K.green);
+    tl.fromTo(th.liq, {scaleY:.2}, {scaleY:.82, duration:3.8, ease:'power1.inOut', smoothOrigin:false, transformOrigin:'50% 100%'}, 2.9);
+    counter(th.txt, 2.9, 6.7, 2.20, 4.29, v => '$' + v.toFixed(2));
+    const pm = pump(s, 950, 752, 1200, 640);
+    pumps.push({h:pm.handle, t0:2.9, t1:6.8});
+    const c1 = box(s, 470, 752, {hat:'party', color:'#EE8A4C'});
+    const c2 = box(s, 610, 752, {hat:'party', w:104, h:78});
+    bounce(c1.bob, 4.1, 7.4, 22, 9); bounce(c2.bob, 4.1, 7.4, 22, 9, 1.2);
+    const burst = place(s, 690, 300);
+    let d = '';
+    for (let i = 0; i < 24; i++){ const r = i%2 ? 108 : 150, a = i/24*Math.PI*2; d += (i?'L':'M') + (r*Math.cos(a)).toFixed(1) + ' ' + (r*Math.sin(a)*.8).toFixed(1); }
+    el('path', {d:d+'Z', fill:K.yellow, stroke:INK, 'stroke-width':5, 'stroke-linejoin':'round'}, burst);
+    hand(burst, 0, 20, '+80%', 84, K.red);
+    hand(burst, 0, 64, 'in 7 days', 28, INK);
+    popScale(burst, 4.0); shake(4.3);
+  })();
+
+  // ---------- Shot 2: clothesline timeline ----------
+  (function(){
+    const s = S[1];
+    el('path', {d:'M430 760 V556 M1400 760 V244', stroke:K.brown, 'stroke-width':14, 'stroke-linecap':'round'}, s);
+    el('path', {d:'M430 760 V556 M1400 760 V244', stroke:INK, 'stroke-width':3, fill:'none', opacity:.7}, s);
+    const pts = [[430,560],[540,548],[800,470],[1070,392],[1320,282],[1400,248]];
+    const line = el('path', {d:'M' + pts.map(p => p.join(' ')).join(' L'), fill:'none', stroke:INK, 'stroke-width':4}, s);
+    draw(line, 9.3, 1.6);
+    [['SEP 14','$2.20'],['SEP 17','$2.87'],['SEP 20','$3.45'],['SEP 23','$4.29']].forEach(([d, p], i) => {
+      const [x, y] = pts[i+1];
+      const card = place(s, x, y);
+      el('rect', {x:-78, y:10, width:156, height:118, rx:6, fill:K.cream, stroke:INK, 'stroke-width':4}, card);
+      el('rect', {x:-8, y:-8, width:16, height:34, rx:3, fill:'#C99A62', stroke:INK, 'stroke-width':3}, card);
+      hand(card, 0, 50, d, 26, '#6B5A4E');
+      hand(card, 0, 104, p, i === 3 ? 52 : 46, i === 3 ? K.red : INK);
+      SWINGS.push({g:card, t:10.2 + i*.55});
+    });
+    const n1 = paper(s, 1000, 662, 200, 76, -4); hand(n1, 0, 10, '+14% snapshot day', 26, K.red);
+    const n2 = paper(s, 1210, 612, 190, 76, 3); hand(n2, 0, 10, '+45% in 3 days', 26, K.red);
+    pop(n1, 12.9); pop(n2, 13.3);
+    const lineup = [];
+    ['1','2','3','4','5'].forEach((n, i) => {
+      const b = box(s, 490 + i*80, 760, {w:66, h:54, s:1, label:n});
+      lineup.push(b.inner);
+      bounce(b.bob, 14.2, 16.8, 10, 8, i*.7);
+    });
+    [['BTC',1190],['ZEC',1280]].forEach(([l, x]) => { const b = box(s, x, 760, {w:70, h:54, shades:true, color:'#D8A94A', label:l, fur:'#F2B36B'}); lineup.push(b.inner); });
+    tl.fromTo(lineup, {y:120, opacity:0}, {y:0, opacity:1, duration:.45, ease:'back.out(2)', stagger:.1}, 13.7);
+  })();
+
+  // ---------- Shot 3: NEAR@3.33 ----------
+  (function(){
+    const s = S[2];
+    const th = thermo(s, 560, 600, 240, 'PRIVATE TVL', K.teal, K.tealL);
+    pop(th.g, 18.2, 0);
+    el('line', {x1:518, x2:640, y1:286, y2:286, stroke:K.red, 'stroke-width':4, 'stroke-dasharray':'10 7'}, th.g);
+    hand(th.g, 650, 294, '$70M', 30, K.red, 'start');
+    tl.fromTo(th.liq, {scaleY:.05}, {scaleY:.9, duration:3.8, ease:'power1.inOut', smoothOrigin:false, transformOrigin:'50% 100%'}, 18.7);
+    counter(th.txt, 18.7, 22.5, 0, 70.8, v => '$' + v.toFixed(1) + 'M');
+    const pm = pump(s, 780, 752, 560, 600, '#EE8A4C');
+    pumps.push({h:pm.handle, t0:18.7, t1:22.5});
+    pop(pm.g, 18.3, 0);
+    tl.set($('flash'), {opacity:.95}, 22.65); tl.call(sfx, ['flash'], 22.65); tl.to($('flash'), {opacity:0, duration:.7, ease:'power2.out'}, 22.67);
+    const pol = place(s, 960, 280, 7);
+    el('rect', {x:-120, y:-100, width:240, height:220, rx:6, fill:'#fff', stroke:INK, 'stroke-width':4}, pol);
+    el('rect', {x:-100, y:-82, width:200, height:140, fill:'#B8E0DC', stroke:INK, 'stroke-width':3}, pol);
+    hand(pol, 0, -10, 'SNAPSHOT!', 40, K.redD);
+    hand(pol, 0, 36, 'Sep 17 · +14%', 28, INK);
+    hand(pol, 0, 98, '$70M reached', 26, '#6B5A4E');
+    popScale(pol, 22.75);
+    const tk = sign(s, 1210, 222, 380, 100, ['333,333 locked', 'NEAR@3.33 tokens'], 34);
+    fadeOut(pol, 24.5);
+    drop(tk, 24.7);
+    const crowd = [1080, 1220, 1360].map((x, i) => box(s, x, 752, {hat:'party', w:108, h:76, color:i===1?'#EE8A4C':K.orange}));
+    tl.fromTo(crowd.map(c => c.inner), {y:140, opacity:0}, {y:0, opacity:1, duration:.5, ease:'back.out(2)', stagger:.12}, 23.5);
+    crowd.forEach((c, i) => bounce(c.bob, 24.0, 26.6, 16, 9, i));
+    const coins = [];
+    for (let i = 0; i < 16; i++){
+      const cx = 1020 + (i*83)%420, cy = 700 + (i%3)*14;
+      const c = el('g', {}, s);
+      el('ellipse', {cx, cy, rx:17, ry:12, fill:K.yellow, stroke:INK, 'stroke-width':3.5}, c);
+      el('ellipse', {cx, cy:cy-1, rx:8, ry:5, fill:'none', stroke:'#C99A2E', 'stroke-width':2.5}, c);
+      coins.push(c);
+    }
+    tl.fromTo(coins, {y:-620, opacity:0}, {y:0, opacity:1, duration:.9, ease:'bounce.out', stagger:.06}, 23.8);
+    const rules = paper(s, 1210, 410, 380, 150, -2);
+    ['✓ $100+ private balance', '✓ 1+ private swap', '✓ max 2% per wallet'].forEach((r, i) => hand(rules, -160, -30 + i*42, r, 30, i ? INK : INK, 'start'));
+    pop(rules, 25.4);
+    fadeOut(rules, 27.3);
+    const lock = place(s, 1210, 428);
+    el('path', {d:'M-58 -20 V-70 Q-58 -128 0 -128 Q58 -128 58 -70 V-20', fill:'none', stroke:'#8B8F9A', 'stroke-width':22}, lock);
+    el('path', {d:'M-58 -20 V-70 Q-58 -128 0 -128 Q58 -128 58 -70 V-20', fill:'none', stroke:INK, 'stroke-width':4}, lock);
+    el('rect', {x:-100, y:-30, width:200, height:150, rx:18, fill:'#E9B949', stroke:INK, 'stroke-width':5}, lock);
+    el('circle', {cx:0, cy:20, r:13, fill:INK}, lock); el('rect', {x:-5, y:22, width:10, height:34, fill:INK}, lock);
+    hand(lock, 0, 104, '$3.33', 36, INK);
+    popScale(lock, 27.6);
+    tl.to(lock, {rotation:6, duration:.12, yoyo:true, repeat:7, ease:'sine.inOut', smoothOrigin:false, transformOrigin:'50% 0%'}, 28.3);
+    const cond = sign(s, 1210, 574, 470, 46, ['unlocks only if 3-day avg ≥ $3.33'], 27);
+    pop(cond, 28.0);
+    crowd.forEach((c, i) => {
+      const pl = el('g', {}, c.bob);
+      el('line', {x1:0, x2:0, y1:c.top, y2:c.top-40, stroke:K.brown, 'stroke-width':6}, pl);
+      el('rect', {x:-44, y:c.top-78, width:88, height:40, rx:6, fill:K.cream, stroke:INK, 'stroke-width':3.5}, pl);
+      hand(pl, 0, c.top-49, 'UP! ↑', 26, K.red);
+      popScale(pl, 29.6 + i*.15);
+      bounce(c.bob, 29.8, 32.6, 20, 10, i*.9);
+    });
+    stamp(stampV(s, 860, 210, 280, 'STRONG', '#2E7D3E'), 31.0);
+  })();
+
+  // ---------- Shot 4: Intents ----------
+  (function(){
+    const s = S[3];
+    for (let i = 0; i < 3; i++){
+      const w = box(s, 0, 706, {w:92, h:66, s:.9});
+      el('rect', {x:-32, y:w.top-46, width:64, height:44, rx:4, fill:'#C99A62', stroke:INK, 'stroke-width':3.5}, w.bob);
+      el('path', {d:`M-32 ${w.top-30} H32 M0 ${w.top-46} V${w.top-2}`, stroke:INK, 'stroke-width':2.5}, w.bob);
+      walkers.push({outer:w.outer, bob:w.bob, i});
+    }
+    const board = place(s, 800, 205);
+    el('path', {d:'M-230 -95 V-60 M230 -95 V-60', stroke:INK, 'stroke-width':5}, board);
+    el('rect', {x:-290, y:-66, width:580, height:156, rx:16, fill:K.navy, stroke:INK, 'stroke-width':6}, board);
+    hand(board, 0, -26, 'NEAR Intents · all-time volume (Dune)', 28, K.cream);
+    const big = hand(board, 0, 62, '', 86, K.yellow);
+    counter(big, 33.6, 36.0, 0, 31.4, v => '$' + v.toFixed(1) + 'B');
+    drop(board, 33.3);
+    const jar = place(s, 560, 560);
+    el('rect', {x:-100, y:-150, width:200, height:250, rx:26, fill:'#E8F4F4', 'fill-opacity':.55, stroke:INK, 'stroke-width':5}, jar);
+    const pubFill = el('rect', {x:-88, y:-120, width:176, height:208, rx:16, fill:K.teal, opacity:.9}, jar);
+    const confFill = el('rect', {x:-88, y:-134, width:176, height:14, rx:4, fill:K.amberS}, jar);
+    for (let i = 0; i < 18; i++) el('circle', {cx:-70 + (i%6)*28, cy:-90 + Math.floor(i/6)*62 + (i%2)*14, r:8, fill:K.tealL, opacity:.8}, jar);
+    el('rect', {x:-80, y:-176, width:160, height:28, rx:8, fill:K.brown, stroke:INK, 'stroke-width':4}, jar);
+    pop(jar, 36.2);
+    tl.fromTo(pubFill, {scaleY:0}, {scaleY:1, duration:1, ease:'power2.out', smoothOrigin:false, transformOrigin:'50% 100%'}, 36.5);
+    popScale(confFill, 37.6);
+    const jl = paper(s, 560, 690, 230, 60, -2); hand(jl, 0, 11, 'public $29.5B', 30, K.teal);
+    pop(jl, 37.2);
+    const cl = bubble(s, 800, 390, 250, 76, 'private: 6%!', 34, 'l');
+    pop(cl, 37.9);
+    const bag = (x, sc, lbl, sub) => {
+      const g = place(s, x, 740, 0, sc);
+      el('path', {d:'M-60 0 Q-80 -70 -40 -110 L-26 -128 L26 -128 L40 -110 Q80 -70 60 0 Z', fill:'#D9B27A', stroke:INK, 'stroke-width':5, 'stroke-linejoin':'round'}, g);
+      el('path', {d:'M-30 -126 Q0 -112 30 -126', stroke:INK, 'stroke-width':5, fill:'none'}, g);
+      hand(g, 0, -50, lbl, 36, '#2E7D3E');
+      hand(g, 0, -18, sub, 20, INK);
+      return g;
+    };
+    const b1 = bag(960, .8, '≈$1M', 'Sep 7–13');
+    const b2 = bag(1150, 1.35, '≈$2M', 'Sep 14–20');
+    popScale(b1, 39.8); popScale(b2, 40.4);
+    const x2 = place(s, 1052, 530); hand(x2, 0, 0, '× 2', 56, K.red); popScale(x2, 41.2);
+    const tag = paper(s, 1310, 410, 250, 96, 5); hand(tag, 0, -8, 'daily record', 26, '#6B5A4E'); hand(tag, 0, 30, '$300M+ · Sep 18', 30, INK);
+    drop(tag, 42.2);
+    stamp(stampV(s, 1290, 250, 290, 'STRONG · REAL', '#2E7D3E'), 43.2);
+  })();
+
+  // ---------- Shot 5: perps ----------
+  const reporterBubbles = [];
+  (function(){
+    const s = S[4];
+    const post = paper(s, 760, 330, 470, 330, -2);
+    hand(post, 0, -112, 'CONFIDENTIAL PERPS', 46, K.redD);
+    hand(post, 0, -70, 'running on Hyperliquid', 28, '#6B5A4E');
+    [['40×', -150], ['50+ mkts', 0], ['hidden', 150]].forEach(([l, x]) => {
+      el('rect', {x:x-66, y:-46, width:132, height:44, rx:22, fill:K.yellow, stroke:INK, 'stroke-width':3.5}, post);
+      hand(post, x, -15, l, 28, INK);
+    });
+    el('rect', {x:-200, y:20, width:400, height:70, rx:8, fill:'#fff', stroke:INK, 'stroke-width':3}, post);
+    hand(post, -186, 66, 'BTC-PERP  LONG  12.4  @ 86,120', 30, INK, 'start');
+    hand(post, 0, 124, 'what the public ledger sees', 24, '#6B5A4E');
+    pop(post, 45.4);
+    [[-190,110],[-70,58],[-6,54],[56,136]].forEach(([x, w], i) => {
+      const r = el('rect', {x:x, y:30, width:w, height:50, rx:4, fill:INK}, post);
+      tl.fromTo(r, {scaleX:0}, {scaleX:1, duration:.3, ease:'power2.out', smoothOrigin:false, transformOrigin:'0% 50%'}, 46.8 + i*.3);
+    });
+    const note = paper(s, 700, 580, 250, 80, 6); hand(note, 0, -4, 'volume +120%?', 30, K.red); hand(note, 0, 28, 'source: ???', 24, '#6B5A4E');
+    pop(note, 52.8);
+    [[1110,'LAUNCHED SEP 17!','17th!','r'],[1340,'LAUNCHED SEP 21!','21st!','l']].forEach(([x, head, say, tail], i) => {
+      const r = box(s, x, 752, {hat:'press', w:112, h:80, color:i ? '#EE8A4C' : K.orange});
+      const np = el('g', {}, r.bob);
+      el('line', {x1:-40, x2:-40, y1:r.top+30, y2:r.top-30, stroke:INK, 'stroke-width':4}, np);
+      el('line', {x1:40, x2:40, y1:r.top+30, y2:r.top-30, stroke:INK, 'stroke-width':4}, np);
+      el('rect', {x:-96, y:r.top-146, width:192, height:116, rx:4, fill:'#F4EFE4', stroke:INK, 'stroke-width':4}, np);
+      el('path', {d:`M-84 ${r.top-60} H84 M-84 ${r.top-46} H40`, stroke:'#9C9186', 'stroke-width':4}, np);
+      hand(np, 0, r.top-118, 'DAILY NEWS', 18, '#6B5A4E');
+      hand(np, 0, r.top-86, head, 18, K.redD);
+      tl.fromTo(r.inner, {x:i ? 300 : 0, y:i ? 0 : 200, opacity:0}, {x:0, y:0, opacity:1, duration:.6, ease:'back.out(1.6)'}, 49.4 + i*.3);
+      const bb = bubble(s, i ? x - 30 : x - 20, 440, 130, 64, say, 34, tail);
+      reporterBubbles.push(bb);
+      bounce(r.bob, 50.3, 54.6, 12, 5.2, i*Math.PI/1.9);
+    });
+    stamp(stampV(s, 1220, 190, 380, 'MEDIUM · SHAKY', '#B7791F'), 53.6);
+  })();
+
+  // ---------- Shot 6: TVL balloon ----------
+  let loopArrows;
+  (function(){
+    const s = S[5];
+    const sway = el('g', {}, s);
+    sways.push({g:sway, cx:620, cy:720, amp:3, f:1.3});
+    el('path', {d:'M620 452 C600 520 640 600 620 700', fill:'none', stroke:INK, 'stroke-width':3}, sway);
+    const bal = el('g', {}, sway);
+    el('ellipse', {cx:620, cy:330, rx:110, ry:122, fill:'#E86A5A', stroke:INK, 'stroke-width':5}, bal);
+    el('ellipse', {cx:580, cy:280, rx:26, ry:38, fill:'#fff', opacity:.35, transform:'rotate(-20 580 280)'}, bal);
+    el('path', {d:'M606 450 L620 462 L634 450 Z', fill:'#E86A5A', stroke:INK, 'stroke-width':4, 'stroke-linejoin':'round'}, bal);
+    hand(bal, 620, 300, 'TVL', 34, K.cream);
+    const bt = hand(bal, 620, 360, '', 50, K.cream);
+    counter(bt, 55.6, 57.8, 0, 350, v => '$' + Math.round(v) + 'M' + (v >= 349.5 ? '+' : ''));
+    tl.fromTo(bal, {scale:.25, opacity:0}, {scale:.72, opacity:1, duration:.9, ease:'back.out(1.6)', smoothOrigin:false, transformOrigin:'50% 100%'}, 55.5);
+    tl.to(bal, {scale:1.08, duration:1.4, ease:'elastic.out(1,0.5)', smoothOrigin:false, transformOrigin:'50% 100%'}, 56.6);
+    const wt = place(s, 620, 742);
+    el('path', {d:'M-54 0 L-40 -44 H40 L54 0 Z', fill:'#5B5F6B', stroke:INK, 'stroke-width':5, 'stroke-linejoin':'round'}, wt);
+    hand(wt, 0, -12, 'NEAR', 22, K.cream);
+    const dtag = paper(s, 470, 640, 180, 66, -6); hand(dtag, 0, 10, 'Sep 16 → 23', 28, INK);
+    pop(dtag, 56.2);
+    const was = paper(s, 410, 250, 150, 64, -8); hand(was, 0, 10, 'was $191M', 28, '#6B5A4E');
+    pop(was, 56.0);
+
+    const cx = 1150, cy = 400, r = 150;
+    const ring = el('g', {}, s);
+    el('circle', {cx, cy, r, fill:'none', stroke:INK, 'stroke-width':6, 'stroke-dasharray':'22 14'}, ring);
+    loopArrows = el('g', {}, ring);
+    [45,135,225,315].forEach(t => {
+      const a = t*Math.PI/180;
+      el('path', {d:'M-14 -13 L16 0 L-14 13 Z', fill:K.red, stroke:INK, 'stroke-width':3, transform:`translate(${cx + r*Math.cos(a)},${cy + r*Math.sin(a)}) rotate(${t+90})`}, loopArrows);
+    });
+    spinners.push({g:loopArrows, cx, cy, speed:40});
+    popScale(ring, 58.9);
+    [[cx, cy-r, ['NEAR price ↑']], [cx+r, cy, ['NEAR inside', 'worth more']], [cx, cy+r, ['TVL ↑ in $']], [cx-r, cy, ['"TVL surges!"']]].forEach(([x, y, lines], i) => {
+      const t = sign(s, x, y, Math.max(...lines.map(l => l.length))*15 + 40, lines.length*34 + 22, lines, 30);
+      popScale(t, 59.4 + i*.45);
+    });
+    stamp(stampV(s, 1150, 640, 360, 'PARTLY AN EFFECT', '#B7791F'), 63.8);
+  })();
+
+  // ---------- Shot 7: Ondo misses the train ----------
+  let smoke = [];
+  (function(){
+    const s = S[6];
+    const X = d => 440 + (d-14)*100;
+    const band = sign(s, 800, 230, 700, 70, ['the +80% rally: Sep 14 → 22'], 40, K.redD);
+    drop(band, 66.2);
+    el('line', {x1:150, x2:1450, y1:730, y2:730, stroke:'#5B5F6B', 'stroke-width':8}, s);
+    for (let x = 160; x < 1450; x += 60) el('rect', {x, y:726, width:34, height:12, fill:'#6B4A2E', stroke:INK, 'stroke-width':2}, s);
+    [14,17,20,23].forEach(d => {
+      const p = place(s, X(d), 470);
+      el('line', {x1:0, x2:0, y1:30, y2:250, stroke:d === 23 ? K.red : INK, 'stroke-width':d === 23 ? 5 : 3, 'stroke-dasharray':'8 8'}, p);
+      el('rect', {x:-56, y:-16, width:112, height:46, rx:8, fill:d === 23 ? K.yellow : K.cream, stroke:INK, 'stroke-width':4}, p);
+      hand(p, 0, 17, 'SEP ' + d, 28, INK);
+      pop(p, 66.4 + (d-14)*.05);
+    });
+    const train = el('g', {}, s);
+    const eng = box(train, 0, 726, {kind:'box', w:150, h:96, color:K.red, light:'#E0584B', label:'RALLY'});
+    el('rect', {x:30, y:eng.top-50, width:30, height:52, fill:INK}, eng.bob);
+    el('rect', {x:22, y:eng.top-60, width:46, height:14, fill:INK}, eng.bob);
+    for (let i = 0; i < 3; i++){ const c = el('circle', {cx:45, cy:eng.top-80, r:16 + i*6, fill:'#fff', stroke:INK, 'stroke-width':3, opacity:.9}, eng.bob); smoke.push({c, i, base:eng.top-80}); }
+    const w1 = box(train, -180, 726, {w:130, h:80, hat:'party', label:'+80%'});
+    const w2 = box(train, -340, 726, {w:130, h:80, hat:'party'});
+    [w1, w2].forEach((w, i) => bounce(w.bob, 66.5, 70, 8, 12, i));
+    bounce(eng.bob, 66.5, 70, 5, 14);
+    tl.fromTo(train, {x:-200}, {x:1900, duration:3.4, ease:'power1.in'}, 66.6);
+    const ondo = box(s, 0, 752, {w:120, h:86, color:'#5B8FD1', fur:'#E9E4DA', label:'ONDO'});
+    const case_ = el('g', {}, ondo.bob);
+    el('rect', {x:62, y:ondo.top+40, width:74, height:52, rx:6, fill:K.brown, stroke:INK, 'stroke-width':4}, case_);
+    el('path', {d:`M84 ${ondo.top+40} V${ondo.top+30} H114 V${ondo.top+40}`, stroke:INK, 'stroke-width':4, fill:'none'}, case_);
+    hand(case_, 99, ondo.top+74, 'US stocks', 14, K.cream);
+    const sweat = el('path', {d:`M-66 ${ondo.top+6} q-8 14 0 20 q8 -6 0 -20 Z`, fill:'#9FD4F0', stroke:INK, 'stroke-width':2.5}, ondo.bob);
+    tl.fromTo(ondo.inner, {x:-260}, {x:X(23), duration:1.8, ease:'power2.out'}, 70.0);
+    bounce(ondo.bob, 70.0, 71.8, 14, 16);
+    popScale(sweat, 71.9);
+    const bb = bubble(s, X(23) - 150, 540, 250, 70, 'did I miss it?', 34, 'r');
+    pop(bb, 72.0);
+    const ct = paper(s, X(23) - 150, 650, 240, 60, 3); hand(ct, 0, 10, '20 stocks & ETFs', 26, INK);
+    pop(ct, 72.3);
+    stamp(stampV(s, 640, 400, 320, 'TOO LATE', '#B3261E'), 72.6);
+  })();
+
+  // ---------- Shot 8: accomplices on the waves ----------
+  (function(){
+    const s = S[7];
+    const poster = (x, head, big, sub1, sub2, col, at, cnt) => {
+      const p = paper(s, x, 290, 360, 300, x < 800 ? -3 : 3);
+      el('rect', {x:-160, y:-130, width:320, height:52, fill:INK}, p);
+      hand(p, 0, -94, head, 34, K.yellow);
+      const b = hand(p, 0, 20, '', 78, col);
+      hand(p, 0, 64, sub1, 28, INK);
+      hand(p, 0, 102, sub2, 24, '#6B5A4E');
+      pop(p, at);
+      counter(b, at + .4, at + 2.2, 0, cnt[0], cnt[1]);
+    };
+    poster(610, 'ACCOMPLICE #1', '', 'BTC shorts wiped out', 'Sep 21 · BTC > $85K', K.redD, 75.3, [648, v => '$' + Math.round(v) + 'M']);
+    poster(990, 'ACCOMPLICE #2', '', 'Zcash record high', 'Sep 23 · sector ≈ $33.6B', '#B7791F', 79.8, [1600, v => '$' + Math.round(v).toLocaleString('en-US')]);
+    const mkWave = (base, col, amp, len) => {
+      let d = `M200 ${base}`;
+      for (let x = 200; x <= 1500; x += 20) d += ` L${x} ${(base + amp*Math.sin(x/len*2*Math.PI)).toFixed(1)}`;
+      d += ` L1500 ${base+140} L200 ${base+140} Z`;
+      const g = el('g', {}, s);
+      el('path', {d, fill:col, stroke:INK, 'stroke-width':5, 'stroke-linejoin':'round'}, g);
+      return g;
+    };
+    const wv = el('g', {}, s);
+    const back = mkWave(610, K.blue1, 18, 180);
+    wv.appendChild(back);
+    const boats = el('g', {}, wv);
+    [['BTC',620,'#D8A94A','#E3A35F'],['ZEC',900,'#E7C24A','#EBD3AE'],['NEAR',1180,K.orange,'#F2B36B']].forEach(([l, x, col, fur], i) => {
+      const b = box(boats, x, 650, {w:120, h:82, color:col, fur, label:l, shades:l !== 'NEAR', hat:l === 'NEAR' ? 'party' : null});
+      bounce(b.bob, 75, 87, 10, 2.4, i*1.4);
+      sways.push({g:b.inner, cx:0, cy:-40, amp:6, f:2, ph:i});
+    });
+    const mid = mkWave(655, K.blue2, 16, 150); wv.appendChild(mid);
+    const front = mkWave(700, K.blue3, 14, 210); wv.appendChild(front);
+    waves.push({g:back, dir:1, amp:30, f:1.1}, {g:mid, dir:-1, amp:36, f:1.3}, {g:front, dir:1, amp:26, f:.9});
+    tl.fromTo(wv, {y:220, opacity:0}, {y:0, opacity:1, duration:1, ease:'power2.out'}, 82.6);
+    tl.fromTo(boats, {y:130}, {y:0, duration:2.2, ease:'back.out(1.2)'}, 83.3);
+    stamp(stampV(s, 1300, 200, 300, 'STRONG', '#2E7D3E'), 85.4);
+  })();
+
+  // ---------- Shot 9: podium & curtain ----------
+  let closedStamp, footer;
+  (function(){
+    const s = S[8];
+    const rows = [
+      ['Intents', 'usage', 3, 180, K.greenS],
+      ['Market', 'wave', 2, 215, K.greenS],
+      ['NEAR@3.33', 'trigger', 1, 255, K.greenS],
+      ['Private', 'perps', 4, 150, K.amberS],
+      ['TVL', 'growth', 5, 120, K.amberS],
+      ['Ondo', 'deal', 6, 100, K.redS]
+    ];
+    rows.forEach(([a, b, rank, h, col], i) => {
+      const x = 470 + i*164;
+      const g = el('g', {}, s);
+      el('rect', {x:x-74, y:762-h, width:148, height:h, rx:6, fill:col, stroke:INK, 'stroke-width':5}, g);
+      hand(g, x, 762-h+42, '#' + rank, 40, INK);
+      hand(g, x, 762-h+76, a, 25, INK);
+      hand(g, x, 762-h+102, b, 25, INK);
+      tl.fromTo(g, {y:300}, {y:0, duration:.55, ease:'back.out(1.4)'}, 87.4 + i*.14);
+      const who = box(s, x, 762-h, {w:84, h:60, s:1, color:rank === 1 ? '#EE8A4C' : K.orange, hat:rank === 1 ? 'party' : null});
+      tl.fromTo(who.inner, {y:-300, opacity:0}, {y:0, opacity:1, duration:.6, ease:'bounce.out'}, 88.2 + i*.14);
+      if (rank === 1) bounce(who.bob, 89, 96, 14, 9);
+    });
+    const leg = paper(s, 1320, 300, 190, 118, 4);
+    [['strong','#2E7D3E'],['mixed','#B7791F'],['too late','#B3261E']].forEach(([l, c], i) => { el('rect', {x:-70, y:-40 + i*32, width:22, height:22, rx:4, fill:[K.greenS,K.amberS,K.redS][i], stroke:INK, 'stroke-width':3}, leg); hand(leg, -36, -22 + i*32, l, 24, c, 'start'); });
+    pop(leg, 89.4);
+    const scroll = place(s, 800, 210);
+    el('rect', {x:-400, y:-86, width:800, height:172, rx:8, fill:K.cream, stroke:INK, 'stroke-width':5}, scroll);
+    el('rect', {x:-420, y:-96, width:26, height:192, rx:13, fill:K.brown, stroke:INK, 'stroke-width':4}, scroll);
+    el('rect', {x:394, y:-96, width:26, height:192, rx:13, fill:K.brown, stroke:INK, 'stroke-width':4}, scroll);
+    hand(scroll, 0, -46, 'WATCH THIS', 38, K.redD);
+    hand(scroll, 0, -6, 'Rewards pay only while the 3-day avg price stays ≥ $3.33.', 30, INK);
+    hand(scroll, 0, 30, 'Once converted, that NEAR can be sold.', 30, INK);
+    hand(scroll, 0, 66, 'Incentive TVL has fled before: Berachain −88% from peak.', 30, INK);
+    tl.fromTo(scroll, {scaleX:.04, opacity:0}, {scaleX:1, opacity:1, duration:.9, ease:'power3.out', smoothOrigin:false, transformOrigin:'50% 50%'}, 92.2);
+    // Final stamp & footer live in the top layer, over the closed curtains
+    closedStamp = place(top, 800, 360, -8);
+    closedStamp.__pos = [800, 360];
+    el('rect', {x:-300, y:-78, width:600, height:156, rx:12, fill:K.cream, 'fill-opacity':.92, stroke:'#B3261E', 'stroke-width':8}, closedStamp);
+    el('rect', {x:-286, y:-64, width:572, height:128, rx:6, fill:'none', stroke:'#B3261E', 'stroke-width':3}, closedStamp);
+    hand(closedStamp, 0, 30, 'CASE CLOSED', 96, '#B3261E');
+    footer = el('g', {}, top);
+    el('rect', {x:470, y:150, width:660, height:44, rx:22, fill:K.navy, opacity:.85}, footer);
+    hand(footer, 800, 180, 'not investment advice · figures from news reports, Sep 14–24, 2026', 24, K.cream);
+  })();
+
+  // ---------- Curtains, scene switching, acting ----------
+  const curL = $('curL'), curR = $('curR');
+  gsap.set(curL, {x:-8}); gsap.set(curR, {x:8});
+  gsap.set(S.slice(1), {autoAlpha:0});
+  gsap.set(footer, {opacity:0});
+  tl.to(curL, {x:-680, duration:.9, ease:'power3.out'}, 1.7);
+  tl.to(curR, {x:680, duration:.9, ease:'power3.out'}, 1.7);
+  SC.forEach((sc, i) => {
+    if (!i) return;
+    tl.call(sfx, ['whoosh'], sc.t - .75);
+    tl.to(curL, {x:-8, duration:.45, ease:'power2.in'}, sc.t - .75);
+    tl.to(curR, {x:8, duration:.45, ease:'power2.in'}, sc.t - .75);
+    tl.set(S[i-1], {autoAlpha:0}, sc.t);
+    tl.set(S[i], {autoAlpha:1}, sc.t);
+    tl.to(curL, {x:-680, duration:.75, ease:'power3.out'}, sc.t + .05);
+    tl.to(curR, {x:680, duration:.75, ease:'power3.out'}, sc.t + .05);
+    tl.to(pose, {hop:-30, duration:.16, yoyo:true, repeat:1, ease:'power1.out'}, sc.t + .2);
+  });
+  tl.call(sfx, ['whoosh'], 96.3);
+  tl.to(curL, {x:-8, duration:.8, ease:'power2.inOut'}, 96.3);
+  tl.to(curR, {x:8, duration:.8, ease:'power2.inOut'}, 96.3);
+  stamp(closedStamp, 97.0);
+  tl.fromTo(footer, {opacity:0}, {opacity:1, duration:.5, immediateRender:false}, 97.6);
+
+  tl.set(pose, {walk:1}, 2.4); tl.to(pose, {x:200, duration:1.1, ease:'power1.out'}, 2.4); tl.set(pose, {walk:0}, 3.5);
+  tl.to(pose, {arm:-30, duration:.35, ease:'back.out(2)'}, 4.0);
+  tl.to(pose, {arm:40, duration:.5}, 8.0);
+  tl.to(pose, {arm:-18, duration:.35, ease:'back.out(2)'}, 10.0);
+  tl.to(pose, {arm:40, duration:.5}, 13.5);
+  tl.to(pose, {arm:-20, duration:.35, ease:'back.out(2)'}, 18.8);
+  tl.to(pose, {arm:-36, duration:.35, ease:'back.out(2)'}, 28.5);
+  tl.to(pose, {arm:40, duration:.5}, 32.0);
+  tl.to(pose, {arm:-14, duration:.35, ease:'back.out(2)'}, 33.7);
+  tl.to(pose, {arm:40, duration:.5}, 38.0);
+  tl.to(pose, {eye:1, bR:-10, bL:4, duration:.2}, 50.2);
+  tl.to(pose, {eye:0, bR:0, bL:0, duration:.2}, 54.5);
+  tl.to(pose, {arm:-36, duration:.35, ease:'back.out(2)'}, 59.6);
+  tl.to(pose, {arm:40, duration:.5}, 64.5);
+  tl.to(pose, {eye:1, bR:-9, bL:-9, duration:.2}, 70.3);
+  tl.to(pose, {eye:0, bR:0, bL:0, duration:.2}, 73.4);
+  tl.to(pose, {arm:-24, duration:.35, ease:'back.out(2)'}, 75.6);
+  tl.to(pose, {arm:40, duration:.5}, 86.0);
+  tl.set(pose, {walk:1}, 97.3); tl.to(pose, {x:800, duration:1.2, ease:'power1.inOut'}, 97.3); tl.set(pose, {walk:0}, 98.5);
+  tl.to(pose, {hatY:-46, hatR:-26, lean:14, duration:.4, ease:'back.out(2)'}, 98.9);
+  tl.to(pose, {hatY:0, hatR:-4, lean:0, duration:.45, ease:'power2.inOut'}, 100.2);
+  // ---------- Virtual camera (CSS 3D dolly / orbit / roll over the stage) ----------
+  const cam3 = {s:1, x:0, y:0, rx:0, ry:0, rz:0};
+  const N0 = {s:1, x:0, y:0, rx:0, ry:0, rz:0};
+  const camMove = (at, to, dur, ease) => tl.to(cam3, Object.assign({duration:dur || 1.2, ease:ease || 'power3.inOut'}, to), at);
+  const camFrom = (at, from, dur) => { tl.set(cam3, Object.assign({}, N0, from), at); tl.to(cam3, Object.assign({duration:dur || 1.6, ease:'power3.out'}, N0), at + .01); };
+  camFrom(1.7, {s:1.18, ry:-10, rx:5, y:3}, 2.2);
+  camMove(4.0, {s:1.1}, .15, 'power2.out'); camMove(4.2, N0, .9, 'elastic.out(1,.5)');
+  SC.forEach((sc, i) => { if (i) camFrom(sc.t, {s:1.16, ry:i % 2 ? 9 : -9, rx:4, rz:i % 2 ? -1.5 : 1.5}, 1.7); });
+  camMove(22.4, {s:1.38, x:18, y:2}, .5, 'power3.out'); camMove(24.4, N0, .9);
+  camMove(28.2, {s:1.5, x:-25, y:-2, rz:-1.5}, .8); camMove(30.2, N0, .55);
+  camMove(34.8, {s:1.22, y:10}, .8); camMove(36.4, N0, 1);
+  camMove(40.3, {s:1.18, x:-8, y:-6}, .5, 'back.out(2)'); camMove(41.6, N0, .7);
+  camMove(56.8, {s:1.3, x:12, y:6}, .9); camMove(58.8, N0, 1);
+  camMove(60.4, {s:1.15, x:-9, rz:1}, 1.2); camMove(62.6, N0, .9);
+  camMove(69.9, {s:1.22, x:11}, .3); camMove(70.25, {x:-11}, 1.7, 'power1.inOut'); camMove(72.05, N0, .35);
+  camMove(82.8, {s:1.1, rx:6, rz:1.8}, 1.2); camMove(84.1, {rz:-1.8}, .9, 'sine.inOut'); camMove(85.0, N0, .25);
+  camMove(88.0, {s:1.12, ry:-6, x:-4}, 2.6, 'sine.inOut'); camMove(90.7, {ry:6, x:4}, 3.2, 'sine.inOut'); camMove(94.0, N0, 1.2);
+  camMove(96.2, {s:1.12, y:-2}, 2.4, 'power2.inOut');
+  tl.to({}, {duration:.01}, D - .01);
+
+  // ---------- Procedural frame ----------
+  const boilT = $('boilT'), rays = $('rays');
+  const camEl = $('camEl');
+  const G3 = build3D();
+  const subEn = $('subEn'), subKo = $('subKo'), tcOut = $('tcOut'), scrub = $('scrub'), chipsEl = $('chips');
+  const rm = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (rm){ $('fg').removeAttribute('filter'); top.removeAttribute('filter'); }
+  const fmtT = t => Math.floor(t/60) + ':' + String(Math.floor(t%60)).padStart(2, '0');
+  let lastScene = -1, lastSub = null, lastSeed = -1;
+  let voiceOn = false, speaking = false, spokenIdx = -1, waitingVoice = false, waitStart = 0, curUtt = null, wantPlaying = false, juryOn = true, juryOpen = null, juryStart = 0;
+  function sceneAt(t){ let i = 0; SC.forEach((s, j) => { if (t >= s.t) i = j; }); return i; }
+  function frame(t, w){
+    if (w == null) w = t;
+    const seed = Math.floor(w*8) % 4;
+    if (!rm && seed !== lastSeed){ boilT.setAttribute('seed', seed + 1); lastSeed = seed; }
+    rays.setAttribute('transform', `rotate(${(w*2.5)%360} 800 330)`);
+    titleOuter.setAttribute('transform', `rotate(${(Math.sin(w*1.7)*1.4).toFixed(2)} 800 0)`);
+    // Hash
+    H.pos.setAttribute('transform', `translate(${pose.x},${pose.y + pose.hop}) scale(${pose.s})`);
+    const by = pose.walk ? -Math.abs(Math.sin(w*13))*14 : Math.sin(w*2.4)*3;
+    H.bob.setAttribute('transform', `translate(0,${by.toFixed(2)}) rotate(${pose.lean} 0 0)`);
+    H.arm.setAttribute('transform', `rotate(${pose.arm})`);
+    H.hat.setAttribute('transform', `translate(0,${pose.hatY}) rotate(${pose.hatR} 0 -171)`);
+    H.eyesHappy.setAttribute('opacity', pose.eye > .5 ? 0 : 1);
+    H.eyesDot.setAttribute('opacity', pose.eye > .5 ? 1 : 0);
+    H.browL.setAttribute('transform', `translate(0,${pose.bL})`);
+    H.browR.setAttribute('transform', `translate(0,${pose.bR}) rotate(${pose.bR*.9} 35 -138)`);
+    // props
+    for (const p of pumps){ const on = t >= p.t0 && t <= p.t1; p.h.setAttribute('transform', `translate(0,${on ? (Math.abs(Math.sin(w*5.5))*40).toFixed(1) : 0})`); }
+    for (const b of bounces){ if (t >= b.t0 && t <= b.t1) b.g.setAttribute('transform', `translate(0,${(-Math.abs(Math.sin(w*b.f + b.ph))*b.amp).toFixed(1)})`); else if (b.g.__last !== 'rest'){ b.g.setAttribute('transform', ''); } }
+    for (const sw of sways){ sw.g.setAttribute('transform', `rotate(${(Math.sin(w*sw.f + (sw.ph||0))*sw.amp).toFixed(2)} ${sw.cx} ${sw.cy})`); }
+    for (const sp of spinners) sp.g.setAttribute('transform', `rotate(${(w*sp.speed)%360} ${sp.cx} ${sp.cy})`);
+    for (const wv of waves) wv.g.setAttribute('transform', `translate(${(Math.sin(w*wv.f)*wv.amp*wv.dir).toFixed(1)},0)`);
+    for (const wk of walkers){
+      const x = 1560 - ((w*130 + wk.i*420) % 1400 + 1400) % 1400;
+      wk.outer.setAttribute('transform', `translate(${x.toFixed(1)},706) scale(.9)`);
+      wk.bob.setAttribute('transform', `translate(0,${(-Math.abs(Math.sin(w*9 + wk.i))*8).toFixed(1)})`);
+    }
+    smoke.forEach(s => { const k = ((w*1.4 + s.i/3) % 1); s.c.setAttribute('transform', `translate(${(-k*60).toFixed(1)},${(-k*70).toFixed(1)}) scale(${(.6 + k*.8).toFixed(2)})`); s.c.setAttribute('opacity', (1-k).toFixed(2)); });
+    reporterBubbles.forEach((b, i) => {
+      const on = t >= 50.3 && t < 55 ? (Math.floor((t-50.3)/.65) % 2 === i ? 1 : 0) : 0;
+      b.setAttribute('opacity', on);
+    });
+    for (const sw of SWINGS){
+      const a = t - sw.t;
+      sw.g.setAttribute('opacity', a < 0 ? 0 : 1);
+      sw.g.setAttribute('transform', `rotate(${a < 0 ? -70 : (-70*Math.exp(-4.2*a)*Math.cos(a*9)).toFixed(2)})`);
+    }
+    for (const st of STAMPS){
+      const q = Math.min(1, Math.max(0, (t - st.t)/.28));
+      const e = 1 + 2.6*Math.pow(q - 1, 3) + 1.6*Math.pow(q - 1, 2);
+      st.g.setAttribute('transform', `scale(${(2.6 - 1.6*e).toFixed(3)})`);
+      st.g.setAttribute('opacity', t < st.t ? 0 : Math.min(1, q*3).toFixed(2));
+    }
+    for (const c of counters){
+      const p = Math.min(1, Math.max(0, (t - c.t0)/(c.t1 - c.t0)));
+      c.elm.textContent = c.fmt(c.from + (c.to - c.from)*(1 - Math.pow(1 - p, 3)));
+    }
+    // captions (EN + KO) + lip sync
+    let idx = -1;
+    for (let i = 0; i < CUES.length; i++){ if (CUES[i].t <= t) idx = i; }
+    const cue = CUES[idx], next = CUES[idx+1];
+    let en = '', ko = '', typing = false;
+    if (cue && (!next || t < next.t) && (t < cue.t + cue.s.length/CPS + 5 || (speaking && spokenIdx === idx))){
+      if (voiceOn){ en = cue.s; }
+      else { const n = Math.floor((t - cue.t)*CPS); en = cue.s.slice(0, n); typing = n < cue.s.length; }
+      ko = cue.ko;
+    }
+    if (en !== lastSub){ subEn.textContent = en; subKo.textContent = en ? ko : ''; lastSub = en; }
+    const talking = voiceOn ? speaking : (typing && !tl.paused());
+    const open = talking && Math.sin(w*16) > -.2;
+    H.mTalk.setAttribute('opacity', open ? 1 : 0);
+    H.mSmile.setAttribute('opacity', open ? 0 : 1);
+    if (open) H.mTalk.setAttribute('ry', (5 + Math.abs(Math.sin(w*16))*6).toFixed(1));
+    const si = sceneAt(t);
+    if (si !== lastScene){
+      plaqueT.textContent = 'EXHIBIT ' + (si+1) + ' / 9';
+      [...chipsEl.children].forEach((c, j) => c.setAttribute('aria-current', j === si ? 'true' : 'false'));
+      lastScene = si;
+    }
+    if (!rm){
+      const lim = (cam3.s - 1)*50 + Math.abs(cam3.ry)*.9 + Math.abs(cam3.rz)*.4;
+      const cx = Math.max(-lim, Math.min(lim, cam3.x)), cy = Math.max(-lim, Math.min(lim, cam3.y));
+      camEl.style.transform = `translate(${cx.toFixed(2)}%,${cy.toFixed(2)}%) rotateX(${cam3.rx.toFixed(2)}deg) rotateY(${cam3.ry.toFixed(2)}deg) rotateZ(${cam3.rz.toFixed(2)}deg) scale(${(cam3.s + Math.abs(cam3.ry)*.006 + Math.abs(cam3.rz)*.01).toFixed(4)})`;
+      if (G3) G3.render(t, w);
+    }
+    tcOut.textContent = fmtT(t) + ' / ' + fmtT(D);
+    if (document.activeElement !== scrub) scrub.value = t.toFixed(2);
+  }
+  const playBtn = $('playBtn'), voiceBtn = $('voiceBtn'), juryBtn = $('juryBtn');
+  const synth = window.speechSynthesis || null;
+  let enVoice = null;
+  function pickVoice(){
+    if (!synth) return;
+    const vs = synth.getVoices().filter(v => /^en(-|_)/i.test(v.lang));
+    enVoice = vs.find(v => /Google US English|Samantha|Aria|Jenny|Guy|Daniel/i.test(v.name)) || vs.find(v => /en-US/i.test(v.lang)) || vs[0] || null;
+  }
+  if (synth){ pickVoice(); synth.onvoiceschanged = pickVoice; } else { voiceBtn.disabled = true; voiceBtn.textContent = 'Voice unavailable'; }
+  function say(text, idx){
+    if (!synth) return;
+    synth.cancel();
+    const u = new SpeechSynthesisUtterance(text);
+    u.lang = 'en-US'; if (enVoice) u.voice = enVoice; u.rate = 1.05; u.pitch = 1.1;
+    curUtt = u; speaking = true; spokenIdx = idx;
+    const done = () => { if (curUtt !== u) return; speaking = false; if (waitingVoice){ waitingVoice = false; resume(); } };
+    u.onend = done; u.onerror = done;
+    synth.speak(u);
+  }
+  function stopVoice(){ if (synth) synth.cancel(); curUtt = null; speaking = false; waitingVoice = false; }
+  function resume(){ if (wantPlaying && !juryOpen && !waitingVoice){ tl.play(); if (synth && synth.paused) synth.resume(); } }
+  function setWant(p){
+    wantPlaying = p;
+    playBtn.textContent = p ? 'Pause' : (tl.progress() >= 1 ? 'Replay' : 'Play');
+    if (p) resume(); else { tl.pause(); if (synth && speaking) synth.pause(); }
+  }
+  function setVoice(on){
+    voiceOn = on && !!synth; sfxOn = on;
+    if (on) initAudio();
+    if (!voiceOn) stopVoice();
+    voiceBtn.setAttribute('aria-pressed', voiceOn ? 'true' : 'false');
+    voiceBtn.textContent = voiceOn ? 'Voice on' : 'Voice off';
+    lastSub = null;
+  }
+  function cueIndexAt(t){ let i = -1; for (let j = 0; j < CUES.length; j++) if (CUES[j].t <= t) i = j; return i; }
+  function holdFor(i){
+    const c = CUES[i], nx = CUES[i+1];
+    const nextScene = SC.find(sc => sc.t > c.t);
+    return Math.min(nx ? nx.t : D, nextScene ? nextScene.t - .8 : D) - .05;
+  }
+  function seek(t){
+    stopVoice(); closeJury(false);
+    tl.seek(t);
+    spokenIdx = cueIndexAt(t - .6);
+    ASKS.forEach(a => { if (a.t >= t - .01) { a.done = false; a.pick = null; } });
+    prevT = t;
+    frame(t, performance.now()/1000);
+  }
+
+  // ---------- Jury mode ----------
+  const ASKS = [
+    {t:30.85, v:'strong', who:'Suspect 1 · NEAR@3.33', head:'STRONG', en:'Timing matches: +14% on the snapshot day, and holders are paid only above $3.33.', ko:'타이밍 일치: 스냅샷 당일 +14%, 그리고 $3.33 위에서만 보상.'},
+    {t:43.05, v:'strong', who:'Suspect 2 · Intents usage', head:'STRONG', en:'Dune shows $31.4B of real volume, and only 6% runs through the incentive side.', ko:'Dune 기준 실거래 314억 달러, 인센티브 쪽은 6%뿐.'},
+    {t:53.45, v:'mixed', who:'Suspect 3 · Confidential perps', head:'MIXED', en:'It did launch, but the date and the +120% volume figure are unverified.', ko:'출시는 사실이지만 날짜와 +120% 수치는 검증 불가.'},
+    {t:63.65, v:'mixed', who:'Suspect 4 · TVL balloon', head:'MIXED', en:'TVL is priced in dollars, so part of the jump is the rally itself.', ko:'TVL은 달러 표시라 상승분 일부는 랠리 그 자체.'},
+    {t:72.45, v:'weak', who:'Suspect 5 · Ondo deal', head:'TOO LATE', en:'Announced Sep 23, after most of the rise had already happened.', ko:'9월 23일 발표. 상승 대부분이 끝난 뒤.'},
+    {t:85.25, v:'strong', who:'Accomplices · Market wave', head:'STRONG', en:'$648M of BTC shorts squeezed and a privacy-coin rally in the same week.', ko:'같은 주에 BTC 숏 6.48억 달러 청산 + 프라이버시 코인 랠리.'}
+  ];
+  const juryEl = $('jury'), jWho = $('jWho'), jBar = $('jBar'), toast = $('toast'), scoreEl = $('score');
+  let toastTimer = null, prevT = 0;
+  const JURY_SECS = 10;
+  function openJury(a){
+    juryOpen = a; juryStart = performance.now();
+    tl.pause();
+    jWho.textContent = a.who;
+    juryEl.hidden = false;
+    if (voiceOn && !speaking) say('Jury, what is your verdict?', spokenIdx);
+    const first = juryEl.querySelector('button'); if (first) first.focus({preventScroll:true});
+  }
+  function closeJury(resumeAfter){
+    if (!juryOpen) return;
+    juryOpen.done = true;
+    juryOpen = null; juryEl.hidden = true;
+    if (resumeAfter) resume();
+  }
+  juryEl.querySelectorAll('button').forEach(b => b.addEventListener('click', () => {
+    const a = juryOpen; if (!a) return;
+    a.pick = b.dataset.v;
+    closeJury(true);
+    showVerdict(a);
+  }));
+  function showVerdict(a){
+    clearTimeout(toastTimer);
+    setTimeout(() => {
+      const hit = a.pick === a.v;
+      $('tHead').textContent = a.pick ? (hit ? 'You matched Hash! · 정답! ' : 'Hash ruled ' + a.head + ' · 판결: ' + a.head) : 'Hash ruled ' + a.head;
+      $('tEn').textContent = a.en; $('tKo').textContent = a.ko;
+      toast.hidden = false;
+      if (a.pick) sfx(hit ? 'ding' : 'buzz');
+      toastTimer = setTimeout(() => { toast.hidden = true; }, 3600);
+    }, 650);
+  }
+  juryBtn.addEventListener('click', () => { juryOn = !juryOn; juryBtn.setAttribute('aria-pressed', juryOn ? 'true' : 'false'); if (!juryOn) closeJury(true); });
+
+  // ---------- Main loop ----------
+  function loop(){
+    const t = tl.time(), w = performance.now()/1000;
+    if (!tl.paused()){
+      if (voiceOn){
+        const i = cueIndexAt(t);
+        if (i >= 0 && i !== spokenIdx && t - CUES[i].t < .6) say(CUES[i].s, i);
+        if (speaking && spokenIdx >= 0 && spokenIdx < CUES.length && t >= holdFor(spokenIdx)){ tl.pause(); waitingVoice = true; waitStart = w; }
+      }
+      if (juryOn) for (const a of ASKS){ if (!a.done && prevT < a.t && t >= a.t){ openJury(a); break; } }
+    }
+    if (waitingVoice && w - waitStart > 12){ waitingVoice = false; resume(); }
+    if (juryOpen){
+      const left = 1 - (performance.now() - juryStart)/(JURY_SECS*1000);
+      jBar.style.transform = `scaleX(${Math.max(0, left)})`;
+      if (left <= 0){ const a = juryOpen; closeJury(true); showVerdict(a); }
+    }
+    const answered = ASKS.filter(a => a.pick);
+    if (t >= 97.8 && answered.length){
+      const hits = answered.filter(a => a.pick === a.v).length;
+      scoreEl.innerHTML = `Jury score ${hits}/${ASKS.length}<small>배심원 점수 ${hits}/${ASKS.length}</small>`;
+      scoreEl.hidden = false;
+    } else scoreEl.hidden = true;
+    if (tl.progress() >= 1 && wantPlaying){ wantPlaying = false; playBtn.textContent = 'Replay'; }
+    frame(t, w);
+    prevT = t;
+    requestAnimationFrame(loop);
+  }
+
+  // ---------- Controls ----------
+  playBtn.addEventListener('click', () => {
+    $('startOv').hidden = true;
+    if (tl.progress() >= 1){ seek(0); setWant(true); return; }
+    setWant(!wantPlaying);
+  });
+  $('restartBtn').addEventListener('click', () => { $('startOv').hidden = true; seek(0); setWant(true); });
+  voiceBtn.addEventListener('click', () => setVoice(!voiceOn));
+  $('startVoice').addEventListener('click', () => { setVoice(true); $('startOv').hidden = true; seek(0); setWant(true); });
+  $('startSilent').addEventListener('click', () => { setVoice(false); $('startOv').hidden = true; seek(0); setWant(true); });
+  scrub.addEventListener('input', () => seek(parseFloat(scrub.value)));
+  function goShot(i){
+    $('startOv').hidden = true;
+    if (rm){ seek(KEY[i]); setWant(false); }
+    else { seek(Math.max(0, SC[i].t - (i ? .8 : 0))); setWant(true); }
+  }
+  SC.forEach((sc, i) => {
+    const b = document.createElement('button');
+    b.type = 'button'; b.className = 'chip';
+    b.textContent = (i+1) + ' · ' + sc.chip;
+    b.addEventListener('click', () => goShot(i));
+    chipsEl.appendChild(b);
+  });
+  document.addEventListener('keydown', e => {
+    if (e.target.closest && e.target.closest('input, button, a')) return;
+    if (e.code === 'Space'){ e.preventDefault(); playBtn.click(); }
+    if (e.code === 'ArrowRight') goShot(Math.min(8, sceneAt(tl.time()) + 1));
+    if (e.code === 'ArrowLeft') goShot(Math.max(0, sceneAt(tl.time()) - 1));
+  });
+
+  // ---------- Storyboard ----------
+  const SHOTS = [
+    {tc:'00:00–00:09', name:'Cold open · "Pumped"', v:['Opening', 'v-none'],
+     frame:'Red curtains are closed with a wooden title sign hanging in front: "The Week NEAR Went +80%!". The curtains part to show a hamster standing on a bicycle pump, a hose running to a giant NEAR PRICE thermometer, and two party-hat hamsters.',
+     motion:'The sign sways, then flies up with a back-in ease. The curtains open (0.9 s). The pump handle pumps 40 px at 5.5 Hz while the thermometer rises and the bulb counter rolls from $2.20 to $4.29. A yellow "+80%" starburst pops in with overshoot and a stage shake.',
+     acting:'Hash scurries in from the left with a bouncy hamster hop and points the magnifier at the thermometer. The party hamsters jump up and down.',
+     data:'$2.20 (Sep 14) → $4.29 (Sep 23), +78–80% over 7 days.', src:'CoinCentral, Cointelegraph',
+     trans:'The curtains close for 0.45 s. Props swap while they are shut, then they reopen.'},
+    {tc:'00:09–00:18', name:'The crime scene', v:['Setup', 'v-none'],
+     frame:'A clothesline rises from left to right between two poles, so the line itself works as the price chart. Four paper cards hang on it: SEP 14 $2.20, SEP 17 $2.87, SEP 20 $3.45, SEP 23 $4.29. Sticky notes point out +14% and +45%.',
+     motion:'The line draws in. Each card swings down from its clothespin with an elastic ease, 0.55 s apart. The notes pop up. At the end, a lineup of five numbered suspect hamsters and two hamsters in sunglasses (BTC, ZEC) hops in along the floor.',
+     acting:'Hash points along the line, then lowers the magnifier to introduce the lineup.',
+     data:'Sep 17: $2.87 (+14.3%). Sep 20: ≈$3.45 (+45% in 3 days). Sep 23: $4.29.', src:'The Crypto Times, Parameter, Cointelegraph',
+     trans:'Curtain close and open.'},
+    {tc:'00:18–00:33', name:'Suspect 1 · NEAR@3.33', v:['Strong', 'v-strong'],
+     frame:'A pump hamster fills a PRIVATE TVL thermometer up to a red $70M line. A flash freezes a polaroid that reads "SNAPSHOT! Sep 17 · +14%". A wooden sign drops in reading "333,333 locked NEAR@3.33 tokens". Coins rain onto three party-hat hamsters. A giant padlock marked $3.33 replaces the rules sheet.',
+     motion:'The pump runs for 3.8 s while the bulb counter rolls to $70.8M. A full-screen white flash and the polaroid pop together. Coins bounce onto the floor 0.06 s apart. The rules paper fades out as the padlock pops in and rattles. The crowd raises "UP! ↑" placards and jumps. A green STRONG stamp lands with a shake.',
+     acting:'Hash points at the gauge, then higher at the padlock on "the twist".',
+     data:'Confidential TVL $70.79M on Sep 17 · 333,333 tokens · >$100 balance + ≥1 private swap · 2% cap · unlock needs 3-day VWAP ≥ $3.33.', src:'PR Newswire, crypto.news, TradingView/Coindar. Call-option framing: PANews',
+     trans:'Curtain close and open.'},
+    {tc:'00:33–00:45', name:'Suspect 2 · Real usage', v:['Strong', 'v-strong'],
+     frame:'A navy scoreboard hangs from ropes and reads "$31.4B". A glass jar is filled with teal "public" marbles and a thin amber "private 6%" layer. Two money sacks (≈$1M vs ≈$2M) sit with a red "× 2". A record tag reads "$300M+ · Sep 18". Crate-carrying hamsters walk across the back of the stage the whole time.',
+     motion:'The scoreboard drops in with a bounce and its counter rolls up. The jar fills from the bottom and the amber layer pops on top. The second sack pops in at 1.35× the size of the first. The walkers loop in from the right curtain and out at the left.',
+     acting:'Hash gestures at the scoreboard, then lets the numbers speak.',
+     data:'≈$31.4B all-time Intents volume (Dune): $29.5B public, $1.9B confidential. Daily record $300M+ on Sep 18. Weekly fees ≈$2M for Sep 14–20, about 2× the prior week.', src:'Crypto Briefing (Dune), The Cryptonomist',
+     trans:'Curtain close and open.'},
+    {tc:'00:45–00:55', name:'Suspect 3 · Confidential perps', v:['Medium', 'v-med'],
+     frame:'A taped-up poster for CONFIDENTIAL PERPS with chips for 40×, 50+ markets and hidden positions, plus a trade ticket. Two reporter hamsters in PRESS hats hold up newspapers that disagree: "LAUNCHED SEP 17!" and "LAUNCHED SEP 21!". A sticky note reads "volume +120%? source: ???".',
+     motion:'Black marker bars wipe across the ticket one field at a time. The reporters slide in from opposite sides. Their speech bubbles ("17th!" / "21st!") alternate every 0.65 s while each reporter hops on their turn. An amber MEDIUM · SHAKY stamp lands last.',
+     acting:'Hash\'s eyes switch from happy arcs to suspicious dots, with the right brow raised.',
+     data:'Up to 40× leverage, 50+ markets, positions hidden, execution on Hyperliquid. Outlets give the launch date as Sep 17 or Sep 21.', src:'Altcoin Buzz, Crypto Briefing, CoinMarketCap',
+     trans:'Curtain close and open.'},
+    {tc:'00:55–01:06', name:'Suspect 4 · The TVL balloon', v:['Partly an effect', 'v-med'],
+     frame:'A red TVL balloon is tied to a NEAR weight, with notes reading "was $191M" and "Sep 16 → 23". On the right, a dashed loop links four wooden signs: NEAR price ↑ → NEAR inside worth more → TVL ↑ in $ → "TVL surges!".',
+     motion:'The balloon inflates from its knot with an elastic overshoot while its counter rolls to $350M+. The whole balloon sways on its string. The loop\'s red arrowheads orbit continuously, and the signs pop in clockwise.',
+     acting:'Hash points at the loop on "counted in dollars".',
+     data:'Chain TVL ≈$191M → $350M+ in about a week.', src:'DefiLlama, via BitcoinEthereumNews and CoinGape',
+     trans:'Curtain close and open.'},
+    {tc:'01:06–01:15', name:'Suspect 5 · Ondo misses the train', v:['Too late', 'v-low'],
+     frame:'Dated posts (SEP 14/17/20/23) stand along a railway, with a sign reading "the +80% rally: Sep 14 → 22". A RALLY train pulling a conga line of party-hat hamsters puffs across and leaves. A grey ONDO hamster in a blue scarf runs in with a US-stocks suitcase and stops at the Sep 23 post, sweating.',
+     motion:'The train crosses the stage in 3.4 s with ease-in acceleration, its smoke puffs drifting and fading. Ondo runs in with a fast bob. A sweat drop and a "did I miss it?" bubble pop in, then the red TOO LATE stamp lands.',
+     acting:'Hash raises both brows in the suspicious-dot pose.',
+     data:'Ondo partnership announced Sep 23: 20 tokenized US stocks and ETFs.', src:'FXStreet, PR Newswire',
+     trans:'Curtain close and open.'},
+    {tc:'01:15–01:27', name:'Accomplices · The market wave', v:['Strong', 'v-strong'],
+     frame:'Two taped "ACCOMPLICE" posters: $648M of BTC shorts wiped out, and the $1,600 Zcash record. Below them, three layers of cardboard stage waves carry BTC, ZEC and NEAR hamsters.',
+     motion:'The poster counters roll up. The wave layers slide in from below, then rock sideways in opposite directions like theatre waves on sticks. The hamsters rise out of the water and bob and tilt out of sync. A green STRONG stamp lands.',
+     acting:'Hash points up at the posters, then relaxes as the waves come in.',
+     data:'$648M of BTC shorts liquidated on Sep 21 as BTC went past $85K. Zcash hit a record $1,600 on Sep 23. Privacy-coin sector ≈$33.6B.', src:'The Crypto Times, investingLive, Fortune, KuCoin',
+     trans:'Curtain close and open.'},
+    {tc:'01:27–01:41', name:'The ranking · Curtain call', v:['Summary', 'v-none'],
+     frame:'A six-step podium coloured by evidence strength. NEAR@3.33 is #1 in a party hat, followed by Market wave, Intents, Private perps, TVL and Ondo. A scroll unrolls with the WATCH THIS warning. Then the curtains close, a CASE CLOSED stamp lands on them, and a disclaimer ribbon appears.',
+     motion:'The podium blocks rise with an overshoot, 0.14 s apart, and each hamster drops onto its block. The scroll unrolls from the centre. The curtains close (0.8 s) and the stamp hits with the heaviest shake in the piece.',
+     acting:'Hash walks to centre stage in front of the curtain, tips the hat and bows (lean 14°), then straightens up.',
+     data:'Rewards pay only while the 3-day VWAP ≥ $3.33, and converted NEAR can be sold. Berachain TVL fell 88% from its peak.', src:'Synthesis of the sources above; bex.co',
+     trans:'Hold on the last frame. Replay restarts at 0:00.'}
+  ];
+
+  const stage = $('stage');
+  function snapshot(){
+    const c = stage.cloneNode(true);
+    c.removeAttribute('id'); c.removeAttribute('role'); c.setAttribute('aria-hidden', 'true');
+    c.querySelectorAll('[filter="url(#boil)"]').forEach(n => n.removeAttribute('filter'));
+    c.querySelectorAll('[id]').forEach(n => n.removeAttribute('id'));
+    c.setAttribute('class', 'thumb');
+    return c;
+  }
+  const board = $('board');
+  const esc = s => s.replace(/&/g, '&amp;').replace(/</g, '&lt;');
+  SHOTS.forEach((sh, i) => {
+    seek(KEY[i]);
+    const card = document.createElement('article'); card.className = 'shot';
+    const vis = document.createElement('div'); vis.className = 'shot-vis';
+    const topRow = document.createElement('div'); topRow.className = 'shot-top';
+    topRow.innerHTML = `<span class="shot-no">Shot ${i+1}<small>${sh.tc}</small></span><span class="verdict ${sh.v[1]}">${sh.v[0]}</span>`;
+    vis.append(topRow, snapshot());
+    const btn = document.createElement('button'); btn.type = 'button'; btn.className = 'btn ghost play-from';
+    btn.textContent = 'Play from shot ' + (i+1);
+    btn.addEventListener('click', () => { goShot(i); document.querySelector('.player').scrollIntoView({behavior: rm ? 'auto' : 'smooth', block:'start'}); });
+    vis.appendChild(btn);
+    const lines = CUES.filter(c => c.t >= SC[i].t && c.t < (SC[i+1] ? SC[i+1].t : D));
+    const dl = document.createElement('dl');
+    const add = (k, html, cls) => { const dt = document.createElement('dt'); dt.textContent = k; const dd = document.createElement('dd'); if (cls) dd.className = cls; dd.innerHTML = html; dl.append(dt, dd); };
+    add('Shot', `<b>${esc(sh.name)}</b>`);
+    add('Set & frame', esc(sh.frame));
+    add('Motion', esc(sh.motion));
+    add('Hash & cast', esc(sh.acting));
+    add('Captions · EN / KO', lines.map(c => `<p><small>${fmtT(c.t)}</small>“${esc(c.s)}”<span class="ko">${esc(c.ko)}</span></p>`).join(''), 'vo');
+    add('On-screen data', esc(sh.data) + `<br><span class="src">Source: ${esc(sh.src)}</span>`);
+    add('Transition out', esc(sh.trans));
+    card.append(vis, dl);
+    board.appendChild(card);
+  });
+
+  const saved = Object.assign({}, pose);
+  const POSES = [
+    ['Neutral', 'Happy ^ ^ eyes, gentle idle bob.', {}],
+    ['Pointing', 'Magnifier raised at the evidence.', {arm:-32}],
+    ['Suspicious', 'Dot eyes, one brow up. For shaky sources.', {eye:1, bR:-10, bL:4}],
+    ['Curtain call', 'Hat tip and bow at the end.', {hatY:-46, hatR:-26, lean:14}]
+  ];
+  const posesEl = $('poses');
+  seek(12);
+  POSES.forEach(([n, d, p]) => {
+    Object.assign(pose, {x:0, y:0, s:1, hop:0, walk:0, arm:40, hatY:0, hatR:-4, eye:0, bL:0, bR:0, lean:0}, p);
+    frame(12.02);
+    const svg = document.createElementNS(NS, 'svg');
+    svg.setAttribute('viewBox', '-165 -300 375 345');
+    svg.setAttribute('aria-hidden', 'true');
+    const g = H.pos.cloneNode(true);
+    g.removeAttribute('id'); g.removeAttribute('transform');
+    g.querySelectorAll('[id]').forEach(x => x.removeAttribute('id'));
+    svg.appendChild(g);
+    const boxEl = document.createElement('div'); boxEl.className = 'pose';
+    const b = document.createElement('b'); b.textContent = n;
+    const s = document.createElement('span'); s.textContent = d;
+    boxEl.append(svg, b, s);
+    posesEl.appendChild(boxEl);
+  });
+  Object.assign(pose, saved);
+
+  seek(rm ? KEY[0] : 0);
+  setVoice(false);
+  voiceBtn.textContent = synth ? 'Voice off' : 'Voice unavailable';
+  requestAnimationFrame(loop);
+})();
+</script>

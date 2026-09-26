@@ -1,0 +1,20 @@
+const { chromium } = require('playwright');
+(async () => {
+  const b = await chromium.launch({ args:['--use-gl=swiftshader','--enable-webgl','--ignore-gpu-blocklist'] });
+  const p = await b.newPage({ viewport: { width: 1280, height: 820 } });
+  const errs = [];
+  p.on('pageerror', e => errs.push(e.message));
+  p.on('console', m => { if (m.type()==='error' && !/ERR_|net::/.test(m.text())) errs.push(m.text()); });
+  await p.goto('file://' + process.cwd() + '/preview.html');
+  await p.waitForTimeout(600);
+  await p.click('#startSilent');
+  await p.click('#juryBtn');
+  await p.evaluate(() => { const s = document.querySelector('#scrub'); s.value = 32.7; s.dispatchEvent(new Event('input')); });
+  await p.waitForTimeout(250);
+  await (await p.$('.stagewrap')).screenshot({ path: 'cube.png' });
+  await p.evaluate(() => { const s = document.querySelector('#scrub'); s.value = 24.9; s.dispatchEvent(new Event('input')); });
+  await p.waitForTimeout(250);
+  await (await p.$('.stagewrap')).screenshot({ path: 'coins.png' });
+  console.log('errors:', JSON.stringify(errs));
+  await b.close();
+})();
