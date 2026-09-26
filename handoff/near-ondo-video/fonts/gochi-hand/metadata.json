@@ -1,0 +1,19 @@
+{
+  "id": "gochi-hand",
+  "family": "Gochi Hand",
+  "subsets": ["latin"],
+  "weights": [400],
+  "styles": ["normal"],
+  "defSubset": "latin",
+  "variable": false,
+  "lastModified": "2026-06-30",
+  "version": "v27",
+  "category": "handwriting",
+  "license": {
+    "type": "OFL-1.1",
+    "url": "https://openfontlicense.org",
+    "attribution": "Copyright (c) 2011, HT Fonts (www.htfonts.com info@htfonts.com), with Reserved Font Names \"Gochi\" and \"Gochi Hand\""
+  },
+  "source": "https://github.com/google/fonts",
+  "type": "google"
+}

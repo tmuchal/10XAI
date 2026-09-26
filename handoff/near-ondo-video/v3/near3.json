@@ -1,0 +1,387 @@
+{
+ "chapters": [
+  {
+   "ko": "오프닝",
+   "en": "Opening",
+   "set": "city",
+   "sky": [
+    "#FDE7C4",
+    "#FBD3C8",
+    "#E9DDF6"
+   ],
+   "src": ""
+  },
+  {
+   "ko": "차트가 말하는 것",
+   "en": "What the chart says",
+   "set": "chart",
+   "sky": [
+    "#E6F2FF",
+    "#FDF3DA",
+    "#FCE3D2"
+   ],
+   "src": "CoinCentral · Cointelegraph"
+  },
+  {
+   "ko": "누가 가격을 밀었나",
+   "en": "Who pushed the price?",
+   "set": "vault",
+   "sky": [
+    "#FFF1D6",
+    "#FCE3CC",
+    "#F3D9E8"
+   ],
+   "src": ""
+  },
+  {
+   "ko": "팩트체크",
+   "en": "Fact check",
+   "set": "court",
+   "sky": [
+    "#F4EEE2",
+    "#FBE9D0",
+    "#F2D8C4"
+   ],
+   "src": ""
+  },
+  {
+   "ko": "공급과 소각",
+   "en": "Supply and burn",
+   "set": "bank",
+   "sky": [
+    "#EAF4E4",
+    "#FDF2D8",
+    "#F8E1C8"
+   ],
+   "src": "DL News · SVRN"
+  },
+  {
+   "ko": "미래: AI × 인텐트",
+   "en": "The future: AI meets intents",
+   "set": "lab",
+   "sky": [
+    "#E3ECFF",
+    "#EEE3FB",
+    "#FBE6EF"
+   ],
+   "src": "NEAR 2026 roadmap"
+  },
+  {
+   "ko": "투자 관점 시나리오",
+   "en": "Scenarios, not advice",
+   "set": "city",
+   "sky": [
+    "#E9F6FF",
+    "#FFF3D6",
+    "#FCE0D4"
+   ],
+   "src": ""
+  },
+  {
+   "ko": "판결",
+   "en": "The verdict",
+   "set": "court",
+   "sky": [
+    "#FFF0D2",
+    "#FCDCC8",
+    "#EBD9F2"
+   ],
+   "src": ""
+  }
+ ],
+ "cues": [
+  {
+   "id": "hook1",
+   "ch": 0,
+   "pose": "wave",
+   "en": "NEAR went from $2.20 to $4.29 in nine days. Almost double.",
+   "ko": "NEAR, 9일 만에 $2.20에서 $4.29로. 거의 두 배입니다.",
+   "src": "CoinCentral · Cointelegraph",
+   "react": {
+    "at": 1.4,
+    "d": 1.3,
+    "mood": "shock",
+    "ko": "9일 만에<br><em>2배</em>?!",
+    "en": "Almost double?!"
+   }
+  },
+  {
+   "id": "hook2",
+   "ch": 0,
+   "who": "noa",
+   "en": "Hype or real? Chart, claims, future.",
+   "ko": "거품일까, 진짜일까? 차트, 주장, 미래까지."
+  },
+  {
+   "id": "c1",
+   "ch": 1,
+   "card": true,
+   "en": "Chapter one. What the chart says.",
+   "ko": "1장. 차트가 말하는 것."
+  },
+  {
+   "id": "pa1",
+   "ch": 1,
+   "pose": "point",
+   "en": "September 14 to 17: a slow climb. Then snapshot day: plus 14 percent.",
+   "ko": "9월 14~17일 완만한 상승. 그리고 스냅샷 당일 +14%.",
+   "src": "The Crypto Times"
+  },
+  {
+   "id": "pa2",
+   "ch": 1,
+   "pose": "point",
+   "en": "Three days later, another 45 percent, breaking a years-long downtrend.",
+   "ko": "사흘 뒤 45% 추가 상승, 수년간 이어진 하락 추세선을 돌파.",
+   "src": "Parameter · CoinCentral"
+  },
+  {
+   "id": "pa3",
+   "ch": 1,
+   "pose": "think",
+   "en": "The old ceiling, $3.80 to $3.90, is now the floor to hold.",
+   "ko": "예전 천장이던 $3.80~3.90, 이제는 지켜야 할 바닥입니다.",
+   "src": "CoinCentral"
+  },
+  {
+   "id": "pa4",
+   "ch": 1,
+   "who": "noa",
+   "en": "Zoom out: the all-time high was $20.44. NEAR is still 79 percent below it.",
+   "ko": "멀리 보면, 최고가는 $20.44. 아직 79% 아래입니다.",
+   "src": "CoinMarketCap"
+  },
+  {
+   "id": "c2",
+   "ch": 2,
+   "card": true,
+   "en": "Chapter two. Who pushed the price?",
+   "ko": "2장. 누가 가격을 밀었나?"
+  },
+  {
+   "id": "dr1",
+   "ch": 2,
+   "pose": "point",
+   "en": "Suspect one: the NEAR at 3.33 incentive. Private deposits hit 70 million on September 17.",
+   "ko": "첫째, NEAR@3.33 인센티브. 9월 17일 비공개 예치금 7천만 달러 돌파.",
+   "src": "PR Newswire · crypto.news"
+  },
+  {
+   "id": "dr2",
+   "ch": 2,
+   "pose": "think",
+   "en": "Its reward tokens unlock only if the three-day average holds $3.33. Holders want it higher.",
+   "ko": "보상 토큰은 3일 평균가 $3.33 이상이어야 해제. 보유자는 상승을 원하죠.",
+   "src": "PANews · Coindar"
+  },
+  {
+   "id": "dr3",
+   "ch": 2,
+   "pose": "point",
+   "en": "Suspect two: real usage. Intents moved 31.4 billion dollars, and weekly fees doubled.",
+   "ko": "둘째, 실사용. 인텐트 누적 314억 달러, 주간 수수료는 2배.",
+   "src": "Dune via Crypto Briefing · The Cryptonomist"
+  },
+  {
+   "id": "dr4",
+   "ch": 2,
+   "en": "Suspect three: the market. A 648 million dollar Bitcoin short squeeze, and a privacy-coin rally.",
+   "ko": "셋째, 시장. 비트코인 숏스퀴즈 6억 4,800만 달러, 프라이버시 코인 랠리.",
+   "src": "The Crypto Times · Fortune"
+  },
+  {
+   "id": "dr5",
+   "ch": 2,
+   "who": "noa",
+   "en": "The incentive lit the fuse. Usage and the market kept it burning.",
+   "ko": "종합하면, 인센티브가 불을 붙이고 실사용과 시장이 불길을 키웠습니다."
+  },
+  {
+   "id": "c3",
+   "ch": 3,
+   "card": true,
+   "en": "Chapter three. Fact check.",
+   "ko": "3장. 팩트체크."
+  },
+  {
+   "id": "fc1",
+   "ch": 3,
+   "en": "Claim: plus 80 percent in a week. True.",
+   "ko": "주장: 일주일 +80%. 사실.",
+   "src": "Cointelegraph · CoinCentral"
+  },
+  {
+   "id": "fc2",
+   "ch": 3,
+   "pose": "think",
+   "en": "Claim: TVL hit 350 million. True, but inflated, because the rally itself pumps a dollar TVL.",
+   "ko": "주장: TVL 3.5억 달러. 사실이지만 부풀림. 달러 기준 TVL은 랠리가 키웁니다.",
+   "src": "DefiLlama via BitcoinEthereumNews",
+   "react": {
+    "at": 2.0,
+    "d": 1.2,
+    "mood": "squint",
+    "ko": "가격이<br><b>TVL</b>을 부풀려?",
+    "en": "Price pumps TVL?"
+   }
+  },
+  {
+   "id": "fc3",
+   "ch": 3,
+   "en": "Claim: volume up 120 percent. Unverified. No source.",
+   "ko": "주장: 거래량 +120%. 미확인. 출처 없음."
+  },
+  {
+   "id": "fc4",
+   "ch": 3,
+   "pose": "shrug",
+   "en": "Claim: the perps launch drove it. Unclear. Even the date differs.",
+   "ko": "주장: 선물 출시가 원인. 불분명. 날짜조차 엇갈림.",
+   "src": "Altcoin Buzz · Crypto Briefing"
+  },
+  {
+   "id": "fc5",
+   "ch": 3,
+   "who": "noa",
+   "en": "The Ondo deal? It came on the 23rd, after the climb.",
+   "ko": "Ondo 제휴? 23일 발표, 상승 이후였죠.",
+   "src": "FXStreet"
+  },
+  {
+   "id": "c4",
+   "ch": 4,
+   "card": true,
+   "en": "Chapter four. Supply and burn.",
+   "ko": "4장. 공급과 소각."
+  },
+  {
+   "id": "tk1",
+   "ch": 4,
+   "pose": "point",
+   "en": "In October 2025, NEAR halved inflation to 2.5 percent, about 32 million tokens a year.",
+   "ko": "2025년 10월, 인플레이션 2.5%로 반감. 연 약 3,200만 개.",
+   "src": "DL News · SVRN"
+  },
+  {
+   "id": "tk2",
+   "ch": 4,
+   "en": "Seventy percent of base gas fees are burned. Intents fees buy NEAR.",
+   "ko": "기본 가스비의 70%는 소각, 인텐트 수수료는 NEAR 매수에 쓰입니다.",
+   "src": "SVRN report"
+  },
+  {
+   "id": "tk3",
+   "ch": 4,
+   "pose": "think",
+   "en": "At September's pace, fees offset only part of issuance. Supply still grows.",
+   "ko": "9월 수준 수수료로는 발행의 일부만 상쇄. 공급은 아직 증가.",
+   "src": "estimate from reported fees and issuance"
+  },
+  {
+   "id": "c5",
+   "ch": 5,
+   "card": true,
+   "en": "Chapter five. The future: AI meets intents.",
+   "ko": "5장. 미래: AI와 인텐트의 만남."
+  },
+  {
+   "id": "fu1",
+   "ch": 5,
+   "en": "The 2026 roadmap bets on two things: Intents, and user-owned AI.",
+   "ko": "2026 로드맵의 두 축: 인텐트, 그리고 사용자 소유 AI.",
+   "src": "NEAR roadmap via Gate · cryptonews"
+  },
+  {
+   "id": "fu2",
+   "ch": 5,
+   "pose": "point",
+   "en": "An AI agent states the result it wants. Solvers deliver it on 35 plus chains.",
+   "ko": "AI 에이전트가 결과만 말하면, 솔버가 35개+ 체인에서 실행.",
+   "src": "KuCoin · ChangeNOW"
+  },
+  {
+   "id": "fu3",
+   "ch": 5,
+   "en": "Trusted hardware keeps the agent's data encrypted, even while it runs.",
+   "ko": "신뢰 하드웨어(TEE)로 에이전트 데이터는 실행 중에도 암호화.",
+   "src": "BingX · NEAR AI"
+  },
+  {
+   "id": "fu4",
+   "ch": 5,
+   "pose": "point",
+   "en": "Underneath: nine shards, dynamic resharding, and a one million TPS test.",
+   "ko": "기반: 샤드 9개, 동적 리샤딩, 초당 100만 건 테스트.",
+   "src": "CoinMarketCap updates"
+  },
+  {
+   "id": "fu5",
+   "ch": 5,
+   "who": "noa",
+   "en": "AI agents need rails that are cheap, private, and cross-chain.",
+   "ko": "AI 에이전트에겐 싸고, 비공개이고, 체인을 넘는 레일이 필요."
+  },
+  {
+   "id": "c6",
+   "ch": 6,
+   "card": true,
+   "en": "Chapter six. Scenarios, not advice.",
+   "ko": "6장. 투자 관점: 조언이 아닌 시나리오."
+  },
+  {
+   "id": "sc1",
+   "ch": 6,
+   "en": "Bull: Intents volume and fees compound, and AI agents become users.",
+   "ko": "강세: 인텐트 거래량·수수료가 복리로, AI 에이전트가 사용자로."
+  },
+  {
+   "id": "sc2",
+   "ch": 6,
+   "pose": "think",
+   "en": "Base: the incentive cycle ends, and price tests $3.33 to $3.90.",
+   "ko": "기본: 인센티브 사이클 종료, 가격은 $3.33~3.90 시험."
+  },
+  {
+   "id": "sc3",
+   "ch": 6,
+   "pose": "shrug",
+   "en": "Bear: rewards get sold, deposits leave, and the market turns.",
+   "ko": "약세: 보상 매도, 예치금 이탈, 시장 하락."
+  },
+  {
+   "id": "sc4",
+   "ch": 6,
+   "who": "noa",
+   "en": "Watch four numbers: Intents volume, fees, deposits after rewards, and $3.33.",
+   "ko": "볼 숫자 4개: 인텐트 거래량, 수수료, 보상 이후 예치금, $3.33."
+  },
+  {
+   "id": "c7",
+   "ch": 7,
+   "card": true,
+   "en": "Final chapter. The verdict.",
+   "ko": "마지막 장. 판결."
+  },
+  {
+   "id": "v1",
+   "ch": 7,
+   "pose": "wave",
+   "en": "Verdict: an incentive-led rally, on top of real, growing usage.",
+   "ko": "판결: 인센티브가 이끈 랠리, 그 아래엔 커지는 실사용.",
+   "react": {
+    "at": 1.2,
+    "d": 1.3,
+    "mood": "shock",
+    "ko": "주범은<br><em>인센티브!</em>",
+    "en": "The incentive did it!"
+   }
+  },
+  {
+   "id": "v2",
+   "ch": 7,
+   "who": "noa",
+   "en": "Big tech, real risk. Not investment advice.",
+   "ko": "기술은 크고, 위험도 진짜. 투자 조언 아님."
+  }
+ ]
+}

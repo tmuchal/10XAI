@@ -1,0 +1,19 @@
+{
+  "id": "gaegu",
+  "family": "Gaegu",
+  "subsets": ["korean", "latin"],
+  "weights": [300, 400, 700],
+  "styles": ["normal"],
+  "defSubset": "latin",
+  "variable": false,
+  "lastModified": "2025-09-10",
+  "version": "v23",
+  "category": "handwriting",
+  "license": {
+    "type": "OFL-1.1",
+    "url": "https://openfontlicense.org",
+    "attribution": "Copyright 2018 The Gaegu Project Authors Gaegu-Regular.ttf: Copyright 2018 The Gaegu Project Authors Gaegu-Bold.ttf: Copyright 2018 The Gaegu Project Authors"
+  },
+  "source": "https://github.com/google/fonts",
+  "type": "google"
+}
