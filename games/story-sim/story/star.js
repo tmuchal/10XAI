@@ -167,6 +167,121 @@
     },
   };
 
+
+  // ───────────────────────── 인물 프로필 (SPEC §6) ─────────────────────────
+  // 비밀은 호감도와 (일부는) 사건 플래그로 열린다. 세 연습생의 비밀은 각자의 backstory 이벤트와 맞물린다.
+  const PROFILES = {
+    haeun: {
+      age: '19세', title: '연습생 · 메인보컬 지망',
+      likes: ['고음 뻥 터지는 마지막 후렴', '편의점 떡볶이', '엄마가 설거지하며 부르던 노래', '남궁현 선생님 라이브'], dislikes: ['모르는 번호의 전화', '"힘들지?"라는 질문', '무대 위 정적'],
+      bio: '해바라기처럼 밝고 누구에게나 먼저 인사하는 연습생. 연습실 불을 제일 늦게 끄는 아이. 꿈은 무대 한가운데서 고음을 내지르는 메인보컬이다.',
+      secrets: [
+        { aff: 35, t: '사람들 눈이 자신을 보면 목이 꽉 막히는 무대 공포증이 있다. 연습실에서는 다 되는데.' },
+        { aff: 50, flag: 'haeun_debt_hint', t: '아버지 가게가 망한 뒤 생긴 가족 빚을 혼자 갚으려고 밤마다 편의점 알바를 한다. 새벽 두 시 편의점 창고가 그녀의 두 번째 연습실이다.' },
+        { aff: 70, flag: 'bs1', t: '"힘들다"는 말을 한 번 하면 무너질 것 같아서, 4년 동안 그 말을 아껴 두고 있다.' },
+        { aff: 90, flag: 'haeun_family_resolved', t: '빚을 다 갚는 날 엄마 앞에서 부를 노래를 정해 두었다. 엄마가 설거지하며 부르던, 제목도 모르는 그 노래.' },
+      ],
+    },
+    dojun: {
+      age: '21세', title: '연습생 · 전 육상 400m 유망주',
+      likes: ['비 안 오는 날', '라면 물 조절', '한강 새벽 러닝', '바닥 기술 브레이킹'], dislikes: ['빈말', '"아깝다"는 말', '결승선이 멀어지는 꿈'],
+      bio: '고교 육상 400m 유망주였다가 무릎 부상으로 트랙을 떠났다. 재활 삼아 시작한 춤으로 이 회사에 들어왔다. 말이 짧고 직설적이지만 약속은 무조건 지킨다.',
+      secrets: [
+        { aff: 30, t: '부상 이후 아버지와 연락을 끊었다. 아버지에게 자신은 "400m 뛰는 아들"이었다고 생각한다.' },
+        { aff: 45, flag: 'dojun_notebook', t: '작은 노트에 몰래 가사를 쓴다. 말로 못 하는 걸 적어 두는 곳. 누가 보면 귀까지 빨개진다.' },
+        { aff: 70, t: '배우가 되고 싶은 진짜 이유: 카메라 앞에서라면 자기 인생을 다른 사람 인생으로 덮어쓸 수 있을 것 같아서.' },
+        { aff: 90, flag: 'dojun_lyrics_public', t: '노트의 첫 장에 적힌 가사는 <결승선>. "멈춰도 괜찮아 / 결승선은 네가 정하는 거야." 원래는 아버지에게 쓴 편지였다.' },
+      ],
+    },
+    chaerin: {
+      age: '23세', title: '연습생 · 전 국민 아역배우',
+      likes: ['영화 <시>', '대사 없는 장면', '꼼꼼한 계약서', '네 시간의 잠(이라고 우긴다)'], dislikes: ['사전 동의 없는 스케줄', '녹음', '"한 번만 더"', '거짓말하는 어른'],
+      bio: '아홉 살 때 주말극 <엄마의 바다>로 "국민 딸"이 되었다가 열네 살에 업계에서 사라졌다. 사람을 쉽게 믿지 않지만, 카메라가 켜지는 순간 눈빛이 바뀌는 천생 배우.',
+      secrets: [
+        { aff: 25, t: '과거 매니저 이야기가 나오면 손톱을 뜯는 버릇이 있다. 본인은 모른다고 생각한다.' },
+        { aff: 45, flag: 'chaerin_opened', t: '열네 살 때 매니저가 그녀의 출연료로 차를 샀다. 서른 시간째 깨어 있던 촬영장에서 쓰러지자 "프로답지 못하다"는 말을 들었다.' },
+        { aff: 70, flag: 'bs1', t: '그 시절 계약서를 아직 버리지 못했다. 언젠가 법정에서 꺼낼 날을 위해, 혹은 영영 꺼내지 않을 날을 위해.' },
+        { aff: 90, flag: 'chaerin_confronted', t: '기자회견장에서 과거를 말한 날, 처음으로 "연기를 좋아한다"는 걸 스스로 인정했다.' },
+      ],
+    },
+    manager: {
+      age: '46세', title: '별빛 엔터 매니저 실장',
+      likes: ['아재개그', '방송국 구내식당 이모님', '밴 운전', '애들 밥 챙기기'], dislikes: ['애들을 상품이라 부르는 사람', '빈 도시락통', '돌려 말하기'],
+      bio: '1세대 아이돌 로드매니저 출신으로 별빛 엔터에서만 15년을 버틴 산증인. 월급이 끊겨도 떠나지 않았다. 입버릇은 "이건 제가 20년 해봐서 아는데요".',
+      secrets: [
+        { aff: 50, t: '전 대표(플레이어의 삼촌)와는 무명 시절부터의 친구다. 삼촌의 사진을 늘 가방 안주머니에 넣고 다닌다.' },
+        { aff: 65, t: '20년 전 자신이 맡던 그룹이 회사 문제로 사라졌다. 그날 이후 아이들 밥만은 반드시 챙긴다.' },
+        { aff: 80, flag: 'manager_severance', t: '퇴직금 통장은 사실 "애들 데뷔 적금"이라는 이름으로 만들어 둔 것이었다.' },
+        { aff: 95, t: '대표를 처음 본 날 삼촌과 똑같은 고집을 알아봤다. 그래서 남기로 했다. 한 번 더.' },
+      ],
+    },
+    rivalceo: {
+      age: '52세', title: '타이탄 엔터테인먼트 대표',
+      likes: ['데이터', '에스프레소', '그래프가 우상향하는 순간'], dislikes: ['의리라는 말', '감정적인 협상', '작은 회사의 추억 팔이'],
+      bio: '업계 3대 기획사 타이탄의 대표. 숫자와 데이터로 스타를 만든다고 믿는 냉정한 사업가. 작은 회사의 원석을 거액으로 빼 가는 걸로 유명하다. 입버릇은 "시장은 감정을 기억하지 않습니다".',
+      secrets: [
+        { aff: 10, t: '그도 지하 연습실 하나로 시작했다.' },
+        { aff: 25, t: '그가 키운 첫 가수는 계약금 두 배에 다른 회사로 떠났다. 그날 "의리는 계약서에 안 적힌다"는 걸 배웠다고 한다.' },
+        { aff: 40, flag: 'sera_saved', t: '류세라의 식단표에 직접 사인해 온 사람이 그다. 그리고 세라가 쓰러진 밤, 병원 복도에 제일 오래 서 있던 사람도 그다.' },
+      ],
+    },
+    pd: {
+      age: '41세', title: '스타 PD 출신 드라마·영화 감독',
+      likes: ['거짓말 못 하는 배우', '스태프 밥 먼저 챙기기', '대사 없는 롱테이크'], dislikes: ['배우 밥 굶기기', '"한 번만 더"를 스무 번 하는 현장', '누굴 깎아내려 웃기는 예능'],
+      bio: '시청률 30%를 넘긴 예능과 드라마를 연달아 만든 스타 PD였다가, 지금은 칸을 노리는 영화 감독. 입버릇은 "다시. 이번엔 거짓말하지 말고."',
+      secrets: [
+        { aff: 20, t: '캐스팅할 때 인기보다 "눈"을 본다. 신인을 주연으로 써서 대박을 낸 이력이 여럿이다.' },
+        { aff: 35, t: '예능을 그만둔 건 웃기는 게 지겨워서가 아니라, 웃기려고 누굴 깎아내리는 게 지겨워서였다.' },
+        { aff: 55, t: '옛날, 한 아역 배우의 촬영장에 조연출로 있었다. "한 번만 더"가 서른 번 넘게 이어지던 그 현장을 막지 못했다.' },
+        { aff: 75, flag: 'film_lead', t: '<침묵의 계절>의 주인공 대사가 거의 없는 건, 그 아이에게 진 빚을 갚는 방식이다.' },
+      ],
+    },
+    mentor: {
+      age: '58세', title: '데뷔 32년차 가수 겸 배우',
+      likes: ['소극장', '소주 한 병과 옛날 얘기', '잘 지는 법'], dislikes: ['남의 험담', '박수 소리에 취하는 것'],
+      bio: '90년대 가요대상 3연속 대상, 이후 청룡 남우주연상까지 받은 전설. 지금은 소극장 콘서트와 연극을 하며 느긋하게 산다. 삼촌의 오랜 술친구.',
+      secrets: [
+        { aff: 25, t: '대상을 받던 날 가장 먼저 든 감정은 기쁨이 아니라 두려움이었다. "이제 내려갈 일만 남았구나."' },
+        { aff: 40, t: '술과 번아웃으로 5년을 잃었다. 박수 소리가 끊기자 그걸 술로 채웠다.' },
+        { aff: 60, t: '가장 바닥이던 시절 소주 한 병 들고 찾아온 유일한 사람이 삼촌이었다. 그래서 이 회사 아이들을 가끔 들여다본다.' },
+        { aff: 80, flag: 'mentor_bond', t: '32년째 무대 공포증이 있다. 무섭지 않은 날이 오면 그날 그만두겠다고 스스로와 약속했다.' },
+      ],
+    },
+    reporter: {
+      age: '34세', title: '연예 매체 <스냅> 간판 기자',
+      likes: ['특종', '망원렌즈', '거래'], dislikes: ['미성년자를 다루는 기사', '정신과 기록 폭로', '녹음기를 들킨 순간'],
+      bio: '매년 1월 1일 열애설을 터뜨리는 연예 매체 <스냅>의 간판 기자. "황보람이 쓰면 사실"이라는 평판을 얻었다. 명랑한 존댓말로 다가오지만 대화는 전부 녹음한다.',
+      secrets: [
+        { aff: 15, t: '자기만의 원칙이 있다. 미성년자와 정신건강 문제는 쓰지 않는다. "그건 기사가 아니라 흉기라서."' },
+        { aff: 25, t: '3년 동안 연습생이었다. 데뷔 조 직전에 잘렸다.' },
+        { aff: 45, t: '지금도 노래방에 가면 그때 데뷔곡이 될 뻔한 노래를 부른다. 아무도 모르는 노래를.' },
+      ],
+    },
+    rival: {
+      age: '20세', title: '타이탄 엔터 에이스',
+      likes: ['완벽한 박자', '방울토마토(라고 말한다)', '1등'], dislikes: ['약점을 들키는 것', '"동네 학원 애들"', '즐거움이라는 단어'],
+      bio: '열두 살에 타이탄에 들어가 8년 동안 한 번도 월말평가 1등을 놓친 적 없는 "인간 메트로놈". 입버릇은 "그 정도로 데뷔해? 부럽다, 기준이 낮아서."',
+      secrets: [
+        { aff: 15, t: '식사량까지 회사에 통제당한다. 오늘 먹은 건 방울토마토 다섯 개.' },
+        { aff: 30, t: '별빛 아이들이 서로 웃으며 연습하는 모습을 몰래 부러워한다. 연습실 창문 앞을 일부러 지나간다.' },
+        { aff: 50, flag: 'sera_saved', t: '무대가 즐거웠던 마지막 기억은 열두 살 오디션 날이다. 그 뒤로는 계산만 남았다.' },
+        { aff: 70, flag: 'sera_joined', t: '처음으로 계약서가 아니라 자기 마음으로 무대를 골랐다. 떨리는 게 이런 거였구나, 하고 웃었다.' },
+      ],
+    },
+    fanmaster: {
+      age: '27세', title: '홈마 · 팬사이트 <새벽달> 운영자',
+      likes: ['무대 끝 인사하다 울컥한 순간', '대포 카메라', '제때 올라오는 공지'], dislikes: ['사생', '스타를 혹사하는 회사', '공지 없는 스케줄'],
+      bio: '낮에는 회사원, 밤에는 직캠 하나로 팬덤 여론을 움직이는 전설의 홈마 "새벽달". 스타의 사생활은 절대 찍지 않는다는 철칙이 있다.',
+      secrets: [
+        { aff: 20, t: '오래전 좋아하던 아이돌이 회사가 망하면서 사진 한 장 제대로 남기지 못하고 사라졌다. 그래서 찍는다.' },
+        { aff: 40, t: '새벽 네 시까지 사진을 보정하고 아침 아홉 시에 출근한다. 팀장님은 그녀가 홈마인 줄 모른다.' },
+        { aff: 60, flag: 'fanmaster_ally', t: '회사가 스타를 혹사하면 가장 먼저 성명문을 쓸 준비가 되어 있다. 초안은 늘 폴더에 저장되어 있다.' },
+        { aff: 80, t: '대표와 스타가 한강을 뛰는 사진을 몇 번 찍었다. 그 사진만은 절대 올리지 않는다.' },
+      ],
+    },
+  };
+  for (const [id, pr] of Object.entries(PROFILES)) chars[id].profile = pr;
+
   // ───────────────────────── scenes ─────────────────────────
   const scenes = {};
 
@@ -263,10 +378,31 @@
     hideStar(),
     { t: '이렇게 별빛 엔터테인먼트의 마지막 4년이 시작되었다.' },
     { toast: '매달 세 번의 스케줄을 짜서 {s.starName}을 키우세요.' },
-    END,
+    { go: 'ev_first_month' },
   ];
 
   // ───────────────────────── 1년차: 연습생 ─────────────────────────
+
+  // ── 최근 스케줄 회상: 활동이 분야별 r_ 플래그를 켜고, 연초 결산 장면이 그걸 이야기한 뒤 지운다 ──
+  const RECENT = ['r_stage', 'r_act', 'r_media', 'r_train', 'r_side', 'r_care', 'r_rest'];
+  const RECALL = {
+    r_stage: ['작년엔 음방 대기실 복도를 제일 많이 걸었어요. 선배님들한테 90도 인사만 천 번은 했을걸요.', '무대, 무대, 무대. 인이어 없이도 박자가 들릴 만큼 섰어요.'],
+    r_act: ['촬영장 분장차에서 대본 외우다 잠든 날이 제일 많았어요.', '작년엔 남의 인생을 몇 개나 살아본 것 같아요. 그래서 제 인생이 조금 더 좋아졌어요.'],
+    r_media: ['광고판에서 제 얼굴 볼 때마다 아직도 깜짝 놀라요. 편의점 냉장고에 붙은 거 보셨어요?', '예능, 라디오, 팬사인회. 작년엔 말을 제일 많이 한 해예요.'],
+    r_train: ['연습실 거울이랑 제일 친했던 한 해였어요. 금 간 데 위치까지 외웠어요.', '레슨, 레슨, 레슨. 트레이너 선생님들 목소리가 꿈에서도 들려요.'],
+    r_side: ['알바랑 보조 출연 뛰면서 회사 월세 보탠 거, 저 좀 뿌듯했어요.', '버스킹하고 브이로그 찍던 날들이요. 작은 무대도 무대더라고요.'],
+    r_care: ['운동이랑 관리 열심히 했더니 체력이 달라졌어요. 계단을 뛰어 올라가도 숨이 안 차요.', '상담 선생님이랑 얘기한 게 제일 도움이 됐어요. 제 마음 이름을 알게 됐거든요.'],
+    r_rest: ['작년엔 대표님이 쉬게 해 주신 날이 많았죠. 그게 이상하게 제일 큰 힘이 됐어요.', '많이 쉬었어요. 게으른 게 아니라 버티는 법을 배운 거라고, 오 실장님이 그랬어요.'],
+  };
+  const recall = (n) => {
+    const order = RECENT.slice(n % RECENT.length).concat(RECENT.slice(0, n % RECENT.length));
+    return [
+      order.reduceRight((rest, f) => ({ if: { flag: f }, then: [say(RECALL[f][n % 2], f === 'r_rest' ? 'smile' : 'laugh')], else: rest ? [rest] : [] }), null),
+      { if: { v: { stress: '>=65' } }, then: [say('…근데 솔직히 좀 지쳤어요. 올해는 숨 쉴 틈도 스케줄에 넣어 주세요.', 'tired')] },
+      { fx: { unflag: RECENT } },
+    ];
+  };
+
   scenes.ev_first_month = [
     { bg: 'agency_office' },
     { title: '1년차', sub: '연습생의 겨울' },
@@ -280,6 +416,7 @@
       [{ c: 'manager', t: '배우는 연기가 기본이고 비주얼, 멘탈이 버팀목입니다. 오디션에서 열 번 떨어지는 건 일상이에요.', e: 'neutral' }]
     ),
     { c: 'manager', t: '그리고 스트레스. 애들은 기계가 아닙니다. 쉬게 하는 것도 대표님 일이에요.', e: 'cold' },
+    { c: 'manager', t: '하나 더. 한 달에 한 번은 꼭 얘기 나누세요. 대표랑 말 안 하는 연습생은, 마음부터 이사 갑니다.', e: 'neutral' },
     perStar({
       haeun: [{ c: 'haeun', t: '저는 안 쉬어도 돼요! 연습 체질이에요!', e: 'laugh' }, { c: 'manager', t: '저런 애가 제일 먼저 쓰러집니다.', e: 'worried' }],
       dojun: [{ c: 'dojun', t: '스케줄 빡빡하게 짜주세요. 쉬는 거 못 합니다.', e: 'neutral' }, { c: 'manager', t: '저런 애가 무릎 나갑니다.', e: 'worried' }],
@@ -719,19 +856,47 @@
     perStar((id) => [{ ending: `burnout_${id}` }]),
   ];
 
+  // 통장이 마이너스가 될 때마다 (반복). 세 번째엔 버틸 방법이 없다 — 파산 또는 매각.
   scenes.ev_money_low = [
     { bg: 'agency_office' },
     { show: 'manager', e: 'worried', at: 'c' },
-    { c: 'manager', t: '대표님… 통장이 마이너스입니다. 이번 달 월세, 못 냅니다.', e: 'worried' },
-    { c: 'manager', t: '방법은 몇 가지 있습니다. 전부 마음에 안 드실 거고요.', e: 'sad' },
-    {
-      prompt: '돈을 어떻게 마련할까?',
-      choice: [
-        { t: '은행 대출을 받는다 (+1,500)', fx: { v: { money: 1500 }, flag: 'loan' }, then: [{ c: 'manager', t: '이자가 무섭긴 한데… 일단 숨은 쉬겠네요.', e: 'neutral' }] },
-        { t: '삼촌이 남긴 LP와 트로피를 판다 (+800)', fx: { v: { money: 800 }, aff: { manager: -4 } }, then: [{ c: 'manager', t: '…그 트로피, 저 사장님이 처음 받은 거였는데. 아닙니다. 잘하셨어요.', e: 'sad' }] },
-        { t: '타이탄의 투자 제안을 받는다 (+3,000)', fx: { v: { money: 3000 }, flag: ['titan_invest', 'titan_offer'] }, then: [{ show: 'rivalceo', e: 'smirk', at: 'r' }, { c: 'rivalceo', t: '현명하십니다, 사장님. 조건은 간단합니다. 계약 갱신 시 우선 협상권은 저희에게.', e: 'smirk' }, { c: 'manager', t: '대표님…!', e: 'angry' }, { hide: 'rivalceo' }] },
-      ],
-    },
+    { if: { noflag: 'bailout1' }, then: [
+      { c: 'manager', t: '대표님… 통장이 마이너스입니다. 이번 달 월세, 못 냅니다.', e: 'worried' },
+      { c: 'manager', t: '방법은 몇 가지 있습니다. 전부 마음에 안 드실 거고요.', e: 'sad' },
+      {
+        prompt: '돈을 어떻게 마련할까?',
+        choice: [
+          { t: '은행 대출을 받는다 (+1,500)', fx: { v: { money: 1500 }, flag: ['loan', 'bailout1'] }, then: [{ c: 'manager', t: '이자가 무섭긴 한데… 일단 숨은 쉬겠네요.', e: 'neutral' }] },
+          { t: '삼촌이 남긴 LP와 트로피를 판다 (+800)', fx: { v: { money: 800 }, aff: { manager: -4 }, flag: ['sold_lp', 'bailout1'] }, then: [{ c: 'manager', t: '…그 트로피, 저 사장님이 처음 받은 거였는데. 아닙니다. 잘하셨어요.', e: 'sad' }] },
+          { t: '타이탄의 투자 제안을 받는다 (+3,000)', fx: { v: { money: 3000 }, flag: ['titan_invest', 'titan_offer', 'bailout1'] }, then: [{ show: 'rivalceo', e: 'smirk', at: 'r' }, { c: 'rivalceo', t: '현명하십니다, 사장님. 조건은 간단합니다. 계약 갱신 시 우선 협상권은 저희에게.', e: 'smirk' }, { c: 'manager', t: '대표님…!', e: 'angry' }, { hide: 'rivalceo' }] },
+        ],
+      },
+    ], else: [{ if: { noflag: 'bailout2' }, then: [
+      { c: 'manager', t: '대표님. …또 마이너스입니다. 이번엔 은행도 전화를 안 받습니다.', e: 'sad' },
+      { if: { flag: 'sold_lp' }, then: [{ c: 'manager', t: '팔 LP도 이제 없고요. 삼촌 사진 액자만 남았습니다. 그건 안 팝니다.', e: 'cold' }] },
+      showStar('worried', 'r'),
+      say('대표님… 제가 행사 알바 더 뛸게요. 진짜 괜찮아요.', 'worried'),
+      {
+        prompt: '두 번째 위기. 어떻게 버틸까?',
+        choice: [
+          { t: '오 실장이 퇴직금을 내놓는다 (+1,200)', fx: { v: { money: 1200 }, aff: { manager: 6 }, flag: ['bailout2', 'manager_severance'] }, then: [{ c: 'manager', t: '받으세요. 이건 제가 20년 해봐서 아는데요, 퇴직금은 퇴직할 때 쓰는 겁니다. 전 퇴직 안 할 거라서요.', e: 'smile' }, { c: 'me', t: '…반드시 갚을게요. 이자까지.' }] },
+          { t: '사채를 쓴다 (+2,000, 논란 위험)', fx: { v: { money: 2000, scandal: 12, stress: 8 }, flag: ['bailout2', 'loan_shark'] }, then: [{ t: '계약서의 이자율은 읽지 않았다. 읽으면 서명할 수 없을 것 같아서.' }, { c: 'manager', t: '…이건 기자들이 좋아하는 종류의 돈입니다, 대표님.', e: 'worried' }] },
+          { t: '타이탄에 {s.starName}의 계약 일부를 담보로 잡힌다 (+3,000)', fx: { v: { money: 3000 }, flag: ['bailout2', 'titan_offer', 'titan_invest'] }, then: [affStar(-8), { t: '서명하는 대표의 손을 {s.starName}이 문틈으로 보고 있었다.' }] },
+        ],
+      },
+    ], else: [
+      { c: 'manager', t: '……대표님. 세 번째입니다. 이제 정말로, 방법이 없습니다.', e: 'cry' },
+      { if: { flag: 'titan_offer' }, then: [
+        { c: 'manager', t: '남은 선택은 두 개예요. 문을 닫든가… 타이탄에 {s.starName}을 보내든가.', e: 'sad' },
+        {
+          prompt: '마지막 선택',
+          choice: [
+            { t: '{s.starName}이라도 살린다. 타이탄으로 보낸다', fx: { flag: 'transferred' }, then: [say('……알겠어요. 대표님 탓 아니에요. 진짜로.', 'cry'), perStar((id) => [{ ending: `transfer_${id}` }])] },
+            { t: '끝까지 같이 간다. 문을 닫는다', go: 'ev_bankrupt' },
+          ],
+        },
+      ], else: [{ go: 'ev_bankrupt' }] },
+    ] }] },
     { hide: 'all' },
     END,
   ];
@@ -806,7 +971,8 @@
       { t: '웹드라마 주연으로 데뷔 (자금 500)', if: ACTOR, req: { v: { money: '>=500' } }, hint: '자금 500 필요', fx: { v: { money: -500 }, flag: ['debut_plan', 'webdrama_debut'] }, then: [say('주연이요? 웹드라마라도… 주연.', 'surprised')] },
       { t: '백서진 감독의 단편영화로 데뷔', if: ACTOR, req: { v: { acting: '>=40' } }, hint: '연기 40 이상', fx: { v: { acting: 3 }, flag: ['debut_plan', 'film_debut', 'met_pd'] }, then: [{ show: 'pd', e: 'smirk', at: 'l' }, { c: 'pd', t: '돈은 없어. 대신 영화제는 간다. 그거면 되지?', e: 'smirk' }, { hide: 'pd' }] },
       { t: '대형 드라마 단역부터', if: ACTOR, fx: { flag: ['debut_plan', 'small_debut'] }, then: [{ c: 'manager', t: '대사 세 줄. 그래도 공중파입니다!', e: 'smile' }] },
-      ...(allowDelay ? [{ t: '아직 이르다. 데뷔를 미룬다', fx: { flag: 'debut_delay', v: { stress: -5 } }, then: [{ c: 'manager', t: '…반년. 반년 넘기면 회사가 못 버팁니다.', e: 'worried' }] }] : []),
+      ...(allowDelay ? [{ t: '아직 이르다. 데뷔를 미룬다', fx: { flag: 'debut_delay', v: { stress: -5 } }, then: [{ c: 'manager', t: '…반년. 반년 넘기면 회사가 못 버팁니다.', e: 'worried' }] }]
+        : [{ t: '…데뷔를 무기한 보류한다', fx: { flag: 'debut_cancel', v: { stress: 8 } }, then: [say('…무기한이요? 알겠어요. 기다리는 거, 잘해요. 아마도요.', 'cry'), { c: 'manager', t: '대표님, 이건 제가 20년 해봐서 아는데요… 보류는 대부분 취소가 됩니다.', e: 'sad' }, affStar(-10)] }]),
     ],
   });
   scenes.ev_debut_plan = [
@@ -847,7 +1013,7 @@
           else: [{
             if: { any: [{ v: { vocal: '>=38' } }, { v: { dance: '>=38' } }] },
             then: [{ t: '실수 없이 무대를 마쳤다. 박수는 따뜻했고, 기사는 짧았다. "무난한 데뷔."' }, { fx: { v: { fame: 8, fans: 55 } } }],
-            else: [{ t: '인이어가 빠졌다. 음 이탈, 박자 실수. 쇼케이스가 끝나고 대기실은 조용했다.' }, { fx: { v: { fame: 4, fans: 25, stress: 12 } } }],
+            else: [{ t: '인이어가 빠졌다. 음 이탈, 박자 실수. 쇼케이스가 끝나고 대기실은 조용했다.' }, { fx: { v: { fame: 4, fans: 25, stress: 12 }, flag: 'debut_rough' } }],
           }],
         },
       ],
@@ -862,7 +1028,7 @@
           else: [{
             if: { v: { acting: '>=36' } },
             then: [{ t: '세 번 만에 오케이. 나쁘지 않았다. "딕션 좋네" 정도의 평.' }, { fx: { v: { fame: 7, fans: 40 } } }],
-            else: [{ t: 'NG 열한 번. 스태프들의 한숨이 들렸다. 그래도 마지막 테이크는 살렸다.' }, { fx: { v: { fame: 3, fans: 20, stress: 12 } } }],
+            else: [{ t: 'NG 열한 번. 스태프들의 한숨이 들렸다. 그래도 마지막 테이크는 살렸다.' }, { fx: { v: { fame: 3, fans: 20, stress: 12 }, flag: 'debut_rough' } }],
           }],
         },
       ]
@@ -893,6 +1059,7 @@
     { if: { flag: 'debuted' }, then: [{ c: 'manager', t: '데뷔는 했습니다. 이제부터가 진짜 전쟁이에요. 올해 목표는 신인상입니다.', e: 'neutral' }], else: [{ c: 'manager', t: '아직 데뷔 전입니다. 올해 안에는 무조건 데뷔해야 합니다.', e: 'worried' }] },
     showStar('smile', 'r'),
     say('올해는 더 잘할게요. 대표님, 떡국 드셨어요?', 'smile'),
+    ...recall(1),
     chatStar('새해 첫날, 올해 목표와 각오를 함께 정한다.', 3),
     { fx: { v: { stress: -5 } } },
     { hide: 'all' },
@@ -1368,6 +1535,20 @@
     END,
   ];
 
+
+  // ── 지난 일의 기억: 수상 소감과 마지막 밤에 앞선 위기·선택을 되짚는다 ──
+  const MEM = {
+    crisis: { if: { flag: 'pushed_hard' }, then: [say('…한 번 무너질 뻔한 적이 있어요. 그때 아무도 멈추지 않았어요. 저도요. 그래서 오늘은 천천히 말할게요.', 'sad')],
+      else: [{ if: { flag: 'crisis1' }, then: [say('새벽 세 시에 무너졌던 날, 대표님이 "쉬는 것도 일"이라고 했어요. 그 한마디로 여기까지 왔어요.', 'cry')] }] },
+    debut: { if: { flag: 'debut_rough' }, then: [trackBr([say('데뷔 쇼케이스에서 인이어 빠졌던 거 기억하세요? 그날 대기실에서 울던 애가 저예요.', 'cry')], [say('첫 촬영장에서 NG 열한 번 냈던 신인, 기억하세요? 그게 저예요.', 'cry')])],
+      else: [{ if: { flag: 'surv_out' }, then: [say('서바이벌에서 떨어진 날, 실장님이 "재기 서사는 팬들이 좋아한다"고 웃어줬어요. 진짜였네요.', 'smile')],
+        else: [{ if: { flag: 'debut_great' }, then: [say('데뷔 날 직캠이 트렌드에 올랐을 때도 꿈 같았는데, 오늘이 더 꿈 같아요.', 'smile')] }] }] },
+    company: { if: { flag: 'manager_severance' }, then: [say('실장님 퇴직금으로 월세 내던 회사예요. 이 트로피로 이자는 갚은 걸로 해 주세요.', 'cry'), { fx: { aff: { manager: 3 } } }],
+      else: [{ if: { flag: 'sold_lp' }, then: [say('삼촌이 남긴 LP까지 팔아 가며 버틴 회사예요. 언젠가 그 LP, 제가 다시 사 올게요.', 'cry')],
+        else: [{ if: { flag: 'loan_shark' }, then: [say('…빚 얘기는 기자님들이 더 잘 아시죠. 전부 갚을게요. 무대로요.', 'cold')] }] }] },
+    others: { if: { flag: 'promised_others' }, then: [say('{s.o1Name}, {s.o2Name}. 첫 달에 대표님이 한 약속 기억하지? 이제 너희 차례야.', 'smile'), affOthers(3)] },
+  };
+
   scenes.ev_rookie_award = [
     { bg: 'awards' },
     { title: '연말 시상식', sub: '신인상' },
@@ -1387,6 +1568,7 @@
           dojun: [{ c: 'dojun', t: '…트랙에서 넘어졌을 때, 다시는 시상대에 못 설 줄 알았습니다.', e: 'cry' }, { c: 'dojun', t: '대표님, 실장님, {s.fandom}. 그리고… 아버지. 고맙습니다.', e: 'cry' }],
           chaerin: [{ c: 'chaerin', t: '열네 살 이후로 이런 데 올 일 없을 줄 알았어요.', e: 'sad' }, { c: 'chaerin', t: '이번엔 제가 선택해서 받은 상이에요. 저를 믿어준 대표님께 이 상을 드리고 싶어요.', e: 'cry' }],
         }),
+        MEM.debut,
         { fx: { v: { fame: 8, fans: 100, stress: -10 }, flag: 'rookie_award' } },
         affStar(8),
       ],
@@ -1411,6 +1593,9 @@
     { t: '인기 {v.fame}. 팬덤 {v.fans}. 자금 {v.money}만 원.' },
     { if: { flag: 'rookie_award' }, then: [{ c: 'manager', t: '신인상 수상 이후로 광고 문의가 세 배입니다. 올해 목표는 본상이에요.', e: 'smile' }], else: [{ c: 'manager', t: '신인상은 놓쳤지만, 3년차가 진짜 승부처입니다. 여기서 뜨면 오래 갑니다.', e: 'neutral' }] },
     showStar('smile', 'r'),
+    ...recall(2),
+    { if: { flag: 'dating_public' }, then: [say('작년에 연애 공개했을 때 대표님이 막아 준 거, 아직도 고마워요. 팬들도 결국 웃어 줬잖아요.', 'shy')] },
+    { if: { flag: 'plagiarism_handled' }, then: [say('표절 의혹 때 작업 폴더 공개해 주신 거요. 그날 제가 쓴 새벽 세 시들이 전부 증거가 됐어요.', 'smile')] },
     chatStar('3년차 첫날. 지난 2년을 돌아보고 올해 꼭 이루고 싶은 것을 이야기한다.', 3),
     { fx: { v: { stress: -5 } } },
     { hide: 'all' },
@@ -1651,11 +1836,35 @@
 
   scenes.ev_health = [
     { bg: 'hospital' },
-    '스케줄 이동 중 밴 안에서 {s.starName}이 정신을 잃었다. 탈진과 영양실조.',
-    showStar('tired', 'c'),
-    { show: 'manager', e: 'angry', at: 'l' },
-    { c: 'manager', t: '대표님. 체력 관리도 스케줄입니다. 애가 기계입니까?', e: 'angry' },
-    say('…죄송해요. 제가 괜찮다고 해서…', 'tired'),
+    { if: { flag: 'health_twice' }, then: [
+      { if: { chance: 0.5 }, then: [
+        '리허설 도중 {s.starName}의 다리가 풀렸다. 무대 감독이 음악을 끄는 소리가 유난히 크게 들렸다.',
+        showStar('tired', 'c'),
+        { show: 'manager', e: 'cold', at: 'l' },
+        { c: 'manager', t: '대표님. 세 번째부터는 사고가 아니라 습관입니다. 스케줄표, 제가 다시 짜겠습니다.', e: 'cold' },
+        say('…실장님 화내는 거 처음 봐요. 죄송해요.', 'sad'),
+      ], else: [
+        '새벽 촬영장. {s.starName}이 대기 의자에서 일어나지 못했다. 손끝이 차가웠다.',
+        showStar('tired', 'c'),
+        { show: 'manager', e: 'worried', at: 'l' },
+        { c: 'manager', t: '링거 한 병이면 된답니다. …대표님, 링거로 버티는 건 오래 못 갑니다.', e: 'worried' },
+        say('링거 맞으면서 대사 외웠어요. 잘했죠? …아, 잘한 거 아니구나.', 'tired'),
+      ] },
+    ], else: [{ if: { flag: 'health_once' }, then: [
+      '또 병원이었다. 이번엔 음악방송 대기실에서 쓰러졌다. 무대 의상을 입은 채로.',
+      showStar('tired', 'c'),
+      { show: 'manager', e: 'angry', at: 'l' },
+      { c: 'manager', t: '대표님, 지난번에도 말씀드렸습니다. 체력은 적금이에요. 깨면 다시 모으는 데 두 배 걸립니다.', e: 'angry' },
+      say('…무대 하나만 더 하고 싶었어요.', 'cry'),
+      { fx: { flag: 'health_twice' } },
+    ], else: [
+      '스케줄 이동 중 밴 안에서 {s.starName}이 정신을 잃었다. 탈진과 영양실조.',
+      showStar('tired', 'c'),
+      { show: 'manager', e: 'angry', at: 'l' },
+      { c: 'manager', t: '대표님. 체력 관리도 스케줄입니다. 애가 기계입니까?', e: 'angry' },
+      say('…죄송해요. 제가 괜찮다고 해서…', 'tired'),
+      { fx: { flag: 'health_once' } },
+    ] }] },
     { fx: { v: { stamina: 25, stress: -10, fame: -2, money: -150 } } },
     { toast: '긴급 휴식: 체력 회복, 인기 소폭 하락' },
     { hide: 'all' },
@@ -1691,12 +1900,12 @@
     trackBr(
       [{
         if: { v: { fame: '>=85' } },
-        then: [{ bg: 'awards', fx: 'flash' }, { t: '"본상 수상자… {s.starName}!"' }, say('작년엔 박수 치러 왔는데, 올해는 박수 받으러 왔네요. {s.fandom}, 사랑해요!', 'cry'), { fx: { v: { fame: 8, fans: 150, awards: 1 }, flag: 'bonsang' } }, affStar(5)],
+        then: [{ bg: 'awards', fx: 'flash' }, { t: '"본상 수상자… {s.starName}!"' }, say('작년엔 박수 치러 왔는데, 올해는 박수 받으러 왔네요. {s.fandom}, 사랑해요!', 'cry'), MEM.company, { fx: { v: { fame: 8, fans: 150, awards: 1 }, flag: 'bonsang' } }, affStar(5)],
         else: [{ t: '본상은 다른 이름들에게 돌아갔다. 대신 "베스트 퍼포먼스상"이 {s.starName}에게 주어졌다.' }, { fx: { v: { fame: 3, fans: 60 } } }],
       }],
       [{
         if: { v: { acting: '>=65', fame: '>=70' } },
-        then: [{ bg: 'awards', fx: 'flash' }, { t: '"우수연기상… {s.starName}!"' }, say('카메라가 저를 먹어버릴 줄 알았는데, 카메라가 저를 살렸어요. 감사합니다.', 'cry'), { fx: { v: { fame: 8, fans: 120, awards: 1 }, flag: 'bonsang' } }, affStar(5)],
+        then: [{ bg: 'awards', fx: 'flash' }, { t: '"우수연기상… {s.starName}!"' }, say('카메라가 저를 먹어버릴 줄 알았는데, 카메라가 저를 살렸어요. 감사합니다.', 'cry'), MEM.company, { fx: { v: { fame: 8, fans: 120, awards: 1 }, flag: 'bonsang' } }, affStar(5)],
         else: [{ t: '우수상은 선배 배우에게 돌아갔다. {s.starName}은 "베스트 커플상"을 받고 멋쩍게 웃었다.' }, { fx: { v: { fame: 3, fans: 50 } } }],
       }]
     ),
@@ -1726,9 +1935,23 @@
   scenes.ev_rand_letter = [
     { bg: 'agency_office' },
     '사무실로 팬레터 한 상자가 도착했다. 맨 위 편지 한 장.',
-    { t: '"취업에 다섯 번 떨어졌어요. 그래도 {s.starName} 무대 보고 여섯 번째 원서를 냈어요. 붙었어요. 고마워요."' },
-    showStar('cry', 'c'),
-    say('…대표님. 제가 누군가한테 이런 사람이에요?', 'cry'),
+    { if: { chance: 0.25 }, then: [
+      { t: '"취업에 다섯 번 떨어졌어요. 그래도 {s.starName} 무대 보고 여섯 번째 원서를 냈어요. 붙었어요. 고마워요."' },
+      showStar('cry', 'c'),
+      say('…대표님. 제가 누군가한테 이런 사람이에요?', 'cry'),
+    ], else: [{ if: { chance: 0.34 }, then: [
+      { t: '"저희 할머니가 {s.starName} 나오는 프로그램만 기다리세요. 요즘 병원에 계신데, 그 시간엔 안 아프시대요."' },
+      showStar('sad', 'c'),
+      say('…사인 CD 하나 보내드려도 될까요? 병원 주소 알아봐 주세요, 실장님.', 'smile'),
+    ], else: [{ if: { chance: 0.5 }, then: [
+      { t: '삐뚤빼뚤한 크레파스 글씨. "커서 {s.starName} 언니(형)처럼 될래요. 근데 밥은 꼭 먹어요." 일곱 살.' },
+      showStar('laugh', 'c'),
+      say('밥 꼭 먹으래요. 대표님, 오늘 저녁 뭐 먹어요? 이건 팬 명령이에요.', 'laugh'),
+    ], else: [
+      { t: '"작년에 힘들 때 {s.starName} 라이브 영상만 백 번 봤어요. 이제 괜찮아요. 그 말 하고 싶었어요."' },
+      showStar('smile', 'c'),
+      say('백 번이요? 저보다 많이 봤네요. …저도 이제 괜찮아요. 그 말 전해 주고 싶어요.', 'shy'),
+    ] }] }] },
     { fx: { v: { mental: 3, stress: -6, fans: 10 } } },
     { hide: 'all' },
     END,
@@ -1737,7 +1960,8 @@
   scenes.ev_rand_rest = [
     { bg: 'agency_office' },
     { show: 'manager', e: 'worried', at: 'c' },
-    { c: 'manager', t: '대표님, 요즘 {s.starName} 표정 보셨습니까. 웃는데 눈이 안 웃어요.', e: 'worried' },
+    { if: { chance: 0.5 }, then: [{ c: 'manager', t: '대표님, 요즘 {s.starName} 표정 보셨습니까. 웃는데 눈이 안 웃어요.', e: 'worried' }],
+      else: [{ c: 'manager', t: '대표님, {s.starName}이 요즘 밥을 반씩 남깁니다. 숙소 냉장고가 그대로예요.', e: 'worried' }] },
     { c: 'manager', t: '이건 제가 20년 해봐서 아는데요, 이럴 때 한 번 쉬어주는 게 1년을 버는 겁니다.', e: 'neutral' },
     {
       prompt: '어떻게 할까?',
@@ -1759,6 +1983,8 @@
     { t: '인기 {v.fame}. 팬덤 {v.fans}. 자금 {v.money}만 원.' },
     { c: 'manager', t: '4년 전에 저 지하실에서 컵라면 먹던 거 생각하면… 이건 제가 20년 해봐서 아는데요, 꿈 같은 겁니다.', e: 'smile' },
     showStar('smile', 'r'),
+    ...recall(3),
+    MEM.company,
     chatStar('약속한 4년의 마지막 해 첫날. 지금까지의 길과 마지막 목표, 그리고 그 이후에 대해 이야기한다.', 4),
     { fx: { v: { stress: -5 } } },
     { hide: 'all' },
@@ -1979,6 +2205,8 @@
       dojun: [{ c: 'dojun', t: '400m보다 긴 4년이었네요. 이제 마지막 코너예요.', e: 'smirk' }],
       chaerin: [{ c: 'chaerin', t: '4년이요. 계약서에 적으라고 했던 거, 기억나요? 말이 날아갈까 봐.', e: 'smile' }, { c: 'chaerin', t: '…안 날아갔네요. 대표님 말은.', e: 'shy' }],
     }),
+    MEM.crisis,
+    MEM.debut,
     chatStar('마지막 시상식 전날 밤. 4년을 돌아보며 가장 기억에 남는 순간과 고마움을 나눈다.', 5),
     affStar(3),
     { hide: 'all' },
@@ -2008,6 +2236,7 @@
               dojun: [{ c: 'dojun', t: '넘어진 놈이 여기까지 왔습니다.', e: 'cry' }, { c: 'dojun', t: '다시 뛰게 해준 대표님, 옆에서 같이 뛴 {s.fandom}. 그리고 객석 어딘가 계실 아버지. …결승선, 통과했습니다.', e: 'cry' }],
               chaerin: [{ c: 'chaerin', t: '예전에 누가 저한테 "한 번만 더"라고 했어요. 서른두 번이나.', e: 'cry' }, { c: 'chaerin', t: '오늘은 제가 말할게요. 한 번만 더, 무대에 서고 싶어요. 제가 원해서요. 고마워요, 대표님.', e: 'smile' }],
             }),
+            MEM.crisis, MEM.debut, MEM.others,
             { fx: { v: { awards: 1 }, flag: 'award_daesang' } },
           ],
           else: [{
@@ -2029,6 +2258,7 @@
               dojun: [{ c: 'dojun', t: '느려도 되고 넘어져도 되는 곳. 연기가 저한테 그런 곳이었습니다. 대표님, 감사합니다.', e: 'cry' }],
               chaerin: [{ c: 'chaerin', t: '아홉 살 때 이 무대 뒤에서 울던 아이가 있었어요. 오늘은 그 아이가 앞에 서 있어요.', e: 'cry' }, { c: 'chaerin', t: '대표님. 저 이제 알아요. 저, 연기 좋아해요.', e: 'smile' }],
             }),
+            MEM.crisis, MEM.debut, MEM.others,
             { fx: { v: { awards: 1 }, flag: 'award_acting_daesang' } },
           ],
           else: [{
@@ -2167,15 +2397,15 @@
   soloEnd('trust_haeun', 'haeun', {
     title: '대표님의 첫 번째 별', rank: 'S', bg: 'rooftop_night', e: 'laugh',
     t: '"평생 파트너"라는 말은 계약서에 적히지 않았다. 대신 하은은 모든 앨범의 첫 번째 땡스 투에 같은 문장을 적었다. "저를 골라준 대표님께." 무대 공포증이 있던 소녀는 이제 신인들에게 "떨리는 건 진심이라서 그래"라고 말해주는 선배가 되었다. 매년 연말, 둘은 그 옥상에서 컵라면을 먹는다. 트로피가 몇 개든, 그 자리엔 늘 두 개의 컵라면뿐이다.',
-  }, { flag: 'forever' });
+  }, { flag: 'forever', v: { fame: '>=80' } });
   soloEnd('trust_dojun', 'dojun', {
     title: '같은 트랙을 달리는 사람', rank: 'S', bg: 'han_river', e: 'smile',
     t: '도준은 재계약서에 사인하며 딱 한 마디 했다. "…대표님이 은퇴할 때까지요." 말이 짧은 그가 한 가장 긴 약속이었다. 그 후 도준이 쓴 가사에는 늘 한 사람이 등장한다. 넘어진 사람 옆에서 같이 걸어준 사람. 한강을 뛰는 두 사람의 사진이 가끔 팬들에게 찍히지만, 새벽달은 그 사진만은 절대 올리지 않는다.',
-  }, { flag: 'forever' });
+  }, { flag: 'forever', v: { fame: '>=80' } });
   soloEnd('trust_chaerin', 'chaerin', {
     title: '말로 한 계약', rank: 'S', bg: 'rooftop_night', e: 'shy',
     t: '"말은 날아간다"던 채린은, 이번 약속만은 계약서에 적지 않았다. 적을 필요가 없었으니까. 채린은 이후 모든 현장에 대표가 쓴 "촬영 수칙"을 들고 다녔다. 그녀의 후배 아역들은 그 종이를 "채린 언니 헌법"이라고 부른다. 어느 인터뷰에서 기자가 물었다. "믿는 어른이 있나요?" 채린은 망설임 없이 웃었다. "한 명이요. 그거면 충분해요."',
-  }, { flag: 'forever' });
+  }, { flag: 'forever', v: { fame: '>=80' } });
 
   mkEnd('producer_star', {
     title: '제작자가 된 스타', rank: 'A', bg: 'agency_office', e: 'smile',
@@ -2264,6 +2494,7 @@
   const DEB_IDOL = { flag: 'debuted', s: { track: 'idol' } };
   const DEB_ACTOR = { flag: 'debuted', s: { track: 'actor' } };
   const ALL3 = { haeun: 1, dojun: 1, chaerin: 1 };
+  const ALL_DECAY = { haeun: -1, dojun: -1, chaerin: -1 };
 
   const activities = [
     // 트레이닝
@@ -2335,6 +2566,11 @@
       req: { noflag: 'debuted' }, hint: '데뷔 전에만 가능',
       fx: { v: { stress: 5, stamina: -3, heart: 1 } },
       lines: ['인형 탈을 쓰고 전단지를 돌렸다.', '웨딩홀 서빙. 축가 부르는 가수를 한참 바라봤다.'] },
+    { id: 'extra', name: '보조 출연', cat: '부업', desc: '드라마 엑스트라와 광고 보조 모델. 데뷔 전 회사 살림을 돕는다.', cost: -110,
+      req: { noflag: 'debuted' }, hint: '데뷔 전에만 가능',
+      fx: { v: { stress: 5, stamina: -3, acting: 1, visual: 1 } },
+      great: { chance: 0.1, fx: { v: { acting: 1, fans: 5 } }, t: '지나가는 행인 3 역할인데 감독이 클로즈업을 한 컷 더 땄다.' },
+      lines: ['새벽 다섯 시, 촬영장 버스에 도시락과 함께 실렸다.', '주인공 뒤를 스쳐 지나가는 연기, 열두 번째 테이크.'] },
     { id: 'vlog', name: '브이로그 촬영', cat: '부업', desc: '자체 콘텐츠로 팬을 모은다.', cost: 20,
       fx: { v: { variety: 2, fans: 5, stress: 2 } },
       great: { chance: 0.1, fx: { v: { fans: 25, fame: 1 } }, t: '브이로그가 알고리즘을 탔다! 조회수 폭발.' },
@@ -2361,12 +2597,12 @@
       req: DEB_IDOL, hint: '아이돌로 데뷔한 뒤',
       fx: { v: { vocal: 3, dance: 1, fans: 5, stress: 4 } },
       lines: ['녹음 부스 안, 같은 소절 스무 번째 테이크.', '프로듀서가 "이 버전으로 가자"고 했다.'] },
-    { id: 'concert', name: '단독 콘서트', cat: '아이돌 활동', desc: '팬덤의 크기를 증명하는 무대. 수익도 크다.', cost: -500,
+    { id: 'concert', name: '단독 콘서트', cat: '아이돌 활동', desc: '팬덤의 크기를 증명하는 무대. 수익도 크다.', cost: -400,
       req: { flag: 'debuted', s: { track: 'idol' }, v: { fans: '>=300' } }, hint: '아이돌, 팬덤 300 이상',
       fx: { v: { fans: 20, vocal: 1, dance: 1, fame: 1, stamina: -8, stress: 7 } },
       great: { chance: 0.1, fx: { v: { fans: 40, fame: 2 } }, t: '앵콜에서 객석 전체가 떼창. "레전드 콘서트" 후기가 쏟아졌다.' },
       lines: ['응원봉 불빛이 파도처럼 흔들렸다.', '세 시간 공연. 마지막 곡에서 목소리가 갈라졌지만 아무도 신경 쓰지 않았다.'] },
-    { id: 'overseas', name: '해외 투어', cat: '아이돌 활동', desc: '아시아 투어 이후 열린다. 크게 벌고 크게 지친다.', cost: -800,
+    { id: 'overseas', name: '해외 투어', cat: '아이돌 활동', desc: '아시아 투어 이후 열린다. 크게 벌고 크게 지친다.', cost: -600,
       req: { flag: ['debuted', 'tour1'], s: { track: 'idol' } }, hint: '아시아 투어 이후',
       fx: { v: { fans: 30, fame: 1, lang: 1, stamina: -10, stress: 10 } },
       fail: { chance: 0.08, fx: { v: { stamina: -8, stress: 6 } }, t: '비행기 연착과 시차. 공연 직전 링거를 맞았다.' },
@@ -2381,7 +2617,7 @@
       req: { flag: 'debuted', v: { fame: '>=25' } }, hint: '데뷔 후, 인기 25 이상',
       fx: { v: { fame: 1, fans: 5, stamina: -4, stress: 5 } },
       lines: ['대학 노천극장에 함성이 울렸다.', '하루에 행사 세 개. 밴에서 김밥으로 끼니를 때웠다.'] },
-    { id: 'cf', name: '광고 촬영', cat: '방송·광고', desc: '인기가 곧 몸값. 회사 통장이 숨을 쉰다.', cost: -500,
+    { id: 'cf', name: '광고 촬영', cat: '방송·광고', desc: '인기가 곧 몸값. 회사 통장이 숨을 쉰다.', cost: -300,
       req: { flag: 'debuted', v: { fame: '>=45' } }, hint: '데뷔 후, 인기 45 이상',
       fx: { v: { fame: 1, visual: 1, stress: 3 } },
       great: { chance: 0.1, fx: { v: { fame: 2, money: 300 } }, t: '광고 매출이 급등해 재계약! 보너스 입금.' },
@@ -2450,6 +2686,18 @@
       lines: ['"Your eyes tell the story." 캐스팅 디렉터가 말했다.', '영어 셀프 테이프를 열두 번 다시 찍었다.'] },
   ];
 
+  const RCAT = {
+    r_train: ['vocal', 'dance', 'acting', 'variety_class', 'language', 'reading', 'stageplay', 'compose', 'monitor'],
+    r_care: ['skincare', 'gym', 'counsel', 'yoga'], r_rest: ['rest', 'vacation', 'volunteer'],
+    r_side: ['parttime', 'extra', 'vlog', 'busking'], r_stage: ['musicshow', 'musicshow_top', 'recording', 'concert', 'overseas'],
+    r_media: ['fansign', 'festival', 'cf', 'variety_show', 'radio', 'snslive', 'pictorial', 'ost', 'fanmeet'],
+    r_act: ['webdrama', 'drama_aud', 'film_aud', 'drama_shoot', 'film_shoot', 'global_meet'],
+  };
+  for (const [f, ids] of Object.entries(RCAT)) for (const id of ids) {
+    const a = activities.find(x => x.id === id);
+    a.fx.flag = [].concat(a.fx.flag || [], f);
+  }
+
   const shop = [
     { id: 'remodel', name: '연습실 리모델링', price: 1000, once: true, desc: '금 간 거울을 바꾸고 방음벽을 단다. 연습 효율이 오른다.', fx: { v: { dance: 5, vocal: 3, stress: -5 } } },
     { id: 'stylist', name: '전담 스타일리스트 고용', price: 1200, once: true, desc: '코디 하나로 사람이 달라진다.', fx: { v: { visual: 8, fame: 2 } } },
@@ -2471,7 +2719,6 @@
     { id: 'bankrupt', if: { v: { money: '<-1500' } }, scene: 'ev_bankrupt', prio: 200, at: 'start' },
     { id: 'burnout', if: { flag: 'crisis1', v: { stress: '>=95' } }, scene: 'ev_burnout', prio: 190, at: 'start' },
     // 새해 · 시즌 (start)
-    { id: 'first_month', if: T('==0'), scene: 'ev_first_month', prio: 100, at: 'start' },
     { id: 'xmas1', if: T('==11'), scene: 'ev_xmas1', prio: 100, at: 'start' },
     { id: 'y2', if: T('==12'), scene: 'ev_y2', prio: 100, at: 'start' },
     { id: 'summer', if: { turn: '==19', flag: 'debuted' }, scene: 'ev_summer', prio: 100, at: 'start' },
@@ -2483,14 +2730,15 @@
     { id: 'bonsang', if: { turn: '>=35', flag: 'debuted' }, scene: 'ev_bonsang', prio: 150 },
     { id: 'baeksang', if: { turn: '>=40', flag: 'debuted', s: { track: 'actor' } }, scene: 'ev_baeksang', prio: 140 },
     // 위기 (end)
-    { id: 'money_low', if: { v: { money: '<0' } }, scene: 'ev_money_low', prio: 95 },
+    { id: 'money_low', if: { v: { money: '<0' } }, scene: 'ev_money_low', prio: 195, once: false },
+    { id: 'money_low_s', if: { v: { money: '<0' } }, scene: 'ev_money_low', prio: 195, at: 'start', once: false },
     { id: 'crisis', if: { v: { stress: '>=80' } }, scene: 'ev_crisis', prio: 90 },
     { id: 'scandal_bomb', if: { v: { scandal: '>=45' } }, scene: 'ev_scandal_bomb', prio: 88 },
     { id: 'health', if: { v: { stamina: '<15' } }, scene: 'ev_health', prio: 85, once: false },
     // 1년차
     { id: 'debut_plan', if: { turn: '>=10', noflag: ['debuted', 'debut_plan', 'debut_delay'] }, scene: 'ev_debut_plan', prio: 80 },
-    { id: 'debut_plan2', if: { turn: '>=15', flag: 'debut_delay', noflag: ['debuted', 'debut_plan'] }, scene: 'ev_debut_plan2', prio: 80 },
-    { id: 'debut', if: { turn: '>=11', flag: 'debut_plan', noflag: 'debuted' }, scene: 'ev_debut', prio: 80 },
+    { id: 'debut_plan2', if: { turn: '>=15', flag: 'debut_delay', noflag: ['debuted', 'debut_plan', 'debut_cancel'] }, scene: 'ev_debut_plan2', prio: 80 },
+    { id: 'debut', if: { turn: '>=11', flag: 'debut_plan', noflag: ['debuted', 'debut_cancel'] }, scene: 'ev_debut', prio: 80 },
     { id: 'surv_r1', if: { flag: 'survival' }, scene: 'ev_surv_r1', prio: 70 },
     { id: 'surv_r2', if: { flag: 'surv_r1' }, scene: 'ev_surv_r2', prio: 70 },
     { id: 'surv_final', if: { flag: 'surv_r2' }, scene: 'ev_surv_final', prio: 70 },
@@ -2557,6 +2805,7 @@
   STORY.register({
     id: 'star',
     genre: '아이돌·배우 육성',
+    tags: ['육성', '현대', '미연시'],
     title: '별빛을 키우는 법',
     subtitle: '망해가는 기획사의 마지막 4년',
     blurb: '삼촌에게 물려받은 건 통장 잔고 3천만 원과 금 간 거울, 그리고 연습생 셋. 단 한 명에게 회사의 운명을 걸고, 대화로 마음을 얻어 4년 안에 그 아이를 별로 만들어라. 아이돌의 가요대상인가, 배우의 칸 영화제인가.',
@@ -2597,7 +2846,7 @@
       activities,
       shop,
       events,
-      turnFx: { v: { money: -80, stress: -3 } },
+      turnFx: { v: { money: -80, stress: -3 }, aff: ALL_DECAY },   // 운영비. 그리고 대화가 끊기면 신뢰도 조금씩 식는다
       finale: 'finale',
     },
   });
