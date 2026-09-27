@@ -32,9 +32,9 @@ ART.EMOTIONS                    // the 12 emotions below
 | `bangs` | `straight` `side` `parted` `none` |
 | `eyes` | hex iris colour |
 | `eyeShape` | `round` `sharp` `gentle` `droopy` |
-| `outfit` | `gown` `uniform` `suit` `school` `stage` `robe` `armor` `casual` `maid` `dress_child` `coat` `hanbok` `tracksuit` `priest` `martial` (무복: cross-collar wuxia robe with sash, bracers) `hanfu` (flowing layered robe with wide sleeves) |
+| `outfit` | `gown` `uniform` `suit` `school` `stage` `robe` `armor` `casual` `maid` `dress_child` `coat` `hanbok` `tracksuit` `priest` `martial` (무복: cross-collar wuxia robe with sash, bracers) `hanfu` (flowing layered robe with wide sleeves) `royal` (조선 곤룡포: red/blue dragon robe with gold 보 medallion) `office` (shirt/blouse with cardigan or vest) |
 | `outfitColor` | hex. `accent` optional hex for trim / embroidery |
-| `acc` | array of: `crown` `tiara` `glasses` `earrings` `ribbon` `hairpin` `cape` `scar` `mole` `flower` `headphones` `necklace` `veil` `hat` `beard` `monocle` `epaulets` `choker` `headband` (martial cloth headband) `sword` (hilt over the shoulder) `fan` (folding fan held at chest) `mask` (half mask) |
+| `acc` | array of: `crown` `tiara` `glasses` `earrings` `ribbon` `hairpin` `cape` `scar` `mole` `flower` `headphones` `necklace` `veil` `hat` `beard` `monocle` `epaulets` `choker` `headband` (martial cloth headband) `sword` (hilt over the shoulder) `fan` (folding fan held at chest) `mask` (half mask) `gat` (조선 갓, black horsehair hat) `lanyard` (office ID badge) `bandage` (plaster/bandage on cheek) |
 
 ### Emotions (exactly these ids)
 
@@ -46,6 +46,7 @@ ART.EMOTIONS                    // the 12 emotions below
 - Romance fantasy: `palace_hall` `ballroom` `garden_rose` `bedroom_noble` `study_duke` `library` `corridor_night` `carriage` `chapel` `balcony_night` `forest` `town_market` `dungeon` `throne_room` `tea_room` `lake`
 - Raising: `house_day` `house_night` `daughter_room` `town_square` `school` `church` `castle_gate` `field_training` `festival` `tavern` `mage_tower` `hill_sunset` `farm` `harbor`
 - Star: `agency_office` `practice_room` `dorm` `stage_concert` `broadcast_studio` `filming_set` `audition_hall` `rooftop_night` `cafe` `street_seoul` `press_room` `awards` `airport` `hospital` `han_river`
+- Modern & dating-sim sets (painted in js/art_modern.js): `classroom` `school_hallway` `school_rooftop` `school_gate_sakura` `gym` `music_room` `convenience_store` `office_floor` `meeting_room` `subway` `apartment_night` `amusement_park` `beach` `festival_night` (fireworks) `ruined_city` `shelter` `ruined_mart` `joseon_palace` `palace_pond` `royal_library` `joseon_market` `palace_wall_night` `gothic_mansion` `neon_alley` `academy_hall` `academy_dorm` `observatory`
 - Murim (무협): `mountain_sect` (sect gates on misty peaks) `bamboo_forest` `murim_inn` (객잔 interior) `training_yard` (연무장) `cliff_sea_of_clouds` `waterfall_cave` `night_rooftops` (tiled roofs under the moon) `market_street` (중원 거리 with lanterns) `sect_hall` (본전 interior) `battlefield_snow` `burning_village` `secluded_hut` (은거지)
 
 ---

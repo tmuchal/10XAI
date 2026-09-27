@@ -2,15 +2,15 @@
 // Validates a story pack against SPEC.md. Usage: node tools/validate.js story/rofan.js
 const fs = require('fs'), path = require('path'), vm = require('vm');
 
-const BG = 'black white sky_day sky_sunset sky_night palace_hall ballroom garden_rose bedroom_noble study_duke library corridor_night carriage chapel balcony_night forest town_market dungeon throne_room tea_room lake house_day house_night daughter_room town_square school church castle_gate field_training festival tavern mage_tower hill_sunset farm harbor agency_office practice_room dorm stage_concert broadcast_studio filming_set audition_hall rooftop_night cafe street_seoul press_room awards airport hospital han_river mountain_sect bamboo_forest murim_inn training_yard cliff_sea_of_clouds waterfall_cave night_rooftops market_street sect_hall battlefield_snow burning_village secluded_hut'.split(' ');
+const BG = 'black white sky_day sky_sunset sky_night palace_hall ballroom garden_rose bedroom_noble study_duke library corridor_night carriage chapel balcony_night forest town_market dungeon throne_room tea_room lake house_day house_night daughter_room town_square school church castle_gate field_training festival tavern mage_tower hill_sunset farm harbor agency_office practice_room dorm stage_concert broadcast_studio filming_set audition_hall rooftop_night cafe street_seoul press_room awards airport hospital han_river mountain_sect bamboo_forest murim_inn training_yard cliff_sea_of_clouds waterfall_cave night_rooftops market_street sect_hall battlefield_snow burning_village secluded_hut classroom school_hallway school_rooftop school_gate_sakura gym music_room convenience_store office_floor meeting_room subway apartment_night amusement_park beach festival_night ruined_city shelter ruined_mart joseon_palace palace_pond royal_library joseon_market palace_wall_night gothic_mansion neon_alley academy_hall academy_dorm observatory'.split(' ');
 const EMO = 'neutral smile laugh sad cry angry surprised shy smirk cold worried tired'.split(' ');
 const LOOK = {
   sex: ['f', 'm'], age: ['child', 'teen', 'adult', 'elder'],
   hairStyle: 'long wavy bob ponytail twintail braid updo bun short messy slick long_m topknot half_up'.split(' '),
   bangs: 'straight side parted none'.split(' '), eyeShape: 'round sharp gentle droopy'.split(' '),
-  outfit: 'gown uniform suit school stage robe armor casual maid dress_child coat hanbok tracksuit priest martial hanfu'.split(' '),
+  outfit: 'gown uniform suit school stage robe armor casual maid dress_child coat hanbok tracksuit priest martial hanfu royal office'.split(' '),
 };
-const ACC = 'crown tiara glasses earrings ribbon hairpin cape scar mole flower headphones necklace veil hat beard monocle epaulets choker headband sword fan mask'.split(' ');
+const ACC = 'crown tiara glasses earrings ribbon hairpin cape scar mole flower headphones necklace veil hat beard monocle epaulets choker headband sword fan mask gat lanyard bandage'.split(' ');
 const STEP_KEYS = new Set('t c e as bg fx show at hide title sub if then else choice prompt go call chat goal max input label def toast ending end'.split(' '));
 const COND_KEYS = new Set('v aff flag noflag s turn age month top maxstat chance any all not'.split(' '));
 const FX_KEYS = new Set('v set setv aff flag unflag'.split(' '));
