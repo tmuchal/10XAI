@@ -41,6 +41,7 @@ let RUN = null;        // run token
 let SAMPLE = null;     // Claude sampling fn (null when unavailable)
 let AI_OFF = false;    // set once the viewer declines or sampling is disabled
 const PREF = Object.assign({ speed: 26, tier: 'quick' }, store.get('unmyeong-pref', {}));
+const HOOK = {};   // filled by js/extras.js (audio, blink, slots, profiles)
 const UIS = { auto: false, skip: false, typing: null, advance: null, sheet: null };
 
 function newState(pack, name) {
@@ -149,7 +150,7 @@ function applyFx(fx, quiet) {
   for (const [id, d] of Object.entries(fx.aff || {})) {
     const before = S.aff[id] ?? 0; S.aff[id] = clamp(before + d, 0, 100);
     const diff = S.aff[id] - before;
-    if (diff) notes.push({ k: charShort(id), d: diff, heart: true });
+    if (diff) { notes.push({ k: charShort(id), d: diff, heart: true }); if (diff > 0 && !quiet) HOOK.sfx?.('heart'); }
   }
   for (const f of arr(fx.flag)) S.flags[f] = 1;
   for (const f of arr(fx.unflag)) delete S.flags[f];
@@ -222,6 +223,7 @@ function setBg(id, how) {
 const FX = { parts: [], raf: 0, kind: '' };
 function startParticles(kind) {
   FX.kind = kind;
+  HOOK.music?.(kind);
   const cv = $('#fx'), ctx = cv.getContext('2d');
   const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
   const resize = () => { cv.width = innerWidth * devicePixelRatio; cv.height = innerHeight * devicePixelRatio; };
@@ -231,7 +233,8 @@ function startParticles(kind) {
   FX.parts = Array.from({ length: N }, () => spawn(true));
   function spawn(any) {
     const w = cv.width, h = cv.height, d = devicePixelRatio;
-    if (FX.kind === 'rofan') return { x: Math.random() * w, y: any ? Math.random() * h : -20, vx: (Math.random() * .6 + .2) * d, vy: (Math.random() * .6 + .45) * d, r: (Math.random() * 4 + 3) * d, a: Math.random() * 6, va: (Math.random() - .5) * .04, c: Math.random() < .5 ? '255,182,206' : '255,226,236' };
+    if (FX.kind === 'rofan' || FX.kind === 'murim') return { x: Math.random() * w, y: any ? Math.random() * h : -20, vx: (Math.random() * .6 + .2) * d, vy: (Math.random() * .6 + .45) * d, r: (Math.random() * 4 + 3) * d, a: Math.random() * 6, va: (Math.random() - .5) * .04,
+      c: FX.kind === 'murim' ? (Math.random() < .5 ? '214,232,206' : '240,236,226') : (Math.random() < .5 ? '255,182,206' : '255,226,236') };
     if (FX.kind === 'raise') return { x: Math.random() * w, y: any ? Math.random() * h : h + 10, vx: (Math.random() - .5) * .3 * d, vy: -(Math.random() * .35 + .12) * d, r: (Math.random() * 2 + 1.2) * d, a: Math.random() * 6, va: .03, c: '255,236,170' };
     return { x: Math.random() * w, y: any ? Math.random() * h : h + 10, vx: (Math.random() - .5) * .2 * d, vy: -(Math.random() * .5 + .2) * d, r: (Math.random() * 2.2 + .8) * d, a: Math.random() * 6, va: .05, c: Math.random() < .5 ? '255,110,190' : '110,230,255' };
   }
@@ -245,7 +248,7 @@ function startParticles(kind) {
       p.x += p.vx + Math.sin(p.a) * .3; p.y += p.vy; p.a += p.va;
       if (p.y > cv.height + 30 || p.y < -30 || p.x > cv.width + 30) { FX.parts[i] = spawn(false); continue; }
       ctx.save(); ctx.translate(p.x, p.y);
-      if (FX.kind === 'rofan') {
+      if (FX.kind === 'rofan' || FX.kind === 'murim') {
         ctx.rotate(p.a); ctx.fillStyle = `rgba(${p.c},.75)`;
         ctx.beginPath(); ctx.ellipse(0, 0, p.r, p.r * .55, 0, 0, Math.PI * 2); ctx.fill();
       } else {
@@ -326,7 +329,7 @@ function advance() {
   if (UIS.typing) { UIS.typing(); return; }
   const r = UIS.advance; UIS.advance = null; if (r) r();
 }
-async function typeLine(name, text, color) {
+async function typeLine(name, text, color, who) {
   const box = $('#box'); box.hidden = false;
   const np = $('#nameplate'), ln = $('#line'), more = $('#more');
   if (name) { np.hidden = false; np.textContent = name; np.style.background = color || ''; np.style.color = color ? '#1a0e14' : ''; }
@@ -338,10 +341,11 @@ async function typeLine(name, text, color) {
   else {
     const chars = [...text];
     let n = 0, done = false;
+    HOOK.flap?.(who, true);
     await new Promise(res => {
       UIS.typing = () => { done = true; };
       const step = () => {
-        if (done || n >= chars.length) { ln.innerHTML = html; UIS.typing = null; res(); return; }
+        if (done || n >= chars.length) { ln.innerHTML = html; UIS.typing = null; HOOK.flap?.(who, false); res(); return; }
         n += 1; ln.innerHTML = fmt(chars.slice(0, n).join(''));
         setTimeout(step, PREF.speed);
       };
@@ -424,7 +428,7 @@ async function exec(st, f, idx, token) {
     renderChars(st.c && st.c !== 'me' ? st.c : null);
     logLine(name, text);
     save(true);
-    await typeLine(name, text, color);
+    await typeLine(name, text, color, st.c && st.c !== 'me' ? st.c : null);
     if (RUN !== token) return 'stop';
   } else if (st.e && st.c && st.c !== 'me') { showChar(st.c, st.e, st.at); renderChars(); }
   if (st.if !== undefined && (st.then || st.else)) {
@@ -474,7 +478,7 @@ function choose(st, token) {
       const b = el('button', 'opt', `<span>${esc(interp(o.t))}</span>${locked ? `<small>${esc(interp(o.hint || reqHint(o.req)))}</small>` : ''}`);
       b.type = 'button'; b.style.animationDelay = (k * 60) + 'ms';
       if (locked) b.disabled = true;
-      b.onclick = () => { box.hidden = true; box.innerHTML = ''; res(k); };
+      b.onclick = () => { HOOK.sfx?.('select'); box.hidden = true; box.innerHTML = ''; res(k); };
       box.appendChild(b);
     });
     if (!box.querySelector('.opt:not([disabled])')) { // nothing selectable: fall through with the first option
@@ -522,7 +526,7 @@ function statsHTML() {
   }).join('');
   const hud = (P.sim?.hud || Object.keys(P.vars || {})).filter(k => !statDef(k)).map(k => `<div class="bar"><span>${esc(varName(k))}</span><span></span><b>${Math.round(S.v[k] ?? 0).toLocaleString()}</b></div>`).join('');
   const ids = Object.keys(P.chars).filter(id => (S.aff[id] ?? 0) > 0 || S.flags['met_' + id]);
-  const affs = ids.sort((a, b) => S.aff[b] - S.aff[a]).map(id => `<div class="aff"><span class="face">${portrait(id, S.aff[id] >= 60 ? 'smile' : 'neutral', 'face')}</span><span class="n">${esc(charShort(id))}<small>${esc(charDef(id).role || '')}</small><span class="heart">♥ ${S.aff[id]}</span></span></div>`).join('');
+  const affs = ids.sort((a, b) => S.aff[b] - S.aff[a]).map(id => `<button class="aff" type="button" data-a="profile" data-v="${esc(id)}"><span class="face">${portrait(id, S.aff[id] >= 60 ? 'smile' : 'neutral', 'face')}</span><span class="n">${esc(charShort(id))}<small>${esc(charDef(id).role || '')}</small><span class="heart">♥ ${S.aff[id]}</span></span></button>`).join('');
   return `${P.sim ? `<div class="sub">${esc(dateLabel(simDate()))}${P.sim.ageStart != null ? ` · ${simAge()}세` : ''}</div>` : ''}
     <div class="bars">${bars}</div>${hud ? `<div class="bars">${hud}</div>` : ''}
     ${affs ? `<div class="sub">관계</div><div class="affs">${affs}</div>` : ''}`;
@@ -541,7 +545,8 @@ function endingsHTML(pack) {
 }
 function openMenu() {
   sheet('메뉴', `
-    <button class="ghost" type="button" data-a="title">타이틀로 (자동 저장됨)</button>
+    <div class="row2"><button class="ghost" type="button" data-a="slots">저장 · 불러오기</button><button class="ghost" type="button" data-a="title">타이틀로 (자동 저장)</button></div>
+    ${HOOK.menuExtra ? HOOK.menuExtra() : ''}
     <div class="sub">AI 대화</div>
     <p class="sub" style="letter-spacing:0">${aiStatus()}</p>
     <div class="tabs">
@@ -742,6 +747,7 @@ function pickAutoEnding() {
 function showEnding(id) {
   if (id === 'auto') id = pickAutoEnding();
   const e = P.endings[id]; if (!e) return;
+  HOOK.music?.(null); HOOK.sfx?.('ending');
   const got = store.get('unmyeong-endings', {}); (got[P.id] = got[P.id] || {})[id] = Date.now(); store.set('unmyeong-endings', got);
   store.del(saveKey(P.id));
   RUN = {};
@@ -952,6 +958,7 @@ function closeModal() { $('#modal').hidden = true; }
 const WAR_URL = 'https://claude.ai/artifact/KH8CkrabZAM1cBs4kyLNa7';
 function showTitle() {
   RUN = {}; closeSheet(); closeModal();
+  HOOK.music?.('title');
   delete document.body.dataset.genre;
   $('#stage').hidden = true; $('#ending').hidden = true; $('#title').hidden = false;
   const bills = $('#bills'); bills.innerHTML = '';
@@ -1045,6 +1052,7 @@ document.addEventListener('click', e => {
       openPlanner(); break;
     }
     case 'run-plan': runPlan(); break;
+    default: HOOK.action?.(a, v, t);
   }
 });
 document.addEventListener('keydown', e => {

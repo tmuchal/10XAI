@@ -28,13 +28,13 @@ ART.EMOTIONS                    // the 12 emotions below
 | `age` | `'child'` (≈10) \| `'teen'` \| `'adult'` \| `'elder'` |
 | `skin` | hex, e.g. `'#f7dccb'` |
 | `hair` | hex. `hair2` optional hex for gradient tips / highlights |
-| `hairStyle` | `long` `wavy` `bob` `ponytail` `twintail` `braid` `updo` `bun` `short` `messy` `slick` `long_m` (a man's long hair tied low) |
+| `hairStyle` | `long` `wavy` `bob` `ponytail` `twintail` `braid` `updo` `bun` `short` `messy` `slick` `long_m` (a man's long hair tied low) `topknot` (wuxia high topknot with loose side strands) `half_up` (half-up long hair with a pin) |
 | `bangs` | `straight` `side` `parted` `none` |
 | `eyes` | hex iris colour |
 | `eyeShape` | `round` `sharp` `gentle` `droopy` |
-| `outfit` | `gown` `uniform` `suit` `school` `stage` `robe` `armor` `casual` `maid` `dress_child` `coat` `hanbok` `tracksuit` `priest` |
+| `outfit` | `gown` `uniform` `suit` `school` `stage` `robe` `armor` `casual` `maid` `dress_child` `coat` `hanbok` `tracksuit` `priest` `martial` (무복: cross-collar wuxia robe with sash, bracers) `hanfu` (flowing layered robe with wide sleeves) |
 | `outfitColor` | hex. `accent` optional hex for trim / embroidery |
-| `acc` | array of: `crown` `tiara` `glasses` `earrings` `ribbon` `hairpin` `cape` `scar` `mole` `flower` `headphones` `necklace` `veil` `hat` `beard` `monocle` `epaulets` `choker` |
+| `acc` | array of: `crown` `tiara` `glasses` `earrings` `ribbon` `hairpin` `cape` `scar` `mole` `flower` `headphones` `necklace` `veil` `hat` `beard` `monocle` `epaulets` `choker` `headband` (martial cloth headband) `sword` (hilt over the shoulder) `fan` (folding fan held at chest) `mask` (half mask) |
 
 ### Emotions (exactly these ids)
 
@@ -46,6 +46,7 @@ ART.EMOTIONS                    // the 12 emotions below
 - Romance fantasy: `palace_hall` `ballroom` `garden_rose` `bedroom_noble` `study_duke` `library` `corridor_night` `carriage` `chapel` `balcony_night` `forest` `town_market` `dungeon` `throne_room` `tea_room` `lake`
 - Raising: `house_day` `house_night` `daughter_room` `town_square` `school` `church` `castle_gate` `field_training` `festival` `tavern` `mage_tower` `hill_sunset` `farm` `harbor`
 - Star: `agency_office` `practice_room` `dorm` `stage_concert` `broadcast_studio` `filming_set` `audition_hall` `rooftop_night` `cafe` `street_seoul` `press_room` `awards` `airport` `hospital` `han_river`
+- Murim (무협): `mountain_sect` (sect gates on misty peaks) `bamboo_forest` `murim_inn` (객잔 interior) `training_yard` (연무장) `cliff_sea_of_clouds` `waterfall_cave` `night_rooftops` (tiled roofs under the moon) `market_street` (중원 거리 with lanterns) `sect_hall` (본전 interior) `battlefield_snow` `burning_village` `secluded_hut` (은거지)
 
 ---
 
@@ -181,6 +182,27 @@ The hub also always offers **대화하기** (free AI chat with the hub character
 
 ---
 
-## 6. Validation
+## 6. Character profiles (optional, per char)
+
+```js
+profile: {
+  age: '24세', title: '북부 대공',           // short facts shown on the profile card
+  likes: ['겨울 바다', '쓴 커피'], dislikes: ['거짓말'],
+  bio: '2–3 sentences anyone would know.',
+  secrets: [ { aff: 30, t: 'revealed at affection 30' }, { aff: 60, t: '…' }, { aff: 90, t: '…', flag: 'optional flag also required' } ],
+}
+```
+
+The 인물 screen lists every character the player has met (affection > 0 or flag `met_<id>`) with a large portrait, affection, facts, and secrets unlocked by affection (locked ones show as "호감도 N 이상에서 공개").
+
+## 7. Animation hooks in portraits (art.js)
+
+Portrait SVGs wrap the parts the engine animates in classed groups:
+
+- `<g class="eo">` eyes as drawn for the emotion, `<g class="ec" style="opacity:0">` closed-eye lines — the engine blinks by toggling opacity.
+- `<g class="mc">` the mouth as drawn for the emotion, `<g class="mo" style="opacity:0">` an open "talking" mouth — the engine flaps it while text is typing.
+- Emotions whose eyes are already closed (laugh) may omit `ec`.
+
+## 8. Validation
 
 Each story file must load in Node with a stub (`global.STORY={register(p){…}}`) and pass `node games/story-sim/tools/validate.js story/<file>.js`, which checks: every `go`/`call`/`scene` target exists; every `bg` id is in the list above; every speaker/show id is a char or `'me'`; every `e` is a valid emotion; every `ending` id exists; every `look` uses allowed values.
