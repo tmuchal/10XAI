@@ -46,7 +46,19 @@
     g.gain.setValueAtTime(vol, t); g.gain.exponentialRampToValueAtTime(0.0001, t + 0.06);
     s.connect(f); f.connect(g); g.connect(A.master); s.start(t); s.stop(t + 0.08);
   }
+  function noiseHit(t, o = {}) {
+    const c = A.ctx, s = c.createBufferSource(), f = c.createBiquadFilter(), g = c.createGain();
+    const dur = o.dur ?? 0.15, vol = o.vol ?? 0.04;
+    s.buffer = A.noise; s.loop = dur > 0.9;
+    f.type = o.type || 'bandpass'; f.frequency.setValueAtTime(o.f || 1800, t); f.Q.value = o.q ?? 0.8;
+    if (o.sweep) f.frequency.exponentialRampToValueAtTime(o.sweep, t + dur);
+    g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(vol, t + (o.a || 0.005)); g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+    s.connect(f); f.connect(g); g.connect(o.wet ? A.bus : A.master); s.start(t); s.stop(t + dur + 0.05);
+  }
   const kick = t => tone(140, t, 0.32, { bend: 0.3, bendT: 0.12, vol: 0.22, dry: true });
+  const softKick = (t, v = 0.12) => tone(110, t, 0.28, { bend: 0.4, bendT: 0.1, vol: v, dry: true });
+  const snare = (t, v = 0.03) => noiseHit(t, { f: 1900, q: 0.7, dur: 0.16, vol: v });
+  const pluck = (m, t, vol = 0.05, dur = 1.2) => tone(mf(m), t, dur, { type: 'triangle', vol, a: 0.004, bend: 0.992, bendT: 0.35 });
   const bell = (m, t, vol = 0.05, dur = 1.4) => { tone(mf(m), t, dur, { vol }); tone(mf(m) * 2.01, t, dur * 0.6, { vol: vol * 0.35 }); };
 
   const SONGS = {
@@ -90,7 +102,72 @@
           if (Math.random() < 0.3) tone(mf(scale[k] + 12), t + h * q + 0.07, 0.9, { type: 'triangle', vol: 0.02 });
         });
       } },
+    // 학원 로맨스: bright pop piano
+    school: { bpm: 104, chords: [[48, 52, 55], [43, 47, 50], [45, 48, 52], [41, 45, 48]],
+      bar(t, ch, b, q) {
+        softKick(t, 0.09); softKick(t + q * 2, 0.08); snare(t + q, 0.018); snare(t + q * 3, 0.018);
+        for (let i = 0; i < 8; i++) hat(t + i * q / 2, i % 2 ? 0.012 : 0.018);
+        tone(mf(ch[0] - 12), t, q * 1.8, { type: 'triangle', vol: 0.05 }); tone(mf(ch[0] - 12), t + q * 2, q * 1.8, { type: 'triangle', vol: 0.045 });
+        [0.5, 1.5, 2.5, 3.5].forEach(i => ch.forEach(m => tone(mf(m + 12), t + i * q, q * 0.5, { type: 'triangle', vol: 0.016, a: 0.004 })));
+        const mel = b % 2 ? [2, -1, 1, 0, 2, -1, 1, -1] : [0, 1, 2, -1, 2, 1, 0, -1];
+        mel.forEach((k, i) => { if (k >= 0) tone(mf(ch[k] + 24), t + i * q / 2, q * 0.9, { type: 'sine', vol: 0.04, a: 0.004 }); });
+      } },
+    // 오피스: lo-fi
+    office: { bpm: 76, chords: [[50, 53, 57, 60, 64], [43, 53, 57, 59, 64], [48, 52, 55, 59, 62], [45, 48, 52, 55, 59]],
+      bar(t, ch, b, q) {
+        const sw = q * 0.12;
+        softKick(t, 0.11); softKick(t + q * 1.5 + sw, 0.07); softKick(t + q * 2.5 + sw, 0.09);
+        snare(t + q, 0.022); snare(t + q * 3, 0.022);
+        for (let i = 0; i < 8; i++) hat(t + i * q / 2 + (i % 2 ? sw : 0), 0.01);
+        tone(mf(ch[0] - 12), t, q * 3.6, { type: 'sine', vol: 0.06, a: 0.02 });
+        ch.forEach(m => { tone(mf(m), t, q * 2.2, { type: 'sine', vol: 0.02, a: 0.03, lp: 1100 }); tone(mf(m), t + q * 2.5 + sw, q * 1.2, { type: 'triangle', vol: 0.012, lp: 900 }); });
+        if (Math.random() < 0.6) tone(mf(ch[2 + (b % 3)] + 12), t + q * (1.5 + (b % 2)), q * 1.4, { type: 'sine', vol: 0.025 });
+        if (Math.random() < 0.5) noiseHit(t + Math.random() * q * 4, { type: 'highpass', f: 3500, dur: 0.03, vol: 0.01 });
+      } },
+    // 조선 궁중: gayageum pentatonic
+    joseon: { bpm: 66, chords: [[38, 45], [38, 45], [43, 50], [45, 52]],
+      bar(t, ch, b, q) {
+        ch.forEach(m => tone(mf(m), t, q * 4.2, { type: 'sine', vol: 0.04, a: 1 }));
+        tone(90, t, 0.5, { bend: 0.5, bendT: 0.2, vol: 0.12, dry: true });
+        noiseHit(t + q * 2.5, { f: 900, q: 2, dur: 0.12, vol: 0.02 }); noiseHit(t + q * 3, { f: 900, q: 2, dur: 0.12, vol: 0.016 });
+        const scale = [62, 64, 67, 69, 71, 74, 76, 79];
+        let k = (b * 2) % 6;
+        [0, 0.75, 1.5, 2, 3, 3.5].forEach(h => {
+          if (Math.random() < 0.28) return;
+          k = clamp(k + Math.floor(Math.random() * 3) - 1, 0, scale.length - 1);
+          pluck(scale[k], t + h * q, 0.055, 1.5);
+          if (Math.random() < 0.25) pluck(scale[k] - 12, t + h * q + 0.04, 0.025, 1);
+        });
+      } },
+    // 마법 아카데미: celesta waltz (3/4)
+    academy: { bpm: 138, beats: 3, chords: [[53, 57, 60], [50, 53, 57], [46, 50, 53], [48, 52, 55]],
+      bar(t, ch, b, q) {
+        tone(mf(ch[0] - 12), t, q * 1.2, { type: 'triangle', vol: 0.05 });
+        [1, 2].forEach(i => ch.forEach(m => tone(mf(m), t + i * q, q * 0.6, { type: 'triangle', vol: 0.014 })));
+        const mel = [[2, 1, 0], [0, 2, 1], [1, 2, 2], [2, 0, 1]][b % 4];
+        mel.forEach((k, i) => bell(ch[k] + 24, t + i * q, i ? 0.028 : 0.04, 1.6));
+        if (b % 2) bell(ch[2] + 36, t + q * 2.5, 0.018, 1.8);
+      } },
+    // 아포칼립스: dark ambient drone
+    apoc: { bpm: 48, chords: [[33, 40], [33, 40], [31, 38], [34, 41]],
+      bar(t, ch, b, q) {
+        ch.forEach(m => tone(mf(m), t, q * 4.4, { type: 'sawtooth', vol: 0.02, a: 1.5, lp: 260 }));
+        tone(mf(ch[0] + 12), t, q * 4.2, { type: 'sine', vol: 0.015, a: 2 });
+        if (b % 2 === 0) noiseHit(t, { type: 'lowpass', f: 300, sweep: 700, dur: q * 4, vol: 0.02, a: 1.5 });
+        if (Math.random() < 0.55) { const m = ch[0] + 36 + [0, 1, 3, 7][Math.floor(Math.random() * 4)]; bell(m, t + q * (1 + Math.random() * 2), 0.018, 3.5); }
+      } },
+    // 밤의 저택: minor harpsichord & strings
+    night: { bpm: 84, chords: [[45, 48, 52], [41, 45, 48], [38, 41, 45], [40, 44, 47]],
+      bar(t, ch, b, q) {
+        ch.forEach(m => tone(mf(m), t, q * 4.3, { type: 'sawtooth', vol: 0.012, a: 0.9, lp: 1300 }));
+        tone(mf(ch[0] - 12), t, q * 4, { type: 'sawtooth', vol: 0.02, a: 0.5, lp: 400 });
+        const arp = [0, 1, 2, 3, 2, 1, 0, 1].map(i => i < 3 ? ch[i] + 12 : ch[0] + 24);
+        arp.forEach((m, i) => tone(mf(m), t + i * q / 2, 0.4, { type: 'sawtooth', vol: 0.016, a: 0.003, lp: 3200 }));
+        if (b % 4 === 3) tone(mf(ch[1] + 24), t + q * 2, q * 2, { type: 'sawtooth', vol: 0.01, a: 0.4, lp: 2000 });
+      } },
   };
+  const SONG_ALIAS = { murim: 'murim' };
+  const songFor = k => (!k ? null : SONGS[k] ? k : SONG_ALIAS[k] || 'rofan');
   function schedule() {
     const c = A.ctx; if (!c || !A.kind) return;
     const song = SONGS[A.kind]; if (!song) return;
@@ -98,11 +175,13 @@
     while (A.next < c.currentTime + 0.35) {
       if (A.next < c.currentTime) A.next = c.currentTime + 0.05;
       song.bar(A.next, song.chords[A.bar % song.chords.length], A.bar, q);
-      A.next += q * 4; A.bar++;
+      A.next += q * (song.beats || 4); A.bar++;
     }
   }
   function music(kind) {
-    A.kind = kind && SONGS[kind] ? kind : null;
+    const k = songFor(kind);
+    if (k && k === A.kind) return;   // keep the current song running
+    A.kind = k;
     A.bar = 0;
     if (A.ctx) A.next = A.ctx.currentTime + 0.1;
     clearInterval(A.timer);
@@ -114,6 +193,13 @@
     if (k === 'select') { tone(880, t, 0.12, { vol: 0.05, dry: true }); tone(1320, t + 0.05, 0.14, { vol: 0.04, dry: true }); }
     if (k === 'heart') [76, 80, 83].forEach((m, i) => bell(m + 12, t + i * 0.08, 0.04, 0.8));
     if (k === 'ending') [62, 66, 69, 74, 78].forEach((m, i) => bell(m, t + i * 0.22, 0.05, 3));
+    if (k === 'card') { noiseHit(t, { f: 400, sweep: 3000, dur: 0.9, vol: 0.03, a: 0.3, q: 1.2 }); [79, 83, 86, 91].forEach((m, i) => bell(m, t + 0.35 + i * 0.07, 0.02, 1.4)); }
+    if (k === 'shake') { tone(70, t, 0.4, { bend: 0.6, bendT: 0.3, vol: 0.2, dry: true }); noiseHit(t, { type: 'lowpass', f: 400, dur: 0.35, vol: 0.05 }); }
+    if (k === 'flash') noiseHit(t, { type: 'highpass', f: 5000, sweep: 9000, dur: 0.35, vol: 0.03 });
+    if (k === 'page') noiseHit(t, { type: 'highpass', f: 2200, dur: 0.22, vol: 0.05, a: 0.02 });
+    if (k === 'stamp') { tone(90, t, 0.35, { bend: 0.5, bendT: 0.15, vol: 0.22, dry: true }); noiseHit(t, { f: 600, dur: 0.12, vol: 0.06 }); }
+    if (k === 'great') [72, 76, 79, 84].forEach((m, i) => bell(m, t + i * 0.06, 0.04, 1));
+    if (k === 'result') [67, 72].forEach((m, i) => bell(m, t + i * 0.12, 0.035, 1.2));
   }
   function setSound(on) {
     PREF.sound = on; store.set('unmyeong-pref', PREF);
@@ -140,7 +226,7 @@
   }
   if (!REDUCE) setInterval(() => {
     if (document.hidden) return;
-    document.querySelectorAll('#chars .ch svg, .hubchar svg, #ending .ec svg, .prof .pp svg, .bill .art svg').forEach(svg => { if (Math.random() < 0.33) blink(svg); });
+    document.querySelectorAll('#chars .ch svg, .hubchar svg, #ending .end-char svg, .prof .pp svg, .bill .art svg, .mhero .art svg, #chat .ch-head .face svg').forEach(svg => { if (Math.random() < 0.33) blink(svg); });
   }, 1300);
   let flapT = 0;
   function flap(who, on) {
@@ -185,7 +271,7 @@
   }
   function slotSave(n) {
     const c = JSON.parse(JSON.stringify(S));
-    if (S.mode === 'vn' && c.stack.length) c.stack[c.stack.length - 1].i -= 1;
+    if (S.mode === 'vn' && c.stack.length) { c.stack[c.stack.length - 1].i -= 1; c.replay = 1; }
     c.savedAt = Date.now();
     store.set(slotKey(P.id, n), c);
     toast(`슬롯 ${n}에 저장했습니다`);
@@ -194,7 +280,7 @@
   function slotLoad(n) {
     const sv = store.get(slotKey(P.id, n), null); if (!sv) return;
     UIS.typing?.(); UIS.advance = null; UIS.auto = false; UIS.skip = false;
-    ['#chat', '#play', '#card'].forEach(sel => document.querySelector(sel)?.remove());
+    ['#chat', '#play', '#card', '#recap', '#mflip'].forEach(sel => document.querySelector(sel)?.remove());
     $('#choices').hidden = true;
     closeSheet();
     store.set(saveKey(P.id), sv);
@@ -223,9 +309,9 @@
   }
 
   /* ---------------- menu & actions ---------------- */
-  HOOK.menuExtra = () => `<div class="sub">소리</div><div class="tabs">
+  HOOK.menuExtra = () => `<div class="setrow"><div class="sub">소리</div><div class="tabs">
     <button class="tab ${PREF.sound ? 'on' : ''}" type="button" data-a="sound-on">음악·효과음 켜기</button>
-    <button class="tab ${PREF.sound ? '' : 'on'}" type="button" data-a="sound-off">끄기</button></div>`;
+    <button class="tab ${PREF.sound ? '' : 'on'}" type="button" data-a="sound-off">끄기</button></div></div>`;
   HOOK.action = (a, v) => {
     switch (a) {
       case 'slots': openSlots(); break;

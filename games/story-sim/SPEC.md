@@ -79,6 +79,8 @@ STORY.register({
   endings: { true_kael: { title: '…', rank: 'S', t: 'epilogue, 3–6 sentences', bg: 'lake', c: 'kael', e: 'smile' }, … },
   endingRules: [ { id: 'true_kael', if: {…cond…} }, …, { id: 'normal', if: {} } ],  // first match wins, for {ending:'auto'}
   sim: { … },                  // optional, see §5
+  tags: ['미연시', '로맨스 판타지'],  // optional: title-screen filter hints (미연시 / 육성 / 무협·판타지 / 전략 are matched loosely)
+  theme: 'school',             // optional: visual theme when the id is not one of rofan raise star murim school office joseon academy apoc night
 });
 ```
 
@@ -102,6 +104,7 @@ Initial affection: `affStart: { kael: 10, rian: 20 }` at pack level (default 0).
 | `{c:'kael', t:'…', e:'smile', as:'???'}` | a character line. `e` sets the expression (it persists). `as` overrides the displayed name. Speaking auto-shows the character. |
 | `{c:'me', t:'…'}` | the player speaks |
 | `{bg:'ballroom', fx:'fade'\|'flash'\|'shake'}` | change the background (default `fade`) |
+| `{fx:'flash'\|'shake', t:'…'}` | a string `fx` on any step without `bg` flashes / shakes the screen and keeps the background |
 | `{show:'kael', e:'cold', at:'l'\|'c'\|'r'}` | show / move a character |
 | `{hide:'kael'}` / `{hide:'all'}` | hide |
 | `{title:'제1장', sub:'가면무도회'}` | a full-screen chapter card |
@@ -172,6 +175,8 @@ sim: {
   ],
   shop: [ { id, name, price, desc, fx, once: true } ],   // optional
   events: [ { id, if: cond, scene: 'sceneId', prio: 10, once: true (default), at: 'start'|'end' (default 'end') } ],
+  // optional per event: label: '생일' — shown in the hub's "이번 달 목표" hint when a turn/age/month-gated event is coming up
+  //   (without it the engine uses the scene's first {title} step or a keyword from the event id)
   turnFx: { v: { stress: -2 } },   // applied automatically every turn (e.g. natural recovery)
   finale: 'finale',               // scene run after the last turn; it should end with {ending:'auto'} or specific endings
 }
