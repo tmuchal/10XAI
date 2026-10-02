@@ -127,9 +127,8 @@ def base_frame(t):
     im = gameplay_frame(seg, lf, tl_).convert('RGBA')
     if seg.get('callout'):
         im = M.callout(im, seg['callout'], tl_, dur)
-    lab = M.footage_label()
-    y = LETTERBOX / 2 if seg.get('letterbox') else 34
-    im = M.paste(im, lab, (W / 2, y), alpha=0.9)
+    if not seg.get('letterbox'):
+        im = M.paste(im, M.footage_label(), (W / 2, 34), alpha=0.9)
     im = im.convert('RGB')
     if seg.get('letterbox'):
         d = ImageDraw.Draw(im)
