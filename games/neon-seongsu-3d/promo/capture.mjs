@@ -6,7 +6,7 @@
 //   node capture.mjs --force --workers 2 --quality high
 //
 // Captures ONLY the frozen snapshot in build/game/ (copied from ../index.html, ../js, ../vendor by
-// snapshot.sh), never the live game. Frames: build/gameplay/<shot>/%05d.jpg at 1280x720 + a DONE marker.
+// build.py --only snapshot), never the live game. Frames: build/gameplay/<shot>/%05d.jpg at 1280x720 + a DONE marker.
 import fs from 'fs';
 import path from 'path';
 import { createRequire } from 'module';
@@ -31,10 +31,10 @@ const SHOTS = {
     setup: `S.x0=PL.x;S.z0=PL.z;S.y0=PL.yaw;`,
     cam: `CAM.yaw=S.y0-0.42+0.62*e;CAM.pitch=-0.06+0.1*e;PL.x=S.x0+Math.sin(S.y0)*5*e;PL.z=S.z0+Math.cos(S.y0)*5*e;` },
   S02_omni: { pre: 0.5, hud: false,
-    setup: `PL.h.root.visible=false;S.y0=Math.atan2(LOC.omni.x-PL.x,LOC.omni.z-PL.z);`,
-    cam: `CAM.yaw=S.y0-0.25+0.3*e;CAM.pitch=0.0-0.5*e;` },
+    setup: `PL.h.root.visible=false;S.y0=PL.yaw;PL.x+=Math.cos(S.y0)*2.5-Math.sin(S.y0)*3;PL.z+=-Math.sin(S.y0)*2.5-Math.cos(S.y0)*3;`,
+    cam: `CAM.yaw=S.y0-0.1+0.25*e;CAM.pitch=0.02-0.42*e;` },
   S03_horde: { pre: 0.6 },
-  S04_raiders: { pre: 0.3, setup: `const y=LOC.raiderYard;PL.x=y.x+3;PL.z=y.z-13;PL.yaw=CAM.yaw=Math.atan2(y.x-PL.x,y.z-PL.z);` },
+  S04_raiders: { pre: 0.3, setup: `PL.z+=10;` },
   S05_street: { pre: 0.2, setup: `S.y0=CAM.yaw;`, cam: `CAM.yaw=S.y0+0.5-0.5*e;CAM.pitch=0.16-0.04*e;` },
   S06_lineup: { pre: 0.4, hud: false,
     setup: `PL.h.root.visible=false;S.x0=PL.x;S.z0=PL.z;`,
@@ -48,7 +48,7 @@ const SHOTS = {
   S11_drive2: { pre: 2.2, hud: false, cam: `CAM.lastLook=GAME.t;if(PL.inCar){CAM.yaw=PL.inCar.yaw+0.9-0.6*e;}CAM.pitch=0.08;` },
   S12_viaduct: { pre: 1.8, hud: false },
   S13_forest: { pre: 0.6, setup: `const n=ACT.nests[0];if(n){PL.yaw=Math.atan2(n.g.position.x-PL.x,n.g.position.z-PL.z);CAM.yaw=PL.yaw;}S.y0=CAM.yaw;`, cam: `CAM.yaw=S.y0;CAM.pitch=0.1;` },
-  S14_tower: { pre: 0.3, setup: `S.y0=Math.atan2(LOC.omni.x-PL.x,LOC.omni.z-PL.z);PL.yaw=S.y0;`, cam: `KEYS.KeyW=true;CAM.yaw=S.y0;CAM.pitch=-0.12-0.3*e;` },
+  S14_tower: { pre: 0.3, setup: `S.y0=PL.yaw;PL.x+=Math.cos(S.y0)*2.5;PL.z+=-Math.sin(S.y0)*2.5;`, cam: `KEYS.KeyW=true;CAM.yaw=S.y0;CAM.pitch=-0.12-0.3*e;` },
   S15_wave2: { pre: 3.2 },
 };
 
