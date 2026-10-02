@@ -88,6 +88,8 @@ async function openGame(browser) {
 async function shoot(page, seg, dir, frames) {
   const sh = SHOTS[seg.name] || {};
   await page.evaluate(([scene, hud, setup, pre]) => {
+    // reset input left over from an earlier auto-fire shot on this page (RMB = aim zoom)
+    MOUSE.rmb = MOUSE.lmb = false; for (const k in KEYS) KEYS[k] = false; CAM.aim = 0;
     NS3.scene(scene);
     window.__S = {};
     // eslint-disable-next-line no-new-func
