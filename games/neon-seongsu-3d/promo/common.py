@@ -59,8 +59,8 @@ LINES = [
 ]
 
 # Seconds of silence BEFORE each line (index = line - 1). Line 1 waits for the opening logo card.
-GAP_BEFORE = [5.2, 1.6, 1.3, 1.6, 1.8, 1.4, 1.4, 1.6, 2.6]
-TAIL = 4.6
+GAP_BEFORE = [7.6, 2.2, 3.4, 2.2, 4.4, 1.6, 1.8, 4.0, 4.2]
+TAIL = 6.4
 
 MODEL_URLS = {
     'kokoro-v1.0.onnx': 'https://github.com/thewh1teagle/kokoro-onnx/releases/download/model-files-v1.0/kokoro-v1.0.onnx',
