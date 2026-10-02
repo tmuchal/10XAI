@@ -67,6 +67,14 @@ body.boost #c3d{filter:saturate(1.3) hue-rotate(-8deg)}
 #buildList{display:flex;gap:6px;overflow-x:auto}.bitem{flex:none;background:#16120c;border:1px solid var(--line);color:var(--ink);padding:6px 10px;text-align:left;cursor:pointer;font-family:var(--body)}
 .bitem b{display:block;font-size:13px}.bitem small{font-family:var(--mono);font-size:11px;color:#ff9a3a}.bitem.on{border-color:var(--amber);box-shadow:0 0 12px rgba(255,179,71,.3)}
 #buildDesc{font-size:12px;color:var(--dim)}
+#hint{position:absolute;left:50%;top:calc(env(safe-area-inset-top,0px) + 70px);transform:translate(-50%,-8px);background:rgba(8,10,18,.9);border:1px solid rgba(41,231,255,.45);padding:7px 14px;font-size:14px;opacity:0;transition:opacity .35s,transform .35s;max-width:min(560px,calc(100vw - 40px));text-align:center}
+#hint.show{opacity:1;transform:translate(-50%,0)}#hint kbd{font-family:var(--mono);background:rgba(255,255,255,.12);border:1px solid var(--line);padding:0 5px}#hint b{color:var(--cyan)}
+#saveIco{position:absolute;right:18px;bottom:calc(env(safe-area-inset-bottom,0px) + 150px);font-family:var(--mono);font-size:11px;color:var(--green);letter-spacing:.14em;opacity:0}
+#saveIco.show{animation:sv 1.6s ease-out}@keyframes sv{0%,60%{opacity:1}100%{opacity:0}}
+.panel.wide{width:min(940px,100%)}.cols{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:18px}.cols h3{margin:0 0 8px;font-family:var(--display);font-weight:400;font-size:18px;color:var(--amber)}
+.log{list-style:none;margin:0 0 8px;padding:0;display:flex;flex-direction:column;gap:4px}.log li{display:flex;gap:8px;align-items:baseline;font-size:14px;color:var(--dim)}.log li b{width:20px;font-family:var(--mono);text-align:center}.log li small{font-size:11px;color:var(--dim);font-family:var(--mono)}
+.log li.done{color:var(--ink)}.log li.done b{color:var(--green)}.log li.cur{color:var(--amber)}
+.set{display:grid;grid-template-columns:120px 1fr;align-items:center;gap:10px;font-size:13px;margin-bottom:8px}.set.chk{display:flex}.set input[type=range]{accent-color:var(--cyan);width:100%}
 /* overlays */
 .ov{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(4,4,10,.8);padding:18px 16px;overflow:auto;pointer-events:auto}
 .panel{width:min(680px,100%);background:#0c0b14;border:1px solid rgba(255,46,136,.4);box-shadow:0 0 50px rgba(255,46,136,.12);padding:18px;display:flex;flex-direction:column;gap:12px;margin:auto}
@@ -102,6 +110,8 @@ body.boost #c3d{filter:saturate(1.3) hue-rotate(-8deg)}
 .qsel{display:flex;gap:6px}.qsel button{background:transparent;border:1px solid var(--line);color:var(--dim);font-family:var(--mono);font-size:12px;padding:6px 10px;cursor:pointer}.qsel button.on{border-color:var(--cyan);color:var(--cyan)}
 .keys{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:5px 16px;font-size:13px;color:var(--dim);margin:0;padding:0;list-style:none}
 .keys kbd{font-family:var(--mono);color:var(--ink);background:rgba(255,255,255,.08);border:1px solid var(--line);padding:0 6px;margin-right:6px}
+#loading small{display:block;font-family:var(--body);font-size:14px;color:var(--dim);text-shadow:none;margin-top:14px;max-width:34em;text-align:center}
+#loading>div{text-align:center;padding:0 20px}
 #loading{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(7,6,12,.94);font-family:var(--display);font-size:32px;color:var(--toxic);text-shadow:0 0 20px rgba(125,255,155,.5);pointer-events:auto}
 #bigmap{max-width:100%;max-height:100%}
 /* touch */
@@ -136,6 +146,7 @@ body.touch .bl{transform:scale(.7);transform-origin:left bottom;bottom:170px}bod
   <div id="marker" hidden><i></i><b id="mkDist"></b></div>
   <div id="banner"><div class="b-main" id="bMain"></div><div class="b-sub" id="bSub"></div></div>
   <div id="msg"><img id="msgPic" alt=""><div><div id="msgFrom"></div><div id="msgKo"></div><div id="msgEn"></div></div></div>
+  <div id="hint"></div><div id="saveIco">저장됨</div>
   <div id="buildBar" hidden><h4>쉘터 건설<small>1–7 선택 · R 회전 · 클릭 설치 · B 닫기</small></h4><div id="buildList"></div><div id="buildDesc"></div></div>
 </div>
 
@@ -155,10 +166,21 @@ body.touch .bl{transform:scale(.7);transform-origin:left bottom;bottom:170px}bod
 <div class="ov" id="board" hidden><div class="panel"><h2>해결사 의뢰<small>FIXER CONTRACTS · YOON MI-RA</small></h2><div id="boardList" style="display:flex;flex-direction:column;gap:8px"></div><div class="meta" id="boardStats"></div><div class="row"><button class="btn ghost" id="boardClose">닫기 (Esc)</button></div></div></div>
 <div class="ov" id="bench" hidden><div class="panel"><h2>작업대<small>WORKBENCH · CRAFT · UPGRADE</small></h2><div id="benchList" style="display:flex;flex-direction:column;gap:6px"></div><div class="meta" id="benchStats"></div><div class="row"><button class="btn ghost" id="benchClose">닫기 (Esc)</button></div></div></div>
 <div class="ov" id="mapScr" hidden><canvas id="bigmap"></canvas></div>
-<div class="ov" id="pauseScr" hidden><div class="panel"><h2>일시정지<small>PAUSED</small></h2><ul class="keys">
-  <li><kbd>WASD</kbd>이동 · 운전</li><li><kbd>마우스</kbd>시점 · 조준</li><li><kbd>좌클릭</kbd>사격 · 설치</li><li><kbd>우클릭</kbd>정밀 조준</li><li><kbd>Shift</kbd>달리기</li><li><kbd>Space</kbd>점프 · 핸드브레이크</li>
-  <li><kbd>R</kbd>재장전 · 건설 회전</li><li><kbd>1–4</kbd>무기</li><li><kbd>Q</kbd>빠른 칼질</li><li><kbd>E</kbd>상호작용 (길게: 핫와이어)</li><li><kbd>F</kbd>차 타기 · 내리기</li><li><kbd>B</kbd>쉘터 건설</li><li><kbd>V</kbd>손전등</li><li><kbd>Z</kbd>뉴로 부스트 (슬로모션)</li><li><kbd>M</kbd>지도</li></ul>
-  <div class="row"><button class="btn" id="btnResume">계속하기</button><div class="qsel"><span class="meta" style="align-self:center">그래픽 (새로고침)</span><button data-q2="high">높음</button><button data-q2="med">중간</button><button data-q2="low">낮음</button></div></div></div></div>
+<div class="ov" id="pauseScr" hidden><div class="panel wide"><h2>일시정지<small>PAUSED · SETTINGS · MISSION LOG</small></h2>
+  <div class="cols">
+    <section><h3>미션 로그</h3><p class="meta" id="logNow"></p><ol id="logList" class="log"></ol><p class="meta" id="logStats"></p></section>
+    <section><h3>설정</h3>
+      <label class="set">마우스 감도<input type="range" id="setSens" min="0.3" max="2.5" step="0.05"></label>
+      <label class="set">시야각 (FOV)<input type="range" id="setFov" min="54" max="84" step="1"></label>
+      <label class="set">전체 볼륨<input type="range" id="setVol" min="0" max="1" step="0.05"></label>
+      <label class="set chk"><input type="checkbox" id="setInv">상하 반전</label>
+      <div class="qsel"><span class="meta" style="align-self:center">그래픽 (새로고침)</span><button data-q2="high">높음</button><button data-q2="med">중간</button><button data-q2="low">낮음</button></div>
+      <h3>조작</h3><ul class="keys">
+  <li><kbd>WASD</kbd>이동 · 운전</li><li><kbd>좌클릭</kbd>사격 · 설치</li><li><kbd>우클릭</kbd>정밀 조준</li><li><kbd>Shift</kbd>달리기</li><li><kbd>Space</kbd>점프 · 핸드브레이크</li>
+  <li><kbd>R</kbd>재장전 · 회전</li><li><kbd>1–4</kbd>무기</li><li><kbd>Q</kbd>빠른 칼질</li><li><kbd>E</kbd>상호작용</li><li><kbd>F</kbd>차 타기</li><li><kbd>B</kbd>건설</li><li><kbd>Z</kbd>뉴로 부스트</li><li><kbd>V</kbd>손전등</li><li><kbd>M</kbd>지도</li></ul>
+    </section>
+  </div>
+  <div class="row"><button class="btn" id="btnResume">계속하기</button></div></div></div>
 <div class="ov" id="deathScr" hidden><div class="panel" style="border-color:rgba(255,77,94,.5)"><h2 style="color:var(--red)">쓰러졌다<small>YOU WENT DOWN</small></h2><p class="tag" id="deathSub"></p><div class="row"><button class="btn" id="btnRespawn">쉘터에서 깨어나기</button></div></div></div>
 <div class="ov" id="endScr" hidden><div class="panel"><h2>성수의 밤<small>ENDING · THE RAIN STOPS</small></h2><p class="tag">TTUK 코어가 꺼지자 드론 메시가 하나씩 떨어졌다. 3년 만에 비가 그쳤다. 블랙 로스터리의 커피는 아직 따뜻하다.<span>With the TTUK core severed, the drone mesh fell out of the sky. For the first time in three years, the rain stopped.</span></p><p class="meta" id="endStats"></p><div class="row"><button class="btn" id="btnFree">자유 모드로 계속</button></div></div></div>
 <div id="fade"></div>
@@ -181,7 +203,7 @@ body.touch .bl{transform:scale(.7);transform-origin:left bottom;bottom:170px}bod
     <div class="meta">3D · WebGL 필요. 느리면 그래픽을 낮춤으로. 진행은 이 브라우저에 저장된다.</div>
   </div>
 </div>
-<div id="loading" hidden>격리구역 7 로딩 중…</div>
+<div id="loading" hidden><div>격리구역 7 로딩 중…<small id="loadTip"></small></div></div>
 
 <script src="vendor/three.min.js"></script>
 <script src="vendor/three-extras.js"></script>

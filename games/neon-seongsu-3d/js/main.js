@@ -120,12 +120,23 @@ function initGame(){
   // player
   PL.h=makeHuman(LOOKS.seojin);PL.h.gun.visible=true;scene.add(PL.h.root);
   spawnCity();
+  campProps(LOC.raiderYard,9);campProps({x:LOC.pier.x,z:LOC.pier.z-10},8);
   // raider camp under Seongsu station
   for(let i=0;i<6;i++){const s=randomSpot(2,9,LOC.raiderYard.x,LOC.raiderYard.z);if(s)spawnRaider(s.x,s.z,{camp:'yard'})}
   loadGame();
   placeShelterNPCs();
   addEventListener('resize',onResize);
   buildMinimap();
+  polishInit();
+}
+function campProps(c,r){
+  const tarps=['#5a1010','#2a2a30','#3a2a1a'];
+  for(let i=0;i<4;i++){const a=i/4*6.28+.4,x=c.x+Math.cos(a)*r*.8,z=c.z+Math.sin(a)*r*.8;if(solidW(x,z))continue;
+    const g=new THREE.Group();g.position.set(x,0,z);g.rotation.y=a;
+    for(const s of[-1,1])mesh(g,cyl(.05,.05,2.4,6),'#2a2a2a',s*1.4,1.2,0);mesh(g,rbox(3.2,.06,2.6),rpick(tarps),0,2.35,0).rotation.x=.18;
+    mesh(g,rbox(1.1,.7,.8),'#3a4a2a',-.6,.35,-.3);mesh(g,rbox(.8,.5,.6),'#4a3a2a',.7,.25,.4);scene.add(g)}
+  for(let i=0;i<10;i++){const a=i/10*6.28,x=c.x+Math.cos(a)*r*1.25,z=c.z+Math.sin(a)*r*1.25;if(solidW(x,z))continue;const f=mesh(scene,rbox(2.2,1.5,.12),'#3a3a40',x,.75,z);f.rotation.y=-a+Math.PI/2;if(i%3===0)mesh(scene,rbox(2.2,.25,.14),'#ff5040',x,1.4,z,'hot').rotation.y=-a+Math.PI/2}
+  CITY.barrels.push([c.x,c.z]);
 }
 function onResize(){camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();renderer.setSize(innerWidth,innerHeight);if(composer){composer.setSize(innerWidth,innerHeight);if(composer.fxaa)composer.fxaa.uniforms.resolution.value.set(1/(innerWidth*QSET[QUALITY].pr),1/(innerHeight*QSET[QUALITY].pr))}}
 function placeShelterNPCs(){
@@ -133,6 +144,7 @@ function placeShelterNPCs(){
   if(GAME.rescued.kang)want.push(['kang',LOC.shelter.x+6,LOC.shelter.z+2.5,-Math.PI/2]);
   if(GAME.rescued.taeo)want.push(['taeo',LOC.shelter.x+2,LOC.shelter.z-3,0]);
   for(const[id,x,z,yaw]of want){if(ACT.npcs.some(n=>n.id===id&&Math.hypot(n.x-x,n.z-z)<1))continue;ACT.npcs.filter(n=>n.id===id).forEach(n=>removeActor(n));ACT.npcs=ACT.npcs.filter(n=>n.id!==id);spawnNPC(id,x,z,yaw)}
+  const surv=ACT.npcs.filter(n=>n.id==='survivor');for(let i=surv.length;i<Math.min(8,GAME.survivors);i++){const a=i/8*6.28+.4;spawnNPC('survivor',LOC.shelter.x-2+Math.cos(a)*2.6,LOC.shelter.z+1.5+Math.sin(a)*2.2,Math.atan2(-Math.cos(a),-Math.sin(a)))}
   for(const a of ACT.allies)if(a.id&&GAME.rescued[a.id]&&!a.dead){removeActor(a);a.dead=1;a.deadT=99}
   ACT.allies=ACT.allies.filter(a=>!(a.id&&GAME.rescued[a.id]));
 }
@@ -178,14 +190,14 @@ function anyOverlay(){return['board','bench','mapScr','pauseScr','deathScr','end
 const _fw=new THREE.Vector3(),_rt=new THREE.Vector3(),_piv=new THREE.Vector3(),_cp=new THREE.Vector3();
 function camForward(){return _fw.set(Math.sin(CAM.yaw)*Math.cos(CAM.pitch),-Math.sin(CAM.pitch),Math.cos(CAM.yaw)*Math.cos(CAM.pitch)).normalize()}
 function updateCamera(dt){
-  const sens=MOUSE.locked?.0022:.004;
-  if(!anyOverlay()){CAM.yaw-=MOUSE.dx*sens;CAM.pitch=clamp(CAM.pitch+MOUSE.dy*sens,-.55,1.15);if(Math.abs(MOUSE.dx)>1)CAM.lastLook=GAME.t}
+  const sens=(MOUSE.locked?.0022:.004)*SET.sens;
+  if(!anyOverlay()){CAM.yaw-=MOUSE.dx*sens;CAM.pitch=clamp(CAM.pitch+MOUSE.dy*sens*(SET.invert?-1:1),-.55,1.15);if(Math.abs(MOUSE.dx)>1)CAM.lastLook=GAME.t}
   MOUSE.dx=MOUSE.dy=0;
   const aiming=(MOUSE.rmb||KEYS.KeyC)&&!PL.inCar&&!PL.dead;CAM.aim=lerp(CAM.aim,aiming?1:0,Math.min(1,dt*10));
   let dist,height,shoulder;
   if(PL.inCar){const c=PL.inCar;if(GAME.t-(CAM.lastLook||-9)>1.4){const want=c.yaw+(Math.hypot(c.vx,c.vz)>2&&(c.vx*Math.sin(c.yaw)+c.vz*Math.cos(c.yaw))<-1?Math.PI:0);CAM.yaw+=angDiff(want,CAM.yaw)*Math.min(1,dt*3);CAM.pitch=lerp(CAM.pitch,.28,dt*2)}
-    const sp=Math.hypot(c.vx,c.vz);dist=7.2+c.len*.4+sp*.05;height=2.2;shoulder=0;_piv.set(c.x,1.4,c.z);camera.fov=lerp(camera.fov,62+sp*.35,dt*3)}
-  else{dist=lerp(3.6,1.9,CAM.aim);height=1.62;shoulder=lerp(.62,.72,CAM.aim);_piv.set(PL.x,height+PL.y,PL.z);camera.fov=lerp(camera.fov,lerp(64,50,CAM.aim)+(PL.sprinting?5:0),dt*8)}
+    const sp=Math.hypot(c.vx,c.vz);dist=7.2+c.len*.4+sp*.05;height=2.2;shoulder=0;_piv.set(c.x,1.4,c.z);camera.fov=lerp(camera.fov,SET.fov-2+sp*.35,dt*3)}
+  else{dist=lerp(3.6,1.9,CAM.aim);height=1.62;shoulder=lerp(.62,.72,CAM.aim);_piv.set(PL.x,height+PL.y,PL.z);camera.fov=lerp(camera.fov,lerp(SET.fov,SET.fov-14,CAM.aim)+(PL.sprinting?5:0),dt*8)}
   camera.updateProjectionMatrix();
   const f=camForward();_rt.set(-Math.cos(CAM.yaw),0,Math.sin(CAM.yaw));
   _cp.copy(_piv).addScaledVector(f,-dist).addScaledVector(_rt,shoulder);_cp.y+=PL.inCar?.6:.12;
@@ -297,10 +309,10 @@ function updatePlayer(dt){
   const aiming=CAM.aim>.4||MOUSE.lmb&&!curW().melee;
   PL.sprinting=(KEYS.ShiftLeft||KEYS.ShiftRight||(isTouch&&m>.95))&&m>.2&&PL.stamina>2&&!aiming;
   PL.stamina=clamp(PL.stamina+(PL.sprinting?-22:14)*dt,0,100);
-  let spd=0;
+  let spd=0;PL.lastSpd=0;
   if(m>.12){const fx=Math.sin(CAM.yaw),fz=Math.cos(CAM.yaw),rx=-Math.cos(CAM.yaw),rz=Math.sin(CAM.yaw);
     const dx=(fx*-ax.y+rx*ax.x)/Math.max(1,m),dz=(fz*-ax.y+rz*ax.x)/Math.max(1,m);
-    spd=(PL.sprinting?7.6:aiming?2.8:4.4)*Math.min(1,m);moveEnt(PL,dx*spd*dt,dz*spd*dt);
+    spd=(PL.sprinting?7.6:aiming?2.8:4.4)*Math.min(1,m);PL.lastSpd=spd;moveEnt(PL,dx*spd*dt,dz*spd*dt);
     if(!aiming)PL.yaw+=angDiff(Math.atan2(dx,dz),PL.yaw)*Math.min(1,dt*12)}
   if(aiming)PL.yaw+=angDiff(CAM.yaw,PL.yaw)*Math.min(1,dt*18);
   if(PRESSED.has('Space')&&PL.y<=0){PL.vy=4.6}
@@ -357,7 +369,7 @@ function passMission(){
   banner('의뢰 완료',`+$${(R.money||0).toLocaleString()}${R.scrap?` · +${R.scrap} 고철`:''}`,'');sfx('pass');
   if(m.story){GAME.story++;if(m.def.done)m.def.done();if(m.def.final)setTimeout(showEnding,3500)}else GAME.contractsDone++;
   if(m.v.ally&&m.v.ally.id===undefined&&!m.v.ally.dead){const a=m.v.ally;removeActor(a);a.dead=1;a.deadT=99}
-  GAME.board=null;GAME.calm=false;saveGame();
+  GAME.board=null;GAME.calm=false;saveGame();if(R.survivor)placeShelterNPCs();
   if(!m.def.final)setTimeout(()=>msg('mira','수고했어. 다음 의뢰는 내 카운터에서.','Nice work. Next contract is at my counter.'),1800);
 }
 function failMission(reason){const m=MSN.active;if(!m)return;MSN.active=null;banner('의뢰 실패',reason,'bad');sfx('fail');
@@ -398,7 +410,7 @@ function stepText(){const m=MSN.active,s=MSN.step();if(!m||!s)return'';let t=s.t
 
 /* ---------- panels: board, bench, sleep, map, pause ---------- */
 function closeOverlays(){['board','bench','mapScr','pauseScr'].forEach(id=>$(id).hidden=true);GAME.paused=false}
-function pauseFor(id){$(id).hidden=false;GAME.paused=true;document.exitPointerLock&&document.exitPointerLock();MOUSE.lmb=MOUSE.rmb=false}
+function pauseFor(id){if(id==='pauseScr')renderPause();$(id).hidden=false;GAME.paused=true;document.exitPointerLock&&document.exitPointerLock();MOUSE.lmb=MOUSE.rmb=false}
 function openBoard(){
   if(!GAME.board)GAME.board=[...CONTRACTS].sort(()=>Math.random()-.5).slice(0,3);
   const next=STORY[GAME.story];
@@ -529,7 +541,7 @@ function hudUpdate(dt){
 }
 
 /* ---------- save ---------- */
-function saveGame(){if(GAME.capture)return;try{localStorage.setItem('ns3d-save',JSON.stringify({story:GAME.story,money:GAME.money,inv:GAME.inv,rescued:GAME.rescued,survivors:GAME.survivors,minutes:GAME.minutes,kills:GAME.kills,contractsDone:GAME.contractsDone,coreHp:SH.coreHp,
+function saveGame(){if(GAME.capture)return;const si=$('saveIco');si.classList.remove('show');void si.offsetWidth;si.classList.add('show');try{localStorage.setItem('ns3d-save',JSON.stringify({story:GAME.story,money:GAME.money,inv:GAME.inv,rescued:GAME.rescued,survivors:GAME.survivors,minutes:GAME.minutes,kills:GAME.kills,contractsDone:GAME.contractsDone,coreHp:SH.coreHp,
   pieces:SH.pieces.map(p=>({type:p.type,x:p.x,z:p.z,rot:p.rot,hp:p.hp})),pl:{hp:PL.hp,armor:PL.armor,weapon:PL.weapon}}))}catch(e){}}
 function loadGame(){
   let s=null;try{s=JSON.parse(localStorage.getItem('ns3d-save')||'null')}catch(e){}
@@ -551,7 +563,7 @@ function tick(dt){
   document.body.classList.toggle('boost',GAME.boost>0);
   const wdt=GAME.boost>0?dt*.3:dt;
   updatePlayer(dt);
-  aiUpdate(wdt);vehUpdate(wdt);shelterUpdate(wdt);missionUpdate(dt);fxUpdate(wdt);worldUpdate(dt);
+  aiUpdate(wdt);vehUpdate(wdt);shelterUpdate(wdt);missionUpdate(dt);fxUpdate(wdt);worldUpdate(dt);polishUpdate(dt,wdt);
   incomeT-=dt;if(incomeT<=0){incomeT=30;const n=(GAME.rescued.kang?1:0)+(GAME.rescued.taeo?1:0)+GAME.survivors;if(n){GAME.inv.scrap+=n;}}
   if(PRESSED.has('KeyM')||PRESSED.has('Tab')){pauseFor('mapScr');drawBigMap()}
   if(PRESSED.has('Escape')||PRESSED.has('KeyP')){if(SH.building)setBuildMode(false);else pauseFor('pauseScr')}
@@ -569,7 +581,7 @@ function frame(t){
 
 /* ---------- boot ---------- */
 function startGame(fresh){
-  $('loading').hidden=false;
+  $('loadTip').textContent='TIP · '+rpick(TIPS);$('loading').hidden=false;
   setTimeout(()=>{
     GAME.fresh=fresh;if(fresh)try{localStorage.removeItem('ns3d-save')}catch(e){}
     audioInit();if(AU.ctx&&AU.ctx.state==='suspended')AU.ctx.resume();
@@ -601,7 +613,7 @@ const NS3={
   scenes:['street','horde','drive','shelter','build','raiders','forest','omni','wave','title'],
   ready:false,
   init(q){if(this.ready)return true;QUALITY=q||QUALITY;GAME.capture=true;GAME.fresh=true;audioInit=()=>{};initGame();$('titleScr').hidden=true;$('loading').hidden=true;$('hud').hidden=false;GAME.state='play';GAME.paused=false;GAME.god=true;this.ready=true;return true},
-  clear(){SH.lastNightWave=GAME.day;for(const z of ACT.zombies){removeActor(z)}ACT.zombies=[];for(const r of ACT.raiders)removeActor(r);ACT.raiders=[];for(const n of ACT.nests)SCENE.remove(n.g);ACT.nests=[];MSN.active=null;SH.waveOn=false;
+  clear(){SH.lastNightWave=GAME.day;bannerT=0;$('banner').classList.remove('show');msgT=0;MSGQ.length=0;$('msg').classList.remove('show');for(const z of ACT.zombies){removeActor(z)}ACT.zombies=[];for(const r of ACT.raiders)removeActor(r);ACT.raiders=[];for(const n of ACT.nests)SCENE.remove(n.g);ACT.nests=[];MSN.active=null;SH.waveOn=false;
     if(PL.inCar)exitCar(true);CUT=null;$('cut').hidden=true;closeOverlays();setBuildMode(false);PL.dead=false;PL.hp=100;PL.h.root.visible=true;this.auto=null},
   place(x,z,yaw,pitch){PL.x=x;PL.z=z;PL.yaw=yaw;CAM.yaw=yaw;CAM.pitch=pitch??.18},
   scene(name){this.init();this.clear();const S=this;GAME.calm=false;
@@ -615,6 +627,10 @@ const NS3={
     if(name==='forest'){GAME.minutes=3*60;S.place(P(20,40).x,P(20,40).z,Math.PI*.85,.12);spawnNest(P(17,47).x,P(17,47).z);spawnNest(P(24,52).x,P(24,52).z);for(let i=0;i<8;i++){const s=randomSpot(8,20,P(20,48).x,P(20,48).z);if(s)spawnZombie(s.x,s.z,'glow')}PL.weapon='katana';S.auto={walk:1}}
     if(name==='omni'){GAME.minutes=0;S.place(P(97,62).x,P(97,62).z,.55,-.32);for(let i=0;i<10;i++){const s=randomSpot(4,22,L.omni.x,L.omni.z);if(s)spawnZombie(s.x,s.z,i<2?'brute':'glow')}}
     if(name==='wave'){GAME.minutes=60;S.place(L.shelter.x,L.shelter.z-2,Math.PI,.2);if(!SH.pieces.length)S.demoBase();startWave(3);SH.waveSpawn=0;for(let i=0;i<16;i++){const s=randomSpot(18,34,SH.zone.x,SH.zone.z);if(s)spawnZombie(s.x,s.z,i%5===0?'runner':'walker',{wave:true})}PL.weapon='shotgun';GAME.inv.owned.shotgun=true;GAME.inv.mag.shotgun=999;S.auto={fire:1,aimCam:1}}
+    if(name==='lineup'){GAME.minutes=22*60;const c0=LOC.shelter;S.place(c0.x,c0.z-6,0,.05);PL.h.root.visible=true;
+      const types=['sedan','gt','omni','raider','taxi','van'];types.forEach((t,i)=>{const c=makeCar(t,c0.x-12+i*4.8,c0.z-1,Math.PI/2+.5);c.lights=true});
+      [['walker',-3],['runner',-1.8],['brute',0],['glow',1.6]].forEach(([t,x])=>{const z=spawnZombie(c0.x+x,c0.z-3.2,t);z.speed=0;z.dmg=0;z.yaw=Math.PI});
+      const r=spawnRaider(c0.x+3.2,c0.z-3.2);r.yaw=Math.PI;S.auto=null;GAME.safe=true}
     if(name==='title'){GAME.minutes=23*60;S.place(P(40,53).x,P(40,53).z,Math.PI/2,-.04);PL.h.root.visible=false;$('hud').hidden=true}
     else $('hud').hidden=false;
     for(let i=0;i<20;i++)tick(1/60);updateCamera(1/60);this.render();return true},
@@ -631,3 +647,97 @@ const NS3={
     KEYS.KeyW=false;MOUSE.lmb=false;this.render();return true},
 };
 window.NS3=NS3;
+
+/* =========================================================================
+   Polish: dynamic light pool, OMNI patrol drones, lightning, footsteps,
+   settings, contextual hints, mission log, shelter survivors.
+   ========================================================================= */
+const SET={sens:1,invert:false,fov:64,vol:.7};
+try{Object.assign(SET,JSON.parse(localStorage.getItem('ns3d-settings')||'{}'))}catch(e){}
+function saveSettings(){try{localStorage.setItem('ns3d-settings',JSON.stringify(SET))}catch(e){}if(AU.master)AU.master.gain.value=SET.vol}
+const LP={lights:[],t:0,assigned:[]};
+const DRONES=[];let boltT=rnd(14,30),flashV=0,spotCD=0;
+function polishInit(){
+  const n=QUALITY==='low'?3:QUALITY==='med'?6:9;
+  for(let i=0;i<n;i++){const l=new THREE.PointLight(0xffffff,0,16,2);scene.add(l);LP.lights.push(l)}
+  // shelter campfire
+  CITY.barrels.push([LOC.shelter.x-2,LOC.shelter.z+1.5]);
+  const fire=new THREE.Mesh(cyl(.4,.45,.8,10),mat('#3a2a20'));fire.position.set(LOC.shelter.x-2,.4,LOC.shelter.z+1.5);scene.add(fire);
+  // OMNI patrol drones with searchlights
+  const coneG=new THREE.ConeGeometry(6.5,30,20,1,true);coneG.translate(0,-15,0);
+  const coneM=new THREE.MeshBasicMaterial({color:'#d8ecff',transparent:true,opacity:.045,blending:THREE.AdditiveBlending,depthWrite:false,side:THREE.DoubleSide,toneMapped:false});
+  const spotM=new THREE.MeshBasicMaterial({map:radialTex('rgba(220,240,255,1)','rgba(0,0,0,0)'),transparent:true,opacity:.55,blending:THREE.AdditiveBlending,depthWrite:false,toneMapped:false});
+  for(let i=0;i<7;i++){
+    const g=new THREE.Group();
+    mesh(g,rbox(1.3,.32,1.3),'#16171e',0,0,0);mesh(g,rbox(.5,.14,.5),'#ff2e88',0,-.2,0,'hot');
+    for(const[a,b]of[[1,1],[1,-1],[-1,1],[-1,-1]]){mesh(g,rbox(.9,.06,.1),'#22242c',a*.55,.08,b*.55).rotation.y=a*b*Math.PI/4;const r=mesh(g,cyl(.42,.42,.02,16),'#8a90a0',a*.85,.16,b*.85);r.material=new THREE.MeshBasicMaterial({color:'#8a90a0',transparent:true,opacity:.25})}
+    const red=mesh(g,sph(.08,6,4),'#ff2848',.7,-.05,.7,'hot'),blue=mesh(g,sph(.08,6,4),'#2a60ff',-.7,-.05,-.7,'hot');
+    const cone=new THREE.Mesh(coneG,coneM);g.add(cone);
+    const spot=new THREE.Mesh(new THREE.PlaneGeometry(15,15),spotM);spot.rotation.x=-Math.PI/2;scene.add(spot);
+    scene.add(g);
+    DRONES.push({g,cone,spot,red,blue,cx:rnd(60,540),cz:rnd(30,360),rad:rnd(40,95),ang:Math.random()*6.28,spd:rnd(.06,.12)*(Math.random()<.5?-1:1),alt:rnd(26,34),ph:Math.random()*6});
+  }
+  const bm=new THREE.MeshBasicMaterial({color:'#ffd400',transparent:true,opacity:.22,blending:THREE.AdditiveBlending,depthWrite:false,toneMapped:false,side:THREE.DoubleSide});
+  LP.beam=new THREE.Mesh(new THREE.CylinderGeometry(.7,.7,120,16,1,true),bm);LP.beam.position.y=60;LP.beam.visible=false;scene.add(LP.beam);
+  LP.ring=new THREE.Mesh(new THREE.RingGeometry(1.6,2.1,32),bm.clone());LP.ring.material.opacity=.6;LP.ring.rotation.x=-Math.PI/2;LP.ring.position.y=.1;scene.add(LP.ring);
+  LP.droneLight=new THREE.SpotLight(0xd8ecff,0,70,.32,.5,1.2);scene.add(LP.droneLight,LP.droneLight.target);
+  if(AU.master)AU.master.gain.value=SET.vol;
+}
+function polishUpdate(dt,wdt){
+  // light pool
+  LP.t-=dt;
+  if(LP.t<=0){LP.t=.25;const cx=camera.position.x,cz=camera.position.z,c=[];
+    const add=(x,y,z,col,int,dist,fire)=>{const d=Math.hypot(x-cx,z-cz);if(d<48)c.push({x,y,z,col,int,dist,fire,d})};
+    for(const l of CITY.lamps)if(Math.abs(l[0]-cx)<48&&Math.abs(l[1]-cz)<48)add(l[0],5.6,l[1],l[2],1.5,16,false);
+    for(const s of CITY.signSpots)if(Math.abs(s[0]-cx)<48&&Math.abs(s[1]-cz)<48)add(s[0],3.6,s[1],s[2],1.9,12,false);
+    for(const b of CITY.barrels)if(Math.abs(b[0]-cx)<48&&Math.abs(b[1]-cz)<48)add(b[0],2.4,b[1],'#ff8a3a',1.1,9,true);
+    for(const v of VEH.cars)if(v.burn>0)add(v.x,1.6,v.z,'#ff7a2e',3.2,15,true);
+    c.sort((a,b)=>a.d-b.d);LP.assigned=c.slice(0,LP.lights.length);
+    LP.lights.forEach((l,i)=>{const s=LP.assigned[i];if(!s){l.intensity=0;l.userData={};return}l.position.set(s.x,s.y,s.z);l.color.set(s.col);l.distance=s.dist;l.userData=s})}
+  LP.lights.forEach(l=>{const s=l.userData;if(!s||!s.x)return;const fade=clamp(1-(s.d-30)/18,0,1);l.intensity=s.int*fade*(s.fire?.75+Math.random()*.5:1)*(GAME.night?1:.5)});
+  // drones
+  let nearD=null,nd=1e9;spotCD-=dt;
+  for(const d of DRONES){d.ang+=d.spd*wdt;d.ph+=dt;
+    const x=d.cx+Math.cos(d.ang)*d.rad,z=d.cz+Math.sin(d.ang)*d.rad;d.g.position.set(x,d.alt+Math.sin(d.ph)*.6,z);d.g.rotation.y=-d.ang;
+    const sw=Math.sin(d.ph*.7)*.32,sw2=Math.cos(d.ph*.53)*.25;d.cone.rotation.set(sw2,0,sw);
+    const gx=x+Math.tan(-sw)*d.alt*-1,gz=z+Math.tan(sw2)*d.alt;d.spot.position.set(gx,.09,gz);
+    d.red.visible=Math.floor(GAME.t*3+d.ph)%2===0;d.blue.visible=!d.red.visible;
+    const pd=Math.hypot(PL.x-gx,PL.z-gz);if(pd<6.5&&!PL.dead&&!GAME.safe&&spotCD<=0&&!PL.inCar){spotCD=20;PL.noiseT=5;PL.noiseR=75;toast('OMNI 드론 스캔에 포착 · 감염체가 몰려온다','#ff2e88');sfx('alarm');for(let i=0;i<3;i++){const s=randomSpot(25,40);if(s)spawnZombie(s.x,s.z,'runner')}}
+    const dd=Math.hypot(x-camera.position.x,z-camera.position.z);if(dd<nd){nd=dd;nearD={d,gx,gz,x,z}}}
+  if(nearD&&nd<90){const L=LP.droneLight;L.intensity=QUALITY==='low'?0:4;L.position.copy(nearD.d.g.position);L.target.position.set(nearD.gx,0,nearD.gz)}else LP.droneLight.intensity=0;
+  {const tg=stepTarget();const show=!!tg&&!CUT&&!(tg.kind==='zombie'||tg.kind==='raider');LP.beam.visible=LP.ring.visible=show;if(show){LP.beam.position.x=LP.ring.position.x=tg.x;LP.beam.position.z=LP.ring.position.z=tg.z;const s=1+Math.sin(GAME.t*3)*.08;LP.ring.scale.set(s,s,s)}}
+  // lightning
+  boltT-=dt;if(boltT<=0){boltT=rnd(22,55);flashV=1;if(AU.ctx){noise(.12,.5,6000,'highpass');noise(2.6,.55,160,'lowpass',.9);tone(40,2.2,'sine',.25,25,.9)}}
+  if(flashV>0){flashV=Math.max(0,flashV-dt*3.2);const f=flashV>.6||(flashV<.4&&flashV>.25)?flashV:0;hemi.intensity+=f*3.5;sky.material.color.addScalar(f*3)}
+  // footsteps
+  if(!PL.inCar&&!PL.dead){const sp=PL.lastSpd||0;PL.stepAcc=(PL.stepAcc||0)+sp*dt;if(PL.stepAcc>(PL.sprinting?2.3:1.65)){PL.stepAcc=0;if(AU.ctx&&sp>.5){noise(.07,.07+(PL.sprinting?.04:0),800,'bandpass');noise(.1,.04,4000,'highpass',.02)}}}
+  // hints
+  hintTick(dt);
+}
+/* contextual one-time hints */
+let HINTS={};try{HINTS=JSON.parse(localStorage.getItem('ns3d-hints')||'{}')}catch(e){}
+let hintCD=4;
+function hint(id,html){if(HINTS[id]||GAME.capture)return false;HINTS[id]=1;try{localStorage.setItem('ns3d-hints',JSON.stringify(HINTS))}catch(e){}const el=$('hint');el.innerHTML=html;el.classList.add('show');clearTimeout(el._t);el._t=setTimeout(()=>el.classList.remove('show'),7000);hintCD=9;return true}
+function hintTick(dt){
+  hintCD-=dt;if(hintCD>0||CUT)return;
+  const near=(L,r,f)=>L.some(e=>!e.dead&&(!f||f(e))&&Math.hypot(e.x-PL.x,e.z-PL.z)<r);
+  if(hint('move','<kbd>WASD</kbd> 이동 · <kbd>마우스</kbd> 시점 · 화면을 <kbd>클릭</kbd>하면 시점이 고정된다'))return;
+  if(near(ACT.zombies,26)&&hint('zombie','감염체는 <b>머리</b>를 노려라 — 헤드샷은 2.3배 피해 · <kbd>우클릭</kbd> 정밀 조준'))return;
+  if(!PL.inCar&&near(VEH.cars,6,c=>!c.wreck&&!c.locked)&&hint('car','<kbd>F</kbd> 차에 타기 · 달리는 차로 감염체를 칠 수 있다'))return;
+  if(!PL.inCar&&near(VEH.cars,5,c=>!c.wreck&&c.locked)&&hint('hotwire','잠긴 차는 <kbd>E</kbd>를 길게 눌러 핫와이어 — 경보가 울려 감염체가 몰려온다'))return;
+  if(GAME.story>=1&&Math.hypot(PL.x-SH.zone.x,PL.z-SH.zone.z)<SH.zone.r&&hint('build','<kbd>B</kbd> 쉘터 건설 · <kbd>1–7</kbd> 선택 · <kbd>R</kbd> 회전 · <kbd>클릭</kbd> 설치'))return;
+  const w=curW();if(!w.melee&&GAME.inv.mag[PL.weapon]+GAME.inv.ammo[PL.weapon]<8&&hint('ammo','탄약이 부족하다 · <kbd>4</kbd>/<kbd>Q</kbd> 모노블레이드 · 작업대에서 탄약 제작'))return;
+  if(GAME.kills>=5&&hint('boost','<kbd>Z</kbd> 뉴로 부스트 — 세상은 느려지고 너는 그대로 움직인다'))return;
+  if(GAME.kills>=2&&hint('map','<kbd>M</kbd> 지도 · 노란 마커가 목표 · 분홍 점은 감염 둥지'))return;
+  if(PL.inCar&&hint('drive','<kbd>Space</kbd> 핸드브레이크 드리프트 · <kbd>H</kbd> 경적 · 차에서 내리기 <kbd>F</kbd>'))return;
+}
+/* pause menu: settings + mission log */
+function renderPause(){
+  $('setSens').value=SET.sens;$('setFov').value=SET.fov;$('setVol').value=SET.vol;$('setInv').checked=SET.invert;
+  $('logList').innerHTML=STORY.map((s,i)=>`<li class="${i<GAME.story?'done':i===GAME.story?'cur':''}"><b>${i<GAME.story?'✓':i===GAME.story?'▶':String(i+1)}</b>${esc(s.title)} <small>${esc(s.en)}</small></li>`).join('');
+  $('logNow').textContent=MSN.active?`진행 중: ${MSN.active.title} — ${stepText()}`:STORY[GAME.story]?'쉘터의 미라에게서 다음 의뢰를 받아라.':'모든 스토리 완료. 해결사 의뢰를 계속할 수 있다.';
+  $('logStats').textContent=`${GAME.day}일차 · 처치 ${GAME.kills} · 의뢰 ${GAME.contractsDone} · 쉘터 구조물 ${SH.pieces.length} · 생존자 ${GAME.survivors+(GAME.rescued.kang?1:0)+(GAME.rescued.taeo?1:0)}`;
+}
+['setSens','setFov','setVol'].forEach(id=>$(id).addEventListener('input',e=>{SET[{setSens:'sens',setFov:'fov',setVol:'vol'}[id]]=+e.target.value;saveSettings()}));
+$('setInv').addEventListener('change',e=>{SET.invert=e.target.checked;saveSettings()});
+const TIPS=['감염체는 네온 불빛과 소리에 몰린다. 밤에는 간판 아래를 피하라.','잠긴 차를 핫와이어하면 경보가 울린다. 도망칠 준비를 하고 시동을 걸어라.','UV 조명탑은 발전기가 있어야 켜진다.','레이더는 감염체와도 싸운다. 둘을 붙여 놓고 빠져라.','구조한 생존자는 30초마다 고철을 가져온다.','헤드샷은 2.3배 피해. 브루트는 머리를 노려라.','침대에서 자면 저장되고 6시간이 지난다.','OMNI 드론의 탐조등에 잡히면 감염체가 몰려온다.'];

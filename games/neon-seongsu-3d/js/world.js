@@ -367,12 +367,12 @@ function buildCity(scene,quality){
   const q=new THREE.Quaternion().setFromEuler(new THREE.Euler(-Math.PI/2,0,0));const col=new THREE.Color();
   lamps.forEach((l,i)=>{M4.makeTranslation(l[0],3,l[1]);pole.setMatrixAt(i,M4);M4.makeTranslation(l[0],6,l[1]);head.setMatrixAt(i,M4);col.set(l[2]).multiplyScalar(1.6);head.setColorAt(i,col);
     M4.compose(new THREE.Vector3(l[0],.06,l[1]),q,new THREE.Vector3(12,12,1));pool.setMatrixAt(i,M4);col.set(l[2]).multiplyScalar(.28);pool.setColorAt(i,col)});
-  pool.renderOrder=2;scene.add(pole,head,pool);
+  pool.renderOrder=2;scene.add(pole,head,pool);CITY.lamps=lamps;
   // sign light pools on the ground
   const sp=[];for(const b of B){if(!b.signFace||b.omni)continue;const x0=b.x*TILE,z0=b.y*TILE,x1=(b.x+b.w)*TILE,z1=(b.y+b.h)*TILE;
     const p=b.signFace==='s'?[(x0+x1)/2,z1+3]:b.signFace==='n'?[(x0+x1)/2,z0-3]:b.signFace==='e'?[x1+3,(z0+z1)/2]:[x0-3,(z0+z1)/2];sp.push([p[0],p[1],b.signCol])}
   const spool=new THREE.InstancedMesh(new THREE.PlaneGeometry(1,1),pool.material,sp.length);
-  sp.forEach((l,i)=>{M4.compose(new THREE.Vector3(l[0],.07,l[1]),q,new THREE.Vector3(10,10,1));spool.setMatrixAt(i,M4);col.set(l[2]).multiplyScalar(.35);spool.setColorAt(i,col)});spool.renderOrder=2;scene.add(spool);
+  sp.forEach((l,i)=>{M4.compose(new THREE.Vector3(l[0],.07,l[1]),q,new THREE.Vector3(10,10,1));spool.setMatrixAt(i,M4);col.set(l[2]).multiplyScalar(.35);spool.setColorAt(i,col)});spool.renderOrder=2;scene.add(spool);CITY.signSpots=sp;
   // trees
   const trees=[];
   for(let y=0;y<MH;y++)for(let x=0;x<MW;x++){const t=map[idx(x,y)];

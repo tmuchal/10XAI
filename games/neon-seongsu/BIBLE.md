@@ -67,3 +67,15 @@ Single source of truth for the game (`index.html`) and the promo video (`promo/`
 - **2077**: Seongsu is walled off as **Quarantine Zone 7**. The rain carries spores. The **Ttukseom Raiders** (뚝섬 레이더즈, led by Boss Hwang 황 두목) hold the station yard and the pier.
 - **Black Roastery** is the last shelter. Yoon Mi-ra runs it as the fixer. Han Seo-jin comes back to the zone; Old Kang and Kang Tae-o are rescued along the way.
 - **Ending:** the TTUK core is pulled from under OMNI Tower, the drone mesh falls, and the rain stops for the first time in three years.
+
+## 7. Dead Rain trailer narration (English VO, EN + KO subtitles)
+
+1. Seongsu-dong. Quarantine Zone Seven. / 성수동. 격리구역 7.
+2. OMNI promised a calmer city. Their drones rained spores instead. / OMNI는 더 평온한 도시를 약속했다. 그들의 드론은 대신 포자를 뿌렸다.
+3. Now the infected follow the neon, and the raiders own the streets. / 이제 감염체는 네온을 따라 움직이고, 거리는 레이더들의 것이 됐다.
+4. Han Seo-jin came back for one reason: to switch it all off. / 한서진이 돌아온 이유는 하나. 이 모든 걸 꺼버리기 위해서.
+5. Take contracts from the last fixer in Seongsu. / 성수의 마지막 해결사에게 의뢰를 받아라.
+6. Hotwire anything with wheels. / 바퀴 달린 건 뭐든 훔쳐라.
+7. Build your shelter in a red-brick warehouse, and hold it when the Blood Rain comes. / 붉은 벽돌 창고에 쉘터를 짓고, 블러드 레인이 오면 버텨라.
+8. Under the Line 2 viaduct, through Seoul Forest, all the way to OMNI Tower. / 2호선 고가 아래로, 서울숲을 지나, OMNI 타워까지.
+9. Neon Seongsu: Dead Rain. Play it free in your browser. / 네온 성수: 데드 레인. 브라우저에서 무료로 플레이하세요.
