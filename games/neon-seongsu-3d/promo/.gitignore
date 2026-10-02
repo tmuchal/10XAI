@@ -1,0 +1,7 @@
+build/
+*.onnx
+*.bin
+assets/fonts/
+*.ttf
+*.otf
+__pycache__/
