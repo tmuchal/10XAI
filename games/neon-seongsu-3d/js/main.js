@@ -735,7 +735,8 @@ function hintTick(dt){
 function renderPause(){
   $('setSens').value=SET.sens;$('setFov').value=SET.fov;$('setVol').value=SET.vol;$('setInv').checked=SET.invert;
   $('logList').innerHTML=STORY.map((s,i)=>`<li class="${i<GAME.story?'done':i===GAME.story?'cur':''}"><b>${i<GAME.story?'✓':i===GAME.story?'▶':String(i+1)}</b>${esc(s.title)} <small>${esc(s.en)}</small></li>`).join('');
-  $('logNow').textContent=MSN.active?`진행 중: ${MSN.active.title} — ${stepText()}`:STORY[GAME.story]?'쉘터의 미라에게서 다음 의뢰를 받아라.':'모든 스토리 완료. 해결사 의뢰를 계속할 수 있다.';
+  document.querySelectorAll('[data-q2]').forEach(b=>b.classList.toggle('on',b.dataset.q2===QUALITY));
+  $('logNow').textContent=MSN.active?`진행 중: ${MSN.active.title} — ${stepText()||'브리핑'}`:STORY[GAME.story]?'쉘터의 미라에게서 다음 의뢰를 받아라.':'모든 스토리 완료. 해결사 의뢰를 계속할 수 있다.';
   $('logStats').textContent=`${GAME.day}일차 · 처치 ${GAME.kills} · 의뢰 ${GAME.contractsDone} · 쉘터 구조물 ${SH.pieces.length} · 생존자 ${GAME.survivors+(GAME.rescued.kang?1:0)+(GAME.rescued.taeo?1:0)}`;
 }
 ['setSens','setFov','setVol'].forEach(id=>$(id).addEventListener('input',e=>{SET[{setSens:'sens',setFov:'fov',setVol:'vol'}[id]]=+e.target.value;saveSettings()}));

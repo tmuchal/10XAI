@@ -62,6 +62,7 @@ function makeHuman(o){
   mesh(gun,rbox(.05,.08,.32,.2),'#1b1c22',0,.02,.14);mesh(gun,rbox(.045,.12,.06,.2),'#14151a',0,-.06,.04);mesh(gun,rbox(.02,.02,.08),'#29e7ff',0,.065,.14,'hot');
   const blade=mesh(gun,rbox(.025,.06,1.05,.2),o.bladeCol||'#29e7ff',0,.02,.6,'hot');blade.visible=false;
   gun.visible=false;
+  for(const g of[hips,torso,head,armL,elbowL,armR,elbowR,legL,kneeL,legR,kneeR])mergeChildren(g,humanClass,{s:HSTD,e:HEMI});
   return{root,body,hips,torso,head,skull,armL,armR,elbowL,elbowR,legL,legR,kneeL,kneeR,gun,blade,ph:Math.random()*6,swing:0,fall:0,flinch:0,fallDir:Math.random()<.5?-1:1};
 }
 function animHuman(h,speed,dt,mode){
@@ -86,6 +87,24 @@ function animFall(h,dt){
   h.armL.rotation.x=-1.4*e*h.fallDir;h.armR.rotation.x=-.6*e;h.armL.rotation.z=.8*e;h.armR.rotation.z=-1*e;
   h.kneeL.rotation.x=.9*e;h.kneeR.rotation.x=.3*e;h.legL.rotation.x=-.4*e;h.torso.rotation.x=0;
 }
+/* ---------- draw-call reduction: merge a group's static child meshes into vertex-coloured meshes ---------- */
+const HSTD=new THREE.MeshStandardMaterial({vertexColors:true,roughness:.7,metalness:.08});
+const HEMI=new THREE.MeshBasicMaterial({vertexColors:true,toneMapped:false});
+const _mv=new THREE.Vector3(),_mn=new THREE.Matrix3();
+function mergeGeos(list){
+  let nv=0,ni=0;for(const m of list){const g=m.geometry;nv+=g.attributes.position.count;ni+=g.index?g.index.count:g.attributes.position.count}
+  const pos=new Float32Array(nv*3),nor=new Float32Array(nv*3),col=new Float32Array(nv*3),ix=new Uint32Array(ni);let vo=0,io=0;
+  for(const m of list){m.updateMatrix();const g=m.geometry,Pa=g.attributes.position,Na=g.attributes.normal,c=m.material.color;_mn.getNormalMatrix(m.matrix);
+    for(let i=0;i<Pa.count;i++){_mv.fromBufferAttribute(Pa,i).applyMatrix4(m.matrix);const o=(vo+i)*3;pos[o]=_mv.x;pos[o+1]=_mv.y;pos[o+2]=_mv.z;_mv.fromBufferAttribute(Na,i).applyMatrix3(_mn).normalize();nor[o]=_mv.x;nor[o+1]=_mv.y;nor[o+2]=_mv.z;col[o]=c.r;col[o+1]=c.g;col[o+2]=c.b}
+    if(g.index)for(let i=0;i<g.index.count;i++)ix[io++]=g.index.getX(i)+vo;else for(let i=0;i<Pa.count;i++)ix[io++]=i+vo;vo+=Pa.count}
+  const geo=new THREE.BufferGeometry();geo.setAttribute('position',new THREE.BufferAttribute(pos,3));geo.setAttribute('normal',new THREE.BufferAttribute(nor,3));geo.setAttribute('color',new THREE.BufferAttribute(col,3));geo.setIndex(new THREE.BufferAttribute(ix,1));geo.computeBoundingSphere();return geo;
+}
+/* classify(mesh) -> key or null (null = leave alone); mats[key] = material for the merged mesh */
+function mergeChildren(grp,classify,mats){
+  const buckets={};for(const ch of[...grp.children]){if(!ch.isMesh||ch.userData.keep)continue;const k=classify(ch);if(!k)continue;(buckets[k]=buckets[k]||[]).push(ch)}
+  for(const k in buckets){const L=buckets[k];if(L.length<2&&k!=='s')continue;const m=new THREE.Mesh(mergeGeos(L),mats[k]);grp.add(m);for(const c of L)grp.remove(c)}
+}
+const humanClass=ch=>ch.material.transparent?null:ch.material.isMeshBasicMaterial?'e':'s';
 /* character looks */
 const LOOKS={
   seojin:{skin:'#e6b89a',top:'#151722',top2:'#0b0b10',sleeve:'#10111a',glove:'#0b0b10',pants:'#11121a',hair:'#0b0b10',hairStyle:'bob',visor:'#29e7ff',shoes:'#0b0b10',glowStripe:'#29e7ff',pack:'#1a1c26',collar:'#10111a',bladeCol:'#29e7ff'},

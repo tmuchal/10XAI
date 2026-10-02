@@ -15,7 +15,7 @@ const VT={
   bus:{ko:'버스',len:11,wid:2.5,h:3.1,maxF:22,acc:5,hp:300,cols:['#1f9d55','#2a6fd6']},
 };
 const CONE_G=(()=>{const g=new THREE.ConeGeometry(3.2,16,16,1,true);g.translate(0,-8,0);g.rotateX(-Math.PI/2);return g})();
-let CONE_M=null;
+let CONE_M=null;const WHEEL_M=new THREE.MeshStandardMaterial({vertexColors:true,roughness:.45,metalness:.6});
 /* body profiles: [x along length (−rear … +front), y] polygons, extruded across the width */
 const PROFILES={
   sedan:{body:[[-.5,.3],[-.5,.68],[-.47,.8],[-.3,.86],[.22,.86],[.44,.76],[.5,.66],[.5,.3]],cab:[[-.33,.84],[-.2,1.38],[.07,1.4],[.24,.86]],belt:.84,roof:1.4},
@@ -76,7 +76,11 @@ function carModel(type,col){
     const u=new THREE.Mesh(new THREE.PlaneGeometry(Wd*1.15,L*.95),new THREE.MeshBasicMaterial({color:new THREE.Color(col).multiplyScalar(1.6),transparent:true,opacity:.55,blending:THREE.AdditiveBlending,depthWrite:false,toneMapped:false}));u.rotation.x=-Math.PI/2;u.position.y=.05;g.add(u)}
   if(!CONE_M)CONE_M=new THREE.MeshBasicMaterial({color:'#fff1c8',transparent:true,opacity:.02,blending:THREE.AdditiveBlending,depthWrite:false,side:THREE.DoubleSide,toneMapped:false});
   const cones=[];for(const s of[-1,1]){const c=new THREE.Mesh(CONE_G,CONE_M);c.position.set(s*Wd*.33,.6,L/2);c.rotation.x=.08;c.visible=false;g.add(c);cones.push(c)}
-  return{g,body,glass,wheels,cones,bar};
+  const carMat=new THREE.MeshStandardMaterial({vertexColors:true,roughness:.3,metalness:.55});
+  for(const k of[...(bar||[])])k.userData.keep=true;
+  mergeChildren(g,ch=>ch.material.transparent?null:ch.material===glass?'g':ch.material.isMeshBasicMaterial?'e':'s',{s:carMat,g:glass,e:HEMI});
+  for(const w of wheels)mergeChildren(w,ch=>ch.material.transparent?'t':'s',{s:WHEEL_M,t:WHEEL_M});
+  return{g,body:carMat,glass,wheels,cones,bar};
 }
 function makeCar(type,x,z,yaw,o={}){
   const t=VT[type],col=o.col||rpick(t.cols),m=carModel(type,col);
@@ -86,7 +90,7 @@ function makeCar(type,x,z,yaw,o={}){
   if(c.wreck)burnLook(c);
   VEH.cars.push(c);return c;
 }
-function burnLook(c){c.m.body.color.set('#1a1512');c.m.body.roughness=.95;c.m.body.metalness=.1;c.m.glass.color.set('#050505');c.m.glass.emissiveIntensity=0;for(const k of c.m.g.children)if(k.material&&k.material.toneMapped===false)k.visible=false}
+function burnLook(c){c.m.body.color.set('#2a2420');c.m.body.roughness=.95;c.m.body.metalness=.1;c.m.glass.color.set('#050505');c.m.glass.emissiveIntensity=0;for(const k of c.m.g.children)if(k.material&&k.material.toneMapped===false)k.visible=false}
 function carCorners(c,x,z,yaw){const s=Math.sin(yaw),co=Math.cos(yaw),L=c.len/2-.1,Wd=c.wid/2-.1,out=[];
   for(const[l,w]of[[L,Wd],[L,-Wd],[-L,Wd],[-L,-Wd],[L,0],[-L,0],[0,Wd],[0,-Wd]])out.push([x+s*l+co*w,z+co*l-s*w]);return out}
 function carBlocked(c,x,z,yaw){
@@ -190,7 +194,7 @@ function vehUpdate(dt){
     const imp=(a.vx-b.vx)*nx+(a.vz-b.vz)*nz;if(imp>0){const j2=imp*.6;a.vx-=nx*j2;a.vz-=nz*j2;b.vx+=nx*j2;b.vz+=nz*j2;if(imp>4){a.hp-=imp*.8;b.hp-=imp*.8;burst((a.x+b.x)/2,.9,(a.z+b.z)/2,12,'#ffcf6b',6,.4,2);if(a===PL.inCar||b===PL.inCar){camShake(Math.min(1,imp/15));sfx('crash')}}}}
 }
 function syncCar(c,dt){
-  c.m.g.position.set(c.x,0,c.z);c.m.g.rotation.y=c.yaw;c.m.g.visible=Math.abs(c.x-camera.position.x)<150&&Math.abs(c.z-camera.position.z)<150;if(!c.m.g.visible)return;
+  c.m.g.position.set(c.x,0,c.z);c.m.g.rotation.y=c.yaw;c.m.g.visible=Math.abs(c.x-camera.position.x)<125&&Math.abs(c.z-camera.position.z)<125;if(!c.m.g.visible)return;
   const sp=c.vx*Math.sin(c.yaw)+c.vz*Math.cos(c.yaw);for(const w of c.m.wheels)w.rotation.x+=sp*dt/.38;
   c.m.wheels[0].rotation.y=c.m.wheels[1].rotation.y=-c.steer*.45;
   const lit=!c.wreck&&(c===PL.inCar||c.ai||c.lights);for(const k of c.m.cones)k.visible=lit||(c.alarm>0&&Math.floor(c.alarm*4)%2===1);
