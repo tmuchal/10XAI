@@ -47,7 +47,7 @@ def build_timeline(durs):
     add('gameplay', 'S11_drive2', s(8) - 0.3, scene='drive', letterbox=True)
     add('gameplay', 'S12_viaduct', P(8, 1) - 0.2, scene='horde', letterbox=True)
     add('gameplay', 'S13_forest', P(8, 2) - 0.2, scene='forest')
-    add('gameplay', 'S14_tower', e(8) + 0.6, scene='omni', letterbox=True)
+    add('gameplay', 'S14_tower', e(8) + 0.6, scene='omni')
     add('gameplay', 'S15_wave2', s(9) - 0.35, scene='wave')
     add('logo', 'logo_close', total)
     for sg in segs:

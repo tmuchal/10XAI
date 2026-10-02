@@ -300,10 +300,28 @@ CALLOUTS = {
 }
 
 
+def dotted_title(s, fnt, fill, pad, shadow):
+    """Black Han Sans has no middle dot: draw 'A · B' as two text runs with a square dot between."""
+    if ' · ' not in s:
+        return text_layer(s, fnt, fill, pad=pad, shadow=shadow)
+    a, b = s.split(' · ', 1)
+    la, lb = text_layer(a, fnt, fill, pad=pad, shadow=shadow), text_layer(b, fnt, fill, pad=pad, shadow=shadow)
+    gap = int(fnt.size * 0.62)
+    out = Image.new('RGBA', (la.width + lb.width - 2 * pad + gap, max(la.height, lb.height)), (0, 0, 0, 0))
+    out.alpha_composite(la, (0, 0))
+    out.alpha_composite(lb, (la.width - 2 * pad + gap, 0))
+    d = ImageDraw.Draw(out)
+    r = fnt.size * 0.09
+    cx, cy = la.width - pad + gap / 2, pad + fnt.size * 0.42
+    d.rectangle((cx - r + shadow[0], cy - r + shadow[1], cx + r + shadow[0], cy + r + shadow[1]), fill=shadow[2])
+    d.rectangle((cx - r, cy - r, cx + r, cy + r), fill=fill)
+    return out
+
+
 @lru_cache(maxsize=8)
 def callout_static(kind):
     en, ko, col = CALLOUTS[kind]
-    big = skew(text_layer(en, BH(132), col + (255,), pad=80, shadow=(8, 8, (0, 0, 0, 255))))
+    big = skew(dotted_title(en, BH(132), col + (255,), pad=80, shadow=(8, 8, (0, 0, 0, 255))))
     big = glow(big, col, ((14, 0.5), (40, 0.3)))
     small = skew(text_layer(ko, PS(54), WHITE + (255,), pad=16, shadow=(4, 4, (0, 0, 0, 255))))
     return big, small

@@ -95,7 +95,7 @@ def gameplay_frame(seg, lf, t_local):
 @lru_cache(maxsize=2)
 def logo_backdrop(kind):
     """Dark, blurred city plate behind the logo, from the first/last frame of a beauty shot."""
-    name, idx = ('S01_title', 0) if kind == 'logo_open' else ('S14_tower', -1)
+    name, idx = ('S01_title', 0) if kind == 'logo_open' else ('S01_title', -1)
     d, fs = frame_list(name)
     if not fs:
         return np.zeros((H, W, 3), np.float32)
@@ -199,8 +199,10 @@ def subtitle_img(n):
         return rows
     rows = wrap(maxw)
     if len(rows) == 2:  # balance the two rows so no single word dangles
-        best = min(range(1, len(words)), key=lambda k: max(M.text_size(fe, ' '.join(words[:k]))[0],
-                                                           M.text_size(fe, ' '.join(words[k:]))[0]))
+        def cost(k):  # widest row, with a bonus for breaking after punctuation
+            c = max(M.text_size(fe, ' '.join(words[:k]))[0], M.text_size(fe, ' '.join(words[k:]))[0])
+            return c * (0.8 if words[k - 1][-1] in ',:.;' else 1.0)
+        best = min(range(1, len(words)), key=cost)
         rows = [' '.join(words[:best]), ' '.join(words[best:])]
     ko_rows = [ln['ko']]
     if M.text_size(fk, ln['ko'])[0] > maxw + 60:
