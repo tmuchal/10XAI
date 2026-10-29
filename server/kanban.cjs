@@ -1068,7 +1068,9 @@ function resolveRunner(task) {
 // Returns the child process, or null (with onClose(-1,"") scheduled) on spawn error.
 function spawnCli(cmd, args, prompt, useStreamJson, taskId, onChunk, onClose) {
   const execEnv = Object.assign({}, process.env);
-  delete execEnv.ANTHROPIC_API_KEY;
+  // Default: strip the API key so runs bill to the CLI's subscription login.
+  // Opt in to API billing with TENXAI_USE_API_KEY=1 (key stays in .env).
+  if (process.env.TENXAI_USE_API_KEY !== "1") delete execEnv.ANTHROPIC_API_KEY;
   let proc;
   try {
     proc = spawn(cmd, args, { cwd: REPO_PATH, env: execEnv, stdio: ["pipe", "pipe", "pipe"] });
